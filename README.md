@@ -1,5 +1,5 @@
 
-# Vulkan Bindings in Vlang
+# Vulkan Bindings for Vlang
 The bindings in`modules/vulkan/vulkan.v` were generated from the official [vk.xml](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml) vulkan registry.
 
 Vulkan Version 1.3.272
