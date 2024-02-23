@@ -296,7 +296,6 @@ pyrightconfig.json
 spec_tools/
 cache/
 .idea/
-vulkan.v
 vulkan_core.h
 replacement_map.txt
 
