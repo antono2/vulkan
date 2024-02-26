@@ -11,6 +11,7 @@ module vulkan
 **
 */
 
+import dl
 import dl.loader
 
 #flag -I @VMODROOT/include/vk_video
@@ -21,6 +22,15 @@ import dl.loader
 #include "vulkan_video_codec_h265std_decode.h"
 #include "vulkan_video_codec_h265std_encode.h"
 #include "vulkan_video_codecs_common.h"
+
+@[heap]
+const loader_instance = *loader.get_or_create_dynamic_lib_loader(loader.DynamicLibLoaderConfig{
+	flags: dl.rtld_lazy
+	key: 'vulkan'
+	env_path: '' // LD_LIBRARY_PATH environment variable is searched by default
+	paths: ['libvulkan.so.1', 'vulkan-1.dll']
+}) or { panic("Couldn't create vulkan loader") }
+pub const loader_p = &loader_instance
 
 
 // VK_VERSION_1_0 is a preprocessor guard. Do not pass it to API calls.
@@ -3584,18 +3594,9 @@ pub fn create_instance(
     p_create_info                                   &InstanceCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_instance                                      &C.Instance) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateInstance(dl_loader.get_sym('vkCreateInstance'
+      f := VkCreateInstance((*loader_p).get_sym('vkCreateInstance'
     ) or { 
-        println("Couldn't load sym for 'vkCreateInstance': ${err}")
+        println("Couldn't load symbol for 'vkCreateInstance': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -3610,18 +3611,9 @@ type VkDestroyInstance = fn (     C.Instance,     &AllocationCallbacks)
 pub fn destroy_instance(
     instance                                        C.Instance,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyInstance(dl_loader.get_sym('vkDestroyInstance'
+      f := VkDestroyInstance((*loader_p).get_sym('vkDestroyInstance'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyInstance': ${err}")
+        println("Couldn't load symbol for 'vkDestroyInstance': ${err}")
         return 
     })
     f(
@@ -3636,18 +3628,9 @@ pub fn enumerate_physical_devices(
     instance                                        C.Instance,
     p_physical_device_count                         &u32,
     p_physical_devices                              &C.PhysicalDevice) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkEnumeratePhysicalDevices(dl_loader.get_sym('vkEnumeratePhysicalDevices'
+      f := VkEnumeratePhysicalDevices((*loader_p).get_sym('vkEnumeratePhysicalDevices'
     ) or { 
-        println("Couldn't load sym for 'vkEnumeratePhysicalDevices': ${err}")
+        println("Couldn't load symbol for 'vkEnumeratePhysicalDevices': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -3662,18 +3645,9 @@ type VkGetPhysicalDeviceFeatures = fn (     C.PhysicalDevice,     &PhysicalDevic
 pub fn get_physical_device_features(
     physical_device                                 C.PhysicalDevice,
     p_features                                      &PhysicalDeviceFeatures)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceFeatures(dl_loader.get_sym('vkGetPhysicalDeviceFeatures'
+      f := VkGetPhysicalDeviceFeatures((*loader_p).get_sym('vkGetPhysicalDeviceFeatures'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceFeatures': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceFeatures': ${err}")
         return 
     })
     f(
@@ -3688,18 +3662,9 @@ pub fn get_physical_device_format_properties(
     physical_device                                 C.PhysicalDevice,
     format                                          Format,
     p_format_properties                             &FormatProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceFormatProperties(dl_loader.get_sym('vkGetPhysicalDeviceFormatProperties'
+      f := VkGetPhysicalDeviceFormatProperties((*loader_p).get_sym('vkGetPhysicalDeviceFormatProperties'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceFormatProperties': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceFormatProperties': ${err}")
         return 
     })
     f(
@@ -3719,18 +3684,9 @@ pub fn get_physical_device_image_format_properties(
     usage                                           ImageUsageFlags,
     flags                                           ImageCreateFlags,
     p_image_format_properties                       &ImageFormatProperties) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceImageFormatProperties(dl_loader.get_sym('vkGetPhysicalDeviceImageFormatProperties'
+      f := VkGetPhysicalDeviceImageFormatProperties((*loader_p).get_sym('vkGetPhysicalDeviceImageFormatProperties'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceImageFormatProperties': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceImageFormatProperties': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -3749,18 +3705,9 @@ type VkGetPhysicalDeviceProperties = fn (     C.PhysicalDevice,     &PhysicalDev
 pub fn get_physical_device_properties(
     physical_device                                 C.PhysicalDevice,
     p_properties                                    &PhysicalDeviceProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceProperties(dl_loader.get_sym('vkGetPhysicalDeviceProperties'
+      f := VkGetPhysicalDeviceProperties((*loader_p).get_sym('vkGetPhysicalDeviceProperties'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceProperties': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceProperties': ${err}")
         return 
     })
     f(
@@ -3775,18 +3722,9 @@ pub fn get_physical_device_queue_family_properties(
     physical_device                                 C.PhysicalDevice,
     p_queue_family_property_count                   &u32,
     p_queue_family_properties                       &QueueFamilyProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceQueueFamilyProperties(dl_loader.get_sym('vkGetPhysicalDeviceQueueFamilyProperties'
+      f := VkGetPhysicalDeviceQueueFamilyProperties((*loader_p).get_sym('vkGetPhysicalDeviceQueueFamilyProperties'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceQueueFamilyProperties': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceQueueFamilyProperties': ${err}")
         return 
     })
     f(
@@ -3801,18 +3739,9 @@ type VkGetPhysicalDeviceMemoryProperties = fn (     C.PhysicalDevice,     &Physi
 pub fn get_physical_device_memory_properties(
     physical_device                                 C.PhysicalDevice,
     p_memory_properties                             &PhysicalDeviceMemoryProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceMemoryProperties(dl_loader.get_sym('vkGetPhysicalDeviceMemoryProperties'
+      f := VkGetPhysicalDeviceMemoryProperties((*loader_p).get_sym('vkGetPhysicalDeviceMemoryProperties'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceMemoryProperties': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceMemoryProperties': ${err}")
         return 
     })
     f(
@@ -3826,16 +3755,9 @@ type VkGetInstanceProcAddr = fn (     C.Instance,     &char) PFN_vkVoidFunction
 pub fn get_instance_proc_addr(
     instance                                        C.Instance,
     p_name                                          &char) PFN_vkVoidFunction {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetInstanceProcAddr(dl_loader.get_sym("vkGetInstanceProcAddr"
+      f := VkGetInstanceProcAddr((*loader_p).get_sym("vkGetInstanceProcAddr"
     ) or { 
-        panic("Couldn't load sym for 'vkGetInstanceProcAddr': ${err}") })
+        panic("Couldn't load symbol for 'vkGetInstanceProcAddr': ${err}") })
     return f(
     instance,
     p_name)
@@ -3847,16 +3769,9 @@ type VkGetDeviceProcAddr = fn (     C.Device,     &char) PFN_vkVoidFunction
 pub fn get_device_proc_addr(
     device                                          C.Device,
     p_name                                          &char) PFN_vkVoidFunction {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceProcAddr(dl_loader.get_sym("vkGetDeviceProcAddr"
+      f := VkGetDeviceProcAddr((*loader_p).get_sym("vkGetDeviceProcAddr"
     ) or { 
-        panic("Couldn't load sym for 'vkGetDeviceProcAddr': ${err}") })
+        panic("Couldn't load symbol for 'vkGetDeviceProcAddr': ${err}") })
     return f(
     device,
     p_name)
@@ -3870,18 +3785,9 @@ pub fn create_device(
     p_create_info                                   &DeviceCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_device                                        &C.Device) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDevice(dl_loader.get_sym('vkCreateDevice'
+      f := VkCreateDevice((*loader_p).get_sym('vkCreateDevice'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDevice': ${err}")
+        println("Couldn't load symbol for 'vkCreateDevice': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -3897,18 +3803,9 @@ type VkDestroyDevice = fn (     C.Device,     &AllocationCallbacks)
 pub fn destroy_device(
     device                                          C.Device,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyDevice(dl_loader.get_sym('vkDestroyDevice'
+      f := VkDestroyDevice((*loader_p).get_sym('vkDestroyDevice'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyDevice': ${err}")
+        println("Couldn't load symbol for 'vkDestroyDevice': ${err}")
         return 
     })
     f(
@@ -3923,18 +3820,9 @@ pub fn enumerate_instance_extension_properties(
     p_layer_name                                    &char,
     p_property_count                                &u32,
     p_properties                                    &ExtensionProperties) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkEnumerateInstanceExtensionProperties(dl_loader.get_sym('vkEnumerateInstanceExtensionProperties'
+      f := VkEnumerateInstanceExtensionProperties((*loader_p).get_sym('vkEnumerateInstanceExtensionProperties'
     ) or { 
-        println("Couldn't load sym for 'vkEnumerateInstanceExtensionProperties': ${err}")
+        println("Couldn't load symbol for 'vkEnumerateInstanceExtensionProperties': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -3951,18 +3839,9 @@ pub fn enumerate_device_extension_properties(
     p_layer_name                                    &char,
     p_property_count                                &u32,
     p_properties                                    &ExtensionProperties) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkEnumerateDeviceExtensionProperties(dl_loader.get_sym('vkEnumerateDeviceExtensionProperties'
+      f := VkEnumerateDeviceExtensionProperties((*loader_p).get_sym('vkEnumerateDeviceExtensionProperties'
     ) or { 
-        println("Couldn't load sym for 'vkEnumerateDeviceExtensionProperties': ${err}")
+        println("Couldn't load symbol for 'vkEnumerateDeviceExtensionProperties': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -3978,18 +3857,9 @@ type VkEnumerateInstanceLayerProperties = fn (     &u32,     &LayerProperties) R
 pub fn enumerate_instance_layer_properties(
     p_property_count                                &u32,
     p_properties                                    &LayerProperties) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkEnumerateInstanceLayerProperties(dl_loader.get_sym('vkEnumerateInstanceLayerProperties'
+      f := VkEnumerateInstanceLayerProperties((*loader_p).get_sym('vkEnumerateInstanceLayerProperties'
     ) or { 
-        println("Couldn't load sym for 'vkEnumerateInstanceLayerProperties': ${err}")
+        println("Couldn't load symbol for 'vkEnumerateInstanceLayerProperties': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4004,18 +3874,9 @@ pub fn enumerate_device_layer_properties(
     physical_device                                 C.PhysicalDevice,
     p_property_count                                &u32,
     p_properties                                    &LayerProperties) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkEnumerateDeviceLayerProperties(dl_loader.get_sym('vkEnumerateDeviceLayerProperties'
+      f := VkEnumerateDeviceLayerProperties((*loader_p).get_sym('vkEnumerateDeviceLayerProperties'
     ) or { 
-        println("Couldn't load sym for 'vkEnumerateDeviceLayerProperties': ${err}")
+        println("Couldn't load symbol for 'vkEnumerateDeviceLayerProperties': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4032,18 +3893,9 @@ pub fn get_device_queue(
     queue_family_index                              u32,
     queue_index                                     u32,
     p_queue                                         &C.Queue)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceQueue(dl_loader.get_sym('vkGetDeviceQueue'
+      f := VkGetDeviceQueue((*loader_p).get_sym('vkGetDeviceQueue'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceQueue': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceQueue': ${err}")
         return 
     })
     f(
@@ -4061,18 +3913,9 @@ pub fn queue_submit(
     submit_count                                    u32,
     p_submits                                       &SubmitInfo,
     fence                                           C.Fence) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueueSubmit(dl_loader.get_sym('vkQueueSubmit'
+      f := VkQueueSubmit((*loader_p).get_sym('vkQueueSubmit'
     ) or { 
-        println("Couldn't load sym for 'vkQueueSubmit': ${err}")
+        println("Couldn't load symbol for 'vkQueueSubmit': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4087,18 +3930,9 @@ type VkQueueWaitIdle = fn (     C.Queue) Result
 
 pub fn queue_wait_idle(
     queue                                           C.Queue) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueueWaitIdle(dl_loader.get_sym('vkQueueWaitIdle'
+      f := VkQueueWaitIdle((*loader_p).get_sym('vkQueueWaitIdle'
     ) or { 
-        println("Couldn't load sym for 'vkQueueWaitIdle': ${err}")
+        println("Couldn't load symbol for 'vkQueueWaitIdle': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4110,18 +3944,9 @@ type VkDeviceWaitIdle = fn (     C.Device) Result
 
 pub fn device_wait_idle(
     device                                          C.Device) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkDeviceWaitIdle(dl_loader.get_sym('vkDeviceWaitIdle'
+      f := VkDeviceWaitIdle((*loader_p).get_sym('vkDeviceWaitIdle'
     ) or { 
-        println("Couldn't load sym for 'vkDeviceWaitIdle': ${err}")
+        println("Couldn't load symbol for 'vkDeviceWaitIdle': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4136,18 +3961,9 @@ pub fn allocate_memory(
     p_allocate_info                                 &MemoryAllocateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_memory                                        &C.DeviceMemory) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAllocateMemory(dl_loader.get_sym('vkAllocateMemory'
+      f := VkAllocateMemory((*loader_p).get_sym('vkAllocateMemory'
     ) or { 
-        println("Couldn't load sym for 'vkAllocateMemory': ${err}")
+        println("Couldn't load symbol for 'vkAllocateMemory': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4164,18 +3980,9 @@ pub fn free_memory(
     device                                          C.Device,
     memory                                          C.DeviceMemory,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkFreeMemory(dl_loader.get_sym('vkFreeMemory'
+      f := VkFreeMemory((*loader_p).get_sym('vkFreeMemory'
     ) or { 
-        println("Couldn't load sym for 'vkFreeMemory': ${err}")
+        println("Couldn't load symbol for 'vkFreeMemory': ${err}")
         return 
     })
     f(
@@ -4194,18 +4001,9 @@ pub fn map_memory(
     size                                            DeviceSize,
     flags                                           MemoryMapFlags,
     pp_data                                         &voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkMapMemory(dl_loader.get_sym('vkMapMemory'
+      f := VkMapMemory((*loader_p).get_sym('vkMapMemory'
     ) or { 
-        println("Couldn't load sym for 'vkMapMemory': ${err}")
+        println("Couldn't load symbol for 'vkMapMemory': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4223,18 +4021,9 @@ type VkUnmapMemory = fn (     C.Device,     C.DeviceMemory)
 pub fn unmap_memory(
     device                                          C.Device,
     memory                                          C.DeviceMemory)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkUnmapMemory(dl_loader.get_sym('vkUnmapMemory'
+      f := VkUnmapMemory((*loader_p).get_sym('vkUnmapMemory'
     ) or { 
-        println("Couldn't load sym for 'vkUnmapMemory': ${err}")
+        println("Couldn't load symbol for 'vkUnmapMemory': ${err}")
         return 
     })
     f(
@@ -4249,18 +4038,9 @@ pub fn flush_mapped_memory_ranges(
     device                                          C.Device,
     memory_range_count                              u32,
     p_memory_ranges                                 &MappedMemoryRange) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkFlushMappedMemoryRanges(dl_loader.get_sym('vkFlushMappedMemoryRanges'
+      f := VkFlushMappedMemoryRanges((*loader_p).get_sym('vkFlushMappedMemoryRanges'
     ) or { 
-        println("Couldn't load sym for 'vkFlushMappedMemoryRanges': ${err}")
+        println("Couldn't load symbol for 'vkFlushMappedMemoryRanges': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4276,18 +4056,9 @@ pub fn invalidate_mapped_memory_ranges(
     device                                          C.Device,
     memory_range_count                              u32,
     p_memory_ranges                                 &MappedMemoryRange) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkInvalidateMappedMemoryRanges(dl_loader.get_sym('vkInvalidateMappedMemoryRanges'
+      f := VkInvalidateMappedMemoryRanges((*loader_p).get_sym('vkInvalidateMappedMemoryRanges'
     ) or { 
-        println("Couldn't load sym for 'vkInvalidateMappedMemoryRanges': ${err}")
+        println("Couldn't load symbol for 'vkInvalidateMappedMemoryRanges': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4303,18 +4074,9 @@ pub fn get_device_memory_commitment(
     device                                          C.Device,
     memory                                          C.DeviceMemory,
     p_committed_memory_in_bytes                     &DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceMemoryCommitment(dl_loader.get_sym('vkGetDeviceMemoryCommitment'
+      f := VkGetDeviceMemoryCommitment((*loader_p).get_sym('vkGetDeviceMemoryCommitment'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceMemoryCommitment': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceMemoryCommitment': ${err}")
         return 
     })
     f(
@@ -4331,18 +4093,9 @@ pub fn bind_buffer_memory(
     buffer                                          C.Buffer,
     memory                                          C.DeviceMemory,
     memory_offset                                   DeviceSize) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBindBufferMemory(dl_loader.get_sym('vkBindBufferMemory'
+      f := VkBindBufferMemory((*loader_p).get_sym('vkBindBufferMemory'
     ) or { 
-        println("Couldn't load sym for 'vkBindBufferMemory': ${err}")
+        println("Couldn't load symbol for 'vkBindBufferMemory': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4360,18 +4113,9 @@ pub fn bind_image_memory(
     image                                           C.Image,
     memory                                          C.DeviceMemory,
     memory_offset                                   DeviceSize) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBindImageMemory(dl_loader.get_sym('vkBindImageMemory'
+      f := VkBindImageMemory((*loader_p).get_sym('vkBindImageMemory'
     ) or { 
-        println("Couldn't load sym for 'vkBindImageMemory': ${err}")
+        println("Couldn't load symbol for 'vkBindImageMemory': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4388,18 +4132,9 @@ pub fn get_buffer_memory_requirements(
     device                                          C.Device,
     buffer                                          C.Buffer,
     p_memory_requirements                           &MemoryRequirements)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetBufferMemoryRequirements(dl_loader.get_sym('vkGetBufferMemoryRequirements'
+      f := VkGetBufferMemoryRequirements((*loader_p).get_sym('vkGetBufferMemoryRequirements'
     ) or { 
-        println("Couldn't load sym for 'vkGetBufferMemoryRequirements': ${err}")
+        println("Couldn't load symbol for 'vkGetBufferMemoryRequirements': ${err}")
         return 
     })
     f(
@@ -4415,18 +4150,9 @@ pub fn get_image_memory_requirements(
     device                                          C.Device,
     image                                           C.Image,
     p_memory_requirements                           &MemoryRequirements)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageMemoryRequirements(dl_loader.get_sym('vkGetImageMemoryRequirements'
+      f := VkGetImageMemoryRequirements((*loader_p).get_sym('vkGetImageMemoryRequirements'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageMemoryRequirements': ${err}")
+        println("Couldn't load symbol for 'vkGetImageMemoryRequirements': ${err}")
         return 
     })
     f(
@@ -4443,18 +4169,9 @@ pub fn get_image_sparse_memory_requirements(
     image                                           C.Image,
     p_sparse_memory_requirement_count               &u32,
     p_sparse_memory_requirements                    &SparseImageMemoryRequirements)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageSparseMemoryRequirements(dl_loader.get_sym('vkGetImageSparseMemoryRequirements'
+      f := VkGetImageSparseMemoryRequirements((*loader_p).get_sym('vkGetImageSparseMemoryRequirements'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageSparseMemoryRequirements': ${err}")
+        println("Couldn't load symbol for 'vkGetImageSparseMemoryRequirements': ${err}")
         return 
     })
     f(
@@ -4476,18 +4193,9 @@ pub fn get_physical_device_sparse_image_format_properties(
     tiling                                          ImageTiling,
     p_property_count                                &u32,
     p_properties                                    &SparseImageFormatProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSparseImageFormatProperties(dl_loader.get_sym('vkGetPhysicalDeviceSparseImageFormatProperties'
+      f := VkGetPhysicalDeviceSparseImageFormatProperties((*loader_p).get_sym('vkGetPhysicalDeviceSparseImageFormatProperties'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSparseImageFormatProperties': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSparseImageFormatProperties': ${err}")
         return 
     })
     f(
@@ -4509,18 +4217,9 @@ pub fn queue_bind_sparse(
     bind_info_count                                 u32,
     p_bind_info                                     &BindSparseInfo,
     fence                                           C.Fence) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueueBindSparse(dl_loader.get_sym('vkQueueBindSparse'
+      f := VkQueueBindSparse((*loader_p).get_sym('vkQueueBindSparse'
     ) or { 
-        println("Couldn't load sym for 'vkQueueBindSparse': ${err}")
+        println("Couldn't load symbol for 'vkQueueBindSparse': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4538,18 +4237,9 @@ pub fn create_fence(
     p_create_info                                   &FenceCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_fence                                         &C.Fence) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateFence(dl_loader.get_sym('vkCreateFence'
+      f := VkCreateFence((*loader_p).get_sym('vkCreateFence'
     ) or { 
-        println("Couldn't load sym for 'vkCreateFence': ${err}")
+        println("Couldn't load symbol for 'vkCreateFence': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4566,18 +4256,9 @@ pub fn destroy_fence(
     device                                          C.Device,
     fence                                           C.Fence,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyFence(dl_loader.get_sym('vkDestroyFence'
+      f := VkDestroyFence((*loader_p).get_sym('vkDestroyFence'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyFence': ${err}")
+        println("Couldn't load symbol for 'vkDestroyFence': ${err}")
         return 
     })
     f(
@@ -4593,18 +4274,9 @@ pub fn reset_fences(
     device                                          C.Device,
     fence_count                                     u32,
     p_fences                                        &C.Fence) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkResetFences(dl_loader.get_sym('vkResetFences'
+      f := VkResetFences((*loader_p).get_sym('vkResetFences'
     ) or { 
-        println("Couldn't load sym for 'vkResetFences': ${err}")
+        println("Couldn't load symbol for 'vkResetFences': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4619,18 +4291,9 @@ type VkGetFenceStatus = fn (     C.Device,     C.Fence) Result
 pub fn get_fence_status(
     device                                          C.Device,
     fence                                           C.Fence) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetFenceStatus(dl_loader.get_sym('vkGetFenceStatus'
+      f := VkGetFenceStatus((*loader_p).get_sym('vkGetFenceStatus'
     ) or { 
-        println("Couldn't load sym for 'vkGetFenceStatus': ${err}")
+        println("Couldn't load symbol for 'vkGetFenceStatus': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4647,18 +4310,9 @@ pub fn wait_for_fences(
     p_fences                                        &C.Fence,
     wait_all                                        Bool32,
     timeout                                         u64) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkWaitForFences(dl_loader.get_sym('vkWaitForFences'
+      f := VkWaitForFences((*loader_p).get_sym('vkWaitForFences'
     ) or { 
-        println("Couldn't load sym for 'vkWaitForFences': ${err}")
+        println("Couldn't load symbol for 'vkWaitForFences': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4677,18 +4331,9 @@ pub fn create_semaphore(
     p_create_info                                   &SemaphoreCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_semaphore                                     &C.Semaphore) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateSemaphore(dl_loader.get_sym('vkCreateSemaphore'
+      f := VkCreateSemaphore((*loader_p).get_sym('vkCreateSemaphore'
     ) or { 
-        println("Couldn't load sym for 'vkCreateSemaphore': ${err}")
+        println("Couldn't load symbol for 'vkCreateSemaphore': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4705,18 +4350,9 @@ pub fn destroy_semaphore(
     device                                          C.Device,
     semaphore                                       C.Semaphore,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroySemaphore(dl_loader.get_sym('vkDestroySemaphore'
+      f := VkDestroySemaphore((*loader_p).get_sym('vkDestroySemaphore'
     ) or { 
-        println("Couldn't load sym for 'vkDestroySemaphore': ${err}")
+        println("Couldn't load symbol for 'vkDestroySemaphore': ${err}")
         return 
     })
     f(
@@ -4733,18 +4369,9 @@ pub fn create_event(
     p_create_info                                   &EventCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_event                                         &C.Event) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateEvent(dl_loader.get_sym('vkCreateEvent'
+      f := VkCreateEvent((*loader_p).get_sym('vkCreateEvent'
     ) or { 
-        println("Couldn't load sym for 'vkCreateEvent': ${err}")
+        println("Couldn't load symbol for 'vkCreateEvent': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4761,18 +4388,9 @@ pub fn destroy_event(
     device                                          C.Device,
     event                                           C.Event,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyEvent(dl_loader.get_sym('vkDestroyEvent'
+      f := VkDestroyEvent((*loader_p).get_sym('vkDestroyEvent'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyEvent': ${err}")
+        println("Couldn't load symbol for 'vkDestroyEvent': ${err}")
         return 
     })
     f(
@@ -4787,18 +4405,9 @@ type VkGetEventStatus = fn (     C.Device,     C.Event) Result
 pub fn get_event_status(
     device                                          C.Device,
     event                                           C.Event) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetEventStatus(dl_loader.get_sym('vkGetEventStatus'
+      f := VkGetEventStatus((*loader_p).get_sym('vkGetEventStatus'
     ) or { 
-        println("Couldn't load sym for 'vkGetEventStatus': ${err}")
+        println("Couldn't load symbol for 'vkGetEventStatus': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4812,18 +4421,9 @@ type VkSetEvent = fn (     C.Device,     C.Event) Result
 pub fn set_event(
     device                                          C.Device,
     event                                           C.Event) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetEvent(dl_loader.get_sym('vkSetEvent'
+      f := VkSetEvent((*loader_p).get_sym('vkSetEvent'
     ) or { 
-        println("Couldn't load sym for 'vkSetEvent': ${err}")
+        println("Couldn't load symbol for 'vkSetEvent': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4837,18 +4437,9 @@ type VkResetEvent = fn (     C.Device,     C.Event) Result
 pub fn reset_event(
     device                                          C.Device,
     event                                           C.Event) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkResetEvent(dl_loader.get_sym('vkResetEvent'
+      f := VkResetEvent((*loader_p).get_sym('vkResetEvent'
     ) or { 
-        println("Couldn't load sym for 'vkResetEvent': ${err}")
+        println("Couldn't load symbol for 'vkResetEvent': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4864,18 +4455,9 @@ pub fn create_query_pool(
     p_create_info                                   &QueryPoolCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_query_pool                                    &C.QueryPool) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateQueryPool(dl_loader.get_sym('vkCreateQueryPool'
+      f := VkCreateQueryPool((*loader_p).get_sym('vkCreateQueryPool'
     ) or { 
-        println("Couldn't load sym for 'vkCreateQueryPool': ${err}")
+        println("Couldn't load symbol for 'vkCreateQueryPool': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4892,18 +4474,9 @@ pub fn destroy_query_pool(
     device                                          C.Device,
     query_pool                                      C.QueryPool,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyQueryPool(dl_loader.get_sym('vkDestroyQueryPool'
+      f := VkDestroyQueryPool((*loader_p).get_sym('vkDestroyQueryPool'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyQueryPool': ${err}")
+        println("Couldn't load symbol for 'vkDestroyQueryPool': ${err}")
         return 
     })
     f(
@@ -4924,18 +4497,9 @@ pub fn get_query_pool_results(
     p_data                                          voidptr,
     stride                                          DeviceSize,
     flags                                           QueryResultFlags) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetQueryPoolResults(dl_loader.get_sym('vkGetQueryPoolResults'
+      f := VkGetQueryPoolResults((*loader_p).get_sym('vkGetQueryPoolResults'
     ) or { 
-        println("Couldn't load sym for 'vkGetQueryPoolResults': ${err}")
+        println("Couldn't load symbol for 'vkGetQueryPoolResults': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4957,18 +4521,9 @@ pub fn create_buffer(
     p_create_info                                   &BufferCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_buffer                                        &C.Buffer) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateBuffer(dl_loader.get_sym('vkCreateBuffer'
+      f := VkCreateBuffer((*loader_p).get_sym('vkCreateBuffer'
     ) or { 
-        println("Couldn't load sym for 'vkCreateBuffer': ${err}")
+        println("Couldn't load symbol for 'vkCreateBuffer': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -4985,18 +4540,9 @@ pub fn destroy_buffer(
     device                                          C.Device,
     buffer                                          C.Buffer,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyBuffer(dl_loader.get_sym('vkDestroyBuffer'
+      f := VkDestroyBuffer((*loader_p).get_sym('vkDestroyBuffer'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyBuffer': ${err}")
+        println("Couldn't load symbol for 'vkDestroyBuffer': ${err}")
         return 
     })
     f(
@@ -5013,18 +4559,9 @@ pub fn create_buffer_view(
     p_create_info                                   &BufferViewCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_view                                          &C.BufferView) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateBufferView(dl_loader.get_sym('vkCreateBufferView'
+      f := VkCreateBufferView((*loader_p).get_sym('vkCreateBufferView'
     ) or { 
-        println("Couldn't load sym for 'vkCreateBufferView': ${err}")
+        println("Couldn't load symbol for 'vkCreateBufferView': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5041,18 +4578,9 @@ pub fn destroy_buffer_view(
     device                                          C.Device,
     buffer_view                                     C.BufferView,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyBufferView(dl_loader.get_sym('vkDestroyBufferView'
+      f := VkDestroyBufferView((*loader_p).get_sym('vkDestroyBufferView'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyBufferView': ${err}")
+        println("Couldn't load symbol for 'vkDestroyBufferView': ${err}")
         return 
     })
     f(
@@ -5069,18 +4597,9 @@ pub fn create_image(
     p_create_info                                   &ImageCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_image                                         &C.Image) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateImage(dl_loader.get_sym('vkCreateImage'
+      f := VkCreateImage((*loader_p).get_sym('vkCreateImage'
     ) or { 
-        println("Couldn't load sym for 'vkCreateImage': ${err}")
+        println("Couldn't load symbol for 'vkCreateImage': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5097,18 +4616,9 @@ pub fn destroy_image(
     device                                          C.Device,
     image                                           C.Image,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyImage(dl_loader.get_sym('vkDestroyImage'
+      f := VkDestroyImage((*loader_p).get_sym('vkDestroyImage'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyImage': ${err}")
+        println("Couldn't load symbol for 'vkDestroyImage': ${err}")
         return 
     })
     f(
@@ -5125,18 +4635,9 @@ pub fn get_image_subresource_layout(
     image                                           C.Image,
     p_subresource                                   &ImageSubresource,
     p_layout                                        &SubresourceLayout)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageSubresourceLayout(dl_loader.get_sym('vkGetImageSubresourceLayout'
+      f := VkGetImageSubresourceLayout((*loader_p).get_sym('vkGetImageSubresourceLayout'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageSubresourceLayout': ${err}")
+        println("Couldn't load symbol for 'vkGetImageSubresourceLayout': ${err}")
         return 
     })
     f(
@@ -5154,18 +4655,9 @@ pub fn create_image_view(
     p_create_info                                   &ImageViewCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_view                                          &C.ImageView) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateImageView(dl_loader.get_sym('vkCreateImageView'
+      f := VkCreateImageView((*loader_p).get_sym('vkCreateImageView'
     ) or { 
-        println("Couldn't load sym for 'vkCreateImageView': ${err}")
+        println("Couldn't load symbol for 'vkCreateImageView': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5182,18 +4674,9 @@ pub fn destroy_image_view(
     device                                          C.Device,
     image_view                                      C.ImageView,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyImageView(dl_loader.get_sym('vkDestroyImageView'
+      f := VkDestroyImageView((*loader_p).get_sym('vkDestroyImageView'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyImageView': ${err}")
+        println("Couldn't load symbol for 'vkDestroyImageView': ${err}")
         return 
     })
     f(
@@ -5210,18 +4693,9 @@ pub fn create_shader_module(
     p_create_info                                   &ShaderModuleCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_shader_module                                 &C.ShaderModule) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateShaderModule(dl_loader.get_sym('vkCreateShaderModule'
+      f := VkCreateShaderModule((*loader_p).get_sym('vkCreateShaderModule'
     ) or { 
-        println("Couldn't load sym for 'vkCreateShaderModule': ${err}")
+        println("Couldn't load symbol for 'vkCreateShaderModule': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5238,18 +4712,9 @@ pub fn destroy_shader_module(
     device                                          C.Device,
     shader_module                                   C.ShaderModule,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyShaderModule(dl_loader.get_sym('vkDestroyShaderModule'
+      f := VkDestroyShaderModule((*loader_p).get_sym('vkDestroyShaderModule'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyShaderModule': ${err}")
+        println("Couldn't load symbol for 'vkDestroyShaderModule': ${err}")
         return 
     })
     f(
@@ -5266,18 +4731,9 @@ pub fn create_pipeline_cache(
     p_create_info                                   &PipelineCacheCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_pipeline_cache                                &C.PipelineCache) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreatePipelineCache(dl_loader.get_sym('vkCreatePipelineCache'
+      f := VkCreatePipelineCache((*loader_p).get_sym('vkCreatePipelineCache'
     ) or { 
-        println("Couldn't load sym for 'vkCreatePipelineCache': ${err}")
+        println("Couldn't load symbol for 'vkCreatePipelineCache': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5294,18 +4750,9 @@ pub fn destroy_pipeline_cache(
     device                                          C.Device,
     pipeline_cache                                  C.PipelineCache,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyPipelineCache(dl_loader.get_sym('vkDestroyPipelineCache'
+      f := VkDestroyPipelineCache((*loader_p).get_sym('vkDestroyPipelineCache'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyPipelineCache': ${err}")
+        println("Couldn't load symbol for 'vkDestroyPipelineCache': ${err}")
         return 
     })
     f(
@@ -5322,18 +4769,9 @@ pub fn get_pipeline_cache_data(
     pipeline_cache                                  C.PipelineCache,
     p_data_size                                     &usize,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPipelineCacheData(dl_loader.get_sym('vkGetPipelineCacheData'
+      f := VkGetPipelineCacheData((*loader_p).get_sym('vkGetPipelineCacheData'
     ) or { 
-        println("Couldn't load sym for 'vkGetPipelineCacheData': ${err}")
+        println("Couldn't load symbol for 'vkGetPipelineCacheData': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5351,18 +4789,9 @@ pub fn merge_pipeline_caches(
     dst_cache                                       C.PipelineCache,
     src_cache_count                                 u32,
     p_src_caches                                    &C.PipelineCache) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkMergePipelineCaches(dl_loader.get_sym('vkMergePipelineCaches'
+      f := VkMergePipelineCaches((*loader_p).get_sym('vkMergePipelineCaches'
     ) or { 
-        println("Couldn't load sym for 'vkMergePipelineCaches': ${err}")
+        println("Couldn't load symbol for 'vkMergePipelineCaches': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5382,18 +4811,9 @@ pub fn create_graphics_pipelines(
     p_create_infos                                  &GraphicsPipelineCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_pipelines                                     &C.Pipeline) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateGraphicsPipelines(dl_loader.get_sym('vkCreateGraphicsPipelines'
+      f := VkCreateGraphicsPipelines((*loader_p).get_sym('vkCreateGraphicsPipelines'
     ) or { 
-        println("Couldn't load sym for 'vkCreateGraphicsPipelines': ${err}")
+        println("Couldn't load symbol for 'vkCreateGraphicsPipelines': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5415,18 +4835,9 @@ pub fn create_compute_pipelines(
     p_create_infos                                  &ComputePipelineCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_pipelines                                     &C.Pipeline) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateComputePipelines(dl_loader.get_sym('vkCreateComputePipelines'
+      f := VkCreateComputePipelines((*loader_p).get_sym('vkCreateComputePipelines'
     ) or { 
-        println("Couldn't load sym for 'vkCreateComputePipelines': ${err}")
+        println("Couldn't load symbol for 'vkCreateComputePipelines': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5445,18 +4856,9 @@ pub fn destroy_pipeline(
     device                                          C.Device,
     pipeline                                        C.Pipeline,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyPipeline(dl_loader.get_sym('vkDestroyPipeline'
+      f := VkDestroyPipeline((*loader_p).get_sym('vkDestroyPipeline'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyPipeline': ${err}")
+        println("Couldn't load symbol for 'vkDestroyPipeline': ${err}")
         return 
     })
     f(
@@ -5473,18 +4875,9 @@ pub fn create_pipeline_layout(
     p_create_info                                   &PipelineLayoutCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_pipeline_layout                               &C.PipelineLayout) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreatePipelineLayout(dl_loader.get_sym('vkCreatePipelineLayout'
+      f := VkCreatePipelineLayout((*loader_p).get_sym('vkCreatePipelineLayout'
     ) or { 
-        println("Couldn't load sym for 'vkCreatePipelineLayout': ${err}")
+        println("Couldn't load symbol for 'vkCreatePipelineLayout': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5501,18 +4894,9 @@ pub fn destroy_pipeline_layout(
     device                                          C.Device,
     pipeline_layout                                 C.PipelineLayout,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyPipelineLayout(dl_loader.get_sym('vkDestroyPipelineLayout'
+      f := VkDestroyPipelineLayout((*loader_p).get_sym('vkDestroyPipelineLayout'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyPipelineLayout': ${err}")
+        println("Couldn't load symbol for 'vkDestroyPipelineLayout': ${err}")
         return 
     })
     f(
@@ -5529,18 +4913,9 @@ pub fn create_sampler(
     p_create_info                                   &SamplerCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_sampler                                       &C.Sampler) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateSampler(dl_loader.get_sym('vkCreateSampler'
+      f := VkCreateSampler((*loader_p).get_sym('vkCreateSampler'
     ) or { 
-        println("Couldn't load sym for 'vkCreateSampler': ${err}")
+        println("Couldn't load symbol for 'vkCreateSampler': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5557,18 +4932,9 @@ pub fn destroy_sampler(
     device                                          C.Device,
     sampler                                         C.Sampler,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroySampler(dl_loader.get_sym('vkDestroySampler'
+      f := VkDestroySampler((*loader_p).get_sym('vkDestroySampler'
     ) or { 
-        println("Couldn't load sym for 'vkDestroySampler': ${err}")
+        println("Couldn't load symbol for 'vkDestroySampler': ${err}")
         return 
     })
     f(
@@ -5585,18 +4951,9 @@ pub fn create_descriptor_set_layout(
     p_create_info                                   &DescriptorSetLayoutCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_set_layout                                    &C.DescriptorSetLayout) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDescriptorSetLayout(dl_loader.get_sym('vkCreateDescriptorSetLayout'
+      f := VkCreateDescriptorSetLayout((*loader_p).get_sym('vkCreateDescriptorSetLayout'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDescriptorSetLayout': ${err}")
+        println("Couldn't load symbol for 'vkCreateDescriptorSetLayout': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5613,18 +4970,9 @@ pub fn destroy_descriptor_set_layout(
     device                                          C.Device,
     descriptor_set_layout                           C.DescriptorSetLayout,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyDescriptorSetLayout(dl_loader.get_sym('vkDestroyDescriptorSetLayout'
+      f := VkDestroyDescriptorSetLayout((*loader_p).get_sym('vkDestroyDescriptorSetLayout'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyDescriptorSetLayout': ${err}")
+        println("Couldn't load symbol for 'vkDestroyDescriptorSetLayout': ${err}")
         return 
     })
     f(
@@ -5641,18 +4989,9 @@ pub fn create_descriptor_pool(
     p_create_info                                   &DescriptorPoolCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_descriptor_pool                               &C.DescriptorPool) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDescriptorPool(dl_loader.get_sym('vkCreateDescriptorPool'
+      f := VkCreateDescriptorPool((*loader_p).get_sym('vkCreateDescriptorPool'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDescriptorPool': ${err}")
+        println("Couldn't load symbol for 'vkCreateDescriptorPool': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5669,18 +5008,9 @@ pub fn destroy_descriptor_pool(
     device                                          C.Device,
     descriptor_pool                                 C.DescriptorPool,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyDescriptorPool(dl_loader.get_sym('vkDestroyDescriptorPool'
+      f := VkDestroyDescriptorPool((*loader_p).get_sym('vkDestroyDescriptorPool'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyDescriptorPool': ${err}")
+        println("Couldn't load symbol for 'vkDestroyDescriptorPool': ${err}")
         return 
     })
     f(
@@ -5696,18 +5026,9 @@ pub fn reset_descriptor_pool(
     device                                          C.Device,
     descriptor_pool                                 C.DescriptorPool,
     flags                                           DescriptorPoolResetFlags) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkResetDescriptorPool(dl_loader.get_sym('vkResetDescriptorPool'
+      f := VkResetDescriptorPool((*loader_p).get_sym('vkResetDescriptorPool'
     ) or { 
-        println("Couldn't load sym for 'vkResetDescriptorPool': ${err}")
+        println("Couldn't load symbol for 'vkResetDescriptorPool': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5723,18 +5044,9 @@ pub fn allocate_descriptor_sets(
     device                                          C.Device,
     p_allocate_info                                 &DescriptorSetAllocateInfo,
     p_descriptor_sets                               &C.DescriptorSet) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAllocateDescriptorSets(dl_loader.get_sym('vkAllocateDescriptorSets'
+      f := VkAllocateDescriptorSets((*loader_p).get_sym('vkAllocateDescriptorSets'
     ) or { 
-        println("Couldn't load sym for 'vkAllocateDescriptorSets': ${err}")
+        println("Couldn't load symbol for 'vkAllocateDescriptorSets': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5751,18 +5063,9 @@ pub fn free_descriptor_sets(
     descriptor_pool                                 C.DescriptorPool,
     descriptor_set_count                            u32,
     p_descriptor_sets                               &C.DescriptorSet) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkFreeDescriptorSets(dl_loader.get_sym('vkFreeDescriptorSets'
+      f := VkFreeDescriptorSets((*loader_p).get_sym('vkFreeDescriptorSets'
     ) or { 
-        println("Couldn't load sym for 'vkFreeDescriptorSets': ${err}")
+        println("Couldn't load symbol for 'vkFreeDescriptorSets': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5781,18 +5084,9 @@ pub fn update_descriptor_sets(
     p_descriptor_writes                             &WriteDescriptorSet,
     descriptor_copy_count                           u32,
     p_descriptor_copies                             &CopyDescriptorSet)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkUpdateDescriptorSets(dl_loader.get_sym('vkUpdateDescriptorSets'
+      f := VkUpdateDescriptorSets((*loader_p).get_sym('vkUpdateDescriptorSets'
     ) or { 
-        println("Couldn't load sym for 'vkUpdateDescriptorSets': ${err}")
+        println("Couldn't load symbol for 'vkUpdateDescriptorSets': ${err}")
         return 
     })
     f(
@@ -5811,18 +5105,9 @@ pub fn create_framebuffer(
     p_create_info                                   &FramebufferCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_framebuffer                                   &C.Framebuffer) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateFramebuffer(dl_loader.get_sym('vkCreateFramebuffer'
+      f := VkCreateFramebuffer((*loader_p).get_sym('vkCreateFramebuffer'
     ) or { 
-        println("Couldn't load sym for 'vkCreateFramebuffer': ${err}")
+        println("Couldn't load symbol for 'vkCreateFramebuffer': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5839,18 +5124,9 @@ pub fn destroy_framebuffer(
     device                                          C.Device,
     framebuffer                                     C.Framebuffer,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyFramebuffer(dl_loader.get_sym('vkDestroyFramebuffer'
+      f := VkDestroyFramebuffer((*loader_p).get_sym('vkDestroyFramebuffer'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyFramebuffer': ${err}")
+        println("Couldn't load symbol for 'vkDestroyFramebuffer': ${err}")
         return 
     })
     f(
@@ -5867,18 +5143,9 @@ pub fn create_render_pass(
     p_create_info                                   &RenderPassCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_render_pass                                   &C.RenderPass) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateRenderPass(dl_loader.get_sym('vkCreateRenderPass'
+      f := VkCreateRenderPass((*loader_p).get_sym('vkCreateRenderPass'
     ) or { 
-        println("Couldn't load sym for 'vkCreateRenderPass': ${err}")
+        println("Couldn't load symbol for 'vkCreateRenderPass': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5895,18 +5162,9 @@ pub fn destroy_render_pass(
     device                                          C.Device,
     render_pass                                     C.RenderPass,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyRenderPass(dl_loader.get_sym('vkDestroyRenderPass'
+      f := VkDestroyRenderPass((*loader_p).get_sym('vkDestroyRenderPass'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyRenderPass': ${err}")
+        println("Couldn't load symbol for 'vkDestroyRenderPass': ${err}")
         return 
     })
     f(
@@ -5922,18 +5180,9 @@ pub fn get_render_area_granularity(
     device                                          C.Device,
     render_pass                                     C.RenderPass,
     p_granularity                                   &Extent2D)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetRenderAreaGranularity(dl_loader.get_sym('vkGetRenderAreaGranularity'
+      f := VkGetRenderAreaGranularity((*loader_p).get_sym('vkGetRenderAreaGranularity'
     ) or { 
-        println("Couldn't load sym for 'vkGetRenderAreaGranularity': ${err}")
+        println("Couldn't load symbol for 'vkGetRenderAreaGranularity': ${err}")
         return 
     })
     f(
@@ -5950,18 +5199,9 @@ pub fn create_command_pool(
     p_create_info                                   &CommandPoolCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_command_pool                                  &C.CommandPool) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateCommandPool(dl_loader.get_sym('vkCreateCommandPool'
+      f := VkCreateCommandPool((*loader_p).get_sym('vkCreateCommandPool'
     ) or { 
-        println("Couldn't load sym for 'vkCreateCommandPool': ${err}")
+        println("Couldn't load symbol for 'vkCreateCommandPool': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -5978,18 +5218,9 @@ pub fn destroy_command_pool(
     device                                          C.Device,
     command_pool                                    C.CommandPool,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyCommandPool(dl_loader.get_sym('vkDestroyCommandPool'
+      f := VkDestroyCommandPool((*loader_p).get_sym('vkDestroyCommandPool'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyCommandPool': ${err}")
+        println("Couldn't load symbol for 'vkDestroyCommandPool': ${err}")
         return 
     })
     f(
@@ -6005,18 +5236,9 @@ pub fn reset_command_pool(
     device                                          C.Device,
     command_pool                                    C.CommandPool,
     flags                                           CommandPoolResetFlags) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkResetCommandPool(dl_loader.get_sym('vkResetCommandPool'
+      f := VkResetCommandPool((*loader_p).get_sym('vkResetCommandPool'
     ) or { 
-        println("Couldn't load sym for 'vkResetCommandPool': ${err}")
+        println("Couldn't load symbol for 'vkResetCommandPool': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -6032,18 +5254,9 @@ pub fn allocate_command_buffers(
     device                                          C.Device,
     p_allocate_info                                 &CommandBufferAllocateInfo,
     p_command_buffers                               &C.CommandBuffer) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAllocateCommandBuffers(dl_loader.get_sym('vkAllocateCommandBuffers'
+      f := VkAllocateCommandBuffers((*loader_p).get_sym('vkAllocateCommandBuffers'
     ) or { 
-        println("Couldn't load sym for 'vkAllocateCommandBuffers': ${err}")
+        println("Couldn't load symbol for 'vkAllocateCommandBuffers': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -6060,18 +5273,9 @@ pub fn free_command_buffers(
     command_pool                                    C.CommandPool,
     command_buffer_count                            u32,
     p_command_buffers                               &C.CommandBuffer)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkFreeCommandBuffers(dl_loader.get_sym('vkFreeCommandBuffers'
+      f := VkFreeCommandBuffers((*loader_p).get_sym('vkFreeCommandBuffers'
     ) or { 
-        println("Couldn't load sym for 'vkFreeCommandBuffers': ${err}")
+        println("Couldn't load symbol for 'vkFreeCommandBuffers': ${err}")
         return 
     })
     f(
@@ -6087,18 +5291,9 @@ type VkBeginCommandBuffer = fn (     C.CommandBuffer,     &CommandBufferBeginInf
 pub fn begin_command_buffer(
     command_buffer                                  C.CommandBuffer,
     p_begin_info                                    &CommandBufferBeginInfo) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBeginCommandBuffer(dl_loader.get_sym('vkBeginCommandBuffer'
+      f := VkBeginCommandBuffer((*loader_p).get_sym('vkBeginCommandBuffer'
     ) or { 
-        println("Couldn't load sym for 'vkBeginCommandBuffer': ${err}")
+        println("Couldn't load symbol for 'vkBeginCommandBuffer': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -6111,18 +5306,9 @@ type VkEndCommandBuffer = fn (     C.CommandBuffer) Result
 
 pub fn end_command_buffer(
     command_buffer                                  C.CommandBuffer) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkEndCommandBuffer(dl_loader.get_sym('vkEndCommandBuffer'
+      f := VkEndCommandBuffer((*loader_p).get_sym('vkEndCommandBuffer'
     ) or { 
-        println("Couldn't load sym for 'vkEndCommandBuffer': ${err}")
+        println("Couldn't load symbol for 'vkEndCommandBuffer': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -6135,18 +5321,9 @@ type VkResetCommandBuffer = fn (     C.CommandBuffer,     CommandBufferResetFlag
 pub fn reset_command_buffer(
     command_buffer                                  C.CommandBuffer,
     flags                                           CommandBufferResetFlags) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkResetCommandBuffer(dl_loader.get_sym('vkResetCommandBuffer'
+      f := VkResetCommandBuffer((*loader_p).get_sym('vkResetCommandBuffer'
     ) or { 
-        println("Couldn't load sym for 'vkResetCommandBuffer': ${err}")
+        println("Couldn't load symbol for 'vkResetCommandBuffer': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -6161,18 +5338,9 @@ pub fn cmd_bind_pipeline(
     command_buffer                                  C.CommandBuffer,
     pipeline_bind_point                             PipelineBindPoint,
     pipeline                                        C.Pipeline)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindPipeline(dl_loader.get_sym('vkCmdBindPipeline'
+      f := VkCmdBindPipeline((*loader_p).get_sym('vkCmdBindPipeline'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindPipeline': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindPipeline': ${err}")
         return 
     })
     f(
@@ -6189,18 +5357,9 @@ pub fn cmd_set_viewport(
     first_viewport                                  u32,
     viewport_count                                  u32,
     p_viewports                                     &Viewport)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetViewport(dl_loader.get_sym('vkCmdSetViewport'
+      f := VkCmdSetViewport((*loader_p).get_sym('vkCmdSetViewport'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetViewport': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetViewport': ${err}")
         return 
     })
     f(
@@ -6218,18 +5377,9 @@ pub fn cmd_set_scissor(
     first_scissor                                   u32,
     scissor_count                                   u32,
     p_scissors                                      &Rect2D)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetScissor(dl_loader.get_sym('vkCmdSetScissor'
+      f := VkCmdSetScissor((*loader_p).get_sym('vkCmdSetScissor'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetScissor': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetScissor': ${err}")
         return 
     })
     f(
@@ -6245,18 +5395,9 @@ type VkCmdSetLineWidth = fn (     C.CommandBuffer,     f32)
 pub fn cmd_set_line_width(
     command_buffer                                  C.CommandBuffer,
     line_width                                      f32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetLineWidth(dl_loader.get_sym('vkCmdSetLineWidth'
+      f := VkCmdSetLineWidth((*loader_p).get_sym('vkCmdSetLineWidth'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetLineWidth': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetLineWidth': ${err}")
         return 
     })
     f(
@@ -6272,18 +5413,9 @@ pub fn cmd_set_depth_bias(
     depth_bias_constant_factor                      f32,
     depth_bias_clamp                                f32,
     depth_bias_slope_factor                         f32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthBias(dl_loader.get_sym('vkCmdSetDepthBias'
+      f := VkCmdSetDepthBias((*loader_p).get_sym('vkCmdSetDepthBias'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthBias': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthBias': ${err}")
         return 
     })
     f(
@@ -6299,18 +5431,9 @@ type VkCmdSetBlendConstants = fn (     C.CommandBuffer,     []f32)
 pub fn cmd_set_blend_constants(
     command_buffer                                  C.CommandBuffer,
     blend_constants                                 []f32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetBlendConstants(dl_loader.get_sym('vkCmdSetBlendConstants'
+      f := VkCmdSetBlendConstants((*loader_p).get_sym('vkCmdSetBlendConstants'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetBlendConstants': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetBlendConstants': ${err}")
         return 
     })
     f(
@@ -6325,18 +5448,9 @@ pub fn cmd_set_depth_bounds(
     command_buffer                                  C.CommandBuffer,
     min_depth_bounds                                f32,
     max_depth_bounds                                f32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthBounds(dl_loader.get_sym('vkCmdSetDepthBounds'
+      f := VkCmdSetDepthBounds((*loader_p).get_sym('vkCmdSetDepthBounds'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthBounds': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthBounds': ${err}")
         return 
     })
     f(
@@ -6352,18 +5466,9 @@ pub fn cmd_set_stencil_compare_mask(
     command_buffer                                  C.CommandBuffer,
     face_mask                                       StencilFaceFlags,
     compare_mask                                    u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetStencilCompareMask(dl_loader.get_sym('vkCmdSetStencilCompareMask'
+      f := VkCmdSetStencilCompareMask((*loader_p).get_sym('vkCmdSetStencilCompareMask'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetStencilCompareMask': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetStencilCompareMask': ${err}")
         return 
     })
     f(
@@ -6379,18 +5484,9 @@ pub fn cmd_set_stencil_write_mask(
     command_buffer                                  C.CommandBuffer,
     face_mask                                       StencilFaceFlags,
     write_mask                                      u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetStencilWriteMask(dl_loader.get_sym('vkCmdSetStencilWriteMask'
+      f := VkCmdSetStencilWriteMask((*loader_p).get_sym('vkCmdSetStencilWriteMask'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetStencilWriteMask': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetStencilWriteMask': ${err}")
         return 
     })
     f(
@@ -6406,18 +5502,9 @@ pub fn cmd_set_stencil_reference(
     command_buffer                                  C.CommandBuffer,
     face_mask                                       StencilFaceFlags,
     reference                                       u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetStencilReference(dl_loader.get_sym('vkCmdSetStencilReference'
+      f := VkCmdSetStencilReference((*loader_p).get_sym('vkCmdSetStencilReference'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetStencilReference': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetStencilReference': ${err}")
         return 
     })
     f(
@@ -6438,18 +5525,9 @@ pub fn cmd_bind_descriptor_sets(
     p_descriptor_sets                               &C.DescriptorSet,
     dynamic_offset_count                            u32,
     p_dynamic_offsets                               &u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindDescriptorSets(dl_loader.get_sym('vkCmdBindDescriptorSets'
+      f := VkCmdBindDescriptorSets((*loader_p).get_sym('vkCmdBindDescriptorSets'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindDescriptorSets': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindDescriptorSets': ${err}")
         return 
     })
     f(
@@ -6471,18 +5549,9 @@ pub fn cmd_bind_index_buffer(
     buffer                                          C.Buffer,
     offset                                          DeviceSize,
     index_type                                      IndexType)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindIndexBuffer(dl_loader.get_sym('vkCmdBindIndexBuffer'
+      f := VkCmdBindIndexBuffer((*loader_p).get_sym('vkCmdBindIndexBuffer'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindIndexBuffer': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindIndexBuffer': ${err}")
         return 
     })
     f(
@@ -6501,18 +5570,9 @@ pub fn cmd_bind_vertex_buffers(
     binding_count                                   u32,
     p_buffers                                       &C.Buffer,
     p_offsets                                       &DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindVertexBuffers(dl_loader.get_sym('vkCmdBindVertexBuffers'
+      f := VkCmdBindVertexBuffers((*loader_p).get_sym('vkCmdBindVertexBuffers'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindVertexBuffers': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindVertexBuffers': ${err}")
         return 
     })
     f(
@@ -6532,18 +5592,9 @@ pub fn cmd_draw(
     instance_count                                  u32,
     first_vertex                                    u32,
     first_instance                                  u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDraw(dl_loader.get_sym('vkCmdDraw'
+      f := VkCmdDraw((*loader_p).get_sym('vkCmdDraw'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDraw': ${err}")
+        println("Couldn't load symbol for 'vkCmdDraw': ${err}")
         return 
     })
     f(
@@ -6564,18 +5615,9 @@ pub fn cmd_draw_indexed(
     first_index                                     u32,
     vertex_offset                                   i32,
     first_instance                                  u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawIndexed(dl_loader.get_sym('vkCmdDrawIndexed'
+      f := VkCmdDrawIndexed((*loader_p).get_sym('vkCmdDrawIndexed'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawIndexed': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawIndexed': ${err}")
         return 
     })
     f(
@@ -6596,18 +5638,9 @@ pub fn cmd_draw_indirect(
     offset                                          DeviceSize,
     draw_count                                      u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawIndirect(dl_loader.get_sym('vkCmdDrawIndirect'
+      f := VkCmdDrawIndirect((*loader_p).get_sym('vkCmdDrawIndirect'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawIndirect': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawIndirect': ${err}")
         return 
     })
     f(
@@ -6627,18 +5660,9 @@ pub fn cmd_draw_indexed_indirect(
     offset                                          DeviceSize,
     draw_count                                      u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawIndexedIndirect(dl_loader.get_sym('vkCmdDrawIndexedIndirect'
+      f := VkCmdDrawIndexedIndirect((*loader_p).get_sym('vkCmdDrawIndexedIndirect'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawIndexedIndirect': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawIndexedIndirect': ${err}")
         return 
     })
     f(
@@ -6657,18 +5681,9 @@ pub fn cmd_dispatch(
     group_count_x                                   u32,
     group_count_y                                   u32,
     group_count_z                                   u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDispatch(dl_loader.get_sym('vkCmdDispatch'
+      f := VkCmdDispatch((*loader_p).get_sym('vkCmdDispatch'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDispatch': ${err}")
+        println("Couldn't load symbol for 'vkCmdDispatch': ${err}")
         return 
     })
     f(
@@ -6685,18 +5700,9 @@ pub fn cmd_dispatch_indirect(
     command_buffer                                  C.CommandBuffer,
     buffer                                          C.Buffer,
     offset                                          DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDispatchIndirect(dl_loader.get_sym('vkCmdDispatchIndirect'
+      f := VkCmdDispatchIndirect((*loader_p).get_sym('vkCmdDispatchIndirect'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDispatchIndirect': ${err}")
+        println("Couldn't load symbol for 'vkCmdDispatchIndirect': ${err}")
         return 
     })
     f(
@@ -6714,18 +5720,9 @@ pub fn cmd_copy_buffer(
     dst_buffer                                      C.Buffer,
     region_count                                    u32,
     p_regions                                       &BufferCopy)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyBuffer(dl_loader.get_sym('vkCmdCopyBuffer'
+      f := VkCmdCopyBuffer((*loader_p).get_sym('vkCmdCopyBuffer'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyBuffer': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyBuffer': ${err}")
         return 
     })
     f(
@@ -6747,18 +5744,9 @@ pub fn cmd_copy_image(
     dst_image_layout                                ImageLayout,
     region_count                                    u32,
     p_regions                                       &ImageCopy)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyImage(dl_loader.get_sym('vkCmdCopyImage'
+      f := VkCmdCopyImage((*loader_p).get_sym('vkCmdCopyImage'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyImage': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyImage': ${err}")
         return 
     })
     f(
@@ -6783,18 +5771,9 @@ pub fn cmd_blit_image(
     region_count                                    u32,
     p_regions                                       &ImageBlit,
     filter                                          Filter)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBlitImage(dl_loader.get_sym('vkCmdBlitImage'
+      f := VkCmdBlitImage((*loader_p).get_sym('vkCmdBlitImage'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBlitImage': ${err}")
+        println("Couldn't load symbol for 'vkCmdBlitImage': ${err}")
         return 
     })
     f(
@@ -6818,18 +5797,9 @@ pub fn cmd_copy_buffer_to_image(
     dst_image_layout                                ImageLayout,
     region_count                                    u32,
     p_regions                                       &BufferImageCopy)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyBufferToImage(dl_loader.get_sym('vkCmdCopyBufferToImage'
+      f := VkCmdCopyBufferToImage((*loader_p).get_sym('vkCmdCopyBufferToImage'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyBufferToImage': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyBufferToImage': ${err}")
         return 
     })
     f(
@@ -6851,18 +5821,9 @@ pub fn cmd_copy_image_to_buffer(
     dst_buffer                                      C.Buffer,
     region_count                                    u32,
     p_regions                                       &BufferImageCopy)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyImageToBuffer(dl_loader.get_sym('vkCmdCopyImageToBuffer'
+      f := VkCmdCopyImageToBuffer((*loader_p).get_sym('vkCmdCopyImageToBuffer'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyImageToBuffer': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyImageToBuffer': ${err}")
         return 
     })
     f(
@@ -6883,18 +5844,9 @@ pub fn cmd_update_buffer(
     dst_offset                                      DeviceSize,
     data_size                                       DeviceSize,
     p_data                                          voidptr)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdUpdateBuffer(dl_loader.get_sym('vkCmdUpdateBuffer'
+      f := VkCmdUpdateBuffer((*loader_p).get_sym('vkCmdUpdateBuffer'
     ) or { 
-        println("Couldn't load sym for 'vkCmdUpdateBuffer': ${err}")
+        println("Couldn't load symbol for 'vkCmdUpdateBuffer': ${err}")
         return 
     })
     f(
@@ -6914,18 +5866,9 @@ pub fn cmd_fill_buffer(
     dst_offset                                      DeviceSize,
     size                                            DeviceSize,
     data                                            u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdFillBuffer(dl_loader.get_sym('vkCmdFillBuffer'
+      f := VkCmdFillBuffer((*loader_p).get_sym('vkCmdFillBuffer'
     ) or { 
-        println("Couldn't load sym for 'vkCmdFillBuffer': ${err}")
+        println("Couldn't load symbol for 'vkCmdFillBuffer': ${err}")
         return 
     })
     f(
@@ -6946,18 +5889,9 @@ pub fn cmd_clear_color_image(
     p_color                                         &ClearColorValue,
     range_count                                     u32,
     p_ranges                                        &ImageSubresourceRange)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdClearColorImage(dl_loader.get_sym('vkCmdClearColorImage'
+      f := VkCmdClearColorImage((*loader_p).get_sym('vkCmdClearColorImage'
     ) or { 
-        println("Couldn't load sym for 'vkCmdClearColorImage': ${err}")
+        println("Couldn't load symbol for 'vkCmdClearColorImage': ${err}")
         return 
     })
     f(
@@ -6979,18 +5913,9 @@ pub fn cmd_clear_depth_stencil_image(
     p_depth_stencil                                 &ClearDepthStencilValue,
     range_count                                     u32,
     p_ranges                                        &ImageSubresourceRange)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdClearDepthStencilImage(dl_loader.get_sym('vkCmdClearDepthStencilImage'
+      f := VkCmdClearDepthStencilImage((*loader_p).get_sym('vkCmdClearDepthStencilImage'
     ) or { 
-        println("Couldn't load sym for 'vkCmdClearDepthStencilImage': ${err}")
+        println("Couldn't load symbol for 'vkCmdClearDepthStencilImage': ${err}")
         return 
     })
     f(
@@ -7011,18 +5936,9 @@ pub fn cmd_clear_attachments(
     p_attachments                                   &ClearAttachment,
     rect_count                                      u32,
     p_rects                                         &ClearRect)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdClearAttachments(dl_loader.get_sym('vkCmdClearAttachments'
+      f := VkCmdClearAttachments((*loader_p).get_sym('vkCmdClearAttachments'
     ) or { 
-        println("Couldn't load sym for 'vkCmdClearAttachments': ${err}")
+        println("Couldn't load symbol for 'vkCmdClearAttachments': ${err}")
         return 
     })
     f(
@@ -7044,18 +5960,9 @@ pub fn cmd_resolve_image(
     dst_image_layout                                ImageLayout,
     region_count                                    u32,
     p_regions                                       &ImageResolve)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdResolveImage(dl_loader.get_sym('vkCmdResolveImage'
+      f := VkCmdResolveImage((*loader_p).get_sym('vkCmdResolveImage'
     ) or { 
-        println("Couldn't load sym for 'vkCmdResolveImage': ${err}")
+        println("Couldn't load symbol for 'vkCmdResolveImage': ${err}")
         return 
     })
     f(
@@ -7075,18 +5982,9 @@ pub fn cmd_set_event(
     command_buffer                                  C.CommandBuffer,
     event                                           C.Event,
     stage_mask                                      PipelineStageFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetEvent(dl_loader.get_sym('vkCmdSetEvent'
+      f := VkCmdSetEvent((*loader_p).get_sym('vkCmdSetEvent'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetEvent': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetEvent': ${err}")
         return 
     })
     f(
@@ -7102,18 +6000,9 @@ pub fn cmd_reset_event(
     command_buffer                                  C.CommandBuffer,
     event                                           C.Event,
     stage_mask                                      PipelineStageFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdResetEvent(dl_loader.get_sym('vkCmdResetEvent'
+      f := VkCmdResetEvent((*loader_p).get_sym('vkCmdResetEvent'
     ) or { 
-        println("Couldn't load sym for 'vkCmdResetEvent': ${err}")
+        println("Couldn't load symbol for 'vkCmdResetEvent': ${err}")
         return 
     })
     f(
@@ -7137,18 +6026,9 @@ pub fn cmd_wait_events(
     p_buffer_memory_barriers                        &BufferMemoryBarrier,
     image_memory_barrier_count                      u32,
     p_image_memory_barriers                         &ImageMemoryBarrier)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWaitEvents(dl_loader.get_sym('vkCmdWaitEvents'
+      f := VkCmdWaitEvents((*loader_p).get_sym('vkCmdWaitEvents'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWaitEvents': ${err}")
+        println("Couldn't load symbol for 'vkCmdWaitEvents': ${err}")
         return 
     })
     f(
@@ -7179,18 +6059,9 @@ pub fn cmd_pipeline_barrier(
     p_buffer_memory_barriers                        &BufferMemoryBarrier,
     image_memory_barrier_count                      u32,
     p_image_memory_barriers                         &ImageMemoryBarrier)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdPipelineBarrier(dl_loader.get_sym('vkCmdPipelineBarrier'
+      f := VkCmdPipelineBarrier((*loader_p).get_sym('vkCmdPipelineBarrier'
     ) or { 
-        println("Couldn't load sym for 'vkCmdPipelineBarrier': ${err}")
+        println("Couldn't load symbol for 'vkCmdPipelineBarrier': ${err}")
         return 
     })
     f(
@@ -7214,18 +6085,9 @@ pub fn cmd_begin_query(
     query_pool                                      C.QueryPool,
     query                                           u32,
     flags                                           QueryControlFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginQuery(dl_loader.get_sym('vkCmdBeginQuery'
+      f := VkCmdBeginQuery((*loader_p).get_sym('vkCmdBeginQuery'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginQuery': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginQuery': ${err}")
         return 
     })
     f(
@@ -7242,18 +6104,9 @@ pub fn cmd_end_query(
     command_buffer                                  C.CommandBuffer,
     query_pool                                      C.QueryPool,
     query                                           u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndQuery(dl_loader.get_sym('vkCmdEndQuery'
+      f := VkCmdEndQuery((*loader_p).get_sym('vkCmdEndQuery'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndQuery': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndQuery': ${err}")
         return 
     })
     f(
@@ -7270,18 +6123,9 @@ pub fn cmd_reset_query_pool(
     query_pool                                      C.QueryPool,
     first_query                                     u32,
     query_count                                     u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdResetQueryPool(dl_loader.get_sym('vkCmdResetQueryPool'
+      f := VkCmdResetQueryPool((*loader_p).get_sym('vkCmdResetQueryPool'
     ) or { 
-        println("Couldn't load sym for 'vkCmdResetQueryPool': ${err}")
+        println("Couldn't load symbol for 'vkCmdResetQueryPool': ${err}")
         return 
     })
     f(
@@ -7299,18 +6143,9 @@ pub fn cmd_write_timestamp(
     pipeline_stage                                  PipelineStageFlagBits,
     query_pool                                      C.QueryPool,
     query                                           u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWriteTimestamp(dl_loader.get_sym('vkCmdWriteTimestamp'
+      f := VkCmdWriteTimestamp((*loader_p).get_sym('vkCmdWriteTimestamp'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWriteTimestamp': ${err}")
+        println("Couldn't load symbol for 'vkCmdWriteTimestamp': ${err}")
         return 
     })
     f(
@@ -7332,18 +6167,9 @@ pub fn cmd_copy_query_pool_results(
     dst_offset                                      DeviceSize,
     stride                                          DeviceSize,
     flags                                           QueryResultFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyQueryPoolResults(dl_loader.get_sym('vkCmdCopyQueryPoolResults'
+      f := VkCmdCopyQueryPoolResults((*loader_p).get_sym('vkCmdCopyQueryPoolResults'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyQueryPoolResults': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyQueryPoolResults': ${err}")
         return 
     })
     f(
@@ -7367,18 +6193,9 @@ pub fn cmd_push_constants(
     offset                                          u32,
     size                                            u32,
     p_values                                        voidptr)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdPushConstants(dl_loader.get_sym('vkCmdPushConstants'
+      f := VkCmdPushConstants((*loader_p).get_sym('vkCmdPushConstants'
     ) or { 
-        println("Couldn't load sym for 'vkCmdPushConstants': ${err}")
+        println("Couldn't load symbol for 'vkCmdPushConstants': ${err}")
         return 
     })
     f(
@@ -7397,18 +6214,9 @@ pub fn cmd_begin_render_pass(
     command_buffer                                  C.CommandBuffer,
     p_render_pass_begin                             &RenderPassBeginInfo,
     contents                                        SubpassContents)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginRenderPass(dl_loader.get_sym('vkCmdBeginRenderPass'
+      f := VkCmdBeginRenderPass((*loader_p).get_sym('vkCmdBeginRenderPass'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginRenderPass': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginRenderPass': ${err}")
         return 
     })
     f(
@@ -7423,18 +6231,9 @@ type VkCmdNextSubpass = fn (     C.CommandBuffer,     SubpassContents)
 pub fn cmd_next_subpass(
     command_buffer                                  C.CommandBuffer,
     contents                                        SubpassContents)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdNextSubpass(dl_loader.get_sym('vkCmdNextSubpass'
+      f := VkCmdNextSubpass((*loader_p).get_sym('vkCmdNextSubpass'
     ) or { 
-        println("Couldn't load sym for 'vkCmdNextSubpass': ${err}")
+        println("Couldn't load symbol for 'vkCmdNextSubpass': ${err}")
         return 
     })
     f(
@@ -7447,18 +6246,9 @@ type VkCmdEndRenderPass = fn (     C.CommandBuffer)
 
 pub fn cmd_end_render_pass(
     command_buffer                                  C.CommandBuffer)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndRenderPass(dl_loader.get_sym('vkCmdEndRenderPass'
+      f := VkCmdEndRenderPass((*loader_p).get_sym('vkCmdEndRenderPass'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndRenderPass': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndRenderPass': ${err}")
         return 
     })
     f(
@@ -7472,18 +6262,9 @@ pub fn cmd_execute_commands(
     command_buffer                                  C.CommandBuffer,
     command_buffer_count                            u32,
     p_command_buffers                               &C.CommandBuffer)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdExecuteCommands(dl_loader.get_sym('vkCmdExecuteCommands'
+      f := VkCmdExecuteCommands((*loader_p).get_sym('vkCmdExecuteCommands'
     ) or { 
-        println("Couldn't load sym for 'vkCmdExecuteCommands': ${err}")
+        println("Couldn't load symbol for 'vkCmdExecuteCommands': ${err}")
         return 
     })
     f(
@@ -8266,18 +7047,9 @@ type VkEnumerateInstanceVersion = fn (     &u32) Result
 
 pub fn enumerate_instance_version(
     p_api_version                                   &u32) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkEnumerateInstanceVersion(dl_loader.get_sym('vkEnumerateInstanceVersion'
+      f := VkEnumerateInstanceVersion((*loader_p).get_sym('vkEnumerateInstanceVersion'
     ) or { 
-        println("Couldn't load sym for 'vkEnumerateInstanceVersion': ${err}")
+        println("Couldn't load symbol for 'vkEnumerateInstanceVersion': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -8291,18 +7063,9 @@ pub fn bind_buffer_memory2(
     device                                          C.Device,
     bind_info_count                                 u32,
     p_bind_infos                                    &BindBufferMemoryInfo) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBindBufferMemory2(dl_loader.get_sym('vkBindBufferMemory2'
+      f := VkBindBufferMemory2((*loader_p).get_sym('vkBindBufferMemory2'
     ) or { 
-        println("Couldn't load sym for 'vkBindBufferMemory2': ${err}")
+        println("Couldn't load symbol for 'vkBindBufferMemory2': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -8318,18 +7081,9 @@ pub fn bind_image_memory2(
     device                                          C.Device,
     bind_info_count                                 u32,
     p_bind_infos                                    &BindImageMemoryInfo) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBindImageMemory2(dl_loader.get_sym('vkBindImageMemory2'
+      f := VkBindImageMemory2((*loader_p).get_sym('vkBindImageMemory2'
     ) or { 
-        println("Couldn't load sym for 'vkBindImageMemory2': ${err}")
+        println("Couldn't load symbol for 'vkBindImageMemory2': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -8347,18 +7101,9 @@ pub fn get_device_group_peer_memory_features(
     local_device_index                              u32,
     remote_device_index                             u32,
     p_peer_memory_features                          &PeerMemoryFeatureFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceGroupPeerMemoryFeatures(dl_loader.get_sym('vkGetDeviceGroupPeerMemoryFeatures'
+      f := VkGetDeviceGroupPeerMemoryFeatures((*loader_p).get_sym('vkGetDeviceGroupPeerMemoryFeatures'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceGroupPeerMemoryFeatures': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceGroupPeerMemoryFeatures': ${err}")
         return 
     })
     f(
@@ -8375,18 +7120,9 @@ type VkCmdSetDeviceMask = fn (     C.CommandBuffer,     u32)
 pub fn cmd_set_device_mask(
     command_buffer                                  C.CommandBuffer,
     device_mask                                     u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDeviceMask(dl_loader.get_sym('vkCmdSetDeviceMask'
+      f := VkCmdSetDeviceMask((*loader_p).get_sym('vkCmdSetDeviceMask'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDeviceMask': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDeviceMask': ${err}")
         return 
     })
     f(
@@ -8405,18 +7141,9 @@ pub fn cmd_dispatch_base(
     group_count_x                                   u32,
     group_count_y                                   u32,
     group_count_z                                   u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDispatchBase(dl_loader.get_sym('vkCmdDispatchBase'
+      f := VkCmdDispatchBase((*loader_p).get_sym('vkCmdDispatchBase'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDispatchBase': ${err}")
+        println("Couldn't load symbol for 'vkCmdDispatchBase': ${err}")
         return 
     })
     f(
@@ -8436,18 +7163,9 @@ pub fn enumerate_physical_device_groups(
     instance                                        C.Instance,
     p_physical_device_group_count                   &u32,
     p_physical_device_group_properties              &PhysicalDeviceGroupProperties) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkEnumeratePhysicalDeviceGroups(dl_loader.get_sym('vkEnumeratePhysicalDeviceGroups'
+      f := VkEnumeratePhysicalDeviceGroups((*loader_p).get_sym('vkEnumeratePhysicalDeviceGroups'
     ) or { 
-        println("Couldn't load sym for 'vkEnumeratePhysicalDeviceGroups': ${err}")
+        println("Couldn't load symbol for 'vkEnumeratePhysicalDeviceGroups': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -8463,18 +7181,9 @@ pub fn get_image_memory_requirements2(
     device                                          C.Device,
     p_info                                          &ImageMemoryRequirementsInfo2,
     p_memory_requirements                           &MemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageMemoryRequirements2(dl_loader.get_sym('vkGetImageMemoryRequirements2'
+      f := VkGetImageMemoryRequirements2((*loader_p).get_sym('vkGetImageMemoryRequirements2'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageMemoryRequirements2': ${err}")
+        println("Couldn't load symbol for 'vkGetImageMemoryRequirements2': ${err}")
         return 
     })
     f(
@@ -8490,18 +7199,9 @@ pub fn get_buffer_memory_requirements2(
     device                                          C.Device,
     p_info                                          &BufferMemoryRequirementsInfo2,
     p_memory_requirements                           &MemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetBufferMemoryRequirements2(dl_loader.get_sym('vkGetBufferMemoryRequirements2'
+      f := VkGetBufferMemoryRequirements2((*loader_p).get_sym('vkGetBufferMemoryRequirements2'
     ) or { 
-        println("Couldn't load sym for 'vkGetBufferMemoryRequirements2': ${err}")
+        println("Couldn't load symbol for 'vkGetBufferMemoryRequirements2': ${err}")
         return 
     })
     f(
@@ -8518,18 +7218,9 @@ pub fn get_image_sparse_memory_requirements2(
     p_info                                          &ImageSparseMemoryRequirementsInfo2,
     p_sparse_memory_requirement_count               &u32,
     p_sparse_memory_requirements                    &SparseImageMemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageSparseMemoryRequirements2(dl_loader.get_sym('vkGetImageSparseMemoryRequirements2'
+      f := VkGetImageSparseMemoryRequirements2((*loader_p).get_sym('vkGetImageSparseMemoryRequirements2'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageSparseMemoryRequirements2': ${err}")
+        println("Couldn't load symbol for 'vkGetImageSparseMemoryRequirements2': ${err}")
         return 
     })
     f(
@@ -8545,18 +7236,9 @@ type VkGetPhysicalDeviceFeatures2 = fn (     C.PhysicalDevice,     &PhysicalDevi
 pub fn get_physical_device_features2(
     physical_device                                 C.PhysicalDevice,
     p_features                                      &PhysicalDeviceFeatures2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceFeatures2(dl_loader.get_sym('vkGetPhysicalDeviceFeatures2'
+      f := VkGetPhysicalDeviceFeatures2((*loader_p).get_sym('vkGetPhysicalDeviceFeatures2'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceFeatures2': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceFeatures2': ${err}")
         return 
     })
     f(
@@ -8570,18 +7252,9 @@ type VkGetPhysicalDeviceProperties2 = fn (     C.PhysicalDevice,     &PhysicalDe
 pub fn get_physical_device_properties2(
     physical_device                                 C.PhysicalDevice,
     p_properties                                    &PhysicalDeviceProperties2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceProperties2(dl_loader.get_sym('vkGetPhysicalDeviceProperties2'
+      f := VkGetPhysicalDeviceProperties2((*loader_p).get_sym('vkGetPhysicalDeviceProperties2'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceProperties2': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceProperties2': ${err}")
         return 
     })
     f(
@@ -8596,18 +7269,9 @@ pub fn get_physical_device_format_properties2(
     physical_device                                 C.PhysicalDevice,
     format                                          Format,
     p_format_properties                             &FormatProperties2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceFormatProperties2(dl_loader.get_sym('vkGetPhysicalDeviceFormatProperties2'
+      f := VkGetPhysicalDeviceFormatProperties2((*loader_p).get_sym('vkGetPhysicalDeviceFormatProperties2'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceFormatProperties2': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceFormatProperties2': ${err}")
         return 
     })
     f(
@@ -8623,18 +7287,9 @@ pub fn get_physical_device_image_format_properties2(
     physical_device                                 C.PhysicalDevice,
     p_image_format_info                             &PhysicalDeviceImageFormatInfo2,
     p_image_format_properties                       &ImageFormatProperties2) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceImageFormatProperties2(dl_loader.get_sym('vkGetPhysicalDeviceImageFormatProperties2'
+      f := VkGetPhysicalDeviceImageFormatProperties2((*loader_p).get_sym('vkGetPhysicalDeviceImageFormatProperties2'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceImageFormatProperties2': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceImageFormatProperties2': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -8650,18 +7305,9 @@ pub fn get_physical_device_queue_family_properties2(
     physical_device                                 C.PhysicalDevice,
     p_queue_family_property_count                   &u32,
     p_queue_family_properties                       &QueueFamilyProperties2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceQueueFamilyProperties2(dl_loader.get_sym('vkGetPhysicalDeviceQueueFamilyProperties2'
+      f := VkGetPhysicalDeviceQueueFamilyProperties2((*loader_p).get_sym('vkGetPhysicalDeviceQueueFamilyProperties2'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceQueueFamilyProperties2': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceQueueFamilyProperties2': ${err}")
         return 
     })
     f(
@@ -8676,18 +7322,9 @@ type VkGetPhysicalDeviceMemoryProperties2 = fn (     C.PhysicalDevice,     &Phys
 pub fn get_physical_device_memory_properties2(
     physical_device                                 C.PhysicalDevice,
     p_memory_properties                             &PhysicalDeviceMemoryProperties2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceMemoryProperties2(dl_loader.get_sym('vkGetPhysicalDeviceMemoryProperties2'
+      f := VkGetPhysicalDeviceMemoryProperties2((*loader_p).get_sym('vkGetPhysicalDeviceMemoryProperties2'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceMemoryProperties2': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceMemoryProperties2': ${err}")
         return 
     })
     f(
@@ -8703,18 +7340,9 @@ pub fn get_physical_device_sparse_image_format_properties2(
     p_format_info                                   &PhysicalDeviceSparseImageFormatInfo2,
     p_property_count                                &u32,
     p_properties                                    &SparseImageFormatProperties2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSparseImageFormatProperties2(dl_loader.get_sym('vkGetPhysicalDeviceSparseImageFormatProperties2'
+      f := VkGetPhysicalDeviceSparseImageFormatProperties2((*loader_p).get_sym('vkGetPhysicalDeviceSparseImageFormatProperties2'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSparseImageFormatProperties2': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSparseImageFormatProperties2': ${err}")
         return 
     })
     f(
@@ -8731,18 +7359,9 @@ pub fn trim_command_pool(
     device                                          C.Device,
     command_pool                                    C.CommandPool,
     flags                                           CommandPoolTrimFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkTrimCommandPool(dl_loader.get_sym('vkTrimCommandPool'
+      f := VkTrimCommandPool((*loader_p).get_sym('vkTrimCommandPool'
     ) or { 
-        println("Couldn't load sym for 'vkTrimCommandPool': ${err}")
+        println("Couldn't load symbol for 'vkTrimCommandPool': ${err}")
         return 
     })
     f(
@@ -8758,18 +7377,9 @@ pub fn get_device_queue2(
     device                                          C.Device,
     p_queue_info                                    &DeviceQueueInfo2,
     p_queue                                         &C.Queue)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceQueue2(dl_loader.get_sym('vkGetDeviceQueue2'
+      f := VkGetDeviceQueue2((*loader_p).get_sym('vkGetDeviceQueue2'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceQueue2': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceQueue2': ${err}")
         return 
     })
     f(
@@ -8786,18 +7396,9 @@ pub fn create_sampler_ycbcr_conversion(
     p_create_info                                   &SamplerYcbcrConversionCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_ycbcr_conversion                              &C.SamplerYcbcrConversion) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateSamplerYcbcrConversion(dl_loader.get_sym('vkCreateSamplerYcbcrConversion'
+      f := VkCreateSamplerYcbcrConversion((*loader_p).get_sym('vkCreateSamplerYcbcrConversion'
     ) or { 
-        println("Couldn't load sym for 'vkCreateSamplerYcbcrConversion': ${err}")
+        println("Couldn't load symbol for 'vkCreateSamplerYcbcrConversion': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -8814,18 +7415,9 @@ pub fn destroy_sampler_ycbcr_conversion(
     device                                          C.Device,
     ycbcr_conversion                                C.SamplerYcbcrConversion,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroySamplerYcbcrConversion(dl_loader.get_sym('vkDestroySamplerYcbcrConversion'
+      f := VkDestroySamplerYcbcrConversion((*loader_p).get_sym('vkDestroySamplerYcbcrConversion'
     ) or { 
-        println("Couldn't load sym for 'vkDestroySamplerYcbcrConversion': ${err}")
+        println("Couldn't load symbol for 'vkDestroySamplerYcbcrConversion': ${err}")
         return 
     })
     f(
@@ -8842,18 +7434,9 @@ pub fn create_descriptor_update_template(
     p_create_info                                   &DescriptorUpdateTemplateCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_descriptor_update_template                    &C.DescriptorUpdateTemplate) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDescriptorUpdateTemplate(dl_loader.get_sym('vkCreateDescriptorUpdateTemplate'
+      f := VkCreateDescriptorUpdateTemplate((*loader_p).get_sym('vkCreateDescriptorUpdateTemplate'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDescriptorUpdateTemplate': ${err}")
+        println("Couldn't load symbol for 'vkCreateDescriptorUpdateTemplate': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -8870,18 +7453,9 @@ pub fn destroy_descriptor_update_template(
     device                                          C.Device,
     descriptor_update_template                      C.DescriptorUpdateTemplate,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyDescriptorUpdateTemplate(dl_loader.get_sym('vkDestroyDescriptorUpdateTemplate'
+      f := VkDestroyDescriptorUpdateTemplate((*loader_p).get_sym('vkDestroyDescriptorUpdateTemplate'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyDescriptorUpdateTemplate': ${err}")
+        println("Couldn't load symbol for 'vkDestroyDescriptorUpdateTemplate': ${err}")
         return 
     })
     f(
@@ -8898,18 +7472,9 @@ pub fn update_descriptor_set_with_template(
     descriptor_set                                  C.DescriptorSet,
     descriptor_update_template                      C.DescriptorUpdateTemplate,
     p_data                                          voidptr)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkUpdateDescriptorSetWithTemplate(dl_loader.get_sym('vkUpdateDescriptorSetWithTemplate'
+      f := VkUpdateDescriptorSetWithTemplate((*loader_p).get_sym('vkUpdateDescriptorSetWithTemplate'
     ) or { 
-        println("Couldn't load sym for 'vkUpdateDescriptorSetWithTemplate': ${err}")
+        println("Couldn't load symbol for 'vkUpdateDescriptorSetWithTemplate': ${err}")
         return 
     })
     f(
@@ -8926,18 +7491,9 @@ pub fn get_physical_device_external_buffer_properties(
     physical_device                                 C.PhysicalDevice,
     p_external_buffer_info                          &PhysicalDeviceExternalBufferInfo,
     p_external_buffer_properties                    &ExternalBufferProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceExternalBufferProperties(dl_loader.get_sym('vkGetPhysicalDeviceExternalBufferProperties'
+      f := VkGetPhysicalDeviceExternalBufferProperties((*loader_p).get_sym('vkGetPhysicalDeviceExternalBufferProperties'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceExternalBufferProperties': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalBufferProperties': ${err}")
         return 
     })
     f(
@@ -8953,18 +7509,9 @@ pub fn get_physical_device_external_fence_properties(
     physical_device                                 C.PhysicalDevice,
     p_external_fence_info                           &PhysicalDeviceExternalFenceInfo,
     p_external_fence_properties                     &ExternalFenceProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceExternalFenceProperties(dl_loader.get_sym('vkGetPhysicalDeviceExternalFenceProperties'
+      f := VkGetPhysicalDeviceExternalFenceProperties((*loader_p).get_sym('vkGetPhysicalDeviceExternalFenceProperties'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceExternalFenceProperties': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalFenceProperties': ${err}")
         return 
     })
     f(
@@ -8980,18 +7527,9 @@ pub fn get_physical_device_external_semaphore_properties(
     physical_device                                 C.PhysicalDevice,
     p_external_semaphore_info                       &PhysicalDeviceExternalSemaphoreInfo,
     p_external_semaphore_properties                 &ExternalSemaphoreProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceExternalSemaphoreProperties(dl_loader.get_sym('vkGetPhysicalDeviceExternalSemaphoreProperties'
+      f := VkGetPhysicalDeviceExternalSemaphoreProperties((*loader_p).get_sym('vkGetPhysicalDeviceExternalSemaphoreProperties'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceExternalSemaphoreProperties': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalSemaphoreProperties': ${err}")
         return 
     })
     f(
@@ -9007,18 +7545,9 @@ pub fn get_descriptor_set_layout_support(
     device                                          C.Device,
     p_create_info                                   &DescriptorSetLayoutCreateInfo,
     p_support                                       &DescriptorSetLayoutSupport)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDescriptorSetLayoutSupport(dl_loader.get_sym('vkGetDescriptorSetLayoutSupport'
+      f := VkGetDescriptorSetLayoutSupport((*loader_p).get_sym('vkGetDescriptorSetLayoutSupport'
     ) or { 
-        println("Couldn't load sym for 'vkGetDescriptorSetLayoutSupport': ${err}")
+        println("Couldn't load symbol for 'vkGetDescriptorSetLayoutSupport': ${err}")
         return 
     })
     f(
@@ -9777,18 +8306,9 @@ pub fn cmd_draw_indirect_count(
     count_buffer_offset                             DeviceSize,
     max_draw_count                                  u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawIndirectCount(dl_loader.get_sym('vkCmdDrawIndirectCount'
+      f := VkCmdDrawIndirectCount((*loader_p).get_sym('vkCmdDrawIndirectCount'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawIndirectCount': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawIndirectCount': ${err}")
         return 
     })
     f(
@@ -9812,18 +8332,9 @@ pub fn cmd_draw_indexed_indirect_count(
     count_buffer_offset                             DeviceSize,
     max_draw_count                                  u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawIndexedIndirectCount(dl_loader.get_sym('vkCmdDrawIndexedIndirectCount'
+      f := VkCmdDrawIndexedIndirectCount((*loader_p).get_sym('vkCmdDrawIndexedIndirectCount'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawIndexedIndirectCount': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawIndexedIndirectCount': ${err}")
         return 
     })
     f(
@@ -9844,18 +8355,9 @@ pub fn create_render_pass2(
     p_create_info                                   &RenderPassCreateInfo2,
     p_allocator                                     &AllocationCallbacks,
     p_render_pass                                   &C.RenderPass) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateRenderPass2(dl_loader.get_sym('vkCreateRenderPass2'
+      f := VkCreateRenderPass2((*loader_p).get_sym('vkCreateRenderPass2'
     ) or { 
-        println("Couldn't load sym for 'vkCreateRenderPass2': ${err}")
+        println("Couldn't load symbol for 'vkCreateRenderPass2': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -9872,18 +8374,9 @@ pub fn cmd_begin_render_pass2(
     command_buffer                                  C.CommandBuffer,
     p_render_pass_begin                             &RenderPassBeginInfo,
     p_subpass_begin_info                            &SubpassBeginInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginRenderPass2(dl_loader.get_sym('vkCmdBeginRenderPass2'
+      f := VkCmdBeginRenderPass2((*loader_p).get_sym('vkCmdBeginRenderPass2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginRenderPass2': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginRenderPass2': ${err}")
         return 
     })
     f(
@@ -9899,18 +8392,9 @@ pub fn cmd_next_subpass2(
     command_buffer                                  C.CommandBuffer,
     p_subpass_begin_info                            &SubpassBeginInfo,
     p_subpass_end_info                              &SubpassEndInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdNextSubpass2(dl_loader.get_sym('vkCmdNextSubpass2'
+      f := VkCmdNextSubpass2((*loader_p).get_sym('vkCmdNextSubpass2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdNextSubpass2': ${err}")
+        println("Couldn't load symbol for 'vkCmdNextSubpass2': ${err}")
         return 
     })
     f(
@@ -9925,18 +8409,9 @@ type VkCmdEndRenderPass2 = fn (     C.CommandBuffer,     &SubpassEndInfo)
 pub fn cmd_end_render_pass2(
     command_buffer                                  C.CommandBuffer,
     p_subpass_end_info                              &SubpassEndInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndRenderPass2(dl_loader.get_sym('vkCmdEndRenderPass2'
+      f := VkCmdEndRenderPass2((*loader_p).get_sym('vkCmdEndRenderPass2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndRenderPass2': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndRenderPass2': ${err}")
         return 
     })
     f(
@@ -9952,18 +8427,9 @@ pub fn reset_query_pool(
     query_pool                                      C.QueryPool,
     first_query                                     u32,
     query_count                                     u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkResetQueryPool(dl_loader.get_sym('vkResetQueryPool'
+      f := VkResetQueryPool((*loader_p).get_sym('vkResetQueryPool'
     ) or { 
-        println("Couldn't load sym for 'vkResetQueryPool': ${err}")
+        println("Couldn't load symbol for 'vkResetQueryPool': ${err}")
         return 
     })
     f(
@@ -9980,18 +8446,9 @@ pub fn get_semaphore_counter_value(
     device                                          C.Device,
     semaphore                                       C.Semaphore,
     p_value                                         &u64) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetSemaphoreCounterValue(dl_loader.get_sym('vkGetSemaphoreCounterValue'
+      f := VkGetSemaphoreCounterValue((*loader_p).get_sym('vkGetSemaphoreCounterValue'
     ) or { 
-        println("Couldn't load sym for 'vkGetSemaphoreCounterValue': ${err}")
+        println("Couldn't load symbol for 'vkGetSemaphoreCounterValue': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -10007,18 +8464,9 @@ pub fn wait_semaphores(
     device                                          C.Device,
     p_wait_info                                     &SemaphoreWaitInfo,
     timeout                                         u64) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkWaitSemaphores(dl_loader.get_sym('vkWaitSemaphores'
+      f := VkWaitSemaphores((*loader_p).get_sym('vkWaitSemaphores'
     ) or { 
-        println("Couldn't load sym for 'vkWaitSemaphores': ${err}")
+        println("Couldn't load symbol for 'vkWaitSemaphores': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -10033,18 +8481,9 @@ type VkSignalSemaphore = fn (     C.Device,     &SemaphoreSignalInfo) Result
 pub fn signal_semaphore(
     device                                          C.Device,
     p_signal_info                                   &SemaphoreSignalInfo) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkSignalSemaphore(dl_loader.get_sym('vkSignalSemaphore'
+      f := VkSignalSemaphore((*loader_p).get_sym('vkSignalSemaphore'
     ) or { 
-        println("Couldn't load sym for 'vkSignalSemaphore': ${err}")
+        println("Couldn't load symbol for 'vkSignalSemaphore': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -10058,16 +8497,9 @@ type VkGetBufferDeviceAddress = fn (     C.Device,     &BufferDeviceAddressInfo)
 pub fn get_buffer_device_address(
     device                                          C.Device,
     p_info                                          &BufferDeviceAddressInfo) DeviceAddress {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetBufferDeviceAddress(dl_loader.get_sym("vkGetBufferDeviceAddress"
+      f := VkGetBufferDeviceAddress((*loader_p).get_sym("vkGetBufferDeviceAddress"
     ) or { 
-        panic("Couldn't load sym for 'vkGetBufferDeviceAddress': ${err}") })
+        panic("Couldn't load symbol for 'vkGetBufferDeviceAddress': ${err}") })
     return f(
     device,
     p_info)
@@ -10079,16 +8511,9 @@ type VkGetBufferOpaqueCaptureAddress = fn (     C.Device,     &BufferDeviceAddre
 pub fn get_buffer_opaque_capture_address(
     device                                          C.Device,
     p_info                                          &BufferDeviceAddressInfo) u64 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetBufferOpaqueCaptureAddress(dl_loader.get_sym("vkGetBufferOpaqueCaptureAddress"
+      f := VkGetBufferOpaqueCaptureAddress((*loader_p).get_sym("vkGetBufferOpaqueCaptureAddress"
     ) or { 
-        panic("Couldn't load sym for 'vkGetBufferOpaqueCaptureAddress': ${err}") })
+        panic("Couldn't load symbol for 'vkGetBufferOpaqueCaptureAddress': ${err}") })
     return f(
     device,
     p_info)
@@ -10100,16 +8525,9 @@ type VkGetDeviceMemoryOpaqueCaptureAddress = fn (     C.Device,     &DeviceMemor
 pub fn get_device_memory_opaque_capture_address(
     device                                          C.Device,
     p_info                                          &DeviceMemoryOpaqueCaptureAddressInfo) u64 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceMemoryOpaqueCaptureAddress(dl_loader.get_sym("vkGetDeviceMemoryOpaqueCaptureAddress"
+      f := VkGetDeviceMemoryOpaqueCaptureAddress((*loader_p).get_sym("vkGetDeviceMemoryOpaqueCaptureAddress"
     ) or { 
-        panic("Couldn't load sym for 'vkGetDeviceMemoryOpaqueCaptureAddress': ${err}") })
+        panic("Couldn't load symbol for 'vkGetDeviceMemoryOpaqueCaptureAddress': ${err}") })
     return f(
     device,
     p_info)
@@ -11010,18 +9428,9 @@ pub fn get_physical_device_tool_properties(
     physical_device                                 C.PhysicalDevice,
     p_tool_count                                    &u32,
     p_tool_properties                               &PhysicalDeviceToolProperties) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceToolProperties(dl_loader.get_sym('vkGetPhysicalDeviceToolProperties'
+      f := VkGetPhysicalDeviceToolProperties((*loader_p).get_sym('vkGetPhysicalDeviceToolProperties'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceToolProperties': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceToolProperties': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -11038,18 +9447,9 @@ pub fn create_private_data_slot(
     p_create_info                                   &PrivateDataSlotCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_private_data_slot                             &C.PrivateDataSlot) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreatePrivateDataSlot(dl_loader.get_sym('vkCreatePrivateDataSlot'
+      f := VkCreatePrivateDataSlot((*loader_p).get_sym('vkCreatePrivateDataSlot'
     ) or { 
-        println("Couldn't load sym for 'vkCreatePrivateDataSlot': ${err}")
+        println("Couldn't load symbol for 'vkCreatePrivateDataSlot': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -11066,18 +9466,9 @@ pub fn destroy_private_data_slot(
     device                                          C.Device,
     private_data_slot                               C.PrivateDataSlot,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyPrivateDataSlot(dl_loader.get_sym('vkDestroyPrivateDataSlot'
+      f := VkDestroyPrivateDataSlot((*loader_p).get_sym('vkDestroyPrivateDataSlot'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyPrivateDataSlot': ${err}")
+        println("Couldn't load symbol for 'vkDestroyPrivateDataSlot': ${err}")
         return 
     })
     f(
@@ -11095,18 +9486,9 @@ pub fn set_private_data(
     object_handle                                   u64,
     private_data_slot                               C.PrivateDataSlot,
     data                                            u64) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetPrivateData(dl_loader.get_sym('vkSetPrivateData'
+      f := VkSetPrivateData((*loader_p).get_sym('vkSetPrivateData'
     ) or { 
-        println("Couldn't load sym for 'vkSetPrivateData': ${err}")
+        println("Couldn't load symbol for 'vkSetPrivateData': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -11126,18 +9508,9 @@ pub fn get_private_data(
     object_handle                                   u64,
     private_data_slot                               C.PrivateDataSlot,
     p_data                                          &u64)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPrivateData(dl_loader.get_sym('vkGetPrivateData'
+      f := VkGetPrivateData((*loader_p).get_sym('vkGetPrivateData'
     ) or { 
-        println("Couldn't load sym for 'vkGetPrivateData': ${err}")
+        println("Couldn't load symbol for 'vkGetPrivateData': ${err}")
         return 
     })
     f(
@@ -11155,18 +9528,9 @@ pub fn cmd_set_event2(
     command_buffer                                  C.CommandBuffer,
     event                                           C.Event,
     p_dependency_info                               &DependencyInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetEvent2(dl_loader.get_sym('vkCmdSetEvent2'
+      f := VkCmdSetEvent2((*loader_p).get_sym('vkCmdSetEvent2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetEvent2': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetEvent2': ${err}")
         return 
     })
     f(
@@ -11182,18 +9546,9 @@ pub fn cmd_reset_event2(
     command_buffer                                  C.CommandBuffer,
     event                                           C.Event,
     stage_mask                                      PipelineStageFlags2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdResetEvent2(dl_loader.get_sym('vkCmdResetEvent2'
+      f := VkCmdResetEvent2((*loader_p).get_sym('vkCmdResetEvent2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdResetEvent2': ${err}")
+        println("Couldn't load symbol for 'vkCmdResetEvent2': ${err}")
         return 
     })
     f(
@@ -11210,18 +9565,9 @@ pub fn cmd_wait_events2(
     event_count                                     u32,
     p_events                                        &C.Event,
     p_dependency_infos                              &DependencyInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWaitEvents2(dl_loader.get_sym('vkCmdWaitEvents2'
+      f := VkCmdWaitEvents2((*loader_p).get_sym('vkCmdWaitEvents2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWaitEvents2': ${err}")
+        println("Couldn't load symbol for 'vkCmdWaitEvents2': ${err}")
         return 
     })
     f(
@@ -11237,18 +9583,9 @@ type VkCmdPipelineBarrier2 = fn (     C.CommandBuffer,     &DependencyInfo)
 pub fn cmd_pipeline_barrier2(
     command_buffer                                  C.CommandBuffer,
     p_dependency_info                               &DependencyInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdPipelineBarrier2(dl_loader.get_sym('vkCmdPipelineBarrier2'
+      f := VkCmdPipelineBarrier2((*loader_p).get_sym('vkCmdPipelineBarrier2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdPipelineBarrier2': ${err}")
+        println("Couldn't load symbol for 'vkCmdPipelineBarrier2': ${err}")
         return 
     })
     f(
@@ -11264,18 +9601,9 @@ pub fn cmd_write_timestamp2(
     stage                                           PipelineStageFlags2,
     query_pool                                      C.QueryPool,
     query                                           u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWriteTimestamp2(dl_loader.get_sym('vkCmdWriteTimestamp2'
+      f := VkCmdWriteTimestamp2((*loader_p).get_sym('vkCmdWriteTimestamp2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWriteTimestamp2': ${err}")
+        println("Couldn't load symbol for 'vkCmdWriteTimestamp2': ${err}")
         return 
     })
     f(
@@ -11293,18 +9621,9 @@ pub fn queue_submit2(
     submit_count                                    u32,
     p_submits                                       &SubmitInfo2,
     fence                                           C.Fence) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueueSubmit2(dl_loader.get_sym('vkQueueSubmit2'
+      f := VkQueueSubmit2((*loader_p).get_sym('vkQueueSubmit2'
     ) or { 
-        println("Couldn't load sym for 'vkQueueSubmit2': ${err}")
+        println("Couldn't load symbol for 'vkQueueSubmit2': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -11320,18 +9639,9 @@ type VkCmdCopyBuffer2 = fn (     C.CommandBuffer,     &CopyBufferInfo2)
 pub fn cmd_copy_buffer2(
     command_buffer                                  C.CommandBuffer,
     p_copy_buffer_info                              &CopyBufferInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyBuffer2(dl_loader.get_sym('vkCmdCopyBuffer2'
+      f := VkCmdCopyBuffer2((*loader_p).get_sym('vkCmdCopyBuffer2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyBuffer2': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyBuffer2': ${err}")
         return 
     })
     f(
@@ -11345,18 +9655,9 @@ type VkCmdCopyImage2 = fn (     C.CommandBuffer,     &CopyImageInfo2)
 pub fn cmd_copy_image2(
     command_buffer                                  C.CommandBuffer,
     p_copy_image_info                               &CopyImageInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyImage2(dl_loader.get_sym('vkCmdCopyImage2'
+      f := VkCmdCopyImage2((*loader_p).get_sym('vkCmdCopyImage2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyImage2': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyImage2': ${err}")
         return 
     })
     f(
@@ -11370,18 +9671,9 @@ type VkCmdCopyBufferToImage2 = fn (     C.CommandBuffer,     &CopyBufferToImageI
 pub fn cmd_copy_buffer_to_image2(
     command_buffer                                  C.CommandBuffer,
     p_copy_buffer_to_image_info                     &CopyBufferToImageInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyBufferToImage2(dl_loader.get_sym('vkCmdCopyBufferToImage2'
+      f := VkCmdCopyBufferToImage2((*loader_p).get_sym('vkCmdCopyBufferToImage2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyBufferToImage2': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyBufferToImage2': ${err}")
         return 
     })
     f(
@@ -11395,18 +9687,9 @@ type VkCmdCopyImageToBuffer2 = fn (     C.CommandBuffer,     &CopyImageToBufferI
 pub fn cmd_copy_image_to_buffer2(
     command_buffer                                  C.CommandBuffer,
     p_copy_image_to_buffer_info                     &CopyImageToBufferInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyImageToBuffer2(dl_loader.get_sym('vkCmdCopyImageToBuffer2'
+      f := VkCmdCopyImageToBuffer2((*loader_p).get_sym('vkCmdCopyImageToBuffer2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyImageToBuffer2': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyImageToBuffer2': ${err}")
         return 
     })
     f(
@@ -11420,18 +9703,9 @@ type VkCmdBlitImage2 = fn (     C.CommandBuffer,     &BlitImageInfo2)
 pub fn cmd_blit_image2(
     command_buffer                                  C.CommandBuffer,
     p_blit_image_info                               &BlitImageInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBlitImage2(dl_loader.get_sym('vkCmdBlitImage2'
+      f := VkCmdBlitImage2((*loader_p).get_sym('vkCmdBlitImage2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBlitImage2': ${err}")
+        println("Couldn't load symbol for 'vkCmdBlitImage2': ${err}")
         return 
     })
     f(
@@ -11445,18 +9719,9 @@ type VkCmdResolveImage2 = fn (     C.CommandBuffer,     &ResolveImageInfo2)
 pub fn cmd_resolve_image2(
     command_buffer                                  C.CommandBuffer,
     p_resolve_image_info                            &ResolveImageInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdResolveImage2(dl_loader.get_sym('vkCmdResolveImage2'
+      f := VkCmdResolveImage2((*loader_p).get_sym('vkCmdResolveImage2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdResolveImage2': ${err}")
+        println("Couldn't load symbol for 'vkCmdResolveImage2': ${err}")
         return 
     })
     f(
@@ -11470,18 +9735,9 @@ type VkCmdBeginRendering = fn (     C.CommandBuffer,     &RenderingInfo)
 pub fn cmd_begin_rendering(
     command_buffer                                  C.CommandBuffer,
     p_rendering_info                                &RenderingInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginRendering(dl_loader.get_sym('vkCmdBeginRendering'
+      f := VkCmdBeginRendering((*loader_p).get_sym('vkCmdBeginRendering'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginRendering': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginRendering': ${err}")
         return 
     })
     f(
@@ -11494,18 +9750,9 @@ type VkCmdEndRendering = fn (     C.CommandBuffer)
 
 pub fn cmd_end_rendering(
     command_buffer                                  C.CommandBuffer)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndRendering(dl_loader.get_sym('vkCmdEndRendering'
+      f := VkCmdEndRendering((*loader_p).get_sym('vkCmdEndRendering'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndRendering': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndRendering': ${err}")
         return 
     })
     f(
@@ -11518,18 +9765,9 @@ type VkCmdSetCullMode = fn (     C.CommandBuffer,     CullModeFlags)
 pub fn cmd_set_cull_mode(
     command_buffer                                  C.CommandBuffer,
     cull_mode                                       CullModeFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetCullMode(dl_loader.get_sym('vkCmdSetCullMode'
+      f := VkCmdSetCullMode((*loader_p).get_sym('vkCmdSetCullMode'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetCullMode': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetCullMode': ${err}")
         return 
     })
     f(
@@ -11543,18 +9781,9 @@ type VkCmdSetFrontFace = fn (     C.CommandBuffer,     FrontFace)
 pub fn cmd_set_front_face(
     command_buffer                                  C.CommandBuffer,
     front_face                                      FrontFace)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetFrontFace(dl_loader.get_sym('vkCmdSetFrontFace'
+      f := VkCmdSetFrontFace((*loader_p).get_sym('vkCmdSetFrontFace'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetFrontFace': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetFrontFace': ${err}")
         return 
     })
     f(
@@ -11568,18 +9797,9 @@ type VkCmdSetPrimitiveTopology = fn (     C.CommandBuffer,     PrimitiveTopology
 pub fn cmd_set_primitive_topology(
     command_buffer                                  C.CommandBuffer,
     primitive_topology                              PrimitiveTopology)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetPrimitiveTopology(dl_loader.get_sym('vkCmdSetPrimitiveTopology'
+      f := VkCmdSetPrimitiveTopology((*loader_p).get_sym('vkCmdSetPrimitiveTopology'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetPrimitiveTopology': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetPrimitiveTopology': ${err}")
         return 
     })
     f(
@@ -11594,18 +9814,9 @@ pub fn cmd_set_viewport_with_count(
     command_buffer                                  C.CommandBuffer,
     viewport_count                                  u32,
     p_viewports                                     &Viewport)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetViewportWithCount(dl_loader.get_sym('vkCmdSetViewportWithCount'
+      f := VkCmdSetViewportWithCount((*loader_p).get_sym('vkCmdSetViewportWithCount'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetViewportWithCount': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetViewportWithCount': ${err}")
         return 
     })
     f(
@@ -11621,18 +9832,9 @@ pub fn cmd_set_scissor_with_count(
     command_buffer                                  C.CommandBuffer,
     scissor_count                                   u32,
     p_scissors                                      &Rect2D)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetScissorWithCount(dl_loader.get_sym('vkCmdSetScissorWithCount'
+      f := VkCmdSetScissorWithCount((*loader_p).get_sym('vkCmdSetScissorWithCount'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetScissorWithCount': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetScissorWithCount': ${err}")
         return 
     })
     f(
@@ -11652,18 +9854,9 @@ pub fn cmd_bind_vertex_buffers2(
     p_offsets                                       &DeviceSize,
     p_sizes                                         &DeviceSize,
     p_strides                                       &DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindVertexBuffers2(dl_loader.get_sym('vkCmdBindVertexBuffers2'
+      f := VkCmdBindVertexBuffers2((*loader_p).get_sym('vkCmdBindVertexBuffers2'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindVertexBuffers2': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindVertexBuffers2': ${err}")
         return 
     })
     f(
@@ -11682,18 +9875,9 @@ type VkCmdSetDepthTestEnable = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_depth_test_enable(
     command_buffer                                  C.CommandBuffer,
     depth_test_enable                               Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthTestEnable(dl_loader.get_sym('vkCmdSetDepthTestEnable'
+      f := VkCmdSetDepthTestEnable((*loader_p).get_sym('vkCmdSetDepthTestEnable'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthTestEnable': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthTestEnable': ${err}")
         return 
     })
     f(
@@ -11707,18 +9891,9 @@ type VkCmdSetDepthWriteEnable = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_depth_write_enable(
     command_buffer                                  C.CommandBuffer,
     depth_write_enable                              Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthWriteEnable(dl_loader.get_sym('vkCmdSetDepthWriteEnable'
+      f := VkCmdSetDepthWriteEnable((*loader_p).get_sym('vkCmdSetDepthWriteEnable'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthWriteEnable': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthWriteEnable': ${err}")
         return 
     })
     f(
@@ -11732,18 +9907,9 @@ type VkCmdSetDepthCompareOp = fn (     C.CommandBuffer,     CompareOp)
 pub fn cmd_set_depth_compare_op(
     command_buffer                                  C.CommandBuffer,
     depth_compare_op                                CompareOp)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthCompareOp(dl_loader.get_sym('vkCmdSetDepthCompareOp'
+      f := VkCmdSetDepthCompareOp((*loader_p).get_sym('vkCmdSetDepthCompareOp'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthCompareOp': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthCompareOp': ${err}")
         return 
     })
     f(
@@ -11757,18 +9923,9 @@ type VkCmdSetDepthBoundsTestEnable = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_depth_bounds_test_enable(
     command_buffer                                  C.CommandBuffer,
     depth_bounds_test_enable                        Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthBoundsTestEnable(dl_loader.get_sym('vkCmdSetDepthBoundsTestEnable'
+      f := VkCmdSetDepthBoundsTestEnable((*loader_p).get_sym('vkCmdSetDepthBoundsTestEnable'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthBoundsTestEnable': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthBoundsTestEnable': ${err}")
         return 
     })
     f(
@@ -11782,18 +9939,9 @@ type VkCmdSetStencilTestEnable = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_stencil_test_enable(
     command_buffer                                  C.CommandBuffer,
     stencil_test_enable                             Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetStencilTestEnable(dl_loader.get_sym('vkCmdSetStencilTestEnable'
+      f := VkCmdSetStencilTestEnable((*loader_p).get_sym('vkCmdSetStencilTestEnable'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetStencilTestEnable': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetStencilTestEnable': ${err}")
         return 
     })
     f(
@@ -11811,18 +9959,9 @@ pub fn cmd_set_stencil_op(
     pass_op                                         StencilOp,
     depth_fail_op                                   StencilOp,
     compare_op                                      CompareOp)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetStencilOp(dl_loader.get_sym('vkCmdSetStencilOp'
+      f := VkCmdSetStencilOp((*loader_p).get_sym('vkCmdSetStencilOp'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetStencilOp': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetStencilOp': ${err}")
         return 
     })
     f(
@@ -11840,18 +9979,9 @@ type VkCmdSetRasterizerDiscardEnable = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_rasterizer_discard_enable(
     command_buffer                                  C.CommandBuffer,
     rasterizer_discard_enable                       Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetRasterizerDiscardEnable(dl_loader.get_sym('vkCmdSetRasterizerDiscardEnable'
+      f := VkCmdSetRasterizerDiscardEnable((*loader_p).get_sym('vkCmdSetRasterizerDiscardEnable'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetRasterizerDiscardEnable': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetRasterizerDiscardEnable': ${err}")
         return 
     })
     f(
@@ -11865,18 +9995,9 @@ type VkCmdSetDepthBiasEnable = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_depth_bias_enable(
     command_buffer                                  C.CommandBuffer,
     depth_bias_enable                               Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthBiasEnable(dl_loader.get_sym('vkCmdSetDepthBiasEnable'
+      f := VkCmdSetDepthBiasEnable((*loader_p).get_sym('vkCmdSetDepthBiasEnable'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthBiasEnable': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthBiasEnable': ${err}")
         return 
     })
     f(
@@ -11890,18 +10011,9 @@ type VkCmdSetPrimitiveRestartEnable = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_primitive_restart_enable(
     command_buffer                                  C.CommandBuffer,
     primitive_restart_enable                        Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetPrimitiveRestartEnable(dl_loader.get_sym('vkCmdSetPrimitiveRestartEnable'
+      f := VkCmdSetPrimitiveRestartEnable((*loader_p).get_sym('vkCmdSetPrimitiveRestartEnable'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetPrimitiveRestartEnable': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetPrimitiveRestartEnable': ${err}")
         return 
     })
     f(
@@ -11916,18 +10028,9 @@ pub fn get_device_buffer_memory_requirements(
     device                                          C.Device,
     p_info                                          &DeviceBufferMemoryRequirements,
     p_memory_requirements                           &MemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceBufferMemoryRequirements(dl_loader.get_sym('vkGetDeviceBufferMemoryRequirements'
+      f := VkGetDeviceBufferMemoryRequirements((*loader_p).get_sym('vkGetDeviceBufferMemoryRequirements'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceBufferMemoryRequirements': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceBufferMemoryRequirements': ${err}")
         return 
     })
     f(
@@ -11943,18 +10046,9 @@ pub fn get_device_image_memory_requirements(
     device                                          C.Device,
     p_info                                          &DeviceImageMemoryRequirements,
     p_memory_requirements                           &MemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceImageMemoryRequirements(dl_loader.get_sym('vkGetDeviceImageMemoryRequirements'
+      f := VkGetDeviceImageMemoryRequirements((*loader_p).get_sym('vkGetDeviceImageMemoryRequirements'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceImageMemoryRequirements': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceImageMemoryRequirements': ${err}")
         return 
     })
     f(
@@ -11971,18 +10065,9 @@ pub fn get_device_image_sparse_memory_requirements(
     p_info                                          &DeviceImageMemoryRequirements,
     p_sparse_memory_requirement_count               &u32,
     p_sparse_memory_requirements                    &SparseImageMemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceImageSparseMemoryRequirements(dl_loader.get_sym('vkGetDeviceImageSparseMemoryRequirements'
+      f := VkGetDeviceImageSparseMemoryRequirements((*loader_p).get_sym('vkGetDeviceImageSparseMemoryRequirements'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceImageSparseMemoryRequirements': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceImageSparseMemoryRequirements': ${err}")
         return 
     })
     f(
@@ -12083,18 +10168,9 @@ pub fn destroy_surface_khr(
     instance                                        C.Instance,
     surface                                         C.SurfaceKHR,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroySurfaceKHR(dl_loader.get_sym('vkDestroySurfaceKHR'
+      f := VkDestroySurfaceKHR((*loader_p).get_sym('vkDestroySurfaceKHR'
     ) or { 
-        println("Couldn't load sym for 'vkDestroySurfaceKHR': ${err}")
+        println("Couldn't load symbol for 'vkDestroySurfaceKHR': ${err}")
         return 
     })
     f(
@@ -12111,18 +10187,9 @@ pub fn get_physical_device_surface_support_khr(
     queue_family_index                              u32,
     surface                                         C.SurfaceKHR,
     p_supported                                     &Bool32) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSurfaceSupportKHR(dl_loader.get_sym('vkGetPhysicalDeviceSurfaceSupportKHR'
+      f := VkGetPhysicalDeviceSurfaceSupportKHR((*loader_p).get_sym('vkGetPhysicalDeviceSurfaceSupportKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSurfaceSupportKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceSupportKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12139,18 +10206,9 @@ pub fn get_physical_device_surface_capabilities_khr(
     physical_device                                 C.PhysicalDevice,
     surface                                         C.SurfaceKHR,
     p_surface_capabilities                          &SurfaceCapabilitiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSurfaceCapabilitiesKHR(dl_loader.get_sym('vkGetPhysicalDeviceSurfaceCapabilitiesKHR'
+      f := VkGetPhysicalDeviceSurfaceCapabilitiesKHR((*loader_p).get_sym('vkGetPhysicalDeviceSurfaceCapabilitiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSurfaceCapabilitiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceCapabilitiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12167,18 +10225,9 @@ pub fn get_physical_device_surface_formats_khr(
     surface                                         C.SurfaceKHR,
     p_surface_format_count                          &u32,
     p_surface_formats                               &SurfaceFormatKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSurfaceFormatsKHR(dl_loader.get_sym('vkGetPhysicalDeviceSurfaceFormatsKHR'
+      f := VkGetPhysicalDeviceSurfaceFormatsKHR((*loader_p).get_sym('vkGetPhysicalDeviceSurfaceFormatsKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSurfaceFormatsKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceFormatsKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12196,18 +10245,9 @@ pub fn get_physical_device_surface_present_modes_khr(
     surface                                         C.SurfaceKHR,
     p_present_mode_count                            &u32,
     p_present_modes                                 &PresentModeKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSurfacePresentModesKHR(dl_loader.get_sym('vkGetPhysicalDeviceSurfacePresentModesKHR'
+      f := VkGetPhysicalDeviceSurfacePresentModesKHR((*loader_p).get_sym('vkGetPhysicalDeviceSurfacePresentModesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSurfacePresentModesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfacePresentModesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12340,18 +10380,9 @@ pub fn create_swapchain_khr(
     p_create_info                                   &SwapchainCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_swapchain                                     &C.SwapchainKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateSwapchainKHR(dl_loader.get_sym('vkCreateSwapchainKHR'
+      f := VkCreateSwapchainKHR((*loader_p).get_sym('vkCreateSwapchainKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateSwapchainKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateSwapchainKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12368,18 +10399,9 @@ pub fn destroy_swapchain_khr(
     device                                          C.Device,
     swapchain                                       C.SwapchainKHR,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroySwapchainKHR(dl_loader.get_sym('vkDestroySwapchainKHR'
+      f := VkDestroySwapchainKHR((*loader_p).get_sym('vkDestroySwapchainKHR'
     ) or { 
-        println("Couldn't load sym for 'vkDestroySwapchainKHR': ${err}")
+        println("Couldn't load symbol for 'vkDestroySwapchainKHR': ${err}")
         return 
     })
     f(
@@ -12396,18 +10418,9 @@ pub fn get_swapchain_images_khr(
     swapchain                                       C.SwapchainKHR,
     p_swapchain_image_count                         &u32,
     p_swapchain_images                              &C.Image) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetSwapchainImagesKHR(dl_loader.get_sym('vkGetSwapchainImagesKHR'
+      f := VkGetSwapchainImagesKHR((*loader_p).get_sym('vkGetSwapchainImagesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetSwapchainImagesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetSwapchainImagesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12427,18 +10440,9 @@ pub fn acquire_next_image_khr(
     semaphore                                       C.Semaphore,
     fence                                           C.Fence,
     p_image_index                                   &u32) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAcquireNextImageKHR(dl_loader.get_sym('vkAcquireNextImageKHR'
+      f := VkAcquireNextImageKHR((*loader_p).get_sym('vkAcquireNextImageKHR'
     ) or { 
-        println("Couldn't load sym for 'vkAcquireNextImageKHR': ${err}")
+        println("Couldn't load symbol for 'vkAcquireNextImageKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12456,18 +10460,9 @@ type VkQueuePresentKHR = fn (     C.Queue,     &PresentInfoKHR) Result
 pub fn queue_present_khr(
     queue                                           C.Queue,
     p_present_info                                  &PresentInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueuePresentKHR(dl_loader.get_sym('vkQueuePresentKHR'
+      f := VkQueuePresentKHR((*loader_p).get_sym('vkQueuePresentKHR'
     ) or { 
-        println("Couldn't load sym for 'vkQueuePresentKHR': ${err}")
+        println("Couldn't load symbol for 'vkQueuePresentKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12481,18 +10476,9 @@ type VkGetDeviceGroupPresentCapabilitiesKHR = fn (     C.Device,     &DeviceGrou
 pub fn get_device_group_present_capabilities_khr(
     device                                          C.Device,
     p_device_group_present_capabilities             &DeviceGroupPresentCapabilitiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceGroupPresentCapabilitiesKHR(dl_loader.get_sym('vkGetDeviceGroupPresentCapabilitiesKHR'
+      f := VkGetDeviceGroupPresentCapabilitiesKHR((*loader_p).get_sym('vkGetDeviceGroupPresentCapabilitiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceGroupPresentCapabilitiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceGroupPresentCapabilitiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12507,18 +10493,9 @@ pub fn get_device_group_surface_present_modes_khr(
     device                                          C.Device,
     surface                                         C.SurfaceKHR,
     p_modes                                         &DeviceGroupPresentModeFlagsKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceGroupSurfacePresentModesKHR(dl_loader.get_sym('vkGetDeviceGroupSurfacePresentModesKHR'
+      f := VkGetDeviceGroupSurfacePresentModesKHR((*loader_p).get_sym('vkGetDeviceGroupSurfacePresentModesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceGroupSurfacePresentModesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceGroupSurfacePresentModesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12535,18 +10512,9 @@ pub fn get_physical_device_present_rectangles_khr(
     surface                                         C.SurfaceKHR,
     p_rect_count                                    &u32,
     p_rects                                         &Rect2D) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDevicePresentRectanglesKHR(dl_loader.get_sym('vkGetPhysicalDevicePresentRectanglesKHR'
+      f := VkGetPhysicalDevicePresentRectanglesKHR((*loader_p).get_sym('vkGetPhysicalDevicePresentRectanglesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDevicePresentRectanglesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDevicePresentRectanglesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12563,18 +10531,9 @@ pub fn acquire_next_image2_khr(
     device                                          C.Device,
     p_acquire_info                                  &AcquireNextImageInfoKHR,
     p_image_index                                   &u32) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAcquireNextImage2KHR(dl_loader.get_sym('vkAcquireNextImage2KHR'
+      f := VkAcquireNextImage2KHR((*loader_p).get_sym('vkAcquireNextImage2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkAcquireNextImage2KHR': ${err}")
+        println("Couldn't load symbol for 'vkAcquireNextImage2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12674,18 +10633,9 @@ pub fn get_physical_device_display_properties_khr(
     physical_device                                 C.PhysicalDevice,
     p_property_count                                &u32,
     p_properties                                    &DisplayPropertiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceDisplayPropertiesKHR(dl_loader.get_sym('vkGetPhysicalDeviceDisplayPropertiesKHR'
+      f := VkGetPhysicalDeviceDisplayPropertiesKHR((*loader_p).get_sym('vkGetPhysicalDeviceDisplayPropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceDisplayPropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceDisplayPropertiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12701,18 +10651,9 @@ pub fn get_physical_device_display_plane_properties_khr(
     physical_device                                 C.PhysicalDevice,
     p_property_count                                &u32,
     p_properties                                    &DisplayPlanePropertiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceDisplayPlanePropertiesKHR(dl_loader.get_sym('vkGetPhysicalDeviceDisplayPlanePropertiesKHR'
+      f := VkGetPhysicalDeviceDisplayPlanePropertiesKHR((*loader_p).get_sym('vkGetPhysicalDeviceDisplayPlanePropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceDisplayPlanePropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceDisplayPlanePropertiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12729,18 +10670,9 @@ pub fn get_display_plane_supported_displays_khr(
     plane_index                                     u32,
     p_display_count                                 &u32,
     p_displays                                      &C.DisplayKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDisplayPlaneSupportedDisplaysKHR(dl_loader.get_sym('vkGetDisplayPlaneSupportedDisplaysKHR'
+      f := VkGetDisplayPlaneSupportedDisplaysKHR((*loader_p).get_sym('vkGetDisplayPlaneSupportedDisplaysKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDisplayPlaneSupportedDisplaysKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDisplayPlaneSupportedDisplaysKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12758,18 +10690,9 @@ pub fn get_display_mode_properties_khr(
     display                                         C.DisplayKHR,
     p_property_count                                &u32,
     p_properties                                    &DisplayModePropertiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDisplayModePropertiesKHR(dl_loader.get_sym('vkGetDisplayModePropertiesKHR'
+      f := VkGetDisplayModePropertiesKHR((*loader_p).get_sym('vkGetDisplayModePropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDisplayModePropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDisplayModePropertiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12788,18 +10711,9 @@ pub fn create_display_mode_khr(
     p_create_info                                   &DisplayModeCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_mode                                          &C.DisplayModeKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDisplayModeKHR(dl_loader.get_sym('vkCreateDisplayModeKHR'
+      f := VkCreateDisplayModeKHR((*loader_p).get_sym('vkCreateDisplayModeKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDisplayModeKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateDisplayModeKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12818,18 +10732,9 @@ pub fn get_display_plane_capabilities_khr(
     mode                                            C.DisplayModeKHR,
     plane_index                                     u32,
     p_capabilities                                  &DisplayPlaneCapabilitiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDisplayPlaneCapabilitiesKHR(dl_loader.get_sym('vkGetDisplayPlaneCapabilitiesKHR'
+      f := VkGetDisplayPlaneCapabilitiesKHR((*loader_p).get_sym('vkGetDisplayPlaneCapabilitiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDisplayPlaneCapabilitiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDisplayPlaneCapabilitiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12847,18 +10752,9 @@ pub fn create_display_plane_surface_khr(
     p_create_info                                   &DisplaySurfaceCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDisplayPlaneSurfaceKHR(dl_loader.get_sym('vkCreateDisplayPlaneSurfaceKHR'
+      f := VkCreateDisplayPlaneSurfaceKHR((*loader_p).get_sym('vkCreateDisplayPlaneSurfaceKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDisplayPlaneSurfaceKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateDisplayPlaneSurfaceKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12893,18 +10789,9 @@ pub fn create_shared_swapchains_khr(
     p_create_infos                                  &SwapchainCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_swapchains                                    &C.SwapchainKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateSharedSwapchainsKHR(dl_loader.get_sym('vkCreateSharedSwapchainsKHR'
+      f := VkCreateSharedSwapchainsKHR((*loader_p).get_sym('vkCreateSharedSwapchainsKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateSharedSwapchainsKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateSharedSwapchainsKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12939,18 +10826,9 @@ pub fn create_xlib_surface_khr(
     p_create_info                                   &XlibSurfaceCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateXlibSurfaceKHR(dl_loader.get_sym('vkCreateXlibSurfaceKHR'
+      f := VkCreateXlibSurfaceKHR((*loader_p).get_sym('vkCreateXlibSurfaceKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateXlibSurfaceKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateXlibSurfaceKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -12968,16 +10846,9 @@ pub fn get_physical_device_xlib_presentation_support_khr(
     queue_family_index                              u32,
     dpy                                             &C.DisplayKHR,
     visual_id                                       voidptr) Bool32 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceXlibPresentationSupportKHR(dl_loader.get_sym("vkGetPhysicalDeviceXlibPresentationSupportKHR"
+      f := VkGetPhysicalDeviceXlibPresentationSupportKHR((*loader_p).get_sym("vkGetPhysicalDeviceXlibPresentationSupportKHR"
     ) or { 
-        panic("Couldn't load sym for 'vkGetPhysicalDeviceXlibPresentationSupportKHR': ${err}") })
+        panic("Couldn't load symbol for 'vkGetPhysicalDeviceXlibPresentationSupportKHR': ${err}") })
     return f(
     physical_device,
     queue_family_index,
@@ -13009,18 +10880,9 @@ pub fn create_xcb_surface_khr(
     p_create_info                                   &XcbSurfaceCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateXcbSurfaceKHR(dl_loader.get_sym('vkCreateXcbSurfaceKHR'
+      f := VkCreateXcbSurfaceKHR((*loader_p).get_sym('vkCreateXcbSurfaceKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateXcbSurfaceKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateXcbSurfaceKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13038,16 +10900,9 @@ pub fn get_physical_device_xcb_presentation_support_khr(
     queue_family_index                              u32,
     connection                                      voidptr,
     visual_id                                       voidptr) Bool32 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceXcbPresentationSupportKHR(dl_loader.get_sym("vkGetPhysicalDeviceXcbPresentationSupportKHR"
+      f := VkGetPhysicalDeviceXcbPresentationSupportKHR((*loader_p).get_sym("vkGetPhysicalDeviceXcbPresentationSupportKHR"
     ) or { 
-        panic("Couldn't load sym for 'vkGetPhysicalDeviceXcbPresentationSupportKHR': ${err}") })
+        panic("Couldn't load symbol for 'vkGetPhysicalDeviceXcbPresentationSupportKHR': ${err}") })
     return f(
     physical_device,
     queue_family_index,
@@ -13079,18 +10934,9 @@ pub fn create_wayland_surface_khr(
     p_create_info                                   &WaylandSurfaceCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateWaylandSurfaceKHR(dl_loader.get_sym('vkCreateWaylandSurfaceKHR'
+      f := VkCreateWaylandSurfaceKHR((*loader_p).get_sym('vkCreateWaylandSurfaceKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateWaylandSurfaceKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateWaylandSurfaceKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13107,16 +10953,9 @@ pub fn get_physical_device_wayland_presentation_support_khr(
     physical_device                                 C.PhysicalDevice,
     queue_family_index                              u32,
     display                                         voidptr) Bool32 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceWaylandPresentationSupportKHR(dl_loader.get_sym("vkGetPhysicalDeviceWaylandPresentationSupportKHR"
+      f := VkGetPhysicalDeviceWaylandPresentationSupportKHR((*loader_p).get_sym("vkGetPhysicalDeviceWaylandPresentationSupportKHR"
     ) or { 
-        panic("Couldn't load sym for 'vkGetPhysicalDeviceWaylandPresentationSupportKHR': ${err}") })
+        panic("Couldn't load symbol for 'vkGetPhysicalDeviceWaylandPresentationSupportKHR': ${err}") })
     return f(
     physical_device,
     queue_family_index,
@@ -13146,18 +10985,9 @@ pub fn create_android_surface_khr(
     p_create_info                                   &AndroidSurfaceCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateAndroidSurfaceKHR(dl_loader.get_sym('vkCreateAndroidSurfaceKHR'
+      f := VkCreateAndroidSurfaceKHR((*loader_p).get_sym('vkCreateAndroidSurfaceKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateAndroidSurfaceKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateAndroidSurfaceKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13191,18 +11021,9 @@ pub fn create_win32_surface_khr(
     p_create_info                                   &Win32SurfaceCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateWin32SurfaceKHR(dl_loader.get_sym('vkCreateWin32SurfaceKHR'
+      f := VkCreateWin32SurfaceKHR((*loader_p).get_sym('vkCreateWin32SurfaceKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateWin32SurfaceKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateWin32SurfaceKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13218,16 +11039,9 @@ type VkGetPhysicalDeviceWin32PresentationSupportKHR = fn (     C.PhysicalDevice,
 pub fn get_physical_device_win32_presentation_support_khr(
     physical_device                                 C.PhysicalDevice,
     queue_family_index                              u32) Bool32 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceWin32PresentationSupportKHR(dl_loader.get_sym("vkGetPhysicalDeviceWin32PresentationSupportKHR"
+      f := VkGetPhysicalDeviceWin32PresentationSupportKHR((*loader_p).get_sym("vkGetPhysicalDeviceWin32PresentationSupportKHR"
     ) or { 
-        panic("Couldn't load sym for 'vkGetPhysicalDeviceWin32PresentationSupportKHR': ${err}") })
+        panic("Couldn't load symbol for 'vkGetPhysicalDeviceWin32PresentationSupportKHR': ${err}") })
     return f(
     physical_device,
     queue_family_index)
@@ -13480,18 +11294,9 @@ pub fn get_physical_device_video_capabilities_khr(
     physical_device                                 C.PhysicalDevice,
     p_video_profile                                 &VideoProfileInfoKHR,
     p_capabilities                                  &VideoCapabilitiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceVideoCapabilitiesKHR(dl_loader.get_sym('vkGetPhysicalDeviceVideoCapabilitiesKHR'
+      f := VkGetPhysicalDeviceVideoCapabilitiesKHR((*loader_p).get_sym('vkGetPhysicalDeviceVideoCapabilitiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceVideoCapabilitiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceVideoCapabilitiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13508,18 +11313,9 @@ pub fn get_physical_device_video_format_properties_khr(
     p_video_format_info                             &PhysicalDeviceVideoFormatInfoKHR,
     p_video_format_property_count                   &u32,
     p_video_format_properties                       &VideoFormatPropertiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceVideoFormatPropertiesKHR(dl_loader.get_sym('vkGetPhysicalDeviceVideoFormatPropertiesKHR'
+      f := VkGetPhysicalDeviceVideoFormatPropertiesKHR((*loader_p).get_sym('vkGetPhysicalDeviceVideoFormatPropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceVideoFormatPropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceVideoFormatPropertiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13537,18 +11333,9 @@ pub fn create_video_session_khr(
     p_create_info                                   &VideoSessionCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_video_session                                 &C.VideoSessionKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateVideoSessionKHR(dl_loader.get_sym('vkCreateVideoSessionKHR'
+      f := VkCreateVideoSessionKHR((*loader_p).get_sym('vkCreateVideoSessionKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateVideoSessionKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateVideoSessionKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13565,18 +11352,9 @@ pub fn destroy_video_session_khr(
     device                                          C.Device,
     video_session                                   C.VideoSessionKHR,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyVideoSessionKHR(dl_loader.get_sym('vkDestroyVideoSessionKHR'
+      f := VkDestroyVideoSessionKHR((*loader_p).get_sym('vkDestroyVideoSessionKHR'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyVideoSessionKHR': ${err}")
+        println("Couldn't load symbol for 'vkDestroyVideoSessionKHR': ${err}")
         return 
     })
     f(
@@ -13593,18 +11371,9 @@ pub fn get_video_session_memory_requirements_khr(
     video_session                                   C.VideoSessionKHR,
     p_memory_requirements_count                     &u32,
     p_memory_requirements                           &VideoSessionMemoryRequirementsKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetVideoSessionMemoryRequirementsKHR(dl_loader.get_sym('vkGetVideoSessionMemoryRequirementsKHR'
+      f := VkGetVideoSessionMemoryRequirementsKHR((*loader_p).get_sym('vkGetVideoSessionMemoryRequirementsKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetVideoSessionMemoryRequirementsKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetVideoSessionMemoryRequirementsKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13622,18 +11391,9 @@ pub fn bind_video_session_memory_khr(
     video_session                                   C.VideoSessionKHR,
     bind_session_memory_info_count                  u32,
     p_bind_session_memory_infos                     &BindVideoSessionMemoryInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBindVideoSessionMemoryKHR(dl_loader.get_sym('vkBindVideoSessionMemoryKHR'
+      f := VkBindVideoSessionMemoryKHR((*loader_p).get_sym('vkBindVideoSessionMemoryKHR'
     ) or { 
-        println("Couldn't load sym for 'vkBindVideoSessionMemoryKHR': ${err}")
+        println("Couldn't load symbol for 'vkBindVideoSessionMemoryKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13651,18 +11411,9 @@ pub fn create_video_session_parameters_khr(
     p_create_info                                   &VideoSessionParametersCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_video_session_parameters                      &C.VideoSessionParametersKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateVideoSessionParametersKHR(dl_loader.get_sym('vkCreateVideoSessionParametersKHR'
+      f := VkCreateVideoSessionParametersKHR((*loader_p).get_sym('vkCreateVideoSessionParametersKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateVideoSessionParametersKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateVideoSessionParametersKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13679,18 +11430,9 @@ pub fn update_video_session_parameters_khr(
     device                                          C.Device,
     video_session_parameters                        C.VideoSessionParametersKHR,
     p_update_info                                   &VideoSessionParametersUpdateInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkUpdateVideoSessionParametersKHR(dl_loader.get_sym('vkUpdateVideoSessionParametersKHR'
+      f := VkUpdateVideoSessionParametersKHR((*loader_p).get_sym('vkUpdateVideoSessionParametersKHR'
     ) or { 
-        println("Couldn't load sym for 'vkUpdateVideoSessionParametersKHR': ${err}")
+        println("Couldn't load symbol for 'vkUpdateVideoSessionParametersKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -13706,18 +11448,9 @@ pub fn destroy_video_session_parameters_khr(
     device                                          C.Device,
     video_session_parameters                        C.VideoSessionParametersKHR,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyVideoSessionParametersKHR(dl_loader.get_sym('vkDestroyVideoSessionParametersKHR'
+      f := VkDestroyVideoSessionParametersKHR((*loader_p).get_sym('vkDestroyVideoSessionParametersKHR'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyVideoSessionParametersKHR': ${err}")
+        println("Couldn't load symbol for 'vkDestroyVideoSessionParametersKHR': ${err}")
         return 
     })
     f(
@@ -13732,18 +11465,9 @@ type VkCmdBeginVideoCodingKHR = fn (     C.CommandBuffer,     &VideoBeginCodingI
 pub fn cmd_begin_video_coding_khr(
     command_buffer                                  C.CommandBuffer,
     p_begin_info                                    &VideoBeginCodingInfoKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginVideoCodingKHR(dl_loader.get_sym('vkCmdBeginVideoCodingKHR'
+      f := VkCmdBeginVideoCodingKHR((*loader_p).get_sym('vkCmdBeginVideoCodingKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginVideoCodingKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginVideoCodingKHR': ${err}")
         return 
     })
     f(
@@ -13757,18 +11481,9 @@ type VkCmdEndVideoCodingKHR = fn (     C.CommandBuffer,     &VideoEndCodingInfoK
 pub fn cmd_end_video_coding_khr(
     command_buffer                                  C.CommandBuffer,
     p_end_coding_info                               &VideoEndCodingInfoKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndVideoCodingKHR(dl_loader.get_sym('vkCmdEndVideoCodingKHR'
+      f := VkCmdEndVideoCodingKHR((*loader_p).get_sym('vkCmdEndVideoCodingKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndVideoCodingKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndVideoCodingKHR': ${err}")
         return 
     })
     f(
@@ -13782,18 +11497,9 @@ type VkCmdControlVideoCodingKHR = fn (     C.CommandBuffer,     &VideoCodingCont
 pub fn cmd_control_video_coding_khr(
     command_buffer                                  C.CommandBuffer,
     p_coding_control_info                           &VideoCodingControlInfoKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdControlVideoCodingKHR(dl_loader.get_sym('vkCmdControlVideoCodingKHR'
+      f := VkCmdControlVideoCodingKHR((*loader_p).get_sym('vkCmdControlVideoCodingKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdControlVideoCodingKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdControlVideoCodingKHR': ${err}")
         return 
     })
     f(
@@ -13862,18 +11568,9 @@ type VkCmdDecodeVideoKHR = fn (     C.CommandBuffer,     &VideoDecodeInfoKHR)
 pub fn cmd_decode_video_khr(
     command_buffer                                  C.CommandBuffer,
     p_decode_info                                   &VideoDecodeInfoKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDecodeVideoKHR(dl_loader.get_sym('vkCmdDecodeVideoKHR'
+      f := VkCmdDecodeVideoKHR((*loader_p).get_sym('vkCmdDecodeVideoKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDecodeVideoKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdDecodeVideoKHR': ${err}")
         return 
     })
     f(
@@ -14017,18 +11714,9 @@ type VkCmdBeginRenderingKHR = fn (     C.CommandBuffer,     &RenderingInfo)
 pub fn cmd_begin_rendering_khr(
     command_buffer                                  C.CommandBuffer,
     p_rendering_info                                &RenderingInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginRenderingKHR(dl_loader.get_sym('vkCmdBeginRenderingKHR'
+      f := VkCmdBeginRenderingKHR((*loader_p).get_sym('vkCmdBeginRenderingKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginRenderingKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginRenderingKHR': ${err}")
         return 
     })
     f(
@@ -14041,18 +11729,9 @@ type VkCmdEndRenderingKHR = fn (     C.CommandBuffer)
 
 pub fn cmd_end_rendering_khr(
     command_buffer                                  C.CommandBuffer)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndRenderingKHR(dl_loader.get_sym('vkCmdEndRenderingKHR'
+      f := VkCmdEndRenderingKHR((*loader_p).get_sym('vkCmdEndRenderingKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndRenderingKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndRenderingKHR': ${err}")
         return 
     })
     f(
@@ -14101,18 +11780,9 @@ type VkGetPhysicalDeviceFeatures2KHR = fn (     C.PhysicalDevice,     &PhysicalD
 pub fn get_physical_device_features2_khr(
     physical_device                                 C.PhysicalDevice,
     p_features                                      &PhysicalDeviceFeatures2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceFeatures2KHR(dl_loader.get_sym('vkGetPhysicalDeviceFeatures2KHR'
+      f := VkGetPhysicalDeviceFeatures2KHR((*loader_p).get_sym('vkGetPhysicalDeviceFeatures2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceFeatures2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceFeatures2KHR': ${err}")
         return 
     })
     f(
@@ -14126,18 +11796,9 @@ type VkGetPhysicalDeviceProperties2KHR = fn (     C.PhysicalDevice,     &Physica
 pub fn get_physical_device_properties2_khr(
     physical_device                                 C.PhysicalDevice,
     p_properties                                    &PhysicalDeviceProperties2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceProperties2KHR(dl_loader.get_sym('vkGetPhysicalDeviceProperties2KHR'
+      f := VkGetPhysicalDeviceProperties2KHR((*loader_p).get_sym('vkGetPhysicalDeviceProperties2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceProperties2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceProperties2KHR': ${err}")
         return 
     })
     f(
@@ -14152,18 +11813,9 @@ pub fn get_physical_device_format_properties2_khr(
     physical_device                                 C.PhysicalDevice,
     format                                          Format,
     p_format_properties                             &FormatProperties2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceFormatProperties2KHR(dl_loader.get_sym('vkGetPhysicalDeviceFormatProperties2KHR'
+      f := VkGetPhysicalDeviceFormatProperties2KHR((*loader_p).get_sym('vkGetPhysicalDeviceFormatProperties2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceFormatProperties2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceFormatProperties2KHR': ${err}")
         return 
     })
     f(
@@ -14179,18 +11831,9 @@ pub fn get_physical_device_image_format_properties2_khr(
     physical_device                                 C.PhysicalDevice,
     p_image_format_info                             &PhysicalDeviceImageFormatInfo2,
     p_image_format_properties                       &ImageFormatProperties2) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceImageFormatProperties2KHR(dl_loader.get_sym('vkGetPhysicalDeviceImageFormatProperties2KHR'
+      f := VkGetPhysicalDeviceImageFormatProperties2KHR((*loader_p).get_sym('vkGetPhysicalDeviceImageFormatProperties2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceImageFormatProperties2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceImageFormatProperties2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -14206,18 +11849,9 @@ pub fn get_physical_device_queue_family_properties2_khr(
     physical_device                                 C.PhysicalDevice,
     p_queue_family_property_count                   &u32,
     p_queue_family_properties                       &QueueFamilyProperties2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceQueueFamilyProperties2KHR(dl_loader.get_sym('vkGetPhysicalDeviceQueueFamilyProperties2KHR'
+      f := VkGetPhysicalDeviceQueueFamilyProperties2KHR((*loader_p).get_sym('vkGetPhysicalDeviceQueueFamilyProperties2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceQueueFamilyProperties2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceQueueFamilyProperties2KHR': ${err}")
         return 
     })
     f(
@@ -14232,18 +11866,9 @@ type VkGetPhysicalDeviceMemoryProperties2KHR = fn (     C.PhysicalDevice,     &P
 pub fn get_physical_device_memory_properties2_khr(
     physical_device                                 C.PhysicalDevice,
     p_memory_properties                             &PhysicalDeviceMemoryProperties2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceMemoryProperties2KHR(dl_loader.get_sym('vkGetPhysicalDeviceMemoryProperties2KHR'
+      f := VkGetPhysicalDeviceMemoryProperties2KHR((*loader_p).get_sym('vkGetPhysicalDeviceMemoryProperties2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceMemoryProperties2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceMemoryProperties2KHR': ${err}")
         return 
     })
     f(
@@ -14259,18 +11884,9 @@ pub fn get_physical_device_sparse_image_format_properties2_khr(
     p_format_info                                   &PhysicalDeviceSparseImageFormatInfo2,
     p_property_count                                &u32,
     p_properties                                    &SparseImageFormatProperties2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSparseImageFormatProperties2KHR(dl_loader.get_sym('vkGetPhysicalDeviceSparseImageFormatProperties2KHR'
+      f := VkGetPhysicalDeviceSparseImageFormatProperties2KHR((*loader_p).get_sym('vkGetPhysicalDeviceSparseImageFormatProperties2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSparseImageFormatProperties2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSparseImageFormatProperties2KHR': ${err}")
         return 
     })
     f(
@@ -14313,18 +11929,9 @@ pub fn get_device_group_peer_memory_features_khr(
     local_device_index                              u32,
     remote_device_index                             u32,
     p_peer_memory_features                          &PeerMemoryFeatureFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceGroupPeerMemoryFeaturesKHR(dl_loader.get_sym('vkGetDeviceGroupPeerMemoryFeaturesKHR'
+      f := VkGetDeviceGroupPeerMemoryFeaturesKHR((*loader_p).get_sym('vkGetDeviceGroupPeerMemoryFeaturesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceGroupPeerMemoryFeaturesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceGroupPeerMemoryFeaturesKHR': ${err}")
         return 
     })
     f(
@@ -14341,18 +11948,9 @@ type VkCmdSetDeviceMaskKHR = fn (     C.CommandBuffer,     u32)
 pub fn cmd_set_device_mask_khr(
     command_buffer                                  C.CommandBuffer,
     device_mask                                     u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDeviceMaskKHR(dl_loader.get_sym('vkCmdSetDeviceMaskKHR'
+      f := VkCmdSetDeviceMaskKHR((*loader_p).get_sym('vkCmdSetDeviceMaskKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDeviceMaskKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDeviceMaskKHR': ${err}")
         return 
     })
     f(
@@ -14371,18 +11969,9 @@ pub fn cmd_dispatch_base_khr(
     group_count_x                                   u32,
     group_count_y                                   u32,
     group_count_z                                   u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDispatchBaseKHR(dl_loader.get_sym('vkCmdDispatchBaseKHR'
+      f := VkCmdDispatchBaseKHR((*loader_p).get_sym('vkCmdDispatchBaseKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDispatchBaseKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdDispatchBaseKHR': ${err}")
         return 
     })
     f(
@@ -14416,18 +12005,9 @@ pub fn trim_command_pool_khr(
     device                                          C.Device,
     command_pool                                    C.CommandPool,
     flags                                           CommandPoolTrimFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkTrimCommandPoolKHR(dl_loader.get_sym('vkTrimCommandPoolKHR'
+      f := VkTrimCommandPoolKHR((*loader_p).get_sym('vkTrimCommandPoolKHR'
     ) or { 
-        println("Couldn't load sym for 'vkTrimCommandPoolKHR': ${err}")
+        println("Couldn't load symbol for 'vkTrimCommandPoolKHR': ${err}")
         return 
     })
     f(
@@ -14454,18 +12034,9 @@ pub fn enumerate_physical_device_groups_khr(
     instance                                        C.Instance,
     p_physical_device_group_count                   &u32,
     p_physical_device_group_properties              &PhysicalDeviceGroupProperties) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkEnumeratePhysicalDeviceGroupsKHR(dl_loader.get_sym('vkEnumeratePhysicalDeviceGroupsKHR'
+      f := VkEnumeratePhysicalDeviceGroupsKHR((*loader_p).get_sym('vkEnumeratePhysicalDeviceGroupsKHR'
     ) or { 
-        println("Couldn't load sym for 'vkEnumeratePhysicalDeviceGroupsKHR': ${err}")
+        println("Couldn't load symbol for 'vkEnumeratePhysicalDeviceGroupsKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -14504,18 +12075,9 @@ pub fn get_physical_device_external_buffer_properties_khr(
     physical_device                                 C.PhysicalDevice,
     p_external_buffer_info                          &PhysicalDeviceExternalBufferInfo,
     p_external_buffer_properties                    &ExternalBufferProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceExternalBufferPropertiesKHR(dl_loader.get_sym('vkGetPhysicalDeviceExternalBufferPropertiesKHR'
+      f := VkGetPhysicalDeviceExternalBufferPropertiesKHR((*loader_p).get_sym('vkGetPhysicalDeviceExternalBufferPropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceExternalBufferPropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalBufferPropertiesKHR': ${err}")
         return 
     })
     f(
@@ -14585,18 +12147,9 @@ pub fn get_memory_win32_handle_khr(
     device                                          C.Device,
     p_get_win32_handle_info                         &MemoryGetWin32HandleInfoKHR,
     p_handle                                        &voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMemoryWin32HandleKHR(dl_loader.get_sym('vkGetMemoryWin32HandleKHR'
+      f := VkGetMemoryWin32HandleKHR((*loader_p).get_sym('vkGetMemoryWin32HandleKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetMemoryWin32HandleKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetMemoryWin32HandleKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -14613,18 +12166,9 @@ pub fn get_memory_win32_handle_properties_khr(
     handle_type                                     ExternalMemoryHandleTypeFlagBits,
     handle                                          voidptr,
     p_memory_win32_handle_properties                &MemoryWin32HandlePropertiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMemoryWin32HandlePropertiesKHR(dl_loader.get_sym('vkGetMemoryWin32HandlePropertiesKHR'
+      f := VkGetMemoryWin32HandlePropertiesKHR((*loader_p).get_sym('vkGetMemoryWin32HandlePropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetMemoryWin32HandlePropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetMemoryWin32HandlePropertiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -14671,18 +12215,9 @@ pub fn get_memory_fd_khr(
     device                                          C.Device,
     p_get_fd_info                                   &MemoryGetFdInfoKHR,
     p_fd                                            &int) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMemoryFdKHR(dl_loader.get_sym('vkGetMemoryFdKHR'
+      f := VkGetMemoryFdKHR((*loader_p).get_sym('vkGetMemoryFdKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetMemoryFdKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetMemoryFdKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -14699,18 +12234,9 @@ pub fn get_memory_fd_properties_khr(
     handle_type                                     ExternalMemoryHandleTypeFlagBits,
     fd                                              int,
     p_memory_fd_properties                          &MemoryFdPropertiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMemoryFdPropertiesKHR(dl_loader.get_sym('vkGetMemoryFdPropertiesKHR'
+      f := VkGetMemoryFdPropertiesKHR((*loader_p).get_sym('vkGetMemoryFdPropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetMemoryFdPropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetMemoryFdPropertiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -14761,18 +12287,9 @@ pub fn get_physical_device_external_semaphore_properties_khr(
     physical_device                                 C.PhysicalDevice,
     p_external_semaphore_info                       &PhysicalDeviceExternalSemaphoreInfo,
     p_external_semaphore_properties                 &ExternalSemaphoreProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceExternalSemaphorePropertiesKHR(dl_loader.get_sym('vkGetPhysicalDeviceExternalSemaphorePropertiesKHR'
+      f := VkGetPhysicalDeviceExternalSemaphorePropertiesKHR((*loader_p).get_sym('vkGetPhysicalDeviceExternalSemaphorePropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceExternalSemaphorePropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalSemaphorePropertiesKHR': ${err}")
         return 
     })
     f(
@@ -14843,18 +12360,9 @@ type VkImportSemaphoreWin32HandleKHR = fn (     C.Device,     &ImportSemaphoreWi
 pub fn import_semaphore_win32_handle_khr(
     device                                          C.Device,
     p_import_semaphore_win32_handle_info            &ImportSemaphoreWin32HandleInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkImportSemaphoreWin32HandleKHR(dl_loader.get_sym('vkImportSemaphoreWin32HandleKHR'
+      f := VkImportSemaphoreWin32HandleKHR((*loader_p).get_sym('vkImportSemaphoreWin32HandleKHR'
     ) or { 
-        println("Couldn't load sym for 'vkImportSemaphoreWin32HandleKHR': ${err}")
+        println("Couldn't load symbol for 'vkImportSemaphoreWin32HandleKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -14869,18 +12377,9 @@ pub fn get_semaphore_win32_handle_khr(
     device                                          C.Device,
     p_get_win32_handle_info                         &SemaphoreGetWin32HandleInfoKHR,
     p_handle                                        &voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetSemaphoreWin32HandleKHR(dl_loader.get_sym('vkGetSemaphoreWin32HandleKHR'
+      f := VkGetSemaphoreWin32HandleKHR((*loader_p).get_sym('vkGetSemaphoreWin32HandleKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetSemaphoreWin32HandleKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetSemaphoreWin32HandleKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -14919,18 +12418,9 @@ type VkImportSemaphoreFdKHR = fn (     C.Device,     &ImportSemaphoreFdInfoKHR) 
 pub fn import_semaphore_fd_khr(
     device                                          C.Device,
     p_import_semaphore_fd_info                      &ImportSemaphoreFdInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkImportSemaphoreFdKHR(dl_loader.get_sym('vkImportSemaphoreFdKHR'
+      f := VkImportSemaphoreFdKHR((*loader_p).get_sym('vkImportSemaphoreFdKHR'
     ) or { 
-        println("Couldn't load sym for 'vkImportSemaphoreFdKHR': ${err}")
+        println("Couldn't load symbol for 'vkImportSemaphoreFdKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -14945,18 +12435,9 @@ pub fn get_semaphore_fd_khr(
     device                                          C.Device,
     p_get_fd_info                                   &SemaphoreGetFdInfoKHR,
     p_fd                                            &int) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetSemaphoreFdKHR(dl_loader.get_sym('vkGetSemaphoreFdKHR'
+      f := VkGetSemaphoreFdKHR((*loader_p).get_sym('vkGetSemaphoreFdKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetSemaphoreFdKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetSemaphoreFdKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -14989,18 +12470,9 @@ pub fn cmd_push_descriptor_set_khr(
     set                                             u32,
     descriptor_write_count                          u32,
     p_descriptor_writes                             &WriteDescriptorSet)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdPushDescriptorSetKHR(dl_loader.get_sym('vkCmdPushDescriptorSetKHR'
+      f := VkCmdPushDescriptorSetKHR((*loader_p).get_sym('vkCmdPushDescriptorSetKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdPushDescriptorSetKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdPushDescriptorSetKHR': ${err}")
         return 
     })
     f(
@@ -15021,18 +12493,9 @@ pub fn cmd_push_descriptor_set_with_template_khr(
     layout                                          C.PipelineLayout,
     set                                             u32,
     p_data                                          voidptr)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdPushDescriptorSetWithTemplateKHR(dl_loader.get_sym('vkCmdPushDescriptorSetWithTemplateKHR'
+      f := VkCmdPushDescriptorSetWithTemplateKHR((*loader_p).get_sym('vkCmdPushDescriptorSetWithTemplateKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdPushDescriptorSetWithTemplateKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdPushDescriptorSetWithTemplateKHR': ${err}")
         return 
     })
     f(
@@ -15109,18 +12572,9 @@ pub fn create_descriptor_update_template_khr(
     p_create_info                                   &DescriptorUpdateTemplateCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_descriptor_update_template                    &C.DescriptorUpdateTemplate) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDescriptorUpdateTemplateKHR(dl_loader.get_sym('vkCreateDescriptorUpdateTemplateKHR'
+      f := VkCreateDescriptorUpdateTemplateKHR((*loader_p).get_sym('vkCreateDescriptorUpdateTemplateKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDescriptorUpdateTemplateKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateDescriptorUpdateTemplateKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15137,18 +12591,9 @@ pub fn destroy_descriptor_update_template_khr(
     device                                          C.Device,
     descriptor_update_template                      C.DescriptorUpdateTemplate,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyDescriptorUpdateTemplateKHR(dl_loader.get_sym('vkDestroyDescriptorUpdateTemplateKHR'
+      f := VkDestroyDescriptorUpdateTemplateKHR((*loader_p).get_sym('vkDestroyDescriptorUpdateTemplateKHR'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyDescriptorUpdateTemplateKHR': ${err}")
+        println("Couldn't load symbol for 'vkDestroyDescriptorUpdateTemplateKHR': ${err}")
         return 
     })
     f(
@@ -15165,18 +12610,9 @@ pub fn update_descriptor_set_with_template_khr(
     descriptor_set                                  C.DescriptorSet,
     descriptor_update_template                      C.DescriptorUpdateTemplate,
     p_data                                          voidptr)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkUpdateDescriptorSetWithTemplateKHR(dl_loader.get_sym('vkUpdateDescriptorSetWithTemplateKHR'
+      f := VkUpdateDescriptorSetWithTemplateKHR((*loader_p).get_sym('vkUpdateDescriptorSetWithTemplateKHR'
     ) or { 
-        println("Couldn't load sym for 'vkUpdateDescriptorSetWithTemplateKHR': ${err}")
+        println("Couldn't load symbol for 'vkUpdateDescriptorSetWithTemplateKHR': ${err}")
         return 
     })
     f(
@@ -15228,18 +12664,9 @@ pub fn create_render_pass2_khr(
     p_create_info                                   &RenderPassCreateInfo2,
     p_allocator                                     &AllocationCallbacks,
     p_render_pass                                   &C.RenderPass) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateRenderPass2KHR(dl_loader.get_sym('vkCreateRenderPass2KHR'
+      f := VkCreateRenderPass2KHR((*loader_p).get_sym('vkCreateRenderPass2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateRenderPass2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateRenderPass2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15256,18 +12683,9 @@ pub fn cmd_begin_render_pass2_khr(
     command_buffer                                  C.CommandBuffer,
     p_render_pass_begin                             &RenderPassBeginInfo,
     p_subpass_begin_info                            &SubpassBeginInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginRenderPass2KHR(dl_loader.get_sym('vkCmdBeginRenderPass2KHR'
+      f := VkCmdBeginRenderPass2KHR((*loader_p).get_sym('vkCmdBeginRenderPass2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginRenderPass2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginRenderPass2KHR': ${err}")
         return 
     })
     f(
@@ -15283,18 +12701,9 @@ pub fn cmd_next_subpass2_khr(
     command_buffer                                  C.CommandBuffer,
     p_subpass_begin_info                            &SubpassBeginInfo,
     p_subpass_end_info                              &SubpassEndInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdNextSubpass2KHR(dl_loader.get_sym('vkCmdNextSubpass2KHR'
+      f := VkCmdNextSubpass2KHR((*loader_p).get_sym('vkCmdNextSubpass2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdNextSubpass2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdNextSubpass2KHR': ${err}")
         return 
     })
     f(
@@ -15309,18 +12718,9 @@ type VkCmdEndRenderPass2KHR = fn (     C.CommandBuffer,     &SubpassEndInfo)
 pub fn cmd_end_render_pass2_khr(
     command_buffer                                  C.CommandBuffer,
     p_subpass_end_info                              &SubpassEndInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndRenderPass2KHR(dl_loader.get_sym('vkCmdEndRenderPass2KHR'
+      f := VkCmdEndRenderPass2KHR((*loader_p).get_sym('vkCmdEndRenderPass2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndRenderPass2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndRenderPass2KHR': ${err}")
         return 
     })
     f(
@@ -15348,18 +12748,9 @@ type VkGetSwapchainStatusKHR = fn (     C.Device,     C.SwapchainKHR) Result
 pub fn get_swapchain_status_khr(
     device                                          C.Device,
     swapchain                                       C.SwapchainKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetSwapchainStatusKHR(dl_loader.get_sym('vkGetSwapchainStatusKHR'
+      f := VkGetSwapchainStatusKHR((*loader_p).get_sym('vkGetSwapchainStatusKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetSwapchainStatusKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetSwapchainStatusKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15388,18 +12779,9 @@ pub fn get_physical_device_external_fence_properties_khr(
     physical_device                                 C.PhysicalDevice,
     p_external_fence_info                           &PhysicalDeviceExternalFenceInfo,
     p_external_fence_properties                     &ExternalFenceProperties)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceExternalFencePropertiesKHR(dl_loader.get_sym('vkGetPhysicalDeviceExternalFencePropertiesKHR'
+      f := VkGetPhysicalDeviceExternalFencePropertiesKHR((*loader_p).get_sym('vkGetPhysicalDeviceExternalFencePropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceExternalFencePropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalFencePropertiesKHR': ${err}")
         return 
     })
     f(
@@ -15459,18 +12841,9 @@ type VkImportFenceWin32HandleKHR = fn (     C.Device,     &ImportFenceWin32Handl
 pub fn import_fence_win32_handle_khr(
     device                                          C.Device,
     p_import_fence_win32_handle_info                &ImportFenceWin32HandleInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkImportFenceWin32HandleKHR(dl_loader.get_sym('vkImportFenceWin32HandleKHR'
+      f := VkImportFenceWin32HandleKHR((*loader_p).get_sym('vkImportFenceWin32HandleKHR'
     ) or { 
-        println("Couldn't load sym for 'vkImportFenceWin32HandleKHR': ${err}")
+        println("Couldn't load symbol for 'vkImportFenceWin32HandleKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15485,18 +12858,9 @@ pub fn get_fence_win32_handle_khr(
     device                                          C.Device,
     p_get_win32_handle_info                         &FenceGetWin32HandleInfoKHR,
     p_handle                                        &voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetFenceWin32HandleKHR(dl_loader.get_sym('vkGetFenceWin32HandleKHR'
+      f := VkGetFenceWin32HandleKHR((*loader_p).get_sym('vkGetFenceWin32HandleKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetFenceWin32HandleKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetFenceWin32HandleKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15535,18 +12899,9 @@ type VkImportFenceFdKHR = fn (     C.Device,     &ImportFenceFdInfoKHR) Result
 pub fn import_fence_fd_khr(
     device                                          C.Device,
     p_import_fence_fd_info                          &ImportFenceFdInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkImportFenceFdKHR(dl_loader.get_sym('vkImportFenceFdKHR'
+      f := VkImportFenceFdKHR((*loader_p).get_sym('vkImportFenceFdKHR'
     ) or { 
-        println("Couldn't load sym for 'vkImportFenceFdKHR': ${err}")
+        println("Couldn't load symbol for 'vkImportFenceFdKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15561,18 +12916,9 @@ pub fn get_fence_fd_khr(
     device                                          C.Device,
     p_get_fd_info                                   &FenceGetFdInfoKHR,
     p_fd                                            &int) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetFenceFdKHR(dl_loader.get_sym('vkGetFenceFdKHR'
+      f := VkGetFenceFdKHR((*loader_p).get_sym('vkGetFenceFdKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetFenceFdKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetFenceFdKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15718,18 +13064,9 @@ pub fn enumerate_physical_device_queue_family_performance_query_counters_khr(
     p_counter_count                                 &u32,
     p_counters                                      &PerformanceCounterKHR,
     p_counter_descriptions                          &PerformanceCounterDescriptionKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR(dl_loader.get_sym('vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR'
+      f := VkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR((*loader_p).get_sym('vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR'
     ) or { 
-        println("Couldn't load sym for 'vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR': ${err}")
+        println("Couldn't load symbol for 'vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15747,18 +13084,9 @@ pub fn get_physical_device_queue_family_performance_query_passes_khr(
     physical_device                                 C.PhysicalDevice,
     p_performance_query_create_info                 &QueryPoolPerformanceCreateInfoKHR,
     p_num_passes                                    &u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR(dl_loader.get_sym('vkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR'
+      f := VkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR((*loader_p).get_sym('vkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR': ${err}")
         return 
     })
     f(
@@ -15773,18 +13101,9 @@ type VkAcquireProfilingLockKHR = fn (     C.Device,     &AcquireProfilingLockInf
 pub fn acquire_profiling_lock_khr(
     device                                          C.Device,
     p_info                                          &AcquireProfilingLockInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAcquireProfilingLockKHR(dl_loader.get_sym('vkAcquireProfilingLockKHR'
+      f := VkAcquireProfilingLockKHR((*loader_p).get_sym('vkAcquireProfilingLockKHR'
     ) or { 
-        println("Couldn't load sym for 'vkAcquireProfilingLockKHR': ${err}")
+        println("Couldn't load symbol for 'vkAcquireProfilingLockKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15797,18 +13116,9 @@ type VkReleaseProfilingLockKHR = fn (     C.Device)
 
 pub fn release_profiling_lock_khr(
     device                                          C.Device)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkReleaseProfilingLockKHR(dl_loader.get_sym('vkReleaseProfilingLockKHR'
+      f := VkReleaseProfilingLockKHR((*loader_p).get_sym('vkReleaseProfilingLockKHR'
     ) or { 
-        println("Couldn't load sym for 'vkReleaseProfilingLockKHR': ${err}")
+        println("Couldn't load symbol for 'vkReleaseProfilingLockKHR': ${err}")
         return 
     })
     f(
@@ -15871,18 +13181,9 @@ pub fn get_physical_device_surface_capabilities2_khr(
     physical_device                                 C.PhysicalDevice,
     p_surface_info                                  &PhysicalDeviceSurfaceInfo2KHR,
     p_surface_capabilities                          &SurfaceCapabilities2KHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSurfaceCapabilities2KHR(dl_loader.get_sym('vkGetPhysicalDeviceSurfaceCapabilities2KHR'
+      f := VkGetPhysicalDeviceSurfaceCapabilities2KHR((*loader_p).get_sym('vkGetPhysicalDeviceSurfaceCapabilities2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSurfaceCapabilities2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceCapabilities2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15899,18 +13200,9 @@ pub fn get_physical_device_surface_formats2_khr(
     p_surface_info                                  &PhysicalDeviceSurfaceInfo2KHR,
     p_surface_format_count                          &u32,
     p_surface_formats                               &SurfaceFormat2KHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSurfaceFormats2KHR(dl_loader.get_sym('vkGetPhysicalDeviceSurfaceFormats2KHR'
+      f := VkGetPhysicalDeviceSurfaceFormats2KHR((*loader_p).get_sym('vkGetPhysicalDeviceSurfaceFormats2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSurfaceFormats2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceFormats2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -15979,18 +13271,9 @@ pub fn get_physical_device_display_properties2_khr(
     physical_device                                 C.PhysicalDevice,
     p_property_count                                &u32,
     p_properties                                    &DisplayProperties2KHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceDisplayProperties2KHR(dl_loader.get_sym('vkGetPhysicalDeviceDisplayProperties2KHR'
+      f := VkGetPhysicalDeviceDisplayProperties2KHR((*loader_p).get_sym('vkGetPhysicalDeviceDisplayProperties2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceDisplayProperties2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceDisplayProperties2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16006,18 +13289,9 @@ pub fn get_physical_device_display_plane_properties2_khr(
     physical_device                                 C.PhysicalDevice,
     p_property_count                                &u32,
     p_properties                                    &DisplayPlaneProperties2KHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceDisplayPlaneProperties2KHR(dl_loader.get_sym('vkGetPhysicalDeviceDisplayPlaneProperties2KHR'
+      f := VkGetPhysicalDeviceDisplayPlaneProperties2KHR((*loader_p).get_sym('vkGetPhysicalDeviceDisplayPlaneProperties2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceDisplayPlaneProperties2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceDisplayPlaneProperties2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16034,18 +13308,9 @@ pub fn get_display_mode_properties2_khr(
     display                                         C.DisplayKHR,
     p_property_count                                &u32,
     p_properties                                    &DisplayModeProperties2KHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDisplayModeProperties2KHR(dl_loader.get_sym('vkGetDisplayModeProperties2KHR'
+      f := VkGetDisplayModeProperties2KHR((*loader_p).get_sym('vkGetDisplayModeProperties2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDisplayModeProperties2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDisplayModeProperties2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16062,18 +13327,9 @@ pub fn get_display_plane_capabilities2_khr(
     physical_device                                 C.PhysicalDevice,
     p_display_plane_info                            &DisplayPlaneInfo2KHR,
     p_capabilities                                  &DisplayPlaneCapabilities2KHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDisplayPlaneCapabilities2KHR(dl_loader.get_sym('vkGetDisplayPlaneCapabilities2KHR'
+      f := VkGetDisplayPlaneCapabilities2KHR((*loader_p).get_sym('vkGetDisplayPlaneCapabilities2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDisplayPlaneCapabilities2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDisplayPlaneCapabilities2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16127,18 +13383,9 @@ pub fn get_image_memory_requirements2_khr(
     device                                          C.Device,
     p_info                                          &ImageMemoryRequirementsInfo2,
     p_memory_requirements                           &MemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageMemoryRequirements2KHR(dl_loader.get_sym('vkGetImageMemoryRequirements2KHR'
+      f := VkGetImageMemoryRequirements2KHR((*loader_p).get_sym('vkGetImageMemoryRequirements2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageMemoryRequirements2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetImageMemoryRequirements2KHR': ${err}")
         return 
     })
     f(
@@ -16154,18 +13401,9 @@ pub fn get_buffer_memory_requirements2_khr(
     device                                          C.Device,
     p_info                                          &BufferMemoryRequirementsInfo2,
     p_memory_requirements                           &MemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetBufferMemoryRequirements2KHR(dl_loader.get_sym('vkGetBufferMemoryRequirements2KHR'
+      f := VkGetBufferMemoryRequirements2KHR((*loader_p).get_sym('vkGetBufferMemoryRequirements2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetBufferMemoryRequirements2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetBufferMemoryRequirements2KHR': ${err}")
         return 
     })
     f(
@@ -16182,18 +13420,9 @@ pub fn get_image_sparse_memory_requirements2_khr(
     p_info                                          &ImageSparseMemoryRequirementsInfo2,
     p_sparse_memory_requirement_count               &u32,
     p_sparse_memory_requirements                    &SparseImageMemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageSparseMemoryRequirements2KHR(dl_loader.get_sym('vkGetImageSparseMemoryRequirements2KHR'
+      f := VkGetImageSparseMemoryRequirements2KHR((*loader_p).get_sym('vkGetImageSparseMemoryRequirements2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageSparseMemoryRequirements2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetImageSparseMemoryRequirements2KHR': ${err}")
         return 
     })
     f(
@@ -16243,18 +13472,9 @@ pub fn create_sampler_ycbcr_conversion_khr(
     p_create_info                                   &SamplerYcbcrConversionCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_ycbcr_conversion                              &C.SamplerYcbcrConversion) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateSamplerYcbcrConversionKHR(dl_loader.get_sym('vkCreateSamplerYcbcrConversionKHR'
+      f := VkCreateSamplerYcbcrConversionKHR((*loader_p).get_sym('vkCreateSamplerYcbcrConversionKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateSamplerYcbcrConversionKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateSamplerYcbcrConversionKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16271,18 +13491,9 @@ pub fn destroy_sampler_ycbcr_conversion_khr(
     device                                          C.Device,
     ycbcr_conversion                                C.SamplerYcbcrConversion,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroySamplerYcbcrConversionKHR(dl_loader.get_sym('vkDestroySamplerYcbcrConversionKHR'
+      f := VkDestroySamplerYcbcrConversionKHR((*loader_p).get_sym('vkDestroySamplerYcbcrConversionKHR'
     ) or { 
-        println("Couldn't load sym for 'vkDestroySamplerYcbcrConversionKHR': ${err}")
+        println("Couldn't load symbol for 'vkDestroySamplerYcbcrConversionKHR': ${err}")
         return 
     })
     f(
@@ -16308,18 +13519,9 @@ pub fn bind_buffer_memory2_khr(
     device                                          C.Device,
     bind_info_count                                 u32,
     p_bind_infos                                    &BindBufferMemoryInfo) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBindBufferMemory2KHR(dl_loader.get_sym('vkBindBufferMemory2KHR'
+      f := VkBindBufferMemory2KHR((*loader_p).get_sym('vkBindBufferMemory2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkBindBufferMemory2KHR': ${err}")
+        println("Couldn't load symbol for 'vkBindBufferMemory2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16335,18 +13537,9 @@ pub fn bind_image_memory2_khr(
     device                                          C.Device,
     bind_info_count                                 u32,
     p_bind_infos                                    &BindImageMemoryInfo) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBindImageMemory2KHR(dl_loader.get_sym('vkBindImageMemory2KHR'
+      f := VkBindImageMemory2KHR((*loader_p).get_sym('vkBindImageMemory2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkBindImageMemory2KHR': ${err}")
+        println("Couldn't load symbol for 'vkBindImageMemory2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16410,18 +13603,9 @@ pub fn get_descriptor_set_layout_support_khr(
     device                                          C.Device,
     p_create_info                                   &DescriptorSetLayoutCreateInfo,
     p_support                                       &DescriptorSetLayoutSupport)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDescriptorSetLayoutSupportKHR(dl_loader.get_sym('vkGetDescriptorSetLayoutSupportKHR'
+      f := VkGetDescriptorSetLayoutSupportKHR((*loader_p).get_sym('vkGetDescriptorSetLayoutSupportKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDescriptorSetLayoutSupportKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDescriptorSetLayoutSupportKHR': ${err}")
         return 
     })
     f(
@@ -16447,18 +13631,9 @@ pub fn cmd_draw_indirect_count_khr(
     count_buffer_offset                             DeviceSize,
     max_draw_count                                  u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawIndirectCountKHR(dl_loader.get_sym('vkCmdDrawIndirectCountKHR'
+      f := VkCmdDrawIndirectCountKHR((*loader_p).get_sym('vkCmdDrawIndirectCountKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawIndirectCountKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawIndirectCountKHR': ${err}")
         return 
     })
     f(
@@ -16482,18 +13657,9 @@ pub fn cmd_draw_indexed_indirect_count_khr(
     count_buffer_offset                             DeviceSize,
     max_draw_count                                  u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawIndexedIndirectCountKHR(dl_loader.get_sym('vkCmdDrawIndexedIndirectCountKHR'
+      f := VkCmdDrawIndexedIndirectCountKHR((*loader_p).get_sym('vkCmdDrawIndexedIndirectCountKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawIndexedIndirectCountKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawIndexedIndirectCountKHR': ${err}")
         return 
     })
     f(
@@ -16721,18 +13887,9 @@ pub fn get_semaphore_counter_value_khr(
     device                                          C.Device,
     semaphore                                       C.Semaphore,
     p_value                                         &u64) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetSemaphoreCounterValueKHR(dl_loader.get_sym('vkGetSemaphoreCounterValueKHR'
+      f := VkGetSemaphoreCounterValueKHR((*loader_p).get_sym('vkGetSemaphoreCounterValueKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetSemaphoreCounterValueKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetSemaphoreCounterValueKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16748,18 +13905,9 @@ pub fn wait_semaphores_khr(
     device                                          C.Device,
     p_wait_info                                     &SemaphoreWaitInfo,
     timeout                                         u64) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkWaitSemaphoresKHR(dl_loader.get_sym('vkWaitSemaphoresKHR'
+      f := VkWaitSemaphoresKHR((*loader_p).get_sym('vkWaitSemaphoresKHR'
     ) or { 
-        println("Couldn't load sym for 'vkWaitSemaphoresKHR': ${err}")
+        println("Couldn't load symbol for 'vkWaitSemaphoresKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16774,18 +13922,9 @@ type VkSignalSemaphoreKHR = fn (     C.Device,     &SemaphoreSignalInfo) Result
 pub fn signal_semaphore_khr(
     device                                          C.Device,
     p_signal_info                                   &SemaphoreSignalInfo) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkSignalSemaphoreKHR(dl_loader.get_sym('vkSignalSemaphoreKHR'
+      f := VkSignalSemaphoreKHR((*loader_p).get_sym('vkSignalSemaphoreKHR'
     ) or { 
-        println("Couldn't load sym for 'vkSignalSemaphoreKHR': ${err}")
+        println("Couldn't load symbol for 'vkSignalSemaphoreKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16892,18 +14031,9 @@ pub fn get_physical_device_fragment_shading_rates_khr(
     physical_device                                 C.PhysicalDevice,
     p_fragment_shading_rate_count                   &u32,
     p_fragment_shading_rates                        &PhysicalDeviceFragmentShadingRateKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceFragmentShadingRatesKHR(dl_loader.get_sym('vkGetPhysicalDeviceFragmentShadingRatesKHR'
+      f := VkGetPhysicalDeviceFragmentShadingRatesKHR((*loader_p).get_sym('vkGetPhysicalDeviceFragmentShadingRatesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceFragmentShadingRatesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceFragmentShadingRatesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -16919,18 +14049,9 @@ pub fn cmd_set_fragment_shading_rate_khr(
     command_buffer                                  C.CommandBuffer,
     p_fragment_size                                 &Extent2D,
     combiner_ops                                    []FragmentShadingRateCombinerOpKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetFragmentShadingRateKHR(dl_loader.get_sym('vkCmdSetFragmentShadingRateKHR'
+      f := VkCmdSetFragmentShadingRateKHR((*loader_p).get_sym('vkCmdSetFragmentShadingRateKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetFragmentShadingRateKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetFragmentShadingRateKHR': ${err}")
         return 
     })
     f(
@@ -16993,18 +14114,9 @@ pub fn wait_for_present_khr(
     swapchain                                       C.SwapchainKHR,
     present_id                                      u64,
     timeout                                         u64) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkWaitForPresentKHR(dl_loader.get_sym('vkWaitForPresentKHR'
+      f := VkWaitForPresentKHR((*loader_p).get_sym('vkWaitForPresentKHR'
     ) or { 
-        println("Couldn't load sym for 'vkWaitForPresentKHR': ${err}")
+        println("Couldn't load symbol for 'vkWaitForPresentKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17044,16 +14156,9 @@ type VkGetBufferDeviceAddressKHR = fn (     C.Device,     &BufferDeviceAddressIn
 pub fn get_buffer_device_address_khr(
     device                                          C.Device,
     p_info                                          &BufferDeviceAddressInfo) DeviceAddress {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetBufferDeviceAddressKHR(dl_loader.get_sym("vkGetBufferDeviceAddressKHR"
+      f := VkGetBufferDeviceAddressKHR((*loader_p).get_sym("vkGetBufferDeviceAddressKHR"
     ) or { 
-        panic("Couldn't load sym for 'vkGetBufferDeviceAddressKHR': ${err}") })
+        panic("Couldn't load symbol for 'vkGetBufferDeviceAddressKHR': ${err}") })
     return f(
     device,
     p_info)
@@ -17065,16 +14170,9 @@ type VkGetBufferOpaqueCaptureAddressKHR = fn (     C.Device,     &BufferDeviceAd
 pub fn get_buffer_opaque_capture_address_khr(
     device                                          C.Device,
     p_info                                          &BufferDeviceAddressInfo) u64 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetBufferOpaqueCaptureAddressKHR(dl_loader.get_sym("vkGetBufferOpaqueCaptureAddressKHR"
+      f := VkGetBufferOpaqueCaptureAddressKHR((*loader_p).get_sym("vkGetBufferOpaqueCaptureAddressKHR"
     ) or { 
-        panic("Couldn't load sym for 'vkGetBufferOpaqueCaptureAddressKHR': ${err}") })
+        panic("Couldn't load symbol for 'vkGetBufferOpaqueCaptureAddressKHR': ${err}") })
     return f(
     device,
     p_info)
@@ -17086,16 +14184,9 @@ type VkGetDeviceMemoryOpaqueCaptureAddressKHR = fn (     C.Device,     &DeviceMe
 pub fn get_device_memory_opaque_capture_address_khr(
     device                                          C.Device,
     p_info                                          &DeviceMemoryOpaqueCaptureAddressInfo) u64 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceMemoryOpaqueCaptureAddressKHR(dl_loader.get_sym("vkGetDeviceMemoryOpaqueCaptureAddressKHR"
+      f := VkGetDeviceMemoryOpaqueCaptureAddressKHR((*loader_p).get_sym("vkGetDeviceMemoryOpaqueCaptureAddressKHR"
     ) or { 
-        panic("Couldn't load sym for 'vkGetDeviceMemoryOpaqueCaptureAddressKHR': ${err}") })
+        panic("Couldn't load symbol for 'vkGetDeviceMemoryOpaqueCaptureAddressKHR': ${err}") })
     return f(
     device,
     p_info)
@@ -17115,18 +14206,9 @@ pub fn create_deferred_operation_khr(
     device                                          C.Device,
     p_allocator                                     &AllocationCallbacks,
     p_deferred_operation                            &C.DeferredOperationKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDeferredOperationKHR(dl_loader.get_sym('vkCreateDeferredOperationKHR'
+      f := VkCreateDeferredOperationKHR((*loader_p).get_sym('vkCreateDeferredOperationKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDeferredOperationKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateDeferredOperationKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17142,18 +14224,9 @@ pub fn destroy_deferred_operation_khr(
     device                                          C.Device,
     operation                                       C.DeferredOperationKHR,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyDeferredOperationKHR(dl_loader.get_sym('vkDestroyDeferredOperationKHR'
+      f := VkDestroyDeferredOperationKHR((*loader_p).get_sym('vkDestroyDeferredOperationKHR'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyDeferredOperationKHR': ${err}")
+        println("Couldn't load symbol for 'vkDestroyDeferredOperationKHR': ${err}")
         return 
     })
     f(
@@ -17168,16 +14241,9 @@ type VkGetDeferredOperationMaxConcurrencyKHR = fn (     C.Device,     C.Deferred
 pub fn get_deferred_operation_max_concurrency_khr(
     device                                          C.Device,
     operation                                       C.DeferredOperationKHR) u32 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetDeferredOperationMaxConcurrencyKHR(dl_loader.get_sym("vkGetDeferredOperationMaxConcurrencyKHR"
+      f := VkGetDeferredOperationMaxConcurrencyKHR((*loader_p).get_sym("vkGetDeferredOperationMaxConcurrencyKHR"
     ) or { 
-        panic("Couldn't load sym for 'vkGetDeferredOperationMaxConcurrencyKHR': ${err}") })
+        panic("Couldn't load symbol for 'vkGetDeferredOperationMaxConcurrencyKHR': ${err}") })
     return f(
     device,
     operation)
@@ -17189,18 +14255,9 @@ type VkGetDeferredOperationResultKHR = fn (     C.Device,     C.DeferredOperatio
 pub fn get_deferred_operation_result_khr(
     device                                          C.Device,
     operation                                       C.DeferredOperationKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeferredOperationResultKHR(dl_loader.get_sym('vkGetDeferredOperationResultKHR'
+      f := VkGetDeferredOperationResultKHR((*loader_p).get_sym('vkGetDeferredOperationResultKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeferredOperationResultKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDeferredOperationResultKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17214,18 +14271,9 @@ type VkDeferredOperationJoinKHR = fn (     C.Device,     C.DeferredOperationKHR)
 pub fn deferred_operation_join_khr(
     device                                          C.Device,
     operation                                       C.DeferredOperationKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkDeferredOperationJoinKHR(dl_loader.get_sym('vkDeferredOperationJoinKHR'
+      f := VkDeferredOperationJoinKHR((*loader_p).get_sym('vkDeferredOperationJoinKHR'
     ) or { 
-        println("Couldn't load sym for 'vkDeferredOperationJoinKHR': ${err}")
+        println("Couldn't load symbol for 'vkDeferredOperationJoinKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17318,18 +14366,9 @@ pub fn get_pipeline_executable_properties_khr(
     p_pipeline_info                                 &PipelineInfoKHR,
     p_executable_count                              &u32,
     p_properties                                    &PipelineExecutablePropertiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPipelineExecutablePropertiesKHR(dl_loader.get_sym('vkGetPipelineExecutablePropertiesKHR'
+      f := VkGetPipelineExecutablePropertiesKHR((*loader_p).get_sym('vkGetPipelineExecutablePropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPipelineExecutablePropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPipelineExecutablePropertiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17347,18 +14386,9 @@ pub fn get_pipeline_executable_statistics_khr(
     p_executable_info                               &PipelineExecutableInfoKHR,
     p_statistic_count                               &u32,
     p_statistics                                    &PipelineExecutableStatisticKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPipelineExecutableStatisticsKHR(dl_loader.get_sym('vkGetPipelineExecutableStatisticsKHR'
+      f := VkGetPipelineExecutableStatisticsKHR((*loader_p).get_sym('vkGetPipelineExecutableStatisticsKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPipelineExecutableStatisticsKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPipelineExecutableStatisticsKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17376,18 +14406,9 @@ pub fn get_pipeline_executable_internal_representations_khr(
     p_executable_info                               &PipelineExecutableInfoKHR,
     p_internal_representation_count                 &u32,
     p_internal_representations                      &PipelineExecutableInternalRepresentationKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPipelineExecutableInternalRepresentationsKHR(dl_loader.get_sym('vkGetPipelineExecutableInternalRepresentationsKHR'
+      f := VkGetPipelineExecutableInternalRepresentationsKHR((*loader_p).get_sym('vkGetPipelineExecutableInternalRepresentationsKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPipelineExecutableInternalRepresentationsKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPipelineExecutableInternalRepresentationsKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17429,18 +14450,9 @@ pub fn map_memory2_khr(
     device                                          C.Device,
     p_memory_map_info                               &MemoryMapInfoKHR,
     pp_data                                         &voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkMapMemory2KHR(dl_loader.get_sym('vkMapMemory2KHR'
+      f := VkMapMemory2KHR((*loader_p).get_sym('vkMapMemory2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkMapMemory2KHR': ${err}")
+        println("Couldn't load symbol for 'vkMapMemory2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17455,18 +14467,9 @@ type VkUnmapMemory2KHR = fn (     C.Device,     &MemoryUnmapInfoKHR) Result
 pub fn unmap_memory2_khr(
     device                                          C.Device,
     p_memory_unmap_info                             &MemoryUnmapInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkUnmapMemory2KHR(dl_loader.get_sym('vkUnmapMemory2KHR'
+      f := VkUnmapMemory2KHR((*loader_p).get_sym('vkUnmapMemory2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkUnmapMemory2KHR': ${err}")
+        println("Couldn't load symbol for 'vkUnmapMemory2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17709,18 +14712,9 @@ pub fn get_physical_device_video_encode_quality_level_properties_khr(
     physical_device                                 C.PhysicalDevice,
     p_quality_level_info                            &PhysicalDeviceVideoEncodeQualityLevelInfoKHR,
     p_quality_level_properties                      &VideoEncodeQualityLevelPropertiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR(dl_loader.get_sym('vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR'
+      f := VkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR((*loader_p).get_sym('vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17738,18 +14732,9 @@ pub fn get_encoded_video_session_parameters_khr(
     p_feedback_info                                 &VideoEncodeSessionParametersFeedbackInfoKHR,
     p_data_size                                     &usize,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetEncodedVideoSessionParametersKHR(dl_loader.get_sym('vkGetEncodedVideoSessionParametersKHR'
+      f := VkGetEncodedVideoSessionParametersKHR((*loader_p).get_sym('vkGetEncodedVideoSessionParametersKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetEncodedVideoSessionParametersKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetEncodedVideoSessionParametersKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -17766,18 +14751,9 @@ type VkCmdEncodeVideoKHR = fn (     C.CommandBuffer,     &VideoEncodeInfoKHR)
 pub fn cmd_encode_video_khr(
     command_buffer                                  C.CommandBuffer,
     p_encode_info                                   &VideoEncodeInfoKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEncodeVideoKHR(dl_loader.get_sym('vkCmdEncodeVideoKHR'
+      f := VkCmdEncodeVideoKHR((*loader_p).get_sym('vkCmdEncodeVideoKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEncodeVideoKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdEncodeVideoKHR': ${err}")
         return 
     })
     f(
@@ -17836,18 +14812,9 @@ pub fn cmd_set_event2_khr(
     command_buffer                                  C.CommandBuffer,
     event                                           C.Event,
     p_dependency_info                               &DependencyInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetEvent2KHR(dl_loader.get_sym('vkCmdSetEvent2KHR'
+      f := VkCmdSetEvent2KHR((*loader_p).get_sym('vkCmdSetEvent2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetEvent2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetEvent2KHR': ${err}")
         return 
     })
     f(
@@ -17863,18 +14830,9 @@ pub fn cmd_reset_event2_khr(
     command_buffer                                  C.CommandBuffer,
     event                                           C.Event,
     stage_mask                                      PipelineStageFlags2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdResetEvent2KHR(dl_loader.get_sym('vkCmdResetEvent2KHR'
+      f := VkCmdResetEvent2KHR((*loader_p).get_sym('vkCmdResetEvent2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdResetEvent2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdResetEvent2KHR': ${err}")
         return 
     })
     f(
@@ -17891,18 +14849,9 @@ pub fn cmd_wait_events2_khr(
     event_count                                     u32,
     p_events                                        &C.Event,
     p_dependency_infos                              &DependencyInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWaitEvents2KHR(dl_loader.get_sym('vkCmdWaitEvents2KHR'
+      f := VkCmdWaitEvents2KHR((*loader_p).get_sym('vkCmdWaitEvents2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWaitEvents2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdWaitEvents2KHR': ${err}")
         return 
     })
     f(
@@ -17918,18 +14867,9 @@ type VkCmdPipelineBarrier2KHR = fn (     C.CommandBuffer,     &DependencyInfo)
 pub fn cmd_pipeline_barrier2_khr(
     command_buffer                                  C.CommandBuffer,
     p_dependency_info                               &DependencyInfo)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdPipelineBarrier2KHR(dl_loader.get_sym('vkCmdPipelineBarrier2KHR'
+      f := VkCmdPipelineBarrier2KHR((*loader_p).get_sym('vkCmdPipelineBarrier2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdPipelineBarrier2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdPipelineBarrier2KHR': ${err}")
         return 
     })
     f(
@@ -17945,18 +14885,9 @@ pub fn cmd_write_timestamp2_khr(
     stage                                           PipelineStageFlags2,
     query_pool                                      C.QueryPool,
     query                                           u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWriteTimestamp2KHR(dl_loader.get_sym('vkCmdWriteTimestamp2KHR'
+      f := VkCmdWriteTimestamp2KHR((*loader_p).get_sym('vkCmdWriteTimestamp2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWriteTimestamp2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdWriteTimestamp2KHR': ${err}")
         return 
     })
     f(
@@ -17974,18 +14905,9 @@ pub fn queue_submit2_khr(
     submit_count                                    u32,
     p_submits                                       &SubmitInfo2,
     fence                                           C.Fence) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueueSubmit2KHR(dl_loader.get_sym('vkQueueSubmit2KHR'
+      f := VkQueueSubmit2KHR((*loader_p).get_sym('vkQueueSubmit2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkQueueSubmit2KHR': ${err}")
+        println("Couldn't load symbol for 'vkQueueSubmit2KHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -18004,18 +14926,9 @@ pub fn cmd_write_buffer_marker2_amd(
     dst_buffer                                      C.Buffer,
     dst_offset                                      DeviceSize,
     marker                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWriteBufferMarker2AMD(dl_loader.get_sym('vkCmdWriteBufferMarker2AMD'
+      f := VkCmdWriteBufferMarker2AMD((*loader_p).get_sym('vkCmdWriteBufferMarker2AMD'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWriteBufferMarker2AMD': ${err}")
+        println("Couldn't load symbol for 'vkCmdWriteBufferMarker2AMD': ${err}")
         return 
     })
     f(
@@ -18033,18 +14946,9 @@ pub fn get_queue_checkpoint_data2_nv(
     queue                                           C.Queue,
     p_checkpoint_data_count                         &u32,
     p_checkpoint_data                               &CheckpointData2NV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetQueueCheckpointData2NV(dl_loader.get_sym('vkGetQueueCheckpointData2NV'
+      f := VkGetQueueCheckpointData2NV((*loader_p).get_sym('vkGetQueueCheckpointData2NV'
     ) or { 
-        println("Couldn't load sym for 'vkGetQueueCheckpointData2NV': ${err}")
+        println("Couldn't load symbol for 'vkGetQueueCheckpointData2NV': ${err}")
         return 
     })
     f(
@@ -18148,18 +15052,9 @@ type VkCmdCopyBuffer2KHR = fn (     C.CommandBuffer,     &CopyBufferInfo2)
 pub fn cmd_copy_buffer2_khr(
     command_buffer                                  C.CommandBuffer,
     p_copy_buffer_info                              &CopyBufferInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyBuffer2KHR(dl_loader.get_sym('vkCmdCopyBuffer2KHR'
+      f := VkCmdCopyBuffer2KHR((*loader_p).get_sym('vkCmdCopyBuffer2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyBuffer2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyBuffer2KHR': ${err}")
         return 
     })
     f(
@@ -18173,18 +15068,9 @@ type VkCmdCopyImage2KHR = fn (     C.CommandBuffer,     &CopyImageInfo2)
 pub fn cmd_copy_image2_khr(
     command_buffer                                  C.CommandBuffer,
     p_copy_image_info                               &CopyImageInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyImage2KHR(dl_loader.get_sym('vkCmdCopyImage2KHR'
+      f := VkCmdCopyImage2KHR((*loader_p).get_sym('vkCmdCopyImage2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyImage2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyImage2KHR': ${err}")
         return 
     })
     f(
@@ -18198,18 +15084,9 @@ type VkCmdCopyBufferToImage2KHR = fn (     C.CommandBuffer,     &CopyBufferToIma
 pub fn cmd_copy_buffer_to_image2_khr(
     command_buffer                                  C.CommandBuffer,
     p_copy_buffer_to_image_info                     &CopyBufferToImageInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyBufferToImage2KHR(dl_loader.get_sym('vkCmdCopyBufferToImage2KHR'
+      f := VkCmdCopyBufferToImage2KHR((*loader_p).get_sym('vkCmdCopyBufferToImage2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyBufferToImage2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyBufferToImage2KHR': ${err}")
         return 
     })
     f(
@@ -18223,18 +15100,9 @@ type VkCmdCopyImageToBuffer2KHR = fn (     C.CommandBuffer,     &CopyImageToBuff
 pub fn cmd_copy_image_to_buffer2_khr(
     command_buffer                                  C.CommandBuffer,
     p_copy_image_to_buffer_info                     &CopyImageToBufferInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyImageToBuffer2KHR(dl_loader.get_sym('vkCmdCopyImageToBuffer2KHR'
+      f := VkCmdCopyImageToBuffer2KHR((*loader_p).get_sym('vkCmdCopyImageToBuffer2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyImageToBuffer2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyImageToBuffer2KHR': ${err}")
         return 
     })
     f(
@@ -18248,18 +15116,9 @@ type VkCmdBlitImage2KHR = fn (     C.CommandBuffer,     &BlitImageInfo2)
 pub fn cmd_blit_image2_khr(
     command_buffer                                  C.CommandBuffer,
     p_blit_image_info                               &BlitImageInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBlitImage2KHR(dl_loader.get_sym('vkCmdBlitImage2KHR'
+      f := VkCmdBlitImage2KHR((*loader_p).get_sym('vkCmdBlitImage2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBlitImage2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdBlitImage2KHR': ${err}")
         return 
     })
     f(
@@ -18273,18 +15132,9 @@ type VkCmdResolveImage2KHR = fn (     C.CommandBuffer,     &ResolveImageInfo2)
 pub fn cmd_resolve_image2_khr(
     command_buffer                                  C.CommandBuffer,
     p_resolve_image_info                            &ResolveImageInfo2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdResolveImage2KHR(dl_loader.get_sym('vkCmdResolveImage2KHR'
+      f := VkCmdResolveImage2KHR((*loader_p).get_sym('vkCmdResolveImage2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdResolveImage2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdResolveImage2KHR': ${err}")
         return 
     })
     f(
@@ -18341,18 +15191,9 @@ type VkCmdTraceRaysIndirect2KHR = fn (     C.CommandBuffer,     DeviceAddress)
 pub fn cmd_trace_rays_indirect2_khr(
     command_buffer                                  C.CommandBuffer,
     indirect_device_address                         DeviceAddress)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdTraceRaysIndirect2KHR(dl_loader.get_sym('vkCmdTraceRaysIndirect2KHR'
+      f := VkCmdTraceRaysIndirect2KHR((*loader_p).get_sym('vkCmdTraceRaysIndirect2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdTraceRaysIndirect2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdTraceRaysIndirect2KHR': ${err}")
         return 
     })
     f(
@@ -18387,18 +15228,9 @@ pub fn get_device_buffer_memory_requirements_khr(
     device                                          C.Device,
     p_info                                          &DeviceBufferMemoryRequirements,
     p_memory_requirements                           &MemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceBufferMemoryRequirementsKHR(dl_loader.get_sym('vkGetDeviceBufferMemoryRequirementsKHR'
+      f := VkGetDeviceBufferMemoryRequirementsKHR((*loader_p).get_sym('vkGetDeviceBufferMemoryRequirementsKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceBufferMemoryRequirementsKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceBufferMemoryRequirementsKHR': ${err}")
         return 
     })
     f(
@@ -18414,18 +15246,9 @@ pub fn get_device_image_memory_requirements_khr(
     device                                          C.Device,
     p_info                                          &DeviceImageMemoryRequirements,
     p_memory_requirements                           &MemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceImageMemoryRequirementsKHR(dl_loader.get_sym('vkGetDeviceImageMemoryRequirementsKHR'
+      f := VkGetDeviceImageMemoryRequirementsKHR((*loader_p).get_sym('vkGetDeviceImageMemoryRequirementsKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceImageMemoryRequirementsKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceImageMemoryRequirementsKHR': ${err}")
         return 
     })
     f(
@@ -18442,18 +15265,9 @@ pub fn get_device_image_sparse_memory_requirements_khr(
     p_info                                          &DeviceImageMemoryRequirements,
     p_sparse_memory_requirement_count               &u32,
     p_sparse_memory_requirements                    &SparseImageMemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceImageSparseMemoryRequirementsKHR(dl_loader.get_sym('vkGetDeviceImageSparseMemoryRequirementsKHR'
+      f := VkGetDeviceImageSparseMemoryRequirementsKHR((*loader_p).get_sym('vkGetDeviceImageSparseMemoryRequirementsKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceImageSparseMemoryRequirementsKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceImageSparseMemoryRequirementsKHR': ${err}")
         return 
     })
     f(
@@ -18616,18 +15430,9 @@ pub fn cmd_bind_index_buffer2_khr(
     offset                                          DeviceSize,
     size                                            DeviceSize,
     index_type                                      IndexType)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindIndexBuffer2KHR(dl_loader.get_sym('vkCmdBindIndexBuffer2KHR'
+      f := VkCmdBindIndexBuffer2KHR((*loader_p).get_sym('vkCmdBindIndexBuffer2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindIndexBuffer2KHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindIndexBuffer2KHR': ${err}")
         return 
     })
     f(
@@ -18645,18 +15450,9 @@ pub fn get_rendering_area_granularity_khr(
     device                                          C.Device,
     p_rendering_area_info                           &RenderingAreaInfoKHR,
     p_granularity                                   &Extent2D)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetRenderingAreaGranularityKHR(dl_loader.get_sym('vkGetRenderingAreaGranularityKHR'
+      f := VkGetRenderingAreaGranularityKHR((*loader_p).get_sym('vkGetRenderingAreaGranularityKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetRenderingAreaGranularityKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetRenderingAreaGranularityKHR': ${err}")
         return 
     })
     f(
@@ -18672,18 +15468,9 @@ pub fn get_device_image_subresource_layout_khr(
     device                                          C.Device,
     p_info                                          &DeviceImageSubresourceInfoKHR,
     p_layout                                        &SubresourceLayout2KHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceImageSubresourceLayoutKHR(dl_loader.get_sym('vkGetDeviceImageSubresourceLayoutKHR'
+      f := VkGetDeviceImageSubresourceLayoutKHR((*loader_p).get_sym('vkGetDeviceImageSubresourceLayoutKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceImageSubresourceLayoutKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceImageSubresourceLayoutKHR': ${err}")
         return 
     })
     f(
@@ -18700,18 +15487,9 @@ pub fn get_image_subresource_layout2_khr(
     image                                           C.Image,
     p_subresource                                   &ImageSubresource2KHR,
     p_layout                                        &SubresourceLayout2KHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageSubresourceLayout2KHR(dl_loader.get_sym('vkGetImageSubresourceLayout2KHR'
+      f := VkGetImageSubresourceLayout2KHR((*loader_p).get_sym('vkGetImageSubresourceLayout2KHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageSubresourceLayout2KHR': ${err}")
+        println("Couldn't load symbol for 'vkGetImageSubresourceLayout2KHR': ${err}")
         return 
     })
     f(
@@ -18805,18 +15583,9 @@ pub fn get_physical_device_cooperative_matrix_properties_khr(
     physical_device                                 C.PhysicalDevice,
     p_property_count                                &u32,
     p_properties                                    &CooperativeMatrixPropertiesKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceCooperativeMatrixPropertiesKHR(dl_loader.get_sym('vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR'
+      f := VkGetPhysicalDeviceCooperativeMatrixPropertiesKHR((*loader_p).get_sym('vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -18908,18 +15677,9 @@ pub fn create_debug_report_callback_ext(
     p_create_info                                   &DebugReportCallbackCreateInfoEXT,
     p_allocator                                     &AllocationCallbacks,
     p_callback                                      &C.DebugReportCallbackEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDebugReportCallbackEXT(dl_loader.get_sym('vkCreateDebugReportCallbackEXT'
+      f := VkCreateDebugReportCallbackEXT((*loader_p).get_sym('vkCreateDebugReportCallbackEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDebugReportCallbackEXT': ${err}")
+        println("Couldn't load symbol for 'vkCreateDebugReportCallbackEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -18936,18 +15696,9 @@ pub fn destroy_debug_report_callback_ext(
     instance                                        C.Instance,
     callback                                        C.DebugReportCallbackEXT,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyDebugReportCallbackEXT(dl_loader.get_sym('vkDestroyDebugReportCallbackEXT'
+      f := VkDestroyDebugReportCallbackEXT((*loader_p).get_sym('vkDestroyDebugReportCallbackEXT'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyDebugReportCallbackEXT': ${err}")
+        println("Couldn't load symbol for 'vkDestroyDebugReportCallbackEXT': ${err}")
         return 
     })
     f(
@@ -18968,18 +15719,9 @@ pub fn debug_report_message_ext(
     message_code                                    i32,
     p_layer_prefix                                  &char,
     p_message                                       &char)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDebugReportMessageEXT(dl_loader.get_sym('vkDebugReportMessageEXT'
+      f := VkDebugReportMessageEXT((*loader_p).get_sym('vkDebugReportMessageEXT'
     ) or { 
-        println("Couldn't load sym for 'vkDebugReportMessageEXT': ${err}")
+        println("Couldn't load symbol for 'vkDebugReportMessageEXT': ${err}")
         return 
     })
     f(
@@ -19084,18 +15826,9 @@ type VkDebugMarkerSetObjectTagEXT = fn (     C.Device,     &DebugMarkerObjectTag
 pub fn debug_marker_set_object_tag_ext(
     device                                          C.Device,
     p_tag_info                                      &DebugMarkerObjectTagInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkDebugMarkerSetObjectTagEXT(dl_loader.get_sym('vkDebugMarkerSetObjectTagEXT'
+      f := VkDebugMarkerSetObjectTagEXT((*loader_p).get_sym('vkDebugMarkerSetObjectTagEXT'
     ) or { 
-        println("Couldn't load sym for 'vkDebugMarkerSetObjectTagEXT': ${err}")
+        println("Couldn't load symbol for 'vkDebugMarkerSetObjectTagEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -19109,18 +15842,9 @@ type VkDebugMarkerSetObjectNameEXT = fn (     C.Device,     &DebugMarkerObjectNa
 pub fn debug_marker_set_object_name_ext(
     device                                          C.Device,
     p_name_info                                     &DebugMarkerObjectNameInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkDebugMarkerSetObjectNameEXT(dl_loader.get_sym('vkDebugMarkerSetObjectNameEXT'
+      f := VkDebugMarkerSetObjectNameEXT((*loader_p).get_sym('vkDebugMarkerSetObjectNameEXT'
     ) or { 
-        println("Couldn't load sym for 'vkDebugMarkerSetObjectNameEXT': ${err}")
+        println("Couldn't load symbol for 'vkDebugMarkerSetObjectNameEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -19134,18 +15858,9 @@ type VkCmdDebugMarkerBeginEXT = fn (     C.CommandBuffer,     &DebugMarkerMarker
 pub fn cmd_debug_marker_begin_ext(
     command_buffer                                  C.CommandBuffer,
     p_marker_info                                   &DebugMarkerMarkerInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDebugMarkerBeginEXT(dl_loader.get_sym('vkCmdDebugMarkerBeginEXT'
+      f := VkCmdDebugMarkerBeginEXT((*loader_p).get_sym('vkCmdDebugMarkerBeginEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDebugMarkerBeginEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdDebugMarkerBeginEXT': ${err}")
         return 
     })
     f(
@@ -19158,18 +15873,9 @@ type VkCmdDebugMarkerEndEXT = fn (     C.CommandBuffer)
 
 pub fn cmd_debug_marker_end_ext(
     command_buffer                                  C.CommandBuffer)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDebugMarkerEndEXT(dl_loader.get_sym('vkCmdDebugMarkerEndEXT'
+      f := VkCmdDebugMarkerEndEXT((*loader_p).get_sym('vkCmdDebugMarkerEndEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDebugMarkerEndEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdDebugMarkerEndEXT': ${err}")
         return 
     })
     f(
@@ -19182,18 +15888,9 @@ type VkCmdDebugMarkerInsertEXT = fn (     C.CommandBuffer,     &DebugMarkerMarke
 pub fn cmd_debug_marker_insert_ext(
     command_buffer                                  C.CommandBuffer,
     p_marker_info                                   &DebugMarkerMarkerInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDebugMarkerInsertEXT(dl_loader.get_sym('vkCmdDebugMarkerInsertEXT'
+      f := VkCmdDebugMarkerInsertEXT((*loader_p).get_sym('vkCmdDebugMarkerInsertEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDebugMarkerInsertEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdDebugMarkerInsertEXT': ${err}")
         return 
     })
     f(
@@ -19290,18 +15987,9 @@ pub fn cmd_bind_transform_feedback_buffers_ext(
     p_buffers                                       &C.Buffer,
     p_offsets                                       &DeviceSize,
     p_sizes                                         &DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindTransformFeedbackBuffersEXT(dl_loader.get_sym('vkCmdBindTransformFeedbackBuffersEXT'
+      f := VkCmdBindTransformFeedbackBuffersEXT((*loader_p).get_sym('vkCmdBindTransformFeedbackBuffersEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindTransformFeedbackBuffersEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindTransformFeedbackBuffersEXT': ${err}")
         return 
     })
     f(
@@ -19322,18 +16010,9 @@ pub fn cmd_begin_transform_feedback_ext(
     counter_buffer_count                            u32,
     p_counter_buffers                               &C.Buffer,
     p_counter_buffer_offsets                        &DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginTransformFeedbackEXT(dl_loader.get_sym('vkCmdBeginTransformFeedbackEXT'
+      f := VkCmdBeginTransformFeedbackEXT((*loader_p).get_sym('vkCmdBeginTransformFeedbackEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginTransformFeedbackEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginTransformFeedbackEXT': ${err}")
         return 
     })
     f(
@@ -19353,18 +16032,9 @@ pub fn cmd_end_transform_feedback_ext(
     counter_buffer_count                            u32,
     p_counter_buffers                               &C.Buffer,
     p_counter_buffer_offsets                        &DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndTransformFeedbackEXT(dl_loader.get_sym('vkCmdEndTransformFeedbackEXT'
+      f := VkCmdEndTransformFeedbackEXT((*loader_p).get_sym('vkCmdEndTransformFeedbackEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndTransformFeedbackEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndTransformFeedbackEXT': ${err}")
         return 
     })
     f(
@@ -19384,18 +16054,9 @@ pub fn cmd_begin_query_indexed_ext(
     query                                           u32,
     flags                                           QueryControlFlags,
     index                                           u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginQueryIndexedEXT(dl_loader.get_sym('vkCmdBeginQueryIndexedEXT'
+      f := VkCmdBeginQueryIndexedEXT((*loader_p).get_sym('vkCmdBeginQueryIndexedEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginQueryIndexedEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginQueryIndexedEXT': ${err}")
         return 
     })
     f(
@@ -19414,18 +16075,9 @@ pub fn cmd_end_query_indexed_ext(
     query_pool                                      C.QueryPool,
     query                                           u32,
     index                                           u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndQueryIndexedEXT(dl_loader.get_sym('vkCmdEndQueryIndexedEXT'
+      f := VkCmdEndQueryIndexedEXT((*loader_p).get_sym('vkCmdEndQueryIndexedEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndQueryIndexedEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndQueryIndexedEXT': ${err}")
         return 
     })
     f(
@@ -19446,18 +16098,9 @@ pub fn cmd_draw_indirect_byte_count_ext(
     counter_buffer_offset                           DeviceSize,
     counter_offset                                  u32,
     vertex_stride                                   u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawIndirectByteCountEXT(dl_loader.get_sym('vkCmdDrawIndirectByteCountEXT'
+      f := VkCmdDrawIndirectByteCountEXT((*loader_p).get_sym('vkCmdDrawIndirectByteCountEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawIndirectByteCountEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawIndirectByteCountEXT': ${err}")
         return 
     })
     f(
@@ -19520,18 +16163,9 @@ pub fn create_cu_module_nvx(
     p_create_info                                   &CuModuleCreateInfoNVX,
     p_allocator                                     &AllocationCallbacks,
     p_module                                        &C.CuModuleNVX) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateCuModuleNVX(dl_loader.get_sym('vkCreateCuModuleNVX'
+      f := VkCreateCuModuleNVX((*loader_p).get_sym('vkCreateCuModuleNVX'
     ) or { 
-        println("Couldn't load sym for 'vkCreateCuModuleNVX': ${err}")
+        println("Couldn't load symbol for 'vkCreateCuModuleNVX': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -19549,18 +16183,9 @@ pub fn create_cu_function_nvx(
     p_create_info                                   &CuFunctionCreateInfoNVX,
     p_allocator                                     &AllocationCallbacks,
     p_function                                      &C.CuFunctionNVX) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateCuFunctionNVX(dl_loader.get_sym('vkCreateCuFunctionNVX'
+      f := VkCreateCuFunctionNVX((*loader_p).get_sym('vkCreateCuFunctionNVX'
     ) or { 
-        println("Couldn't load sym for 'vkCreateCuFunctionNVX': ${err}")
+        println("Couldn't load symbol for 'vkCreateCuFunctionNVX': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -19577,18 +16202,9 @@ pub fn destroy_cu_module_nvx(
     device                                          C.Device,
     vkmodule                                        C.CuModuleNVX,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyCuModuleNVX(dl_loader.get_sym('vkDestroyCuModuleNVX'
+      f := VkDestroyCuModuleNVX((*loader_p).get_sym('vkDestroyCuModuleNVX'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyCuModuleNVX': ${err}")
+        println("Couldn't load symbol for 'vkDestroyCuModuleNVX': ${err}")
         return 
     })
     f(
@@ -19604,18 +16220,9 @@ pub fn destroy_cu_function_nvx(
     device                                          C.Device,
     function                                        C.CuFunctionNVX,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyCuFunctionNVX(dl_loader.get_sym('vkDestroyCuFunctionNVX'
+      f := VkDestroyCuFunctionNVX((*loader_p).get_sym('vkDestroyCuFunctionNVX'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyCuFunctionNVX': ${err}")
+        println("Couldn't load symbol for 'vkDestroyCuFunctionNVX': ${err}")
         return 
     })
     f(
@@ -19630,18 +16237,9 @@ type VkCmdCuLaunchKernelNVX = fn (     C.CommandBuffer,     &CuLaunchInfoNVX)
 pub fn cmd_cu_launch_kernel_nvx(
     command_buffer                                  C.CommandBuffer,
     p_launch_info                                   &CuLaunchInfoNVX)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCuLaunchKernelNVX(dl_loader.get_sym('vkCmdCuLaunchKernelNVX'
+      f := VkCmdCuLaunchKernelNVX((*loader_p).get_sym('vkCmdCuLaunchKernelNVX'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCuLaunchKernelNVX': ${err}")
+        println("Couldn't load symbol for 'vkCmdCuLaunchKernelNVX': ${err}")
         return 
     })
     f(
@@ -19678,16 +16276,9 @@ type VkGetImageViewHandleNVX = fn (     C.Device,     &ImageViewHandleInfoNVX) u
 pub fn get_image_view_handle_nvx(
     device                                          C.Device,
     p_info                                          &ImageViewHandleInfoNVX) u32 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetImageViewHandleNVX(dl_loader.get_sym("vkGetImageViewHandleNVX"
+      f := VkGetImageViewHandleNVX((*loader_p).get_sym("vkGetImageViewHandleNVX"
     ) or { 
-        panic("Couldn't load sym for 'vkGetImageViewHandleNVX': ${err}") })
+        panic("Couldn't load symbol for 'vkGetImageViewHandleNVX': ${err}") })
     return f(
     device,
     p_info)
@@ -19700,18 +16291,9 @@ pub fn get_image_view_address_nvx(
     device                                          C.Device,
     image_view                                      C.ImageView,
     p_properties                                    &ImageViewAddressPropertiesNVX) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageViewAddressNVX(dl_loader.get_sym('vkGetImageViewAddressNVX'
+      f := VkGetImageViewAddressNVX((*loader_p).get_sym('vkGetImageViewAddressNVX'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageViewAddressNVX': ${err}")
+        println("Couldn't load symbol for 'vkGetImageViewAddressNVX': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -19737,18 +16319,9 @@ pub fn cmd_draw_indirect_count_amd(
     count_buffer_offset                             DeviceSize,
     max_draw_count                                  u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawIndirectCountAMD(dl_loader.get_sym('vkCmdDrawIndirectCountAMD'
+      f := VkCmdDrawIndirectCountAMD((*loader_p).get_sym('vkCmdDrawIndirectCountAMD'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawIndirectCountAMD': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawIndirectCountAMD': ${err}")
         return 
     })
     f(
@@ -19772,18 +16345,9 @@ pub fn cmd_draw_indexed_indirect_count_amd(
     count_buffer_offset                             DeviceSize,
     max_draw_count                                  u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawIndexedIndirectCountAMD(dl_loader.get_sym('vkCmdDrawIndexedIndirectCountAMD'
+      f := VkCmdDrawIndexedIndirectCountAMD((*loader_p).get_sym('vkCmdDrawIndexedIndirectCountAMD'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawIndexedIndirectCountAMD': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawIndexedIndirectCountAMD': ${err}")
         return 
     })
     f(
@@ -20358,18 +16922,9 @@ pub fn get_shader_info_amd(
     info_type                                       ShaderInfoTypeAMD,
     p_info_size                                     &usize,
     p_info                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetShaderInfoAMD(dl_loader.get_sym('vkGetShaderInfoAMD'
+      f := VkGetShaderInfoAMD((*loader_p).get_sym('vkGetShaderInfoAMD'
     ) or { 
-        println("Couldn't load sym for 'vkGetShaderInfoAMD': ${err}")
+        println("Couldn't load symbol for 'vkGetShaderInfoAMD': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -20410,18 +16965,9 @@ pub fn create_stream_descriptor_surface_ggp(
     p_create_info                                   &StreamDescriptorSurfaceCreateInfoGGP,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateStreamDescriptorSurfaceGGP(dl_loader.get_sym('vkCreateStreamDescriptorSurfaceGGP'
+      f := VkCreateStreamDescriptorSurfaceGGP((*loader_p).get_sym('vkCreateStreamDescriptorSurfaceGGP'
     ) or { 
-        println("Couldn't load sym for 'vkCreateStreamDescriptorSurfaceGGP': ${err}")
+        println("Couldn't load symbol for 'vkCreateStreamDescriptorSurfaceGGP': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -20496,18 +17042,9 @@ pub fn get_physical_device_external_image_format_properties_nv(
     flags                                           ImageCreateFlags,
     external_handle_type                            ExternalMemoryHandleTypeFlagsNV,
     p_external_image_format_properties              &ExternalImageFormatPropertiesNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceExternalImageFormatPropertiesNV(dl_loader.get_sym('vkGetPhysicalDeviceExternalImageFormatPropertiesNV'
+      f := VkGetPhysicalDeviceExternalImageFormatPropertiesNV((*loader_p).get_sym('vkGetPhysicalDeviceExternalImageFormatPropertiesNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceExternalImageFormatPropertiesNV': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalImageFormatPropertiesNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -20575,18 +17112,9 @@ pub fn get_memory_win32_handle_nv(
     memory                                          C.DeviceMemory,
     handle_type                                     ExternalMemoryHandleTypeFlagsNV,
     p_handle                                        &voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMemoryWin32HandleNV(dl_loader.get_sym('vkGetMemoryWin32HandleNV'
+      f := VkGetMemoryWin32HandleNV((*loader_p).get_sym('vkGetMemoryWin32HandleNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetMemoryWin32HandleNV': ${err}")
+        println("Couldn't load symbol for 'vkGetMemoryWin32HandleNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -20661,18 +17189,9 @@ pub fn create_vi_surface_nn(
     p_create_info                                   &ViSurfaceCreateInfoNN,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateViSurfaceNN(dl_loader.get_sym('vkCreateViSurfaceNN'
+      f := VkCreateViSurfaceNN((*loader_p).get_sym('vkCreateViSurfaceNN'
     ) or { 
-        println("Couldn't load sym for 'vkCreateViSurfaceNN': ${err}")
+        println("Couldn't load symbol for 'vkCreateViSurfaceNN': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -20823,18 +17342,9 @@ type VkCmdBeginConditionalRenderingEXT = fn (     C.CommandBuffer,     &Conditio
 pub fn cmd_begin_conditional_rendering_ext(
     command_buffer                                  C.CommandBuffer,
     p_conditional_rendering_begin                   &ConditionalRenderingBeginInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginConditionalRenderingEXT(dl_loader.get_sym('vkCmdBeginConditionalRenderingEXT'
+      f := VkCmdBeginConditionalRenderingEXT((*loader_p).get_sym('vkCmdBeginConditionalRenderingEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginConditionalRenderingEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginConditionalRenderingEXT': ${err}")
         return 
     })
     f(
@@ -20847,18 +17357,9 @@ type VkCmdEndConditionalRenderingEXT = fn (     C.CommandBuffer)
 
 pub fn cmd_end_conditional_rendering_ext(
     command_buffer                                  C.CommandBuffer)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndConditionalRenderingEXT(dl_loader.get_sym('vkCmdEndConditionalRenderingEXT'
+      f := VkCmdEndConditionalRenderingEXT((*loader_p).get_sym('vkCmdEndConditionalRenderingEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndConditionalRenderingEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndConditionalRenderingEXT': ${err}")
         return 
     })
     f(
@@ -20895,18 +17396,9 @@ pub fn cmd_set_viewport_w_scaling_nv(
     first_viewport                                  u32,
     viewport_count                                  u32,
     p_viewport_w_scalings                           &ViewportWScalingNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetViewportWScalingNV(dl_loader.get_sym('vkCmdSetViewportWScalingNV'
+      f := VkCmdSetViewportWScalingNV((*loader_p).get_sym('vkCmdSetViewportWScalingNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetViewportWScalingNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetViewportWScalingNV': ${err}")
         return 
     })
     f(
@@ -20928,18 +17420,9 @@ type VkReleaseDisplayEXT = fn (     C.PhysicalDevice,     C.DisplayKHR) Result
 pub fn release_display_ext(
     physical_device                                 C.PhysicalDevice,
     display                                         C.DisplayKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkReleaseDisplayEXT(dl_loader.get_sym('vkReleaseDisplayEXT'
+      f := VkReleaseDisplayEXT((*loader_p).get_sym('vkReleaseDisplayEXT'
     ) or { 
-        println("Couldn't load sym for 'vkReleaseDisplayEXT': ${err}")
+        println("Couldn't load symbol for 'vkReleaseDisplayEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -20960,18 +17443,9 @@ pub fn acquire_xlib_display_ext(
     physical_device                                 C.PhysicalDevice,
     dpy                                             &C.DisplayKHR,
     display                                         C.DisplayKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAcquireXlibDisplayEXT(dl_loader.get_sym('vkAcquireXlibDisplayEXT'
+      f := VkAcquireXlibDisplayEXT((*loader_p).get_sym('vkAcquireXlibDisplayEXT'
     ) or { 
-        println("Couldn't load sym for 'vkAcquireXlibDisplayEXT': ${err}")
+        println("Couldn't load symbol for 'vkAcquireXlibDisplayEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -20988,18 +17462,9 @@ pub fn get_rand_r_output_display_ext(
     dpy                                             &C.DisplayKHR,
     rr_output                                       u32,
     p_display                                       &C.DisplayKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetRandROutputDisplayEXT(dl_loader.get_sym('vkGetRandROutputDisplayEXT'
+      f := VkGetRandROutputDisplayEXT((*loader_p).get_sym('vkGetRandROutputDisplayEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetRandROutputDisplayEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetRandROutputDisplayEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21046,18 +17511,9 @@ pub fn get_physical_device_surface_capabilities2_ext(
     physical_device                                 C.PhysicalDevice,
     surface                                         C.SurfaceKHR,
     p_surface_capabilities                          &SurfaceCapabilities2EXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSurfaceCapabilities2EXT(dl_loader.get_sym('vkGetPhysicalDeviceSurfaceCapabilities2EXT'
+      f := VkGetPhysicalDeviceSurfaceCapabilities2EXT((*loader_p).get_sym('vkGetPhysicalDeviceSurfaceCapabilities2EXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSurfaceCapabilities2EXT': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceCapabilities2EXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21128,18 +17584,9 @@ pub fn display_power_control_ext(
     device                                          C.Device,
     display                                         C.DisplayKHR,
     p_display_power_info                            &DisplayPowerInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkDisplayPowerControlEXT(dl_loader.get_sym('vkDisplayPowerControlEXT'
+      f := VkDisplayPowerControlEXT((*loader_p).get_sym('vkDisplayPowerControlEXT'
     ) or { 
-        println("Couldn't load sym for 'vkDisplayPowerControlEXT': ${err}")
+        println("Couldn't load symbol for 'vkDisplayPowerControlEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21156,18 +17603,9 @@ pub fn register_device_event_ext(
     p_device_event_info                             &DeviceEventInfoEXT,
     p_allocator                                     &AllocationCallbacks,
     p_fence                                         &C.Fence) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkRegisterDeviceEventEXT(dl_loader.get_sym('vkRegisterDeviceEventEXT'
+      f := VkRegisterDeviceEventEXT((*loader_p).get_sym('vkRegisterDeviceEventEXT'
     ) or { 
-        println("Couldn't load sym for 'vkRegisterDeviceEventEXT': ${err}")
+        println("Couldn't load symbol for 'vkRegisterDeviceEventEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21186,18 +17624,9 @@ pub fn register_display_event_ext(
     p_display_event_info                            &DisplayEventInfoEXT,
     p_allocator                                     &AllocationCallbacks,
     p_fence                                         &C.Fence) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkRegisterDisplayEventEXT(dl_loader.get_sym('vkRegisterDisplayEventEXT'
+      f := VkRegisterDisplayEventEXT((*loader_p).get_sym('vkRegisterDisplayEventEXT'
     ) or { 
-        println("Couldn't load sym for 'vkRegisterDisplayEventEXT': ${err}")
+        println("Couldn't load symbol for 'vkRegisterDisplayEventEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21216,18 +17645,9 @@ pub fn get_swapchain_counter_ext(
     swapchain                                       C.SwapchainKHR,
     counter                                         SurfaceCounterFlagBitsEXT,
     p_counter_value                                 &u64) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetSwapchainCounterEXT(dl_loader.get_sym('vkGetSwapchainCounterEXT'
+      f := VkGetSwapchainCounterEXT((*loader_p).get_sym('vkGetSwapchainCounterEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetSwapchainCounterEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetSwapchainCounterEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21279,18 +17699,9 @@ pub fn get_refresh_cycle_duration_google(
     device                                          C.Device,
     swapchain                                       C.SwapchainKHR,
     p_display_timing_properties                     &RefreshCycleDurationGOOGLE) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetRefreshCycleDurationGOOGLE(dl_loader.get_sym('vkGetRefreshCycleDurationGOOGLE'
+      f := VkGetRefreshCycleDurationGOOGLE((*loader_p).get_sym('vkGetRefreshCycleDurationGOOGLE'
     ) or { 
-        println("Couldn't load sym for 'vkGetRefreshCycleDurationGOOGLE': ${err}")
+        println("Couldn't load symbol for 'vkGetRefreshCycleDurationGOOGLE': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21307,18 +17718,9 @@ pub fn get_past_presentation_timing_google(
     swapchain                                       C.SwapchainKHR,
     p_presentation_timing_count                     &u32,
     p_presentation_timings                          &PastPresentationTimingGOOGLE) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPastPresentationTimingGOOGLE(dl_loader.get_sym('vkGetPastPresentationTimingGOOGLE'
+      f := VkGetPastPresentationTimingGOOGLE((*loader_p).get_sym('vkGetPastPresentationTimingGOOGLE'
     ) or { 
-        println("Couldn't load sym for 'vkGetPastPresentationTimingGOOGLE': ${err}")
+        println("Couldn't load symbol for 'vkGetPastPresentationTimingGOOGLE': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21441,18 +17843,9 @@ pub fn cmd_set_discard_rectangle_ext(
     first_discard_rectangle                         u32,
     discard_rectangle_count                         u32,
     p_discard_rectangles                            &Rect2D)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDiscardRectangleEXT(dl_loader.get_sym('vkCmdSetDiscardRectangleEXT'
+      f := VkCmdSetDiscardRectangleEXT((*loader_p).get_sym('vkCmdSetDiscardRectangleEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDiscardRectangleEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDiscardRectangleEXT': ${err}")
         return 
     })
     f(
@@ -21468,18 +17861,9 @@ type VkCmdSetDiscardRectangleEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_discard_rectangle_enable_ext(
     command_buffer                                  C.CommandBuffer,
     discard_rectangle_enable                        Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDiscardRectangleEnableEXT(dl_loader.get_sym('vkCmdSetDiscardRectangleEnableEXT'
+      f := VkCmdSetDiscardRectangleEnableEXT((*loader_p).get_sym('vkCmdSetDiscardRectangleEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDiscardRectangleEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDiscardRectangleEnableEXT': ${err}")
         return 
     })
     f(
@@ -21493,18 +17877,9 @@ type VkCmdSetDiscardRectangleModeEXT = fn (     C.CommandBuffer,     DiscardRect
 pub fn cmd_set_discard_rectangle_mode_ext(
     command_buffer                                  C.CommandBuffer,
     discard_rectangle_mode                          DiscardRectangleModeEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDiscardRectangleModeEXT(dl_loader.get_sym('vkCmdSetDiscardRectangleModeEXT'
+      f := VkCmdSetDiscardRectangleModeEXT((*loader_p).get_sym('vkCmdSetDiscardRectangleModeEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDiscardRectangleModeEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDiscardRectangleModeEXT': ${err}")
         return 
     })
     f(
@@ -21617,18 +17992,9 @@ pub fn set_hdr_metadata_ext(
     swapchain_count                                 u32,
     p_swapchains                                    &C.SwapchainKHR,
     p_metadata                                      &HdrMetadataEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetHdrMetadataEXT(dl_loader.get_sym('vkSetHdrMetadataEXT'
+      f := VkSetHdrMetadataEXT((*loader_p).get_sym('vkSetHdrMetadataEXT'
     ) or { 
-        println("Couldn't load sym for 'vkSetHdrMetadataEXT': ${err}")
+        println("Couldn't load symbol for 'vkSetHdrMetadataEXT': ${err}")
         return 
     })
     f(
@@ -21675,18 +18041,9 @@ pub fn create_ios_surface_mvk(
     p_create_info                                   &IOSSurfaceCreateInfoMVK,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateIOSSurfaceMVK(dl_loader.get_sym('vkCreateIOSSurfaceMVK'
+      f := VkCreateIOSSurfaceMVK((*loader_p).get_sym('vkCreateIOSSurfaceMVK'
     ) or { 
-        println("Couldn't load sym for 'vkCreateIOSSurfaceMVK': ${err}")
+        println("Couldn't load symbol for 'vkCreateIOSSurfaceMVK': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21719,18 +18076,9 @@ pub fn create_mac_os_surface_mvk(
     p_create_info                                   &MacOSSurfaceCreateInfoMVK,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateMacOSSurfaceMVK(dl_loader.get_sym('vkCreateMacOSSurfaceMVK'
+      f := VkCreateMacOSSurfaceMVK((*loader_p).get_sym('vkCreateMacOSSurfaceMVK'
     ) or { 
-        println("Couldn't load sym for 'vkCreateMacOSSurfaceMVK': ${err}")
+        println("Couldn't load symbol for 'vkCreateMacOSSurfaceMVK': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21846,18 +18194,9 @@ type VkSetDebugUtilsObjectNameEXT = fn (     C.Device,     &DebugUtilsObjectName
 pub fn set_debug_utils_object_name_ext(
     device                                          C.Device,
     p_name_info                                     &DebugUtilsObjectNameInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetDebugUtilsObjectNameEXT(dl_loader.get_sym('vkSetDebugUtilsObjectNameEXT'
+      f := VkSetDebugUtilsObjectNameEXT((*loader_p).get_sym('vkSetDebugUtilsObjectNameEXT'
     ) or { 
-        println("Couldn't load sym for 'vkSetDebugUtilsObjectNameEXT': ${err}")
+        println("Couldn't load symbol for 'vkSetDebugUtilsObjectNameEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21871,18 +18210,9 @@ type VkSetDebugUtilsObjectTagEXT = fn (     C.Device,     &DebugUtilsObjectTagIn
 pub fn set_debug_utils_object_tag_ext(
     device                                          C.Device,
     p_tag_info                                      &DebugUtilsObjectTagInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetDebugUtilsObjectTagEXT(dl_loader.get_sym('vkSetDebugUtilsObjectTagEXT'
+      f := VkSetDebugUtilsObjectTagEXT((*loader_p).get_sym('vkSetDebugUtilsObjectTagEXT'
     ) or { 
-        println("Couldn't load sym for 'vkSetDebugUtilsObjectTagEXT': ${err}")
+        println("Couldn't load symbol for 'vkSetDebugUtilsObjectTagEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -21896,18 +18226,9 @@ type VkQueueBeginDebugUtilsLabelEXT = fn (     C.Queue,     &DebugUtilsLabelEXT)
 pub fn queue_begin_debug_utils_label_ext(
     queue                                           C.Queue,
     p_label_info                                    &DebugUtilsLabelEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueueBeginDebugUtilsLabelEXT(dl_loader.get_sym('vkQueueBeginDebugUtilsLabelEXT'
+      f := VkQueueBeginDebugUtilsLabelEXT((*loader_p).get_sym('vkQueueBeginDebugUtilsLabelEXT'
     ) or { 
-        println("Couldn't load sym for 'vkQueueBeginDebugUtilsLabelEXT': ${err}")
+        println("Couldn't load symbol for 'vkQueueBeginDebugUtilsLabelEXT': ${err}")
         return 
     })
     f(
@@ -21920,18 +18241,9 @@ type VkQueueEndDebugUtilsLabelEXT = fn (     C.Queue)
 
 pub fn queue_end_debug_utils_label_ext(
     queue                                           C.Queue)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueueEndDebugUtilsLabelEXT(dl_loader.get_sym('vkQueueEndDebugUtilsLabelEXT'
+      f := VkQueueEndDebugUtilsLabelEXT((*loader_p).get_sym('vkQueueEndDebugUtilsLabelEXT'
     ) or { 
-        println("Couldn't load sym for 'vkQueueEndDebugUtilsLabelEXT': ${err}")
+        println("Couldn't load symbol for 'vkQueueEndDebugUtilsLabelEXT': ${err}")
         return 
     })
     f(
@@ -21944,18 +18256,9 @@ type VkQueueInsertDebugUtilsLabelEXT = fn (     C.Queue,     &DebugUtilsLabelEXT
 pub fn queue_insert_debug_utils_label_ext(
     queue                                           C.Queue,
     p_label_info                                    &DebugUtilsLabelEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueueInsertDebugUtilsLabelEXT(dl_loader.get_sym('vkQueueInsertDebugUtilsLabelEXT'
+      f := VkQueueInsertDebugUtilsLabelEXT((*loader_p).get_sym('vkQueueInsertDebugUtilsLabelEXT'
     ) or { 
-        println("Couldn't load sym for 'vkQueueInsertDebugUtilsLabelEXT': ${err}")
+        println("Couldn't load symbol for 'vkQueueInsertDebugUtilsLabelEXT': ${err}")
         return 
     })
     f(
@@ -21969,18 +18272,9 @@ type VkCmdBeginDebugUtilsLabelEXT = fn (     C.CommandBuffer,     &DebugUtilsLab
 pub fn cmd_begin_debug_utils_label_ext(
     command_buffer                                  C.CommandBuffer,
     p_label_info                                    &DebugUtilsLabelEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBeginDebugUtilsLabelEXT(dl_loader.get_sym('vkCmdBeginDebugUtilsLabelEXT'
+      f := VkCmdBeginDebugUtilsLabelEXT((*loader_p).get_sym('vkCmdBeginDebugUtilsLabelEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBeginDebugUtilsLabelEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdBeginDebugUtilsLabelEXT': ${err}")
         return 
     })
     f(
@@ -21993,18 +18287,9 @@ type VkCmdEndDebugUtilsLabelEXT = fn (     C.CommandBuffer)
 
 pub fn cmd_end_debug_utils_label_ext(
     command_buffer                                  C.CommandBuffer)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdEndDebugUtilsLabelEXT(dl_loader.get_sym('vkCmdEndDebugUtilsLabelEXT'
+      f := VkCmdEndDebugUtilsLabelEXT((*loader_p).get_sym('vkCmdEndDebugUtilsLabelEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdEndDebugUtilsLabelEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdEndDebugUtilsLabelEXT': ${err}")
         return 
     })
     f(
@@ -22017,18 +18302,9 @@ type VkCmdInsertDebugUtilsLabelEXT = fn (     C.CommandBuffer,     &DebugUtilsLa
 pub fn cmd_insert_debug_utils_label_ext(
     command_buffer                                  C.CommandBuffer,
     p_label_info                                    &DebugUtilsLabelEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdInsertDebugUtilsLabelEXT(dl_loader.get_sym('vkCmdInsertDebugUtilsLabelEXT'
+      f := VkCmdInsertDebugUtilsLabelEXT((*loader_p).get_sym('vkCmdInsertDebugUtilsLabelEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdInsertDebugUtilsLabelEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdInsertDebugUtilsLabelEXT': ${err}")
         return 
     })
     f(
@@ -22044,18 +18320,9 @@ pub fn create_debug_utils_messenger_ext(
     p_create_info                                   &DebugUtilsMessengerCreateInfoEXT,
     p_allocator                                     &AllocationCallbacks,
     p_messenger                                     &C.DebugUtilsMessengerEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDebugUtilsMessengerEXT(dl_loader.get_sym('vkCreateDebugUtilsMessengerEXT'
+      f := VkCreateDebugUtilsMessengerEXT((*loader_p).get_sym('vkCreateDebugUtilsMessengerEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDebugUtilsMessengerEXT': ${err}")
+        println("Couldn't load symbol for 'vkCreateDebugUtilsMessengerEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -22072,18 +18339,9 @@ pub fn destroy_debug_utils_messenger_ext(
     instance                                        C.Instance,
     messenger                                       C.DebugUtilsMessengerEXT,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyDebugUtilsMessengerEXT(dl_loader.get_sym('vkDestroyDebugUtilsMessengerEXT'
+      f := VkDestroyDebugUtilsMessengerEXT((*loader_p).get_sym('vkDestroyDebugUtilsMessengerEXT'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyDebugUtilsMessengerEXT': ${err}")
+        println("Couldn't load symbol for 'vkDestroyDebugUtilsMessengerEXT': ${err}")
         return 
     })
     f(
@@ -22100,18 +18358,9 @@ pub fn submit_debug_utils_message_ext(
     message_severity                                DebugUtilsMessageSeverityFlagBitsEXT,
     message_types                                   DebugUtilsMessageTypeFlagsEXT,
     p_callback_data                                 &DebugUtilsMessengerCallbackDataEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkSubmitDebugUtilsMessageEXT(dl_loader.get_sym('vkSubmitDebugUtilsMessageEXT'
+      f := VkSubmitDebugUtilsMessageEXT((*loader_p).get_sym('vkSubmitDebugUtilsMessageEXT'
     ) or { 
-        println("Couldn't load sym for 'vkSubmitDebugUtilsMessageEXT': ${err}")
+        println("Couldn't load symbol for 'vkSubmitDebugUtilsMessageEXT': ${err}")
         return 
     })
     f(
@@ -22203,18 +18452,9 @@ pub fn get_android_hardware_buffer_properties_android(
     device                                          C.Device,
     buffer                                          voidptr,
     p_properties                                    &AndroidHardwareBufferPropertiesANDROID) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetAndroidHardwareBufferPropertiesANDROID(dl_loader.get_sym('vkGetAndroidHardwareBufferPropertiesANDROID'
+      f := VkGetAndroidHardwareBufferPropertiesANDROID((*loader_p).get_sym('vkGetAndroidHardwareBufferPropertiesANDROID'
     ) or { 
-        println("Couldn't load sym for 'vkGetAndroidHardwareBufferPropertiesANDROID': ${err}")
+        println("Couldn't load symbol for 'vkGetAndroidHardwareBufferPropertiesANDROID': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -22230,18 +18470,9 @@ pub fn get_memory_android_hardware_buffer_android(
     device                                          C.Device,
     p_info                                          &MemoryGetAndroidHardwareBufferInfoANDROID,
     p_buffer                                        voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMemoryAndroidHardwareBufferANDROID(dl_loader.get_sym('vkGetMemoryAndroidHardwareBufferANDROID'
+      f := VkGetMemoryAndroidHardwareBufferANDROID((*loader_p).get_sym('vkGetMemoryAndroidHardwareBufferANDROID'
     ) or { 
-        println("Couldn't load sym for 'vkGetMemoryAndroidHardwareBufferANDROID': ${err}")
+        println("Couldn't load symbol for 'vkGetMemoryAndroidHardwareBufferANDROID': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -22355,18 +18586,9 @@ pub fn create_execution_graph_pipelines_amdx(
     p_create_infos                                  &ExecutionGraphPipelineCreateInfoAMDX,
     p_allocator                                     &AllocationCallbacks,
     p_pipelines                                     &C.Pipeline) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateExecutionGraphPipelinesAMDX(dl_loader.get_sym('vkCreateExecutionGraphPipelinesAMDX'
+      f := VkCreateExecutionGraphPipelinesAMDX((*loader_p).get_sym('vkCreateExecutionGraphPipelinesAMDX'
     ) or { 
-        println("Couldn't load sym for 'vkCreateExecutionGraphPipelinesAMDX': ${err}")
+        println("Couldn't load symbol for 'vkCreateExecutionGraphPipelinesAMDX': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -22385,18 +18607,9 @@ pub fn get_execution_graph_pipeline_scratch_size_amdx(
     device                                          C.Device,
     execution_graph                                 C.Pipeline,
     p_size_info                                     &ExecutionGraphPipelineScratchSizeAMDX) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetExecutionGraphPipelineScratchSizeAMDX(dl_loader.get_sym('vkGetExecutionGraphPipelineScratchSizeAMDX'
+      f := VkGetExecutionGraphPipelineScratchSizeAMDX((*loader_p).get_sym('vkGetExecutionGraphPipelineScratchSizeAMDX'
     ) or { 
-        println("Couldn't load sym for 'vkGetExecutionGraphPipelineScratchSizeAMDX': ${err}")
+        println("Couldn't load symbol for 'vkGetExecutionGraphPipelineScratchSizeAMDX': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -22413,18 +18626,9 @@ pub fn get_execution_graph_pipeline_node_index_amdx(
     execution_graph                                 C.Pipeline,
     p_node_info                                     &PipelineShaderStageNodeCreateInfoAMDX,
     p_node_index                                    &u32) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetExecutionGraphPipelineNodeIndexAMDX(dl_loader.get_sym('vkGetExecutionGraphPipelineNodeIndexAMDX'
+      f := VkGetExecutionGraphPipelineNodeIndexAMDX((*loader_p).get_sym('vkGetExecutionGraphPipelineNodeIndexAMDX'
     ) or { 
-        println("Couldn't load sym for 'vkGetExecutionGraphPipelineNodeIndexAMDX': ${err}")
+        println("Couldn't load symbol for 'vkGetExecutionGraphPipelineNodeIndexAMDX': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -22440,18 +18644,9 @@ type VkCmdInitializeGraphScratchMemoryAMDX = fn (     C.CommandBuffer,     Devic
 pub fn cmd_initialize_graph_scratch_memory_amdx(
     command_buffer                                  C.CommandBuffer,
     scratch                                         DeviceAddress)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdInitializeGraphScratchMemoryAMDX(dl_loader.get_sym('vkCmdInitializeGraphScratchMemoryAMDX'
+      f := VkCmdInitializeGraphScratchMemoryAMDX((*loader_p).get_sym('vkCmdInitializeGraphScratchMemoryAMDX'
     ) or { 
-        println("Couldn't load sym for 'vkCmdInitializeGraphScratchMemoryAMDX': ${err}")
+        println("Couldn't load symbol for 'vkCmdInitializeGraphScratchMemoryAMDX': ${err}")
         return 
     })
     f(
@@ -22466,18 +18661,9 @@ pub fn cmd_dispatch_graph_amdx(
     command_buffer                                  C.CommandBuffer,
     scratch                                         DeviceAddress,
     p_count_info                                    &DispatchGraphCountInfoAMDX)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDispatchGraphAMDX(dl_loader.get_sym('vkCmdDispatchGraphAMDX'
+      f := VkCmdDispatchGraphAMDX((*loader_p).get_sym('vkCmdDispatchGraphAMDX'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDispatchGraphAMDX': ${err}")
+        println("Couldn't load symbol for 'vkCmdDispatchGraphAMDX': ${err}")
         return 
     })
     f(
@@ -22493,18 +18679,9 @@ pub fn cmd_dispatch_graph_indirect_amdx(
     command_buffer                                  C.CommandBuffer,
     scratch                                         DeviceAddress,
     p_count_info                                    &DispatchGraphCountInfoAMDX)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDispatchGraphIndirectAMDX(dl_loader.get_sym('vkCmdDispatchGraphIndirectAMDX'
+      f := VkCmdDispatchGraphIndirectAMDX((*loader_p).get_sym('vkCmdDispatchGraphIndirectAMDX'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDispatchGraphIndirectAMDX': ${err}")
+        println("Couldn't load symbol for 'vkCmdDispatchGraphIndirectAMDX': ${err}")
         return 
     })
     f(
@@ -22520,18 +18697,9 @@ pub fn cmd_dispatch_graph_indirect_count_amdx(
     command_buffer                                  C.CommandBuffer,
     scratch                                         DeviceAddress,
     count_info                                      DeviceAddress)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDispatchGraphIndirectCountAMDX(dl_loader.get_sym('vkCmdDispatchGraphIndirectCountAMDX'
+      f := VkCmdDispatchGraphIndirectCountAMDX((*loader_p).get_sym('vkCmdDispatchGraphIndirectCountAMDX'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDispatchGraphIndirectCountAMDX': ${err}")
+        println("Couldn't load symbol for 'vkCmdDispatchGraphIndirectCountAMDX': ${err}")
         return 
     })
     f(
@@ -22652,18 +18820,9 @@ type VkCmdSetSampleLocationsEXT = fn (     C.CommandBuffer,     &SampleLocations
 pub fn cmd_set_sample_locations_ext(
     command_buffer                                  C.CommandBuffer,
     p_sample_locations_info                         &SampleLocationsInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetSampleLocationsEXT(dl_loader.get_sym('vkCmdSetSampleLocationsEXT'
+      f := VkCmdSetSampleLocationsEXT((*loader_p).get_sym('vkCmdSetSampleLocationsEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetSampleLocationsEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetSampleLocationsEXT': ${err}")
         return 
     })
     f(
@@ -22678,18 +18837,9 @@ pub fn get_physical_device_multisample_properties_ext(
     physical_device                                 C.PhysicalDevice,
     samples                                         SampleCountFlagBits,
     p_multisample_properties                        &MultisamplePropertiesEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceMultisamplePropertiesEXT(dl_loader.get_sym('vkGetPhysicalDeviceMultisamplePropertiesEXT'
+      f := VkGetPhysicalDeviceMultisamplePropertiesEXT((*loader_p).get_sym('vkGetPhysicalDeviceMultisamplePropertiesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceMultisamplePropertiesEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceMultisamplePropertiesEXT': ${err}")
         return 
     })
     f(
@@ -22905,18 +19055,9 @@ pub fn get_image_drm_format_modifier_properties_ext(
     device                                          C.Device,
     image                                           C.Image,
     p_properties                                    &ImageDrmFormatModifierPropertiesEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageDrmFormatModifierPropertiesEXT(dl_loader.get_sym('vkGetImageDrmFormatModifierPropertiesEXT'
+      f := VkGetImageDrmFormatModifierPropertiesEXT((*loader_p).get_sym('vkGetImageDrmFormatModifierPropertiesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageDrmFormatModifierPropertiesEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetImageDrmFormatModifierPropertiesEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -22964,18 +19105,9 @@ pub fn create_validation_cache_ext(
     p_create_info                                   &ValidationCacheCreateInfoEXT,
     p_allocator                                     &AllocationCallbacks,
     p_validation_cache                              &C.ValidationCacheEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateValidationCacheEXT(dl_loader.get_sym('vkCreateValidationCacheEXT'
+      f := VkCreateValidationCacheEXT((*loader_p).get_sym('vkCreateValidationCacheEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCreateValidationCacheEXT': ${err}")
+        println("Couldn't load symbol for 'vkCreateValidationCacheEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -22992,18 +19124,9 @@ pub fn destroy_validation_cache_ext(
     device                                          C.Device,
     validation_cache                                C.ValidationCacheEXT,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyValidationCacheEXT(dl_loader.get_sym('vkDestroyValidationCacheEXT'
+      f := VkDestroyValidationCacheEXT((*loader_p).get_sym('vkDestroyValidationCacheEXT'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyValidationCacheEXT': ${err}")
+        println("Couldn't load symbol for 'vkDestroyValidationCacheEXT': ${err}")
         return 
     })
     f(
@@ -23020,18 +19143,9 @@ pub fn merge_validation_caches_ext(
     dst_cache                                       C.ValidationCacheEXT,
     src_cache_count                                 u32,
     p_src_caches                                    &C.ValidationCacheEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkMergeValidationCachesEXT(dl_loader.get_sym('vkMergeValidationCachesEXT'
+      f := VkMergeValidationCachesEXT((*loader_p).get_sym('vkMergeValidationCachesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkMergeValidationCachesEXT': ${err}")
+        println("Couldn't load symbol for 'vkMergeValidationCachesEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -23049,18 +19163,9 @@ pub fn get_validation_cache_data_ext(
     validation_cache                                C.ValidationCacheEXT,
     p_data_size                                     &usize,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetValidationCacheDataEXT(dl_loader.get_sym('vkGetValidationCacheDataEXT'
+      f := VkGetValidationCacheDataEXT((*loader_p).get_sym('vkGetValidationCacheDataEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetValidationCacheDataEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetValidationCacheDataEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -23193,18 +19298,9 @@ pub fn cmd_bind_shading_rate_image_nv(
     command_buffer                                  C.CommandBuffer,
     image_view                                      C.ImageView,
     image_layout                                    ImageLayout)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindShadingRateImageNV(dl_loader.get_sym('vkCmdBindShadingRateImageNV'
+      f := VkCmdBindShadingRateImageNV((*loader_p).get_sym('vkCmdBindShadingRateImageNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindShadingRateImageNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindShadingRateImageNV': ${err}")
         return 
     })
     f(
@@ -23221,18 +19317,9 @@ pub fn cmd_set_viewport_shading_rate_palette_nv(
     first_viewport                                  u32,
     viewport_count                                  u32,
     p_shading_rate_palettes                         &ShadingRatePaletteNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetViewportShadingRatePaletteNV(dl_loader.get_sym('vkCmdSetViewportShadingRatePaletteNV'
+      f := VkCmdSetViewportShadingRatePaletteNV((*loader_p).get_sym('vkCmdSetViewportShadingRatePaletteNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetViewportShadingRatePaletteNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetViewportShadingRatePaletteNV': ${err}")
         return 
     })
     f(
@@ -23250,18 +19337,9 @@ pub fn cmd_set_coarse_sample_order_nv(
     sample_order_type                               CoarseSampleOrderTypeNV,
     custom_sample_order_count                       u32,
     p_custom_sample_orders                          &CoarseSampleOrderCustomNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetCoarseSampleOrderNV(dl_loader.get_sym('vkCmdSetCoarseSampleOrderNV'
+      f := VkCmdSetCoarseSampleOrderNV((*loader_p).get_sym('vkCmdSetCoarseSampleOrderNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetCoarseSampleOrderNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetCoarseSampleOrderNV': ${err}")
         return 
     })
     f(
@@ -23540,18 +19618,9 @@ pub fn create_acceleration_structure_nv(
     p_create_info                                   &AccelerationStructureCreateInfoNV,
     p_allocator                                     &AllocationCallbacks,
     p_acceleration_structure                        &C.AccelerationStructureNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateAccelerationStructureNV(dl_loader.get_sym('vkCreateAccelerationStructureNV'
+      f := VkCreateAccelerationStructureNV((*loader_p).get_sym('vkCreateAccelerationStructureNV'
     ) or { 
-        println("Couldn't load sym for 'vkCreateAccelerationStructureNV': ${err}")
+        println("Couldn't load symbol for 'vkCreateAccelerationStructureNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -23568,18 +19637,9 @@ pub fn destroy_acceleration_structure_nv(
     device                                          C.Device,
     acceleration_structure                          C.AccelerationStructureNV,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyAccelerationStructureNV(dl_loader.get_sym('vkDestroyAccelerationStructureNV'
+      f := VkDestroyAccelerationStructureNV((*loader_p).get_sym('vkDestroyAccelerationStructureNV'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyAccelerationStructureNV': ${err}")
+        println("Couldn't load symbol for 'vkDestroyAccelerationStructureNV': ${err}")
         return 
     })
     f(
@@ -23595,18 +19655,9 @@ pub fn get_acceleration_structure_memory_requirements_nv(
     device                                          C.Device,
     p_info                                          &AccelerationStructureMemoryRequirementsInfoNV,
     p_memory_requirements                           &MemoryRequirements2KHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetAccelerationStructureMemoryRequirementsNV(dl_loader.get_sym('vkGetAccelerationStructureMemoryRequirementsNV'
+      f := VkGetAccelerationStructureMemoryRequirementsNV((*loader_p).get_sym('vkGetAccelerationStructureMemoryRequirementsNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetAccelerationStructureMemoryRequirementsNV': ${err}")
+        println("Couldn't load symbol for 'vkGetAccelerationStructureMemoryRequirementsNV': ${err}")
         return 
     })
     f(
@@ -23622,18 +19673,9 @@ pub fn bind_acceleration_structure_memory_nv(
     device                                          C.Device,
     bind_info_count                                 u32,
     p_bind_infos                                    &BindAccelerationStructureMemoryInfoNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBindAccelerationStructureMemoryNV(dl_loader.get_sym('vkBindAccelerationStructureMemoryNV'
+      f := VkBindAccelerationStructureMemoryNV((*loader_p).get_sym('vkBindAccelerationStructureMemoryNV'
     ) or { 
-        println("Couldn't load sym for 'vkBindAccelerationStructureMemoryNV': ${err}")
+        println("Couldn't load symbol for 'vkBindAccelerationStructureMemoryNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -23655,18 +19697,9 @@ pub fn cmd_build_acceleration_structure_nv(
     src                                             C.AccelerationStructureNV,
     scratch                                         C.Buffer,
     scratch_offset                                  DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBuildAccelerationStructureNV(dl_loader.get_sym('vkCmdBuildAccelerationStructureNV'
+      f := VkCmdBuildAccelerationStructureNV((*loader_p).get_sym('vkCmdBuildAccelerationStructureNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBuildAccelerationStructureNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdBuildAccelerationStructureNV': ${err}")
         return 
     })
     f(
@@ -23689,18 +19722,9 @@ pub fn cmd_copy_acceleration_structure_nv(
     dst                                             C.AccelerationStructureNV,
     src                                             C.AccelerationStructureNV,
     mode                                            CopyAccelerationStructureModeKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyAccelerationStructureNV(dl_loader.get_sym('vkCmdCopyAccelerationStructureNV'
+      f := VkCmdCopyAccelerationStructureNV((*loader_p).get_sym('vkCmdCopyAccelerationStructureNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyAccelerationStructureNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyAccelerationStructureNV': ${err}")
         return 
     })
     f(
@@ -23729,18 +19753,9 @@ pub fn cmd_trace_rays_nv(
     width                                           u32,
     height                                          u32,
     depth                                           u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdTraceRaysNV(dl_loader.get_sym('vkCmdTraceRaysNV'
+      f := VkCmdTraceRaysNV((*loader_p).get_sym('vkCmdTraceRaysNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdTraceRaysNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdTraceRaysNV': ${err}")
         return 
     })
     f(
@@ -23771,18 +19786,9 @@ pub fn create_ray_tracing_pipelines_nv(
     p_create_infos                                  &RayTracingPipelineCreateInfoNV,
     p_allocator                                     &AllocationCallbacks,
     p_pipelines                                     &C.Pipeline) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateRayTracingPipelinesNV(dl_loader.get_sym('vkCreateRayTracingPipelinesNV'
+      f := VkCreateRayTracingPipelinesNV((*loader_p).get_sym('vkCreateRayTracingPipelinesNV'
     ) or { 
-        println("Couldn't load sym for 'vkCreateRayTracingPipelinesNV': ${err}")
+        println("Couldn't load symbol for 'vkCreateRayTracingPipelinesNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -23804,18 +19810,9 @@ pub fn get_ray_tracing_shader_group_handles_khr(
     group_count                                     u32,
     data_size                                       usize,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetRayTracingShaderGroupHandlesKHR(dl_loader.get_sym('vkGetRayTracingShaderGroupHandlesKHR'
+      f := VkGetRayTracingShaderGroupHandlesKHR((*loader_p).get_sym('vkGetRayTracingShaderGroupHandlesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetRayTracingShaderGroupHandlesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetRayTracingShaderGroupHandlesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -23837,18 +19834,9 @@ pub fn get_ray_tracing_shader_group_handles_nv(
     group_count                                     u32,
     data_size                                       usize,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetRayTracingShaderGroupHandlesNV(dl_loader.get_sym('vkGetRayTracingShaderGroupHandlesNV'
+      f := VkGetRayTracingShaderGroupHandlesNV((*loader_p).get_sym('vkGetRayTracingShaderGroupHandlesNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetRayTracingShaderGroupHandlesNV': ${err}")
+        println("Couldn't load symbol for 'vkGetRayTracingShaderGroupHandlesNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -23868,18 +19856,9 @@ pub fn get_acceleration_structure_handle_nv(
     acceleration_structure                          C.AccelerationStructureNV,
     data_size                                       usize,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetAccelerationStructureHandleNV(dl_loader.get_sym('vkGetAccelerationStructureHandleNV'
+      f := VkGetAccelerationStructureHandleNV((*loader_p).get_sym('vkGetAccelerationStructureHandleNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetAccelerationStructureHandleNV': ${err}")
+        println("Couldn't load symbol for 'vkGetAccelerationStructureHandleNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -23899,18 +19878,9 @@ pub fn cmd_write_acceleration_structures_properties_nv(
     query_type                                      QueryType,
     query_pool                                      C.QueryPool,
     first_query                                     u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWriteAccelerationStructuresPropertiesNV(dl_loader.get_sym('vkCmdWriteAccelerationStructuresPropertiesNV'
+      f := VkCmdWriteAccelerationStructuresPropertiesNV((*loader_p).get_sym('vkCmdWriteAccelerationStructuresPropertiesNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWriteAccelerationStructuresPropertiesNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdWriteAccelerationStructuresPropertiesNV': ${err}")
         return 
     })
     f(
@@ -23929,18 +19899,9 @@ pub fn compile_deferred_nv(
     device                                          C.Device,
     pipeline                                        C.Pipeline,
     shader                                          u32) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCompileDeferredNV(dl_loader.get_sym('vkCompileDeferredNV'
+      f := VkCompileDeferredNV((*loader_p).get_sym('vkCompileDeferredNV'
     ) or { 
-        println("Couldn't load sym for 'vkCompileDeferredNV': ${err}")
+        println("Couldn't load symbol for 'vkCompileDeferredNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24048,18 +20009,9 @@ pub fn get_memory_host_pointer_properties_ext(
     handle_type                                     ExternalMemoryHandleTypeFlagBits,
     p_host_pointer                                  voidptr,
     p_memory_host_pointer_properties                &MemoryHostPointerPropertiesEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMemoryHostPointerPropertiesEXT(dl_loader.get_sym('vkGetMemoryHostPointerPropertiesEXT'
+      f := VkGetMemoryHostPointerPropertiesEXT((*loader_p).get_sym('vkGetMemoryHostPointerPropertiesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetMemoryHostPointerPropertiesEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetMemoryHostPointerPropertiesEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24084,18 +20036,9 @@ pub fn cmd_write_buffer_marker_amd(
     dst_buffer                                      C.Buffer,
     dst_offset                                      DeviceSize,
     marker                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWriteBufferMarkerAMD(dl_loader.get_sym('vkCmdWriteBufferMarkerAMD'
+      f := VkCmdWriteBufferMarkerAMD((*loader_p).get_sym('vkCmdWriteBufferMarkerAMD'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWriteBufferMarkerAMD': ${err}")
+        println("Couldn't load symbol for 'vkCmdWriteBufferMarkerAMD': ${err}")
         return 
     })
     f(
@@ -24155,18 +20098,9 @@ pub fn get_physical_device_calibrateable_time_domains_ext(
     physical_device                                 C.PhysicalDevice,
     p_time_domain_count                             &u32,
     p_time_domains                                  &TimeDomainEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceCalibrateableTimeDomainsEXT(dl_loader.get_sym('vkGetPhysicalDeviceCalibrateableTimeDomainsEXT'
+      f := VkGetPhysicalDeviceCalibrateableTimeDomainsEXT((*loader_p).get_sym('vkGetPhysicalDeviceCalibrateableTimeDomainsEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceCalibrateableTimeDomainsEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceCalibrateableTimeDomainsEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24184,18 +20118,9 @@ pub fn get_calibrated_timestamps_ext(
     p_timestamp_infos                               &CalibratedTimestampInfoEXT,
     p_timestamps                                    &u64,
     p_max_deviation                                 &u64) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetCalibratedTimestampsEXT(dl_loader.get_sym('vkGetCalibratedTimestampsEXT'
+      f := VkGetCalibratedTimestampsEXT((*loader_p).get_sym('vkGetCalibratedTimestampsEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetCalibratedTimestampsEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetCalibratedTimestampsEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24388,18 +20313,9 @@ pub fn cmd_draw_mesh_tasks_nv(
     command_buffer                                  C.CommandBuffer,
     task_count                                      u32,
     first_task                                      u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawMeshTasksNV(dl_loader.get_sym('vkCmdDrawMeshTasksNV'
+      f := VkCmdDrawMeshTasksNV((*loader_p).get_sym('vkCmdDrawMeshTasksNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawMeshTasksNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawMeshTasksNV': ${err}")
         return 
     })
     f(
@@ -24417,18 +20333,9 @@ pub fn cmd_draw_mesh_tasks_indirect_nv(
     offset                                          DeviceSize,
     draw_count                                      u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawMeshTasksIndirectNV(dl_loader.get_sym('vkCmdDrawMeshTasksIndirectNV'
+      f := VkCmdDrawMeshTasksIndirectNV((*loader_p).get_sym('vkCmdDrawMeshTasksIndirectNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawMeshTasksIndirectNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawMeshTasksIndirectNV': ${err}")
         return 
     })
     f(
@@ -24450,18 +20357,9 @@ pub fn cmd_draw_mesh_tasks_indirect_count_nv(
     count_buffer_offset                             DeviceSize,
     max_draw_count                                  u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawMeshTasksIndirectCountNV(dl_loader.get_sym('vkCmdDrawMeshTasksIndirectCountNV'
+      f := VkCmdDrawMeshTasksIndirectCountNV((*loader_p).get_sym('vkCmdDrawMeshTasksIndirectCountNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawMeshTasksIndirectCountNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawMeshTasksIndirectCountNV': ${err}")
         return 
     })
     f(
@@ -24527,18 +20425,9 @@ pub fn cmd_set_exclusive_scissor_enable_nv(
     first_exclusive_scissor                         u32,
     exclusive_scissor_count                         u32,
     p_exclusive_scissor_enables                     &Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetExclusiveScissorEnableNV(dl_loader.get_sym('vkCmdSetExclusiveScissorEnableNV'
+      f := VkCmdSetExclusiveScissorEnableNV((*loader_p).get_sym('vkCmdSetExclusiveScissorEnableNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetExclusiveScissorEnableNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetExclusiveScissorEnableNV': ${err}")
         return 
     })
     f(
@@ -24556,18 +20445,9 @@ pub fn cmd_set_exclusive_scissor_nv(
     first_exclusive_scissor                         u32,
     exclusive_scissor_count                         u32,
     p_exclusive_scissors                            &Rect2D)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetExclusiveScissorNV(dl_loader.get_sym('vkCmdSetExclusiveScissorNV'
+      f := VkCmdSetExclusiveScissorNV((*loader_p).get_sym('vkCmdSetExclusiveScissorNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetExclusiveScissorNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetExclusiveScissorNV': ${err}")
         return 
     })
     f(
@@ -24605,18 +20485,9 @@ type VkCmdSetCheckpointNV = fn (     C.CommandBuffer,     voidptr)
 pub fn cmd_set_checkpoint_nv(
     command_buffer                                  C.CommandBuffer,
     p_checkpoint_marker                             voidptr)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetCheckpointNV(dl_loader.get_sym('vkCmdSetCheckpointNV'
+      f := VkCmdSetCheckpointNV((*loader_p).get_sym('vkCmdSetCheckpointNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetCheckpointNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetCheckpointNV': ${err}")
         return 
     })
     f(
@@ -24631,18 +20502,9 @@ pub fn get_queue_checkpoint_data_nv(
     queue                                           C.Queue,
     p_checkpoint_data_count                         &u32,
     p_checkpoint_data                               &CheckpointDataNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetQueueCheckpointDataNV(dl_loader.get_sym('vkGetQueueCheckpointDataNV'
+      f := VkGetQueueCheckpointDataNV((*loader_p).get_sym('vkGetQueueCheckpointDataNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetQueueCheckpointDataNV': ${err}")
+        println("Couldn't load symbol for 'vkGetQueueCheckpointDataNV': ${err}")
         return 
     })
     f(
@@ -24776,18 +20638,9 @@ type VkInitializePerformanceApiINTEL = fn (     C.Device,     &InitializePerform
 pub fn initialize_performance_api_intel(
     device                                          C.Device,
     p_initialize_info                               &InitializePerformanceApiInfoINTEL) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkInitializePerformanceApiINTEL(dl_loader.get_sym('vkInitializePerformanceApiINTEL'
+      f := VkInitializePerformanceApiINTEL((*loader_p).get_sym('vkInitializePerformanceApiINTEL'
     ) or { 
-        println("Couldn't load sym for 'vkInitializePerformanceApiINTEL': ${err}")
+        println("Couldn't load symbol for 'vkInitializePerformanceApiINTEL': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24800,18 +20653,9 @@ type VkUninitializePerformanceApiINTEL = fn (     C.Device)
 
 pub fn uninitialize_performance_api_intel(
     device                                          C.Device)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkUninitializePerformanceApiINTEL(dl_loader.get_sym('vkUninitializePerformanceApiINTEL'
+      f := VkUninitializePerformanceApiINTEL((*loader_p).get_sym('vkUninitializePerformanceApiINTEL'
     ) or { 
-        println("Couldn't load sym for 'vkUninitializePerformanceApiINTEL': ${err}")
+        println("Couldn't load symbol for 'vkUninitializePerformanceApiINTEL': ${err}")
         return 
     })
     f(
@@ -24824,18 +20668,9 @@ type VkCmdSetPerformanceMarkerINTEL = fn (     C.CommandBuffer,     &Performance
 pub fn cmd_set_performance_marker_intel(
     command_buffer                                  C.CommandBuffer,
     p_marker_info                                   &PerformanceMarkerInfoINTEL) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetPerformanceMarkerINTEL(dl_loader.get_sym('vkCmdSetPerformanceMarkerINTEL'
+      f := VkCmdSetPerformanceMarkerINTEL((*loader_p).get_sym('vkCmdSetPerformanceMarkerINTEL'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetPerformanceMarkerINTEL': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetPerformanceMarkerINTEL': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24849,18 +20684,9 @@ type VkCmdSetPerformanceStreamMarkerINTEL = fn (     C.CommandBuffer,     &Perfo
 pub fn cmd_set_performance_stream_marker_intel(
     command_buffer                                  C.CommandBuffer,
     p_marker_info                                   &PerformanceStreamMarkerInfoINTEL) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetPerformanceStreamMarkerINTEL(dl_loader.get_sym('vkCmdSetPerformanceStreamMarkerINTEL'
+      f := VkCmdSetPerformanceStreamMarkerINTEL((*loader_p).get_sym('vkCmdSetPerformanceStreamMarkerINTEL'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetPerformanceStreamMarkerINTEL': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetPerformanceStreamMarkerINTEL': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24874,18 +20700,9 @@ type VkCmdSetPerformanceOverrideINTEL = fn (     C.CommandBuffer,     &Performan
 pub fn cmd_set_performance_override_intel(
     command_buffer                                  C.CommandBuffer,
     p_override_info                                 &PerformanceOverrideInfoINTEL) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetPerformanceOverrideINTEL(dl_loader.get_sym('vkCmdSetPerformanceOverrideINTEL'
+      f := VkCmdSetPerformanceOverrideINTEL((*loader_p).get_sym('vkCmdSetPerformanceOverrideINTEL'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetPerformanceOverrideINTEL': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetPerformanceOverrideINTEL': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24900,18 +20717,9 @@ pub fn acquire_performance_configuration_intel(
     device                                          C.Device,
     p_acquire_info                                  &PerformanceConfigurationAcquireInfoINTEL,
     p_configuration                                 &C.PerformanceConfigurationINTEL) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAcquirePerformanceConfigurationINTEL(dl_loader.get_sym('vkAcquirePerformanceConfigurationINTEL'
+      f := VkAcquirePerformanceConfigurationINTEL((*loader_p).get_sym('vkAcquirePerformanceConfigurationINTEL'
     ) or { 
-        println("Couldn't load sym for 'vkAcquirePerformanceConfigurationINTEL': ${err}")
+        println("Couldn't load symbol for 'vkAcquirePerformanceConfigurationINTEL': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24926,18 +20734,9 @@ type VkReleasePerformanceConfigurationINTEL = fn (     C.Device,     C.Performan
 pub fn release_performance_configuration_intel(
     device                                          C.Device,
     configuration                                   C.PerformanceConfigurationINTEL) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkReleasePerformanceConfigurationINTEL(dl_loader.get_sym('vkReleasePerformanceConfigurationINTEL'
+      f := VkReleasePerformanceConfigurationINTEL((*loader_p).get_sym('vkReleasePerformanceConfigurationINTEL'
     ) or { 
-        println("Couldn't load sym for 'vkReleasePerformanceConfigurationINTEL': ${err}")
+        println("Couldn't load symbol for 'vkReleasePerformanceConfigurationINTEL': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24951,18 +20750,9 @@ type VkQueueSetPerformanceConfigurationINTEL = fn (     C.Queue,     C.Performan
 pub fn queue_set_performance_configuration_intel(
     queue                                           C.Queue,
     configuration                                   C.PerformanceConfigurationINTEL) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueueSetPerformanceConfigurationINTEL(dl_loader.get_sym('vkQueueSetPerformanceConfigurationINTEL'
+      f := VkQueueSetPerformanceConfigurationINTEL((*loader_p).get_sym('vkQueueSetPerformanceConfigurationINTEL'
     ) or { 
-        println("Couldn't load sym for 'vkQueueSetPerformanceConfigurationINTEL': ${err}")
+        println("Couldn't load symbol for 'vkQueueSetPerformanceConfigurationINTEL': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -24977,18 +20767,9 @@ pub fn get_performance_parameter_intel(
     device                                          C.Device,
     parameter                                       PerformanceParameterTypeINTEL,
     p_value                                         &PerformanceValueINTEL) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPerformanceParameterINTEL(dl_loader.get_sym('vkGetPerformanceParameterINTEL'
+      f := VkGetPerformanceParameterINTEL((*loader_p).get_sym('vkGetPerformanceParameterINTEL'
     ) or { 
-        println("Couldn't load sym for 'vkGetPerformanceParameterINTEL': ${err}")
+        println("Couldn't load symbol for 'vkGetPerformanceParameterINTEL': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25043,18 +20824,9 @@ pub fn set_local_dimming_amd(
     device                                          C.Device,
     swap_chain                                      C.SwapchainKHR,
     local_dimming_enable                            Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetLocalDimmingAMD(dl_loader.get_sym('vkSetLocalDimmingAMD'
+      f := VkSetLocalDimmingAMD((*loader_p).get_sym('vkSetLocalDimmingAMD'
     ) or { 
-        println("Couldn't load sym for 'vkSetLocalDimmingAMD': ${err}")
+        println("Couldn't load symbol for 'vkSetLocalDimmingAMD': ${err}")
         return 
     })
     f(
@@ -25086,18 +20858,9 @@ pub fn create_image_pipe_surface_fuchsia(
     p_create_info                                   &ImagePipeSurfaceCreateInfoFUCHSIA,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateImagePipeSurfaceFUCHSIA(dl_loader.get_sym('vkCreateImagePipeSurfaceFUCHSIA'
+      f := VkCreateImagePipeSurfaceFUCHSIA((*loader_p).get_sym('vkCreateImagePipeSurfaceFUCHSIA'
     ) or { 
-        println("Couldn't load sym for 'vkCreateImagePipeSurfaceFUCHSIA': ${err}")
+        println("Couldn't load symbol for 'vkCreateImagePipeSurfaceFUCHSIA': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25130,18 +20893,9 @@ pub fn create_metal_surface_ext(
     p_create_info                                   &MetalSurfaceCreateInfoEXT,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateMetalSurfaceEXT(dl_loader.get_sym('vkCreateMetalSurfaceEXT'
+      f := VkCreateMetalSurfaceEXT((*loader_p).get_sym('vkCreateMetalSurfaceEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCreateMetalSurfaceEXT': ${err}")
+        println("Couldn't load symbol for 'vkCreateMetalSurfaceEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25354,16 +21108,9 @@ type VkGetBufferDeviceAddressEXT = fn (     C.Device,     &BufferDeviceAddressIn
 pub fn get_buffer_device_address_ext(
     device                                          C.Device,
     p_info                                          &BufferDeviceAddressInfo) DeviceAddress {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetBufferDeviceAddressEXT(dl_loader.get_sym("vkGetBufferDeviceAddressEXT"
+      f := VkGetBufferDeviceAddressEXT((*loader_p).get_sym("vkGetBufferDeviceAddressEXT"
     ) or { 
-        panic("Couldn't load sym for 'vkGetBufferDeviceAddressEXT': ${err}") })
+        panic("Couldn't load symbol for 'vkGetBufferDeviceAddressEXT': ${err}") })
     return f(
     device,
     p_info)
@@ -25386,18 +21133,9 @@ pub fn get_physical_device_tool_properties_ext(
     physical_device                                 C.PhysicalDevice,
     p_tool_count                                    &u32,
     p_tool_properties                               &PhysicalDeviceToolProperties) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceToolPropertiesEXT(dl_loader.get_sym('vkGetPhysicalDeviceToolPropertiesEXT'
+      f := VkGetPhysicalDeviceToolPropertiesEXT((*loader_p).get_sym('vkGetPhysicalDeviceToolPropertiesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceToolPropertiesEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceToolPropertiesEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25502,18 +21240,9 @@ pub fn get_physical_device_cooperative_matrix_properties_nv(
     physical_device                                 C.PhysicalDevice,
     p_property_count                                &u32,
     p_properties                                    &CooperativeMatrixPropertiesNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceCooperativeMatrixPropertiesNV(dl_loader.get_sym('vkGetPhysicalDeviceCooperativeMatrixPropertiesNV'
+      f := VkGetPhysicalDeviceCooperativeMatrixPropertiesNV((*loader_p).get_sym('vkGetPhysicalDeviceCooperativeMatrixPropertiesNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceCooperativeMatrixPropertiesNV': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceCooperativeMatrixPropertiesNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25570,18 +21299,9 @@ pub fn get_physical_device_supported_framebuffer_mixed_samples_combinations_nv(
     physical_device                                 C.PhysicalDevice,
     p_combination_count                             &u32,
     p_combinations                                  &FramebufferMixedSamplesCombinationNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV(dl_loader.get_sym('vkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV'
+      f := VkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV((*loader_p).get_sym('vkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25706,18 +21426,9 @@ pub fn get_physical_device_surface_present_modes2_ext(
     p_surface_info                                  &PhysicalDeviceSurfaceInfo2KHR,
     p_present_mode_count                            &u32,
     p_present_modes                                 &PresentModeKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceSurfacePresentModes2EXT(dl_loader.get_sym('vkGetPhysicalDeviceSurfacePresentModes2EXT'
+      f := VkGetPhysicalDeviceSurfacePresentModes2EXT((*loader_p).get_sym('vkGetPhysicalDeviceSurfacePresentModes2EXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceSurfacePresentModes2EXT': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfacePresentModes2EXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25733,18 +21444,9 @@ type VkAcquireFullScreenExclusiveModeEXT = fn (     C.Device,     C.SwapchainKHR
 pub fn acquire_full_screen_exclusive_mode_ext(
     device                                          C.Device,
     swapchain                                       C.SwapchainKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAcquireFullScreenExclusiveModeEXT(dl_loader.get_sym('vkAcquireFullScreenExclusiveModeEXT'
+      f := VkAcquireFullScreenExclusiveModeEXT((*loader_p).get_sym('vkAcquireFullScreenExclusiveModeEXT'
     ) or { 
-        println("Couldn't load sym for 'vkAcquireFullScreenExclusiveModeEXT': ${err}")
+        println("Couldn't load symbol for 'vkAcquireFullScreenExclusiveModeEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25758,18 +21460,9 @@ type VkReleaseFullScreenExclusiveModeEXT = fn (     C.Device,     C.SwapchainKHR
 pub fn release_full_screen_exclusive_mode_ext(
     device                                          C.Device,
     swapchain                                       C.SwapchainKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkReleaseFullScreenExclusiveModeEXT(dl_loader.get_sym('vkReleaseFullScreenExclusiveModeEXT'
+      f := VkReleaseFullScreenExclusiveModeEXT((*loader_p).get_sym('vkReleaseFullScreenExclusiveModeEXT'
     ) or { 
-        println("Couldn't load sym for 'vkReleaseFullScreenExclusiveModeEXT': ${err}")
+        println("Couldn't load symbol for 'vkReleaseFullScreenExclusiveModeEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25784,18 +21477,9 @@ pub fn get_device_group_surface_present_modes2_ext(
     device                                          C.Device,
     p_surface_info                                  &PhysicalDeviceSurfaceInfo2KHR,
     p_modes                                         &DeviceGroupPresentModeFlagsKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceGroupSurfacePresentModes2EXT(dl_loader.get_sym('vkGetDeviceGroupSurfacePresentModes2EXT'
+      f := VkGetDeviceGroupSurfacePresentModes2EXT((*loader_p).get_sym('vkGetDeviceGroupSurfacePresentModes2EXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceGroupSurfacePresentModes2EXT': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceGroupSurfacePresentModes2EXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25826,18 +21510,9 @@ pub fn create_headless_surface_ext(
     p_create_info                                   &HeadlessSurfaceCreateInfoEXT,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateHeadlessSurfaceEXT(dl_loader.get_sym('vkCreateHeadlessSurfaceEXT'
+      f := VkCreateHeadlessSurfaceEXT((*loader_p).get_sym('vkCreateHeadlessSurfaceEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCreateHeadlessSurfaceEXT': ${err}")
+        println("Couldn't load symbol for 'vkCreateHeadlessSurfaceEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -25901,18 +21576,9 @@ pub fn cmd_set_line_stipple_ext(
     command_buffer                                  C.CommandBuffer,
     line_stipple_factor                             u32,
     line_stipple_pattern                            u16)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetLineStippleEXT(dl_loader.get_sym('vkCmdSetLineStippleEXT'
+      f := VkCmdSetLineStippleEXT((*loader_p).get_sym('vkCmdSetLineStippleEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetLineStippleEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetLineStippleEXT': ${err}")
         return 
     })
     f(
@@ -25962,18 +21628,9 @@ pub fn reset_query_pool_ext(
     query_pool                                      C.QueryPool,
     first_query                                     u32,
     query_count                                     u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkResetQueryPoolEXT(dl_loader.get_sym('vkResetQueryPoolEXT'
+      f := VkResetQueryPoolEXT((*loader_p).get_sym('vkResetQueryPoolEXT'
     ) or { 
-        println("Couldn't load sym for 'vkResetQueryPoolEXT': ${err}")
+        println("Couldn't load symbol for 'vkResetQueryPoolEXT': ${err}")
         return 
     })
     f(
@@ -26017,18 +21674,9 @@ type VkCmdSetCullModeEXT = fn (     C.CommandBuffer,     CullModeFlags)
 pub fn cmd_set_cull_mode_ext(
     command_buffer                                  C.CommandBuffer,
     cull_mode                                       CullModeFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetCullModeEXT(dl_loader.get_sym('vkCmdSetCullModeEXT'
+      f := VkCmdSetCullModeEXT((*loader_p).get_sym('vkCmdSetCullModeEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetCullModeEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetCullModeEXT': ${err}")
         return 
     })
     f(
@@ -26042,18 +21690,9 @@ type VkCmdSetFrontFaceEXT = fn (     C.CommandBuffer,     FrontFace)
 pub fn cmd_set_front_face_ext(
     command_buffer                                  C.CommandBuffer,
     front_face                                      FrontFace)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetFrontFaceEXT(dl_loader.get_sym('vkCmdSetFrontFaceEXT'
+      f := VkCmdSetFrontFaceEXT((*loader_p).get_sym('vkCmdSetFrontFaceEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetFrontFaceEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetFrontFaceEXT': ${err}")
         return 
     })
     f(
@@ -26067,18 +21706,9 @@ type VkCmdSetPrimitiveTopologyEXT = fn (     C.CommandBuffer,     PrimitiveTopol
 pub fn cmd_set_primitive_topology_ext(
     command_buffer                                  C.CommandBuffer,
     primitive_topology                              PrimitiveTopology)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetPrimitiveTopologyEXT(dl_loader.get_sym('vkCmdSetPrimitiveTopologyEXT'
+      f := VkCmdSetPrimitiveTopologyEXT((*loader_p).get_sym('vkCmdSetPrimitiveTopologyEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetPrimitiveTopologyEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetPrimitiveTopologyEXT': ${err}")
         return 
     })
     f(
@@ -26093,18 +21723,9 @@ pub fn cmd_set_viewport_with_count_ext(
     command_buffer                                  C.CommandBuffer,
     viewport_count                                  u32,
     p_viewports                                     &Viewport)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetViewportWithCountEXT(dl_loader.get_sym('vkCmdSetViewportWithCountEXT'
+      f := VkCmdSetViewportWithCountEXT((*loader_p).get_sym('vkCmdSetViewportWithCountEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetViewportWithCountEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetViewportWithCountEXT': ${err}")
         return 
     })
     f(
@@ -26120,18 +21741,9 @@ pub fn cmd_set_scissor_with_count_ext(
     command_buffer                                  C.CommandBuffer,
     scissor_count                                   u32,
     p_scissors                                      &Rect2D)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetScissorWithCountEXT(dl_loader.get_sym('vkCmdSetScissorWithCountEXT'
+      f := VkCmdSetScissorWithCountEXT((*loader_p).get_sym('vkCmdSetScissorWithCountEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetScissorWithCountEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetScissorWithCountEXT': ${err}")
         return 
     })
     f(
@@ -26151,18 +21763,9 @@ pub fn cmd_bind_vertex_buffers2_ext(
     p_offsets                                       &DeviceSize,
     p_sizes                                         &DeviceSize,
     p_strides                                       &DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindVertexBuffers2EXT(dl_loader.get_sym('vkCmdBindVertexBuffers2EXT'
+      f := VkCmdBindVertexBuffers2EXT((*loader_p).get_sym('vkCmdBindVertexBuffers2EXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindVertexBuffers2EXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindVertexBuffers2EXT': ${err}")
         return 
     })
     f(
@@ -26181,18 +21784,9 @@ type VkCmdSetDepthTestEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_depth_test_enable_ext(
     command_buffer                                  C.CommandBuffer,
     depth_test_enable                               Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthTestEnableEXT(dl_loader.get_sym('vkCmdSetDepthTestEnableEXT'
+      f := VkCmdSetDepthTestEnableEXT((*loader_p).get_sym('vkCmdSetDepthTestEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthTestEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthTestEnableEXT': ${err}")
         return 
     })
     f(
@@ -26206,18 +21800,9 @@ type VkCmdSetDepthWriteEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_depth_write_enable_ext(
     command_buffer                                  C.CommandBuffer,
     depth_write_enable                              Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthWriteEnableEXT(dl_loader.get_sym('vkCmdSetDepthWriteEnableEXT'
+      f := VkCmdSetDepthWriteEnableEXT((*loader_p).get_sym('vkCmdSetDepthWriteEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthWriteEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthWriteEnableEXT': ${err}")
         return 
     })
     f(
@@ -26231,18 +21816,9 @@ type VkCmdSetDepthCompareOpEXT = fn (     C.CommandBuffer,     CompareOp)
 pub fn cmd_set_depth_compare_op_ext(
     command_buffer                                  C.CommandBuffer,
     depth_compare_op                                CompareOp)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthCompareOpEXT(dl_loader.get_sym('vkCmdSetDepthCompareOpEXT'
+      f := VkCmdSetDepthCompareOpEXT((*loader_p).get_sym('vkCmdSetDepthCompareOpEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthCompareOpEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthCompareOpEXT': ${err}")
         return 
     })
     f(
@@ -26256,18 +21832,9 @@ type VkCmdSetDepthBoundsTestEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_depth_bounds_test_enable_ext(
     command_buffer                                  C.CommandBuffer,
     depth_bounds_test_enable                        Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthBoundsTestEnableEXT(dl_loader.get_sym('vkCmdSetDepthBoundsTestEnableEXT'
+      f := VkCmdSetDepthBoundsTestEnableEXT((*loader_p).get_sym('vkCmdSetDepthBoundsTestEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthBoundsTestEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthBoundsTestEnableEXT': ${err}")
         return 
     })
     f(
@@ -26281,18 +21848,9 @@ type VkCmdSetStencilTestEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_stencil_test_enable_ext(
     command_buffer                                  C.CommandBuffer,
     stencil_test_enable                             Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetStencilTestEnableEXT(dl_loader.get_sym('vkCmdSetStencilTestEnableEXT'
+      f := VkCmdSetStencilTestEnableEXT((*loader_p).get_sym('vkCmdSetStencilTestEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetStencilTestEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetStencilTestEnableEXT': ${err}")
         return 
     })
     f(
@@ -26310,18 +21868,9 @@ pub fn cmd_set_stencil_op_ext(
     pass_op                                         StencilOp,
     depth_fail_op                                   StencilOp,
     compare_op                                      CompareOp)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetStencilOpEXT(dl_loader.get_sym('vkCmdSetStencilOpEXT'
+      f := VkCmdSetStencilOpEXT((*loader_p).get_sym('vkCmdSetStencilOpEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetStencilOpEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetStencilOpEXT': ${err}")
         return 
     })
     f(
@@ -26463,18 +22012,9 @@ type VkCopyMemoryToImageEXT = fn (     C.Device,     &CopyMemoryToImageInfoEXT) 
 pub fn copy_memory_to_image_ext(
     device                                          C.Device,
     p_copy_memory_to_image_info                     &CopyMemoryToImageInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCopyMemoryToImageEXT(dl_loader.get_sym('vkCopyMemoryToImageEXT'
+      f := VkCopyMemoryToImageEXT((*loader_p).get_sym('vkCopyMemoryToImageEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCopyMemoryToImageEXT': ${err}")
+        println("Couldn't load symbol for 'vkCopyMemoryToImageEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -26488,18 +22028,9 @@ type VkCopyImageToMemoryEXT = fn (     C.Device,     &CopyImageToMemoryInfoEXT) 
 pub fn copy_image_to_memory_ext(
     device                                          C.Device,
     p_copy_image_to_memory_info                     &CopyImageToMemoryInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCopyImageToMemoryEXT(dl_loader.get_sym('vkCopyImageToMemoryEXT'
+      f := VkCopyImageToMemoryEXT((*loader_p).get_sym('vkCopyImageToMemoryEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCopyImageToMemoryEXT': ${err}")
+        println("Couldn't load symbol for 'vkCopyImageToMemoryEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -26513,18 +22044,9 @@ type VkCopyImageToImageEXT = fn (     C.Device,     &CopyImageToImageInfoEXT) Re
 pub fn copy_image_to_image_ext(
     device                                          C.Device,
     p_copy_image_to_image_info                      &CopyImageToImageInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCopyImageToImageEXT(dl_loader.get_sym('vkCopyImageToImageEXT'
+      f := VkCopyImageToImageEXT((*loader_p).get_sym('vkCopyImageToImageEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCopyImageToImageEXT': ${err}")
+        println("Couldn't load symbol for 'vkCopyImageToImageEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -26539,18 +22061,9 @@ pub fn transition_image_layout_ext(
     device                                          C.Device,
     transition_count                                u32,
     p_transitions                                   &HostImageLayoutTransitionInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkTransitionImageLayoutEXT(dl_loader.get_sym('vkTransitionImageLayoutEXT'
+      f := VkTransitionImageLayoutEXT((*loader_p).get_sym('vkTransitionImageLayoutEXT'
     ) or { 
-        println("Couldn't load sym for 'vkTransitionImageLayoutEXT': ${err}")
+        println("Couldn't load symbol for 'vkTransitionImageLayoutEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -26567,18 +22080,9 @@ pub fn get_image_subresource_layout2_ext(
     image                                           C.Image,
     p_subresource                                   &ImageSubresource2KHR,
     p_layout                                        &SubresourceLayout2KHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageSubresourceLayout2EXT(dl_loader.get_sym('vkGetImageSubresourceLayout2EXT'
+      f := VkGetImageSubresourceLayout2EXT((*loader_p).get_sym('vkGetImageSubresourceLayout2EXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageSubresourceLayout2EXT': ${err}")
+        println("Couldn't load symbol for 'vkGetImageSubresourceLayout2EXT': ${err}")
         return 
     })
     f(
@@ -26732,18 +22236,9 @@ type VkReleaseSwapchainImagesEXT = fn (     C.Device,     &ReleaseSwapchainImage
 pub fn release_swapchain_images_ext(
     device                                          C.Device,
     p_release_info                                  &ReleaseSwapchainImagesInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkReleaseSwapchainImagesEXT(dl_loader.get_sym('vkReleaseSwapchainImagesEXT'
+      f := VkReleaseSwapchainImagesEXT((*loader_p).get_sym('vkReleaseSwapchainImagesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkReleaseSwapchainImagesEXT': ${err}")
+        println("Couldn't load symbol for 'vkReleaseSwapchainImagesEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -26940,18 +22435,9 @@ pub fn get_generated_commands_memory_requirements_nv(
     device                                          C.Device,
     p_info                                          &GeneratedCommandsMemoryRequirementsInfoNV,
     p_memory_requirements                           &MemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetGeneratedCommandsMemoryRequirementsNV(dl_loader.get_sym('vkGetGeneratedCommandsMemoryRequirementsNV'
+      f := VkGetGeneratedCommandsMemoryRequirementsNV((*loader_p).get_sym('vkGetGeneratedCommandsMemoryRequirementsNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetGeneratedCommandsMemoryRequirementsNV': ${err}")
+        println("Couldn't load symbol for 'vkGetGeneratedCommandsMemoryRequirementsNV': ${err}")
         return 
     })
     f(
@@ -26966,18 +22452,9 @@ type VkCmdPreprocessGeneratedCommandsNV = fn (     C.CommandBuffer,     &Generat
 pub fn cmd_preprocess_generated_commands_nv(
     command_buffer                                  C.CommandBuffer,
     p_generated_commands_info                       &GeneratedCommandsInfoNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdPreprocessGeneratedCommandsNV(dl_loader.get_sym('vkCmdPreprocessGeneratedCommandsNV'
+      f := VkCmdPreprocessGeneratedCommandsNV((*loader_p).get_sym('vkCmdPreprocessGeneratedCommandsNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdPreprocessGeneratedCommandsNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdPreprocessGeneratedCommandsNV': ${err}")
         return 
     })
     f(
@@ -26992,18 +22469,9 @@ pub fn cmd_execute_generated_commands_nv(
     command_buffer                                  C.CommandBuffer,
     is_preprocessed                                 Bool32,
     p_generated_commands_info                       &GeneratedCommandsInfoNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdExecuteGeneratedCommandsNV(dl_loader.get_sym('vkCmdExecuteGeneratedCommandsNV'
+      f := VkCmdExecuteGeneratedCommandsNV((*loader_p).get_sym('vkCmdExecuteGeneratedCommandsNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdExecuteGeneratedCommandsNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdExecuteGeneratedCommandsNV': ${err}")
         return 
     })
     f(
@@ -27020,18 +22488,9 @@ pub fn cmd_bind_pipeline_shader_group_nv(
     pipeline_bind_point                             PipelineBindPoint,
     pipeline                                        C.Pipeline,
     group_index                                     u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindPipelineShaderGroupNV(dl_loader.get_sym('vkCmdBindPipelineShaderGroupNV'
+      f := VkCmdBindPipelineShaderGroupNV((*loader_p).get_sym('vkCmdBindPipelineShaderGroupNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindPipelineShaderGroupNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindPipelineShaderGroupNV': ${err}")
         return 
     })
     f(
@@ -27049,18 +22508,9 @@ pub fn create_indirect_commands_layout_nv(
     p_create_info                                   &IndirectCommandsLayoutCreateInfoNV,
     p_allocator                                     &AllocationCallbacks,
     p_indirect_commands_layout                      &C.IndirectCommandsLayoutNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateIndirectCommandsLayoutNV(dl_loader.get_sym('vkCreateIndirectCommandsLayoutNV'
+      f := VkCreateIndirectCommandsLayoutNV((*loader_p).get_sym('vkCreateIndirectCommandsLayoutNV'
     ) or { 
-        println("Couldn't load sym for 'vkCreateIndirectCommandsLayoutNV': ${err}")
+        println("Couldn't load symbol for 'vkCreateIndirectCommandsLayoutNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -27077,18 +22527,9 @@ pub fn destroy_indirect_commands_layout_nv(
     device                                          C.Device,
     indirect_commands_layout                        C.IndirectCommandsLayoutNV,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyIndirectCommandsLayoutNV(dl_loader.get_sym('vkDestroyIndirectCommandsLayoutNV'
+      f := VkDestroyIndirectCommandsLayoutNV((*loader_p).get_sym('vkDestroyIndirectCommandsLayoutNV'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyIndirectCommandsLayoutNV': ${err}")
+        println("Couldn't load symbol for 'vkDestroyIndirectCommandsLayoutNV': ${err}")
         return 
     })
     f(
@@ -27209,18 +22650,9 @@ type VkCmdSetDepthBias2EXT = fn (     C.CommandBuffer,     &DepthBiasInfoEXT)
 pub fn cmd_set_depth_bias2_ext(
     command_buffer                                  C.CommandBuffer,
     p_depth_bias_info                               &DepthBiasInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthBias2EXT(dl_loader.get_sym('vkCmdSetDepthBias2EXT'
+      f := VkCmdSetDepthBias2EXT((*loader_p).get_sym('vkCmdSetDepthBias2EXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthBias2EXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthBias2EXT': ${err}")
         return 
     })
     f(
@@ -27290,18 +22722,9 @@ pub fn acquire_drm_display_ext(
     physical_device                                 C.PhysicalDevice,
     drm_fd                                          i32,
     display                                         C.DisplayKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAcquireDrmDisplayEXT(dl_loader.get_sym('vkAcquireDrmDisplayEXT'
+      f := VkAcquireDrmDisplayEXT((*loader_p).get_sym('vkAcquireDrmDisplayEXT'
     ) or { 
-        println("Couldn't load sym for 'vkAcquireDrmDisplayEXT': ${err}")
+        println("Couldn't load symbol for 'vkAcquireDrmDisplayEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -27318,18 +22741,9 @@ pub fn get_drm_display_ext(
     drm_fd                                          i32,
     connector_id                                    u32,
     display                                         &C.DisplayKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDrmDisplayEXT(dl_loader.get_sym('vkGetDrmDisplayEXT'
+      f := VkGetDrmDisplayEXT((*loader_p).get_sym('vkGetDrmDisplayEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetDrmDisplayEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetDrmDisplayEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -27452,18 +22866,9 @@ pub fn create_private_data_slot_ext(
     p_create_info                                   &PrivateDataSlotCreateInfo,
     p_allocator                                     &AllocationCallbacks,
     p_private_data_slot                             &C.PrivateDataSlot) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreatePrivateDataSlotEXT(dl_loader.get_sym('vkCreatePrivateDataSlotEXT'
+      f := VkCreatePrivateDataSlotEXT((*loader_p).get_sym('vkCreatePrivateDataSlotEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCreatePrivateDataSlotEXT': ${err}")
+        println("Couldn't load symbol for 'vkCreatePrivateDataSlotEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -27480,18 +22885,9 @@ pub fn destroy_private_data_slot_ext(
     device                                          C.Device,
     private_data_slot                               C.PrivateDataSlot,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyPrivateDataSlotEXT(dl_loader.get_sym('vkDestroyPrivateDataSlotEXT'
+      f := VkDestroyPrivateDataSlotEXT((*loader_p).get_sym('vkDestroyPrivateDataSlotEXT'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyPrivateDataSlotEXT': ${err}")
+        println("Couldn't load symbol for 'vkDestroyPrivateDataSlotEXT': ${err}")
         return 
     })
     f(
@@ -27509,18 +22905,9 @@ pub fn set_private_data_ext(
     object_handle                                   u64,
     private_data_slot                               C.PrivateDataSlot,
     data                                            u64) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetPrivateDataEXT(dl_loader.get_sym('vkSetPrivateDataEXT'
+      f := VkSetPrivateDataEXT((*loader_p).get_sym('vkSetPrivateDataEXT'
     ) or { 
-        println("Couldn't load sym for 'vkSetPrivateDataEXT': ${err}")
+        println("Couldn't load symbol for 'vkSetPrivateDataEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -27540,18 +22927,9 @@ pub fn get_private_data_ext(
     object_handle                                   u64,
     private_data_slot                               C.PrivateDataSlot,
     p_data                                          &u64)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPrivateDataEXT(dl_loader.get_sym('vkGetPrivateDataEXT'
+      f := VkGetPrivateDataEXT((*loader_p).get_sym('vkGetPrivateDataEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetPrivateDataEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetPrivateDataEXT': ${err}")
         return 
     })
     f(
@@ -27675,18 +23053,9 @@ pub fn create_cuda_module_nv(
     p_create_info                                   &CudaModuleCreateInfoNV,
     p_allocator                                     &AllocationCallbacks,
     p_module                                        &C.CudaModuleNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateCudaModuleNV(dl_loader.get_sym('vkCreateCudaModuleNV'
+      f := VkCreateCudaModuleNV((*loader_p).get_sym('vkCreateCudaModuleNV'
     ) or { 
-        println("Couldn't load sym for 'vkCreateCudaModuleNV': ${err}")
+        println("Couldn't load symbol for 'vkCreateCudaModuleNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -27704,18 +23073,9 @@ pub fn get_cuda_module_cache_nv(
     vkmodule                                        C.CudaModuleNV,
     p_cache_size                                    &usize,
     p_cache_data                                    voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetCudaModuleCacheNV(dl_loader.get_sym('vkGetCudaModuleCacheNV'
+      f := VkGetCudaModuleCacheNV((*loader_p).get_sym('vkGetCudaModuleCacheNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetCudaModuleCacheNV': ${err}")
+        println("Couldn't load symbol for 'vkGetCudaModuleCacheNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -27733,18 +23093,9 @@ pub fn create_cuda_function_nv(
     p_create_info                                   &CudaFunctionCreateInfoNV,
     p_allocator                                     &AllocationCallbacks,
     p_function                                      &C.CudaFunctionNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateCudaFunctionNV(dl_loader.get_sym('vkCreateCudaFunctionNV'
+      f := VkCreateCudaFunctionNV((*loader_p).get_sym('vkCreateCudaFunctionNV'
     ) or { 
-        println("Couldn't load sym for 'vkCreateCudaFunctionNV': ${err}")
+        println("Couldn't load symbol for 'vkCreateCudaFunctionNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -27761,18 +23112,9 @@ pub fn destroy_cuda_module_nv(
     device                                          C.Device,
     vkmodule                                        C.CudaModuleNV,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyCudaModuleNV(dl_loader.get_sym('vkDestroyCudaModuleNV'
+      f := VkDestroyCudaModuleNV((*loader_p).get_sym('vkDestroyCudaModuleNV'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyCudaModuleNV': ${err}")
+        println("Couldn't load symbol for 'vkDestroyCudaModuleNV': ${err}")
         return 
     })
     f(
@@ -27788,18 +23130,9 @@ pub fn destroy_cuda_function_nv(
     device                                          C.Device,
     function                                        C.CudaFunctionNV,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyCudaFunctionNV(dl_loader.get_sym('vkDestroyCudaFunctionNV'
+      f := VkDestroyCudaFunctionNV((*loader_p).get_sym('vkDestroyCudaFunctionNV'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyCudaFunctionNV': ${err}")
+        println("Couldn't load symbol for 'vkDestroyCudaFunctionNV': ${err}")
         return 
     })
     f(
@@ -27814,18 +23147,9 @@ type VkCmdCudaLaunchKernelNV = fn (     C.CommandBuffer,     &CudaLaunchInfoNV)
 pub fn cmd_cuda_launch_kernel_nv(
     command_buffer                                  C.CommandBuffer,
     p_launch_info                                   &CudaLaunchInfoNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCudaLaunchKernelNV(dl_loader.get_sym('vkCmdCudaLaunchKernelNV'
+      f := VkCmdCudaLaunchKernelNV((*loader_p).get_sym('vkCmdCudaLaunchKernelNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCudaLaunchKernelNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdCudaLaunchKernelNV': ${err}")
         return 
     })
     f(
@@ -27975,18 +23299,9 @@ type VkExportMetalObjectsEXT = fn (     C.Device,     &ExportMetalObjectsInfoEXT
 pub fn export_metal_objects_ext(
     device                                          C.Device,
     p_metal_objects_info                            &ExportMetalObjectsInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkExportMetalObjectsEXT(dl_loader.get_sym('vkExportMetalObjectsEXT'
+      f := VkExportMetalObjectsEXT((*loader_p).get_sym('vkExportMetalObjectsEXT'
     ) or { 
-        println("Couldn't load sym for 'vkExportMetalObjectsEXT': ${err}")
+        println("Couldn't load symbol for 'vkExportMetalObjectsEXT': ${err}")
         return 
     })
     f(
@@ -28158,18 +23473,9 @@ pub fn get_descriptor_set_layout_size_ext(
     device                                          C.Device,
     layout                                          C.DescriptorSetLayout,
     p_layout_size_in_bytes                          &DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDescriptorSetLayoutSizeEXT(dl_loader.get_sym('vkGetDescriptorSetLayoutSizeEXT'
+      f := VkGetDescriptorSetLayoutSizeEXT((*loader_p).get_sym('vkGetDescriptorSetLayoutSizeEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetDescriptorSetLayoutSizeEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetDescriptorSetLayoutSizeEXT': ${err}")
         return 
     })
     f(
@@ -28186,18 +23492,9 @@ pub fn get_descriptor_set_layout_binding_offset_ext(
     layout                                          C.DescriptorSetLayout,
     binding                                         u32,
     p_offset                                        &DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDescriptorSetLayoutBindingOffsetEXT(dl_loader.get_sym('vkGetDescriptorSetLayoutBindingOffsetEXT'
+      f := VkGetDescriptorSetLayoutBindingOffsetEXT((*loader_p).get_sym('vkGetDescriptorSetLayoutBindingOffsetEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetDescriptorSetLayoutBindingOffsetEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetDescriptorSetLayoutBindingOffsetEXT': ${err}")
         return 
     })
     f(
@@ -28215,18 +23512,9 @@ pub fn get_descriptor_ext(
     p_descriptor_info                               &DescriptorGetInfoEXT,
     data_size                                       usize,
     p_descriptor                                    voidptr)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDescriptorEXT(dl_loader.get_sym('vkGetDescriptorEXT'
+      f := VkGetDescriptorEXT((*loader_p).get_sym('vkGetDescriptorEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetDescriptorEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetDescriptorEXT': ${err}")
         return 
     })
     f(
@@ -28243,18 +23531,9 @@ pub fn cmd_bind_descriptor_buffers_ext(
     command_buffer                                  C.CommandBuffer,
     buffer_count                                    u32,
     p_binding_infos                                 &DescriptorBufferBindingInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindDescriptorBuffersEXT(dl_loader.get_sym('vkCmdBindDescriptorBuffersEXT'
+      f := VkCmdBindDescriptorBuffersEXT((*loader_p).get_sym('vkCmdBindDescriptorBuffersEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindDescriptorBuffersEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindDescriptorBuffersEXT': ${err}")
         return 
     })
     f(
@@ -28274,18 +23553,9 @@ pub fn cmd_set_descriptor_buffer_offsets_ext(
     set_count                                       u32,
     p_buffer_indices                                &u32,
     p_offsets                                       &DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDescriptorBufferOffsetsEXT(dl_loader.get_sym('vkCmdSetDescriptorBufferOffsetsEXT'
+      f := VkCmdSetDescriptorBufferOffsetsEXT((*loader_p).get_sym('vkCmdSetDescriptorBufferOffsetsEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDescriptorBufferOffsetsEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDescriptorBufferOffsetsEXT': ${err}")
         return 
     })
     f(
@@ -28306,18 +23576,9 @@ pub fn cmd_bind_descriptor_buffer_embedded_samplers_ext(
     pipeline_bind_point                             PipelineBindPoint,
     layout                                          C.PipelineLayout,
     set                                             u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindDescriptorBufferEmbeddedSamplersEXT(dl_loader.get_sym('vkCmdBindDescriptorBufferEmbeddedSamplersEXT'
+      f := VkCmdBindDescriptorBufferEmbeddedSamplersEXT((*loader_p).get_sym('vkCmdBindDescriptorBufferEmbeddedSamplersEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindDescriptorBufferEmbeddedSamplersEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindDescriptorBufferEmbeddedSamplersEXT': ${err}")
         return 
     })
     f(
@@ -28334,18 +23595,9 @@ pub fn get_buffer_opaque_capture_descriptor_data_ext(
     device                                          C.Device,
     p_info                                          &BufferCaptureDescriptorDataInfoEXT,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetBufferOpaqueCaptureDescriptorDataEXT(dl_loader.get_sym('vkGetBufferOpaqueCaptureDescriptorDataEXT'
+      f := VkGetBufferOpaqueCaptureDescriptorDataEXT((*loader_p).get_sym('vkGetBufferOpaqueCaptureDescriptorDataEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetBufferOpaqueCaptureDescriptorDataEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetBufferOpaqueCaptureDescriptorDataEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -28361,18 +23613,9 @@ pub fn get_image_opaque_capture_descriptor_data_ext(
     device                                          C.Device,
     p_info                                          &ImageCaptureDescriptorDataInfoEXT,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageOpaqueCaptureDescriptorDataEXT(dl_loader.get_sym('vkGetImageOpaqueCaptureDescriptorDataEXT'
+      f := VkGetImageOpaqueCaptureDescriptorDataEXT((*loader_p).get_sym('vkGetImageOpaqueCaptureDescriptorDataEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageOpaqueCaptureDescriptorDataEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetImageOpaqueCaptureDescriptorDataEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -28388,18 +23631,9 @@ pub fn get_image_view_opaque_capture_descriptor_data_ext(
     device                                          C.Device,
     p_info                                          &ImageViewCaptureDescriptorDataInfoEXT,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetImageViewOpaqueCaptureDescriptorDataEXT(dl_loader.get_sym('vkGetImageViewOpaqueCaptureDescriptorDataEXT'
+      f := VkGetImageViewOpaqueCaptureDescriptorDataEXT((*loader_p).get_sym('vkGetImageViewOpaqueCaptureDescriptorDataEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetImageViewOpaqueCaptureDescriptorDataEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetImageViewOpaqueCaptureDescriptorDataEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -28415,18 +23649,9 @@ pub fn get_sampler_opaque_capture_descriptor_data_ext(
     device                                          C.Device,
     p_info                                          &SamplerCaptureDescriptorDataInfoEXT,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetSamplerOpaqueCaptureDescriptorDataEXT(dl_loader.get_sym('vkGetSamplerOpaqueCaptureDescriptorDataEXT'
+      f := VkGetSamplerOpaqueCaptureDescriptorDataEXT((*loader_p).get_sym('vkGetSamplerOpaqueCaptureDescriptorDataEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetSamplerOpaqueCaptureDescriptorDataEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetSamplerOpaqueCaptureDescriptorDataEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -28442,18 +23667,9 @@ pub fn get_acceleration_structure_opaque_capture_descriptor_data_ext(
     device                                          C.Device,
     p_info                                          &AccelerationStructureCaptureDescriptorDataInfoEXT,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT(dl_loader.get_sym('vkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT'
+      f := VkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT((*loader_p).get_sym('vkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -28582,18 +23798,9 @@ pub fn cmd_set_fragment_shading_rate_enum_nv(
     command_buffer                                  C.CommandBuffer,
     shading_rate                                    FragmentShadingRateNV,
     combiner_ops                                    []FragmentShadingRateCombinerOpKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetFragmentShadingRateEnumNV(dl_loader.get_sym('vkCmdSetFragmentShadingRateEnumNV'
+      f := VkCmdSetFragmentShadingRateEnumNV((*loader_p).get_sym('vkCmdSetFragmentShadingRateEnumNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetFragmentShadingRateEnumNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetFragmentShadingRateEnumNV': ${err}")
         return 
     })
     f(
@@ -28958,18 +24165,9 @@ pub fn get_device_fault_info_ext(
     device                                          C.Device,
     p_fault_counts                                  &DeviceFaultCountsEXT,
     p_fault_info                                    &DeviceFaultInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceFaultInfoEXT(dl_loader.get_sym('vkGetDeviceFaultInfoEXT'
+      f := VkGetDeviceFaultInfoEXT((*loader_p).get_sym('vkGetDeviceFaultInfoEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceFaultInfoEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceFaultInfoEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29022,18 +24220,9 @@ type VkAcquireWinrtDisplayNV = fn (     C.PhysicalDevice,     C.DisplayKHR) Resu
 pub fn acquire_winrt_display_nv(
     physical_device                                 C.PhysicalDevice,
     display                                         C.DisplayKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkAcquireWinrtDisplayNV(dl_loader.get_sym('vkAcquireWinrtDisplayNV'
+      f := VkAcquireWinrtDisplayNV((*loader_p).get_sym('vkAcquireWinrtDisplayNV'
     ) or { 
-        println("Couldn't load sym for 'vkAcquireWinrtDisplayNV': ${err}")
+        println("Couldn't load symbol for 'vkAcquireWinrtDisplayNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29048,18 +24237,9 @@ pub fn get_winrt_display_nv(
     physical_device                                 C.PhysicalDevice,
     device_relative_id                              u32,
     p_display                                       &C.DisplayKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetWinrtDisplayNV(dl_loader.get_sym('vkGetWinrtDisplayNV'
+      f := VkGetWinrtDisplayNV((*loader_p).get_sym('vkGetWinrtDisplayNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetWinrtDisplayNV': ${err}")
+        println("Couldn't load symbol for 'vkGetWinrtDisplayNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29092,18 +24272,9 @@ pub fn create_direct_fb_surface_ext(
     p_create_info                                   &DirectFBSurfaceCreateInfoEXT,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateDirectFBSurfaceEXT(dl_loader.get_sym('vkCreateDirectFBSurfaceEXT'
+      f := VkCreateDirectFBSurfaceEXT((*loader_p).get_sym('vkCreateDirectFBSurfaceEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCreateDirectFBSurfaceEXT': ${err}")
+        println("Couldn't load symbol for 'vkCreateDirectFBSurfaceEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29120,16 +24291,9 @@ pub fn get_physical_device_direct_fb_presentation_support_ext(
     physical_device                                 C.PhysicalDevice,
     queue_family_index                              u32,
     dfb                                             voidptr) Bool32 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceDirectFBPresentationSupportEXT(dl_loader.get_sym("vkGetPhysicalDeviceDirectFBPresentationSupportEXT"
+      f := VkGetPhysicalDeviceDirectFBPresentationSupportEXT((*loader_p).get_sym("vkGetPhysicalDeviceDirectFBPresentationSupportEXT"
     ) or { 
-        panic("Couldn't load sym for 'vkGetPhysicalDeviceDirectFBPresentationSupportEXT': ${err}") })
+        panic("Couldn't load symbol for 'vkGetPhysicalDeviceDirectFBPresentationSupportEXT': ${err}") })
     return f(
     physical_device,
     queue_family_index,
@@ -29214,18 +24378,9 @@ pub fn cmd_set_vertex_input_ext(
     p_vertex_binding_descriptions                   &VertexInputBindingDescription2EXT,
     vertex_attribute_description_count              u32,
     p_vertex_attribute_descriptions                 &VertexInputAttributeDescription2EXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetVertexInputEXT(dl_loader.get_sym('vkCmdSetVertexInputEXT'
+      f := VkCmdSetVertexInputEXT((*loader_p).get_sym('vkCmdSetVertexInputEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetVertexInputEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetVertexInputEXT': ${err}")
         return 
     })
     f(
@@ -29368,18 +24523,9 @@ pub fn get_memory_zircon_handle_fuchsia(
     device                                          C.Device,
     p_get_zircon_handle_info                        &MemoryGetZirconHandleInfoFUCHSIA,
     p_zircon_handle                                 &voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMemoryZirconHandleFUCHSIA(dl_loader.get_sym('vkGetMemoryZirconHandleFUCHSIA'
+      f := VkGetMemoryZirconHandleFUCHSIA((*loader_p).get_sym('vkGetMemoryZirconHandleFUCHSIA'
     ) or { 
-        println("Couldn't load sym for 'vkGetMemoryZirconHandleFUCHSIA': ${err}")
+        println("Couldn't load symbol for 'vkGetMemoryZirconHandleFUCHSIA': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29396,18 +24542,9 @@ pub fn get_memory_zircon_handle_properties_fuchsia(
     handle_type                                     ExternalMemoryHandleTypeFlagBits,
     zircon_handle                                   voidptr,
     p_memory_zircon_handle_properties               &MemoryZirconHandlePropertiesFUCHSIA) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMemoryZirconHandlePropertiesFUCHSIA(dl_loader.get_sym('vkGetMemoryZirconHandlePropertiesFUCHSIA'
+      f := VkGetMemoryZirconHandlePropertiesFUCHSIA((*loader_p).get_sym('vkGetMemoryZirconHandlePropertiesFUCHSIA'
     ) or { 
-        println("Couldn't load sym for 'vkGetMemoryZirconHandlePropertiesFUCHSIA': ${err}")
+        println("Couldn't load symbol for 'vkGetMemoryZirconHandlePropertiesFUCHSIA': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29447,18 +24584,9 @@ type VkImportSemaphoreZirconHandleFUCHSIA = fn (     C.Device,     &ImportSemaph
 pub fn import_semaphore_zircon_handle_fuchsia(
     device                                          C.Device,
     p_import_semaphore_zircon_handle_info           &ImportSemaphoreZirconHandleInfoFUCHSIA) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkImportSemaphoreZirconHandleFUCHSIA(dl_loader.get_sym('vkImportSemaphoreZirconHandleFUCHSIA'
+      f := VkImportSemaphoreZirconHandleFUCHSIA((*loader_p).get_sym('vkImportSemaphoreZirconHandleFUCHSIA'
     ) or { 
-        println("Couldn't load sym for 'vkImportSemaphoreZirconHandleFUCHSIA': ${err}")
+        println("Couldn't load symbol for 'vkImportSemaphoreZirconHandleFUCHSIA': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29473,18 +24601,9 @@ pub fn get_semaphore_zircon_handle_fuchsia(
     device                                          C.Device,
     p_get_zircon_handle_info                        &SemaphoreGetZirconHandleInfoFUCHSIA,
     p_zircon_handle                                 &voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetSemaphoreZirconHandleFUCHSIA(dl_loader.get_sym('vkGetSemaphoreZirconHandleFUCHSIA'
+      f := VkGetSemaphoreZirconHandleFUCHSIA((*loader_p).get_sym('vkGetSemaphoreZirconHandleFUCHSIA'
     ) or { 
-        println("Couldn't load sym for 'vkGetSemaphoreZirconHandleFUCHSIA': ${err}")
+        println("Couldn't load symbol for 'vkGetSemaphoreZirconHandleFUCHSIA': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29620,18 +24739,9 @@ pub fn create_buffer_collection_fuchsia(
     p_create_info                                   &BufferCollectionCreateInfoFUCHSIA,
     p_allocator                                     &AllocationCallbacks,
     p_collection                                    &C.BufferCollectionFUCHSIA) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateBufferCollectionFUCHSIA(dl_loader.get_sym('vkCreateBufferCollectionFUCHSIA'
+      f := VkCreateBufferCollectionFUCHSIA((*loader_p).get_sym('vkCreateBufferCollectionFUCHSIA'
     ) or { 
-        println("Couldn't load sym for 'vkCreateBufferCollectionFUCHSIA': ${err}")
+        println("Couldn't load symbol for 'vkCreateBufferCollectionFUCHSIA': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29648,18 +24758,9 @@ pub fn set_buffer_collection_image_constraints_fuchsia(
     device                                          C.Device,
     collection                                      C.BufferCollectionFUCHSIA,
     p_image_constraints_info                        &ImageConstraintsInfoFUCHSIA) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetBufferCollectionImageConstraintsFUCHSIA(dl_loader.get_sym('vkSetBufferCollectionImageConstraintsFUCHSIA'
+      f := VkSetBufferCollectionImageConstraintsFUCHSIA((*loader_p).get_sym('vkSetBufferCollectionImageConstraintsFUCHSIA'
     ) or { 
-        println("Couldn't load sym for 'vkSetBufferCollectionImageConstraintsFUCHSIA': ${err}")
+        println("Couldn't load symbol for 'vkSetBufferCollectionImageConstraintsFUCHSIA': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29675,18 +24776,9 @@ pub fn set_buffer_collection_buffer_constraints_fuchsia(
     device                                          C.Device,
     collection                                      C.BufferCollectionFUCHSIA,
     p_buffer_constraints_info                       &BufferConstraintsInfoFUCHSIA) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetBufferCollectionBufferConstraintsFUCHSIA(dl_loader.get_sym('vkSetBufferCollectionBufferConstraintsFUCHSIA'
+      f := VkSetBufferCollectionBufferConstraintsFUCHSIA((*loader_p).get_sym('vkSetBufferCollectionBufferConstraintsFUCHSIA'
     ) or { 
-        println("Couldn't load sym for 'vkSetBufferCollectionBufferConstraintsFUCHSIA': ${err}")
+        println("Couldn't load symbol for 'vkSetBufferCollectionBufferConstraintsFUCHSIA': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29702,18 +24794,9 @@ pub fn destroy_buffer_collection_fuchsia(
     device                                          C.Device,
     collection                                      C.BufferCollectionFUCHSIA,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyBufferCollectionFUCHSIA(dl_loader.get_sym('vkDestroyBufferCollectionFUCHSIA'
+      f := VkDestroyBufferCollectionFUCHSIA((*loader_p).get_sym('vkDestroyBufferCollectionFUCHSIA'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyBufferCollectionFUCHSIA': ${err}")
+        println("Couldn't load symbol for 'vkDestroyBufferCollectionFUCHSIA': ${err}")
         return 
     })
     f(
@@ -29729,18 +24812,9 @@ pub fn get_buffer_collection_properties_fuchsia(
     device                                          C.Device,
     collection                                      C.BufferCollectionFUCHSIA,
     p_properties                                    &BufferCollectionPropertiesFUCHSIA) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetBufferCollectionPropertiesFUCHSIA(dl_loader.get_sym('vkGetBufferCollectionPropertiesFUCHSIA'
+      f := VkGetBufferCollectionPropertiesFUCHSIA((*loader_p).get_sym('vkGetBufferCollectionPropertiesFUCHSIA'
     ) or { 
-        println("Couldn't load sym for 'vkGetBufferCollectionPropertiesFUCHSIA': ${err}")
+        println("Couldn't load symbol for 'vkGetBufferCollectionPropertiesFUCHSIA': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29787,18 +24861,9 @@ pub fn get_device_subpass_shading_max_workgroup_size_huawei(
     device                                          C.Device,
     renderpass                                      C.RenderPass,
     p_max_workgroup_size                            &Extent2D) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI(dl_loader.get_sym('vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI'
+      f := VkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI((*loader_p).get_sym('vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29812,18 +24877,9 @@ type VkCmdSubpassShadingHUAWEI = fn (     C.CommandBuffer)
 
 pub fn cmd_subpass_shading_huawei(
     command_buffer                                  C.CommandBuffer)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSubpassShadingHUAWEI(dl_loader.get_sym('vkCmdSubpassShadingHUAWEI'
+      f := VkCmdSubpassShadingHUAWEI((*loader_p).get_sym('vkCmdSubpassShadingHUAWEI'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSubpassShadingHUAWEI': ${err}")
+        println("Couldn't load symbol for 'vkCmdSubpassShadingHUAWEI': ${err}")
         return 
     })
     f(
@@ -29851,18 +24907,9 @@ pub fn cmd_bind_invocation_mask_huawei(
     command_buffer                                  C.CommandBuffer,
     image_view                                      C.ImageView,
     image_layout                                    ImageLayout)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindInvocationMaskHUAWEI(dl_loader.get_sym('vkCmdBindInvocationMaskHUAWEI'
+      f := VkCmdBindInvocationMaskHUAWEI((*loader_p).get_sym('vkCmdBindInvocationMaskHUAWEI'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindInvocationMaskHUAWEI': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindInvocationMaskHUAWEI': ${err}")
         return 
     })
     f(
@@ -29901,18 +24948,9 @@ pub fn get_memory_remote_address_nv(
     device                                          C.Device,
     p_memory_get_remote_address_info                &MemoryGetRemoteAddressInfoNV,
     p_address                                       &RemoteAddressNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMemoryRemoteAddressNV(dl_loader.get_sym('vkGetMemoryRemoteAddressNV'
+      f := VkGetMemoryRemoteAddressNV((*loader_p).get_sym('vkGetMemoryRemoteAddressNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetMemoryRemoteAddressNV': ${err}")
+        println("Couldn't load symbol for 'vkGetMemoryRemoteAddressNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -29951,18 +24989,9 @@ pub fn get_pipeline_properties_ext(
     device                                          C.Device,
     p_pipeline_info                                 &PipelineInfoEXT,
     p_pipeline_properties                           &BaseOutStructure) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPipelinePropertiesEXT(dl_loader.get_sym('vkGetPipelinePropertiesEXT'
+      f := VkGetPipelinePropertiesEXT((*loader_p).get_sym('vkGetPipelinePropertiesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetPipelinePropertiesEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetPipelinePropertiesEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -30061,18 +25090,9 @@ type VkCmdSetPatchControlPointsEXT = fn (     C.CommandBuffer,     u32)
 pub fn cmd_set_patch_control_points_ext(
     command_buffer                                  C.CommandBuffer,
     patch_control_points                            u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetPatchControlPointsEXT(dl_loader.get_sym('vkCmdSetPatchControlPointsEXT'
+      f := VkCmdSetPatchControlPointsEXT((*loader_p).get_sym('vkCmdSetPatchControlPointsEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetPatchControlPointsEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetPatchControlPointsEXT': ${err}")
         return 
     })
     f(
@@ -30086,18 +25106,9 @@ type VkCmdSetRasterizerDiscardEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_rasterizer_discard_enable_ext(
     command_buffer                                  C.CommandBuffer,
     rasterizer_discard_enable                       Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetRasterizerDiscardEnableEXT(dl_loader.get_sym('vkCmdSetRasterizerDiscardEnableEXT'
+      f := VkCmdSetRasterizerDiscardEnableEXT((*loader_p).get_sym('vkCmdSetRasterizerDiscardEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetRasterizerDiscardEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetRasterizerDiscardEnableEXT': ${err}")
         return 
     })
     f(
@@ -30111,18 +25122,9 @@ type VkCmdSetDepthBiasEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_depth_bias_enable_ext(
     command_buffer                                  C.CommandBuffer,
     depth_bias_enable                               Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthBiasEnableEXT(dl_loader.get_sym('vkCmdSetDepthBiasEnableEXT'
+      f := VkCmdSetDepthBiasEnableEXT((*loader_p).get_sym('vkCmdSetDepthBiasEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthBiasEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthBiasEnableEXT': ${err}")
         return 
     })
     f(
@@ -30136,18 +25138,9 @@ type VkCmdSetLogicOpEXT = fn (     C.CommandBuffer,     LogicOp)
 pub fn cmd_set_logic_op_ext(
     command_buffer                                  C.CommandBuffer,
     logic_op                                        LogicOp)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetLogicOpEXT(dl_loader.get_sym('vkCmdSetLogicOpEXT'
+      f := VkCmdSetLogicOpEXT((*loader_p).get_sym('vkCmdSetLogicOpEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetLogicOpEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetLogicOpEXT': ${err}")
         return 
     })
     f(
@@ -30161,18 +25154,9 @@ type VkCmdSetPrimitiveRestartEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_primitive_restart_enable_ext(
     command_buffer                                  C.CommandBuffer,
     primitive_restart_enable                        Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetPrimitiveRestartEnableEXT(dl_loader.get_sym('vkCmdSetPrimitiveRestartEnableEXT'
+      f := VkCmdSetPrimitiveRestartEnableEXT((*loader_p).get_sym('vkCmdSetPrimitiveRestartEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetPrimitiveRestartEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetPrimitiveRestartEnableEXT': ${err}")
         return 
     })
     f(
@@ -30204,18 +25188,9 @@ pub fn create_screen_surface_qnx(
     p_create_info                                   &ScreenSurfaceCreateInfoQNX,
     p_allocator                                     &AllocationCallbacks,
     p_surface                                       &C.SurfaceKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateScreenSurfaceQNX(dl_loader.get_sym('vkCreateScreenSurfaceQNX'
+      f := VkCreateScreenSurfaceQNX((*loader_p).get_sym('vkCreateScreenSurfaceQNX'
     ) or { 
-        println("Couldn't load sym for 'vkCreateScreenSurfaceQNX': ${err}")
+        println("Couldn't load symbol for 'vkCreateScreenSurfaceQNX': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -30232,16 +25207,9 @@ pub fn get_physical_device_screen_presentation_support_qnx(
     physical_device                                 C.PhysicalDevice,
     queue_family_index                              u32,
     window                                          voidptr) Bool32 {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceScreenPresentationSupportQNX(dl_loader.get_sym("vkGetPhysicalDeviceScreenPresentationSupportQNX"
+      f := VkGetPhysicalDeviceScreenPresentationSupportQNX((*loader_p).get_sym("vkGetPhysicalDeviceScreenPresentationSupportQNX"
     ) or { 
-        panic("Couldn't load sym for 'vkGetPhysicalDeviceScreenPresentationSupportQNX': ${err}") })
+        panic("Couldn't load symbol for 'vkGetPhysicalDeviceScreenPresentationSupportQNX': ${err}") })
     return f(
     physical_device,
     queue_family_index,
@@ -30278,18 +25246,9 @@ pub fn cmd_set_color_write_enable_ext(
     command_buffer                                  C.CommandBuffer,
     attachment_count                                u32,
     p_color_write_enables                           &Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetColorWriteEnableEXT(dl_loader.get_sym('vkCmdSetColorWriteEnableEXT'
+      f := VkCmdSetColorWriteEnableEXT((*loader_p).get_sym('vkCmdSetColorWriteEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetColorWriteEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetColorWriteEnableEXT': ${err}")
         return 
     })
     f(
@@ -30392,18 +25351,9 @@ pub fn cmd_draw_multi_ext(
     instance_count                                  u32,
     first_instance                                  u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawMultiEXT(dl_loader.get_sym('vkCmdDrawMultiEXT'
+      f := VkCmdDrawMultiEXT((*loader_p).get_sym('vkCmdDrawMultiEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawMultiEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawMultiEXT': ${err}")
         return 
     })
     f(
@@ -30426,18 +25376,9 @@ pub fn cmd_draw_multi_indexed_ext(
     first_instance                                  u32,
     stride                                          u32,
     p_vertex_offset                                 &i32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawMultiIndexedEXT(dl_loader.get_sym('vkCmdDrawMultiIndexedEXT'
+      f := VkCmdDrawMultiIndexedEXT((*loader_p).get_sym('vkCmdDrawMultiIndexedEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawMultiIndexedEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawMultiIndexedEXT': ${err}")
         return 
     })
     f(
@@ -30700,18 +25641,9 @@ pub fn create_micromap_ext(
     p_create_info                                   &MicromapCreateInfoEXT,
     p_allocator                                     &AllocationCallbacks,
     p_micromap                                      &C.MicromapEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateMicromapEXT(dl_loader.get_sym('vkCreateMicromapEXT'
+      f := VkCreateMicromapEXT((*loader_p).get_sym('vkCreateMicromapEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCreateMicromapEXT': ${err}")
+        println("Couldn't load symbol for 'vkCreateMicromapEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -30728,18 +25660,9 @@ pub fn destroy_micromap_ext(
     device                                          C.Device,
     micromap                                        C.MicromapEXT,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyMicromapEXT(dl_loader.get_sym('vkDestroyMicromapEXT'
+      f := VkDestroyMicromapEXT((*loader_p).get_sym('vkDestroyMicromapEXT'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyMicromapEXT': ${err}")
+        println("Couldn't load symbol for 'vkDestroyMicromapEXT': ${err}")
         return 
     })
     f(
@@ -30755,18 +25678,9 @@ pub fn cmd_build_micromaps_ext(
     command_buffer                                  C.CommandBuffer,
     info_count                                      u32,
     p_infos                                         &MicromapBuildInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBuildMicromapsEXT(dl_loader.get_sym('vkCmdBuildMicromapsEXT'
+      f := VkCmdBuildMicromapsEXT((*loader_p).get_sym('vkCmdBuildMicromapsEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBuildMicromapsEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdBuildMicromapsEXT': ${err}")
         return 
     })
     f(
@@ -30783,18 +25697,9 @@ pub fn build_micromaps_ext(
     deferred_operation                              C.DeferredOperationKHR,
     info_count                                      u32,
     p_infos                                         &MicromapBuildInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBuildMicromapsEXT(dl_loader.get_sym('vkBuildMicromapsEXT'
+      f := VkBuildMicromapsEXT((*loader_p).get_sym('vkBuildMicromapsEXT'
     ) or { 
-        println("Couldn't load sym for 'vkBuildMicromapsEXT': ${err}")
+        println("Couldn't load symbol for 'vkBuildMicromapsEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -30811,18 +25716,9 @@ pub fn copy_micromap_ext(
     device                                          C.Device,
     deferred_operation                              C.DeferredOperationKHR,
     p_info                                          &CopyMicromapInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCopyMicromapEXT(dl_loader.get_sym('vkCopyMicromapEXT'
+      f := VkCopyMicromapEXT((*loader_p).get_sym('vkCopyMicromapEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCopyMicromapEXT': ${err}")
+        println("Couldn't load symbol for 'vkCopyMicromapEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -30838,18 +25734,9 @@ pub fn copy_micromap_to_memory_ext(
     device                                          C.Device,
     deferred_operation                              C.DeferredOperationKHR,
     p_info                                          &CopyMicromapToMemoryInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCopyMicromapToMemoryEXT(dl_loader.get_sym('vkCopyMicromapToMemoryEXT'
+      f := VkCopyMicromapToMemoryEXT((*loader_p).get_sym('vkCopyMicromapToMemoryEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCopyMicromapToMemoryEXT': ${err}")
+        println("Couldn't load symbol for 'vkCopyMicromapToMemoryEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -30865,18 +25752,9 @@ pub fn copy_memory_to_micromap_ext(
     device                                          C.Device,
     deferred_operation                              C.DeferredOperationKHR,
     p_info                                          &CopyMemoryToMicromapInfoEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCopyMemoryToMicromapEXT(dl_loader.get_sym('vkCopyMemoryToMicromapEXT'
+      f := VkCopyMemoryToMicromapEXT((*loader_p).get_sym('vkCopyMemoryToMicromapEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCopyMemoryToMicromapEXT': ${err}")
+        println("Couldn't load symbol for 'vkCopyMemoryToMicromapEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -30896,18 +25774,9 @@ pub fn write_micromaps_properties_ext(
     data_size                                       usize,
     p_data                                          voidptr,
     stride                                          usize) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkWriteMicromapsPropertiesEXT(dl_loader.get_sym('vkWriteMicromapsPropertiesEXT'
+      f := VkWriteMicromapsPropertiesEXT((*loader_p).get_sym('vkWriteMicromapsPropertiesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkWriteMicromapsPropertiesEXT': ${err}")
+        println("Couldn't load symbol for 'vkWriteMicromapsPropertiesEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -30926,18 +25795,9 @@ type VkCmdCopyMicromapEXT = fn (     C.CommandBuffer,     &CopyMicromapInfoEXT)
 pub fn cmd_copy_micromap_ext(
     command_buffer                                  C.CommandBuffer,
     p_info                                          &CopyMicromapInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyMicromapEXT(dl_loader.get_sym('vkCmdCopyMicromapEXT'
+      f := VkCmdCopyMicromapEXT((*loader_p).get_sym('vkCmdCopyMicromapEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyMicromapEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyMicromapEXT': ${err}")
         return 
     })
     f(
@@ -30951,18 +25811,9 @@ type VkCmdCopyMicromapToMemoryEXT = fn (     C.CommandBuffer,     &CopyMicromapT
 pub fn cmd_copy_micromap_to_memory_ext(
     command_buffer                                  C.CommandBuffer,
     p_info                                          &CopyMicromapToMemoryInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyMicromapToMemoryEXT(dl_loader.get_sym('vkCmdCopyMicromapToMemoryEXT'
+      f := VkCmdCopyMicromapToMemoryEXT((*loader_p).get_sym('vkCmdCopyMicromapToMemoryEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyMicromapToMemoryEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyMicromapToMemoryEXT': ${err}")
         return 
     })
     f(
@@ -30976,18 +25827,9 @@ type VkCmdCopyMemoryToMicromapEXT = fn (     C.CommandBuffer,     &CopyMemoryToM
 pub fn cmd_copy_memory_to_micromap_ext(
     command_buffer                                  C.CommandBuffer,
     p_info                                          &CopyMemoryToMicromapInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyMemoryToMicromapEXT(dl_loader.get_sym('vkCmdCopyMemoryToMicromapEXT'
+      f := VkCmdCopyMemoryToMicromapEXT((*loader_p).get_sym('vkCmdCopyMemoryToMicromapEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyMemoryToMicromapEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyMemoryToMicromapEXT': ${err}")
         return 
     })
     f(
@@ -31005,18 +25847,9 @@ pub fn cmd_write_micromaps_properties_ext(
     query_type                                      QueryType,
     query_pool                                      C.QueryPool,
     first_query                                     u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWriteMicromapsPropertiesEXT(dl_loader.get_sym('vkCmdWriteMicromapsPropertiesEXT'
+      f := VkCmdWriteMicromapsPropertiesEXT((*loader_p).get_sym('vkCmdWriteMicromapsPropertiesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWriteMicromapsPropertiesEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdWriteMicromapsPropertiesEXT': ${err}")
         return 
     })
     f(
@@ -31035,18 +25868,9 @@ pub fn get_device_micromap_compatibility_ext(
     device                                          C.Device,
     p_version_info                                  &MicromapVersionInfoEXT,
     p_compatibility                                 &AccelerationStructureCompatibilityKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceMicromapCompatibilityEXT(dl_loader.get_sym('vkGetDeviceMicromapCompatibilityEXT'
+      f := VkGetDeviceMicromapCompatibilityEXT((*loader_p).get_sym('vkGetDeviceMicromapCompatibilityEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceMicromapCompatibilityEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceMicromapCompatibilityEXT': ${err}")
         return 
     })
     f(
@@ -31063,18 +25887,9 @@ pub fn get_micromap_build_sizes_ext(
     build_type                                      AccelerationStructureBuildTypeKHR,
     p_build_info                                    &MicromapBuildInfoEXT,
     p_size_info                                     &MicromapBuildSizesInfoEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetMicromapBuildSizesEXT(dl_loader.get_sym('vkGetMicromapBuildSizesEXT'
+      f := VkGetMicromapBuildSizesEXT((*loader_p).get_sym('vkGetMicromapBuildSizesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetMicromapBuildSizesEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetMicromapBuildSizesEXT': ${err}")
         return 
     })
     f(
@@ -31185,18 +26000,9 @@ pub fn cmd_draw_cluster_huawei(
     group_count_x                                   u32,
     group_count_y                                   u32,
     group_count_z                                   u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawClusterHUAWEI(dl_loader.get_sym('vkCmdDrawClusterHUAWEI'
+      f := VkCmdDrawClusterHUAWEI((*loader_p).get_sym('vkCmdDrawClusterHUAWEI'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawClusterHUAWEI': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawClusterHUAWEI': ${err}")
         return 
     })
     f(
@@ -31213,18 +26019,9 @@ pub fn cmd_draw_cluster_indirect_huawei(
     command_buffer                                  C.CommandBuffer,
     buffer                                          C.Buffer,
     offset                                          DeviceSize)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawClusterIndirectHUAWEI(dl_loader.get_sym('vkCmdDrawClusterIndirectHUAWEI'
+      f := VkCmdDrawClusterIndirectHUAWEI((*loader_p).get_sym('vkCmdDrawClusterIndirectHUAWEI'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawClusterIndirectHUAWEI': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawClusterIndirectHUAWEI': ${err}")
         return 
     })
     f(
@@ -31278,18 +26075,9 @@ pub fn set_device_memory_priority_ext(
     device                                          C.Device,
     memory                                          C.DeviceMemory,
     priority                                        f32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetDeviceMemoryPriorityEXT(dl_loader.get_sym('vkSetDeviceMemoryPriorityEXT'
+      f := VkSetDeviceMemoryPriorityEXT((*loader_p).get_sym('vkSetDeviceMemoryPriorityEXT'
     ) or { 
-        println("Couldn't load sym for 'vkSetDeviceMemoryPriorityEXT': ${err}")
+        println("Couldn't load symbol for 'vkSetDeviceMemoryPriorityEXT': ${err}")
         return 
     })
     f(
@@ -31412,18 +26200,9 @@ pub fn get_descriptor_set_layout_host_mapping_info_valve(
     device                                          C.Device,
     p_binding_reference                             &DescriptorSetBindingReferenceVALVE,
     p_host_mapping                                  &DescriptorSetLayoutHostMappingInfoVALVE)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDescriptorSetLayoutHostMappingInfoVALVE(dl_loader.get_sym('vkGetDescriptorSetLayoutHostMappingInfoVALVE'
+      f := VkGetDescriptorSetLayoutHostMappingInfoVALVE((*loader_p).get_sym('vkGetDescriptorSetLayoutHostMappingInfoVALVE'
     ) or { 
-        println("Couldn't load sym for 'vkGetDescriptorSetLayoutHostMappingInfoVALVE': ${err}")
+        println("Couldn't load symbol for 'vkGetDescriptorSetLayoutHostMappingInfoVALVE': ${err}")
         return 
     })
     f(
@@ -31439,18 +26218,9 @@ pub fn get_descriptor_set_host_mapping_valve(
     device                                          C.Device,
     descriptor_set                                  C.DescriptorSet,
     pp_data                                         &voidptr)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDescriptorSetHostMappingVALVE(dl_loader.get_sym('vkGetDescriptorSetHostMappingVALVE'
+      f := VkGetDescriptorSetHostMappingVALVE((*loader_p).get_sym('vkGetDescriptorSetHostMappingVALVE'
     ) or { 
-        println("Couldn't load sym for 'vkGetDescriptorSetHostMappingVALVE': ${err}")
+        println("Couldn't load symbol for 'vkGetDescriptorSetHostMappingVALVE': ${err}")
         return 
     })
     f(
@@ -31613,18 +26383,9 @@ pub fn cmd_copy_memory_indirect_nv(
     copy_buffer_address                             DeviceAddress,
     copy_count                                      u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyMemoryIndirectNV(dl_loader.get_sym('vkCmdCopyMemoryIndirectNV'
+      f := VkCmdCopyMemoryIndirectNV((*loader_p).get_sym('vkCmdCopyMemoryIndirectNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyMemoryIndirectNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyMemoryIndirectNV': ${err}")
         return 
     })
     f(
@@ -31645,18 +26406,9 @@ pub fn cmd_copy_memory_to_image_indirect_nv(
     dst_image                                       C.Image,
     dst_image_layout                                ImageLayout,
     p_image_subresources                            &ImageSubresourceLayers)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyMemoryToImageIndirectNV(dl_loader.get_sym('vkCmdCopyMemoryToImageIndirectNV'
+      f := VkCmdCopyMemoryToImageIndirectNV((*loader_p).get_sym('vkCmdCopyMemoryToImageIndirectNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyMemoryToImageIndirectNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyMemoryToImageIndirectNV': ${err}")
         return 
     })
     f(
@@ -31715,18 +26467,9 @@ pub fn cmd_decompress_memory_nv(
     command_buffer                                  C.CommandBuffer,
     decompress_region_count                         u32,
     p_decompress_memory_regions                     &DecompressMemoryRegionNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDecompressMemoryNV(dl_loader.get_sym('vkCmdDecompressMemoryNV'
+      f := VkCmdDecompressMemoryNV((*loader_p).get_sym('vkCmdDecompressMemoryNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDecompressMemoryNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdDecompressMemoryNV': ${err}")
         return 
     })
     f(
@@ -31743,18 +26486,9 @@ pub fn cmd_decompress_memory_indirect_count_nv(
     indirect_commands_address                       DeviceAddress,
     indirect_commands_count_address                 DeviceAddress,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDecompressMemoryIndirectCountNV(dl_loader.get_sym('vkCmdDecompressMemoryIndirectCountNV'
+      f := VkCmdDecompressMemoryIndirectCountNV((*loader_p).get_sym('vkCmdDecompressMemoryIndirectCountNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDecompressMemoryIndirectCountNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdDecompressMemoryIndirectCountNV': ${err}")
         return 
     })
     f(
@@ -31809,18 +26543,9 @@ pub fn get_pipeline_indirect_memory_requirements_nv(
     device                                          C.Device,
     p_create_info                                   &ComputePipelineCreateInfo,
     p_memory_requirements                           &MemoryRequirements2)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPipelineIndirectMemoryRequirementsNV(dl_loader.get_sym('vkGetPipelineIndirectMemoryRequirementsNV'
+      f := VkGetPipelineIndirectMemoryRequirementsNV((*loader_p).get_sym('vkGetPipelineIndirectMemoryRequirementsNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetPipelineIndirectMemoryRequirementsNV': ${err}")
+        println("Couldn't load symbol for 'vkGetPipelineIndirectMemoryRequirementsNV': ${err}")
         return 
     })
     f(
@@ -31836,18 +26561,9 @@ pub fn cmd_update_pipeline_indirect_buffer_nv(
     command_buffer                                  C.CommandBuffer,
     pipeline_bind_point                             PipelineBindPoint,
     pipeline                                        C.Pipeline)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdUpdatePipelineIndirectBufferNV(dl_loader.get_sym('vkCmdUpdatePipelineIndirectBufferNV'
+      f := VkCmdUpdatePipelineIndirectBufferNV((*loader_p).get_sym('vkCmdUpdatePipelineIndirectBufferNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdUpdatePipelineIndirectBufferNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdUpdatePipelineIndirectBufferNV': ${err}")
         return 
     })
     f(
@@ -31862,16 +26578,9 @@ type VkGetPipelineIndirectDeviceAddressNV = fn (     C.Device,     &PipelineIndi
 pub fn get_pipeline_indirect_device_address_nv(
     device                                          C.Device,
     p_info                                          &PipelineIndirectDeviceAddressInfoNV) DeviceAddress {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetPipelineIndirectDeviceAddressNV(dl_loader.get_sym("vkGetPipelineIndirectDeviceAddressNV"
+      f := VkGetPipelineIndirectDeviceAddressNV((*loader_p).get_sym("vkGetPipelineIndirectDeviceAddressNV"
     ) or { 
-        panic("Couldn't load sym for 'vkGetPipelineIndirectDeviceAddressNV': ${err}") })
+        panic("Couldn't load symbol for 'vkGetPipelineIndirectDeviceAddressNV': ${err}") })
     return f(
     device,
     p_info)
@@ -32063,18 +26772,9 @@ type VkCmdSetTessellationDomainOriginEXT = fn (     C.CommandBuffer,     Tessell
 pub fn cmd_set_tessellation_domain_origin_ext(
     command_buffer                                  C.CommandBuffer,
     domain_origin                                   TessellationDomainOrigin)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetTessellationDomainOriginEXT(dl_loader.get_sym('vkCmdSetTessellationDomainOriginEXT'
+      f := VkCmdSetTessellationDomainOriginEXT((*loader_p).get_sym('vkCmdSetTessellationDomainOriginEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetTessellationDomainOriginEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetTessellationDomainOriginEXT': ${err}")
         return 
     })
     f(
@@ -32088,18 +26788,9 @@ type VkCmdSetDepthClampEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_depth_clamp_enable_ext(
     command_buffer                                  C.CommandBuffer,
     depth_clamp_enable                              Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthClampEnableEXT(dl_loader.get_sym('vkCmdSetDepthClampEnableEXT'
+      f := VkCmdSetDepthClampEnableEXT((*loader_p).get_sym('vkCmdSetDepthClampEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthClampEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthClampEnableEXT': ${err}")
         return 
     })
     f(
@@ -32113,18 +26804,9 @@ type VkCmdSetPolygonModeEXT = fn (     C.CommandBuffer,     PolygonMode)
 pub fn cmd_set_polygon_mode_ext(
     command_buffer                                  C.CommandBuffer,
     polygon_mode                                    PolygonMode)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetPolygonModeEXT(dl_loader.get_sym('vkCmdSetPolygonModeEXT'
+      f := VkCmdSetPolygonModeEXT((*loader_p).get_sym('vkCmdSetPolygonModeEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetPolygonModeEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetPolygonModeEXT': ${err}")
         return 
     })
     f(
@@ -32138,18 +26820,9 @@ type VkCmdSetRasterizationSamplesEXT = fn (     C.CommandBuffer,     SampleCount
 pub fn cmd_set_rasterization_samples_ext(
     command_buffer                                  C.CommandBuffer,
     rasterization_samples                           SampleCountFlagBits)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetRasterizationSamplesEXT(dl_loader.get_sym('vkCmdSetRasterizationSamplesEXT'
+      f := VkCmdSetRasterizationSamplesEXT((*loader_p).get_sym('vkCmdSetRasterizationSamplesEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetRasterizationSamplesEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetRasterizationSamplesEXT': ${err}")
         return 
     })
     f(
@@ -32164,18 +26837,9 @@ pub fn cmd_set_sample_mask_ext(
     command_buffer                                  C.CommandBuffer,
     samples                                         SampleCountFlagBits,
     p_sample_mask                                   &SampleMask)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetSampleMaskEXT(dl_loader.get_sym('vkCmdSetSampleMaskEXT'
+      f := VkCmdSetSampleMaskEXT((*loader_p).get_sym('vkCmdSetSampleMaskEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetSampleMaskEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetSampleMaskEXT': ${err}")
         return 
     })
     f(
@@ -32190,18 +26854,9 @@ type VkCmdSetAlphaToCoverageEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_alpha_to_coverage_enable_ext(
     command_buffer                                  C.CommandBuffer,
     alpha_to_coverage_enable                        Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetAlphaToCoverageEnableEXT(dl_loader.get_sym('vkCmdSetAlphaToCoverageEnableEXT'
+      f := VkCmdSetAlphaToCoverageEnableEXT((*loader_p).get_sym('vkCmdSetAlphaToCoverageEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetAlphaToCoverageEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetAlphaToCoverageEnableEXT': ${err}")
         return 
     })
     f(
@@ -32215,18 +26870,9 @@ type VkCmdSetAlphaToOneEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_alpha_to_one_enable_ext(
     command_buffer                                  C.CommandBuffer,
     alpha_to_one_enable                             Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetAlphaToOneEnableEXT(dl_loader.get_sym('vkCmdSetAlphaToOneEnableEXT'
+      f := VkCmdSetAlphaToOneEnableEXT((*loader_p).get_sym('vkCmdSetAlphaToOneEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetAlphaToOneEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetAlphaToOneEnableEXT': ${err}")
         return 
     })
     f(
@@ -32240,18 +26886,9 @@ type VkCmdSetLogicOpEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_logic_op_enable_ext(
     command_buffer                                  C.CommandBuffer,
     logic_op_enable                                 Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetLogicOpEnableEXT(dl_loader.get_sym('vkCmdSetLogicOpEnableEXT'
+      f := VkCmdSetLogicOpEnableEXT((*loader_p).get_sym('vkCmdSetLogicOpEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetLogicOpEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetLogicOpEnableEXT': ${err}")
         return 
     })
     f(
@@ -32267,18 +26904,9 @@ pub fn cmd_set_color_blend_enable_ext(
     first_attachment                                u32,
     attachment_count                                u32,
     p_color_blend_enables                           &Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetColorBlendEnableEXT(dl_loader.get_sym('vkCmdSetColorBlendEnableEXT'
+      f := VkCmdSetColorBlendEnableEXT((*loader_p).get_sym('vkCmdSetColorBlendEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetColorBlendEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetColorBlendEnableEXT': ${err}")
         return 
     })
     f(
@@ -32296,18 +26924,9 @@ pub fn cmd_set_color_blend_equation_ext(
     first_attachment                                u32,
     attachment_count                                u32,
     p_color_blend_equations                         &ColorBlendEquationEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetColorBlendEquationEXT(dl_loader.get_sym('vkCmdSetColorBlendEquationEXT'
+      f := VkCmdSetColorBlendEquationEXT((*loader_p).get_sym('vkCmdSetColorBlendEquationEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetColorBlendEquationEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetColorBlendEquationEXT': ${err}")
         return 
     })
     f(
@@ -32325,18 +26944,9 @@ pub fn cmd_set_color_write_mask_ext(
     first_attachment                                u32,
     attachment_count                                u32,
     p_color_write_masks                             &ColorComponentFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetColorWriteMaskEXT(dl_loader.get_sym('vkCmdSetColorWriteMaskEXT'
+      f := VkCmdSetColorWriteMaskEXT((*loader_p).get_sym('vkCmdSetColorWriteMaskEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetColorWriteMaskEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetColorWriteMaskEXT': ${err}")
         return 
     })
     f(
@@ -32352,18 +26962,9 @@ type VkCmdSetRasterizationStreamEXT = fn (     C.CommandBuffer,     u32)
 pub fn cmd_set_rasterization_stream_ext(
     command_buffer                                  C.CommandBuffer,
     rasterization_stream                            u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetRasterizationStreamEXT(dl_loader.get_sym('vkCmdSetRasterizationStreamEXT'
+      f := VkCmdSetRasterizationStreamEXT((*loader_p).get_sym('vkCmdSetRasterizationStreamEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetRasterizationStreamEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetRasterizationStreamEXT': ${err}")
         return 
     })
     f(
@@ -32377,18 +26978,9 @@ type VkCmdSetConservativeRasterizationModeEXT = fn (     C.CommandBuffer,     Co
 pub fn cmd_set_conservative_rasterization_mode_ext(
     command_buffer                                  C.CommandBuffer,
     conservative_rasterization_mode                 ConservativeRasterizationModeEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetConservativeRasterizationModeEXT(dl_loader.get_sym('vkCmdSetConservativeRasterizationModeEXT'
+      f := VkCmdSetConservativeRasterizationModeEXT((*loader_p).get_sym('vkCmdSetConservativeRasterizationModeEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetConservativeRasterizationModeEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetConservativeRasterizationModeEXT': ${err}")
         return 
     })
     f(
@@ -32402,18 +26994,9 @@ type VkCmdSetExtraPrimitiveOverestimationSizeEXT = fn (     C.CommandBuffer,    
 pub fn cmd_set_extra_primitive_overestimation_size_ext(
     command_buffer                                  C.CommandBuffer,
     extra_primitive_overestimation_size             f32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetExtraPrimitiveOverestimationSizeEXT(dl_loader.get_sym('vkCmdSetExtraPrimitiveOverestimationSizeEXT'
+      f := VkCmdSetExtraPrimitiveOverestimationSizeEXT((*loader_p).get_sym('vkCmdSetExtraPrimitiveOverestimationSizeEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetExtraPrimitiveOverestimationSizeEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetExtraPrimitiveOverestimationSizeEXT': ${err}")
         return 
     })
     f(
@@ -32427,18 +27010,9 @@ type VkCmdSetDepthClipEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_depth_clip_enable_ext(
     command_buffer                                  C.CommandBuffer,
     depth_clip_enable                               Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthClipEnableEXT(dl_loader.get_sym('vkCmdSetDepthClipEnableEXT'
+      f := VkCmdSetDepthClipEnableEXT((*loader_p).get_sym('vkCmdSetDepthClipEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthClipEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthClipEnableEXT': ${err}")
         return 
     })
     f(
@@ -32452,18 +27026,9 @@ type VkCmdSetSampleLocationsEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_sample_locations_enable_ext(
     command_buffer                                  C.CommandBuffer,
     sample_locations_enable                         Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetSampleLocationsEnableEXT(dl_loader.get_sym('vkCmdSetSampleLocationsEnableEXT'
+      f := VkCmdSetSampleLocationsEnableEXT((*loader_p).get_sym('vkCmdSetSampleLocationsEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetSampleLocationsEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetSampleLocationsEnableEXT': ${err}")
         return 
     })
     f(
@@ -32479,18 +27044,9 @@ pub fn cmd_set_color_blend_advanced_ext(
     first_attachment                                u32,
     attachment_count                                u32,
     p_color_blend_advanced                          &ColorBlendAdvancedEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetColorBlendAdvancedEXT(dl_loader.get_sym('vkCmdSetColorBlendAdvancedEXT'
+      f := VkCmdSetColorBlendAdvancedEXT((*loader_p).get_sym('vkCmdSetColorBlendAdvancedEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetColorBlendAdvancedEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetColorBlendAdvancedEXT': ${err}")
         return 
     })
     f(
@@ -32506,18 +27062,9 @@ type VkCmdSetProvokingVertexModeEXT = fn (     C.CommandBuffer,     ProvokingVer
 pub fn cmd_set_provoking_vertex_mode_ext(
     command_buffer                                  C.CommandBuffer,
     provoking_vertex_mode                           ProvokingVertexModeEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetProvokingVertexModeEXT(dl_loader.get_sym('vkCmdSetProvokingVertexModeEXT'
+      f := VkCmdSetProvokingVertexModeEXT((*loader_p).get_sym('vkCmdSetProvokingVertexModeEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetProvokingVertexModeEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetProvokingVertexModeEXT': ${err}")
         return 
     })
     f(
@@ -32531,18 +27078,9 @@ type VkCmdSetLineRasterizationModeEXT = fn (     C.CommandBuffer,     LineRaster
 pub fn cmd_set_line_rasterization_mode_ext(
     command_buffer                                  C.CommandBuffer,
     line_rasterization_mode                         LineRasterizationModeEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetLineRasterizationModeEXT(dl_loader.get_sym('vkCmdSetLineRasterizationModeEXT'
+      f := VkCmdSetLineRasterizationModeEXT((*loader_p).get_sym('vkCmdSetLineRasterizationModeEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetLineRasterizationModeEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetLineRasterizationModeEXT': ${err}")
         return 
     })
     f(
@@ -32556,18 +27094,9 @@ type VkCmdSetLineStippleEnableEXT = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_line_stipple_enable_ext(
     command_buffer                                  C.CommandBuffer,
     stippled_line_enable                            Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetLineStippleEnableEXT(dl_loader.get_sym('vkCmdSetLineStippleEnableEXT'
+      f := VkCmdSetLineStippleEnableEXT((*loader_p).get_sym('vkCmdSetLineStippleEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetLineStippleEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetLineStippleEnableEXT': ${err}")
         return 
     })
     f(
@@ -32581,18 +27110,9 @@ type VkCmdSetDepthClipNegativeOneToOneEXT = fn (     C.CommandBuffer,     Bool32
 pub fn cmd_set_depth_clip_negative_one_to_one_ext(
     command_buffer                                  C.CommandBuffer,
     negative_one_to_one                             Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetDepthClipNegativeOneToOneEXT(dl_loader.get_sym('vkCmdSetDepthClipNegativeOneToOneEXT'
+      f := VkCmdSetDepthClipNegativeOneToOneEXT((*loader_p).get_sym('vkCmdSetDepthClipNegativeOneToOneEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetDepthClipNegativeOneToOneEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetDepthClipNegativeOneToOneEXT': ${err}")
         return 
     })
     f(
@@ -32606,18 +27126,9 @@ type VkCmdSetViewportWScalingEnableNV = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_viewport_w_scaling_enable_nv(
     command_buffer                                  C.CommandBuffer,
     viewport_w_scaling_enable                       Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetViewportWScalingEnableNV(dl_loader.get_sym('vkCmdSetViewportWScalingEnableNV'
+      f := VkCmdSetViewportWScalingEnableNV((*loader_p).get_sym('vkCmdSetViewportWScalingEnableNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetViewportWScalingEnableNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetViewportWScalingEnableNV': ${err}")
         return 
     })
     f(
@@ -32633,18 +27144,9 @@ pub fn cmd_set_viewport_swizzle_nv(
     first_viewport                                  u32,
     viewport_count                                  u32,
     p_viewport_swizzles                             &ViewportSwizzleNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetViewportSwizzleNV(dl_loader.get_sym('vkCmdSetViewportSwizzleNV'
+      f := VkCmdSetViewportSwizzleNV((*loader_p).get_sym('vkCmdSetViewportSwizzleNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetViewportSwizzleNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetViewportSwizzleNV': ${err}")
         return 
     })
     f(
@@ -32660,18 +27162,9 @@ type VkCmdSetCoverageToColorEnableNV = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_coverage_to_color_enable_nv(
     command_buffer                                  C.CommandBuffer,
     coverage_to_color_enable                        Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetCoverageToColorEnableNV(dl_loader.get_sym('vkCmdSetCoverageToColorEnableNV'
+      f := VkCmdSetCoverageToColorEnableNV((*loader_p).get_sym('vkCmdSetCoverageToColorEnableNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetCoverageToColorEnableNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetCoverageToColorEnableNV': ${err}")
         return 
     })
     f(
@@ -32685,18 +27178,9 @@ type VkCmdSetCoverageToColorLocationNV = fn (     C.CommandBuffer,     u32)
 pub fn cmd_set_coverage_to_color_location_nv(
     command_buffer                                  C.CommandBuffer,
     coverage_to_color_location                      u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetCoverageToColorLocationNV(dl_loader.get_sym('vkCmdSetCoverageToColorLocationNV'
+      f := VkCmdSetCoverageToColorLocationNV((*loader_p).get_sym('vkCmdSetCoverageToColorLocationNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetCoverageToColorLocationNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetCoverageToColorLocationNV': ${err}")
         return 
     })
     f(
@@ -32710,18 +27194,9 @@ type VkCmdSetCoverageModulationModeNV = fn (     C.CommandBuffer,     CoverageMo
 pub fn cmd_set_coverage_modulation_mode_nv(
     command_buffer                                  C.CommandBuffer,
     coverage_modulation_mode                        CoverageModulationModeNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetCoverageModulationModeNV(dl_loader.get_sym('vkCmdSetCoverageModulationModeNV'
+      f := VkCmdSetCoverageModulationModeNV((*loader_p).get_sym('vkCmdSetCoverageModulationModeNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetCoverageModulationModeNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetCoverageModulationModeNV': ${err}")
         return 
     })
     f(
@@ -32735,18 +27210,9 @@ type VkCmdSetCoverageModulationTableEnableNV = fn (     C.CommandBuffer,     Boo
 pub fn cmd_set_coverage_modulation_table_enable_nv(
     command_buffer                                  C.CommandBuffer,
     coverage_modulation_table_enable                Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetCoverageModulationTableEnableNV(dl_loader.get_sym('vkCmdSetCoverageModulationTableEnableNV'
+      f := VkCmdSetCoverageModulationTableEnableNV((*loader_p).get_sym('vkCmdSetCoverageModulationTableEnableNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetCoverageModulationTableEnableNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetCoverageModulationTableEnableNV': ${err}")
         return 
     })
     f(
@@ -32761,18 +27227,9 @@ pub fn cmd_set_coverage_modulation_table_nv(
     command_buffer                                  C.CommandBuffer,
     coverage_modulation_table_count                 u32,
     p_coverage_modulation_table                     &f32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetCoverageModulationTableNV(dl_loader.get_sym('vkCmdSetCoverageModulationTableNV'
+      f := VkCmdSetCoverageModulationTableNV((*loader_p).get_sym('vkCmdSetCoverageModulationTableNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetCoverageModulationTableNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetCoverageModulationTableNV': ${err}")
         return 
     })
     f(
@@ -32787,18 +27244,9 @@ type VkCmdSetShadingRateImageEnableNV = fn (     C.CommandBuffer,     Bool32)
 pub fn cmd_set_shading_rate_image_enable_nv(
     command_buffer                                  C.CommandBuffer,
     shading_rate_image_enable                       Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetShadingRateImageEnableNV(dl_loader.get_sym('vkCmdSetShadingRateImageEnableNV'
+      f := VkCmdSetShadingRateImageEnableNV((*loader_p).get_sym('vkCmdSetShadingRateImageEnableNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetShadingRateImageEnableNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetShadingRateImageEnableNV': ${err}")
         return 
     })
     f(
@@ -32812,18 +27260,9 @@ type VkCmdSetRepresentativeFragmentTestEnableNV = fn (     C.CommandBuffer,     
 pub fn cmd_set_representative_fragment_test_enable_nv(
     command_buffer                                  C.CommandBuffer,
     representative_fragment_test_enable             Bool32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetRepresentativeFragmentTestEnableNV(dl_loader.get_sym('vkCmdSetRepresentativeFragmentTestEnableNV'
+      f := VkCmdSetRepresentativeFragmentTestEnableNV((*loader_p).get_sym('vkCmdSetRepresentativeFragmentTestEnableNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetRepresentativeFragmentTestEnableNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetRepresentativeFragmentTestEnableNV': ${err}")
         return 
     })
     f(
@@ -32837,18 +27276,9 @@ type VkCmdSetCoverageReductionModeNV = fn (     C.CommandBuffer,     CoverageRed
 pub fn cmd_set_coverage_reduction_mode_nv(
     command_buffer                                  C.CommandBuffer,
     coverage_reduction_mode                         CoverageReductionModeNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetCoverageReductionModeNV(dl_loader.get_sym('vkCmdSetCoverageReductionModeNV'
+      f := VkCmdSetCoverageReductionModeNV((*loader_p).get_sym('vkCmdSetCoverageReductionModeNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetCoverageReductionModeNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetCoverageReductionModeNV': ${err}")
         return 
     })
     f(
@@ -33005,18 +27435,9 @@ pub fn get_shader_module_identifier_ext(
     device                                          C.Device,
     shader_module                                   C.ShaderModule,
     p_identifier                                    &ShaderModuleIdentifierEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetShaderModuleIdentifierEXT(dl_loader.get_sym('vkGetShaderModuleIdentifierEXT'
+      f := VkGetShaderModuleIdentifierEXT((*loader_p).get_sym('vkGetShaderModuleIdentifierEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetShaderModuleIdentifierEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetShaderModuleIdentifierEXT': ${err}")
         return 
     })
     f(
@@ -33032,18 +27453,9 @@ pub fn get_shader_module_create_info_identifier_ext(
     device                                          C.Device,
     p_create_info                                   &ShaderModuleCreateInfo,
     p_identifier                                    &ShaderModuleIdentifierEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetShaderModuleCreateInfoIdentifierEXT(dl_loader.get_sym('vkGetShaderModuleCreateInfoIdentifierEXT'
+      f := VkGetShaderModuleCreateInfoIdentifierEXT((*loader_p).get_sym('vkGetShaderModuleCreateInfoIdentifierEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetShaderModuleCreateInfoIdentifierEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetShaderModuleCreateInfoIdentifierEXT': ${err}")
         return 
     })
     f(
@@ -33212,18 +27624,9 @@ pub fn get_physical_device_optical_flow_image_formats_nv(
     p_optical_flow_image_format_info                &OpticalFlowImageFormatInfoNV,
     p_format_count                                  &u32,
     p_image_format_properties                       &OpticalFlowImageFormatPropertiesNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetPhysicalDeviceOpticalFlowImageFormatsNV(dl_loader.get_sym('vkGetPhysicalDeviceOpticalFlowImageFormatsNV'
+      f := VkGetPhysicalDeviceOpticalFlowImageFormatsNV((*loader_p).get_sym('vkGetPhysicalDeviceOpticalFlowImageFormatsNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetPhysicalDeviceOpticalFlowImageFormatsNV': ${err}")
+        println("Couldn't load symbol for 'vkGetPhysicalDeviceOpticalFlowImageFormatsNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -33241,18 +27644,9 @@ pub fn create_optical_flow_session_nv(
     p_create_info                                   &OpticalFlowSessionCreateInfoNV,
     p_allocator                                     &AllocationCallbacks,
     p_session                                       &C.OpticalFlowSessionNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateOpticalFlowSessionNV(dl_loader.get_sym('vkCreateOpticalFlowSessionNV'
+      f := VkCreateOpticalFlowSessionNV((*loader_p).get_sym('vkCreateOpticalFlowSessionNV'
     ) or { 
-        println("Couldn't load sym for 'vkCreateOpticalFlowSessionNV': ${err}")
+        println("Couldn't load symbol for 'vkCreateOpticalFlowSessionNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -33269,18 +27663,9 @@ pub fn destroy_optical_flow_session_nv(
     device                                          C.Device,
     session                                         C.OpticalFlowSessionNV,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyOpticalFlowSessionNV(dl_loader.get_sym('vkDestroyOpticalFlowSessionNV'
+      f := VkDestroyOpticalFlowSessionNV((*loader_p).get_sym('vkDestroyOpticalFlowSessionNV'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyOpticalFlowSessionNV': ${err}")
+        println("Couldn't load symbol for 'vkDestroyOpticalFlowSessionNV': ${err}")
         return 
     })
     f(
@@ -33298,18 +27683,9 @@ pub fn bind_optical_flow_session_image_nv(
     binding_point                                   OpticalFlowSessionBindingPointNV,
     view                                            C.ImageView,
     layout                                          ImageLayout) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBindOpticalFlowSessionImageNV(dl_loader.get_sym('vkBindOpticalFlowSessionImageNV'
+      f := VkBindOpticalFlowSessionImageNV((*loader_p).get_sym('vkBindOpticalFlowSessionImageNV'
     ) or { 
-        println("Couldn't load sym for 'vkBindOpticalFlowSessionImageNV': ${err}")
+        println("Couldn't load symbol for 'vkBindOpticalFlowSessionImageNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -33327,18 +27703,9 @@ pub fn cmd_optical_flow_execute_nv(
     command_buffer                                  C.CommandBuffer,
     session                                         C.OpticalFlowSessionNV,
     p_execute_info                                  &OpticalFlowExecuteInfoNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdOpticalFlowExecuteNV(dl_loader.get_sym('vkCmdOpticalFlowExecuteNV'
+      f := VkCmdOpticalFlowExecuteNV((*loader_p).get_sym('vkCmdOpticalFlowExecuteNV'
     ) or { 
-        println("Couldn't load sym for 'vkCmdOpticalFlowExecuteNV': ${err}")
+        println("Couldn't load symbol for 'vkCmdOpticalFlowExecuteNV': ${err}")
         return 
     })
     f(
@@ -33480,18 +27847,9 @@ pub fn create_shaders_ext(
     p_create_infos                                  &ShaderCreateInfoEXT,
     p_allocator                                     &AllocationCallbacks,
     p_shaders                                       &C.ShaderEXT) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateShadersEXT(dl_loader.get_sym('vkCreateShadersEXT'
+      f := VkCreateShadersEXT((*loader_p).get_sym('vkCreateShadersEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCreateShadersEXT': ${err}")
+        println("Couldn't load symbol for 'vkCreateShadersEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -33509,18 +27867,9 @@ pub fn destroy_shader_ext(
     device                                          C.Device,
     shader                                          C.ShaderEXT,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyShaderEXT(dl_loader.get_sym('vkDestroyShaderEXT'
+      f := VkDestroyShaderEXT((*loader_p).get_sym('vkDestroyShaderEXT'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyShaderEXT': ${err}")
+        println("Couldn't load symbol for 'vkDestroyShaderEXT': ${err}")
         return 
     })
     f(
@@ -33537,18 +27886,9 @@ pub fn get_shader_binary_data_ext(
     shader                                          C.ShaderEXT,
     p_data_size                                     &usize,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetShaderBinaryDataEXT(dl_loader.get_sym('vkGetShaderBinaryDataEXT'
+      f := VkGetShaderBinaryDataEXT((*loader_p).get_sym('vkGetShaderBinaryDataEXT'
     ) or { 
-        println("Couldn't load sym for 'vkGetShaderBinaryDataEXT': ${err}")
+        println("Couldn't load symbol for 'vkGetShaderBinaryDataEXT': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -33566,18 +27906,9 @@ pub fn cmd_bind_shaders_ext(
     stage_count                                     u32,
     p_stages                                        &ShaderStageFlagBits,
     p_shaders                                       &C.ShaderEXT)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBindShadersEXT(dl_loader.get_sym('vkCmdBindShadersEXT'
+      f := VkCmdBindShadersEXT((*loader_p).get_sym('vkCmdBindShadersEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBindShadersEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdBindShadersEXT': ${err}")
         return 
     })
     f(
@@ -33618,18 +27949,9 @@ pub fn get_framebuffer_tile_properties_qcom(
     framebuffer                                     C.Framebuffer,
     p_properties_count                              &u32,
     p_properties                                    &TilePropertiesQCOM) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetFramebufferTilePropertiesQCOM(dl_loader.get_sym('vkGetFramebufferTilePropertiesQCOM'
+      f := VkGetFramebufferTilePropertiesQCOM((*loader_p).get_sym('vkGetFramebufferTilePropertiesQCOM'
     ) or { 
-        println("Couldn't load sym for 'vkGetFramebufferTilePropertiesQCOM': ${err}")
+        println("Couldn't load symbol for 'vkGetFramebufferTilePropertiesQCOM': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -33646,18 +27968,9 @@ pub fn get_dynamic_rendering_tile_properties_qcom(
     device                                          C.Device,
     p_rendering_info                                &RenderingInfo,
     p_properties                                    &TilePropertiesQCOM) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDynamicRenderingTilePropertiesQCOM(dl_loader.get_sym('vkGetDynamicRenderingTilePropertiesQCOM'
+      f := VkGetDynamicRenderingTilePropertiesQCOM((*loader_p).get_sym('vkGetDynamicRenderingTilePropertiesQCOM'
     ) or { 
-        println("Couldn't load sym for 'vkGetDynamicRenderingTilePropertiesQCOM': ${err}")
+        println("Couldn't load symbol for 'vkGetDynamicRenderingTilePropertiesQCOM': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -33973,18 +28286,9 @@ pub fn set_latency_sleep_mode_nv(
     device                                          C.Device,
     swapchain                                       C.SwapchainKHR,
     p_sleep_mode_info                               &LatencySleepModeInfoNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetLatencySleepModeNV(dl_loader.get_sym('vkSetLatencySleepModeNV'
+      f := VkSetLatencySleepModeNV((*loader_p).get_sym('vkSetLatencySleepModeNV'
     ) or { 
-        println("Couldn't load sym for 'vkSetLatencySleepModeNV': ${err}")
+        println("Couldn't load symbol for 'vkSetLatencySleepModeNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -34000,18 +28304,9 @@ pub fn latency_sleep_nv(
     device                                          C.Device,
     swapchain                                       C.SwapchainKHR,
     p_sleep_info                                    &LatencySleepInfoNV) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkLatencySleepNV(dl_loader.get_sym('vkLatencySleepNV'
+      f := VkLatencySleepNV((*loader_p).get_sym('vkLatencySleepNV'
     ) or { 
-        println("Couldn't load sym for 'vkLatencySleepNV': ${err}")
+        println("Couldn't load symbol for 'vkLatencySleepNV': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -34027,18 +28322,9 @@ pub fn set_latency_marker_nv(
     device                                          C.Device,
     swapchain                                       C.SwapchainKHR,
     p_latency_marker_info                           &SetLatencyMarkerInfoNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkSetLatencyMarkerNV(dl_loader.get_sym('vkSetLatencyMarkerNV'
+      f := VkSetLatencyMarkerNV((*loader_p).get_sym('vkSetLatencyMarkerNV'
     ) or { 
-        println("Couldn't load sym for 'vkSetLatencyMarkerNV': ${err}")
+        println("Couldn't load symbol for 'vkSetLatencyMarkerNV': ${err}")
         return 
     })
     f(
@@ -34054,18 +28340,9 @@ pub fn get_latency_timings_nv(
     device                                          C.Device,
     swapchain                                       C.SwapchainKHR,
     p_latency_marker_info                           &GetLatencyMarkerInfoNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetLatencyTimingsNV(dl_loader.get_sym('vkGetLatencyTimingsNV'
+      f := VkGetLatencyTimingsNV((*loader_p).get_sym('vkGetLatencyTimingsNV'
     ) or { 
-        println("Couldn't load sym for 'vkGetLatencyTimingsNV': ${err}")
+        println("Couldn't load symbol for 'vkGetLatencyTimingsNV': ${err}")
         return 
     })
     f(
@@ -34080,18 +28357,9 @@ type VkQueueNotifyOutOfBandNV = fn (     C.Queue,     &OutOfBandQueueTypeInfoNV)
 pub fn queue_notify_out_of_band_nv(
     queue                                           C.Queue,
     p_queue_type_info                               &OutOfBandQueueTypeInfoNV)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkQueueNotifyOutOfBandNV(dl_loader.get_sym('vkQueueNotifyOutOfBandNV'
+      f := VkQueueNotifyOutOfBandNV((*loader_p).get_sym('vkQueueNotifyOutOfBandNV'
     ) or { 
-        println("Couldn't load sym for 'vkQueueNotifyOutOfBandNV': ${err}")
+        println("Couldn't load symbol for 'vkQueueNotifyOutOfBandNV': ${err}")
         return 
     })
     f(
@@ -34256,18 +28524,9 @@ type VkCmdSetAttachmentFeedbackLoopEnableEXT = fn (     C.CommandBuffer,     Ima
 pub fn cmd_set_attachment_feedback_loop_enable_ext(
     command_buffer                                  C.CommandBuffer,
     aspect_mask                                     ImageAspectFlags)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetAttachmentFeedbackLoopEnableEXT(dl_loader.get_sym('vkCmdSetAttachmentFeedbackLoopEnableEXT'
+      f := VkCmdSetAttachmentFeedbackLoopEnableEXT((*loader_p).get_sym('vkCmdSetAttachmentFeedbackLoopEnableEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetAttachmentFeedbackLoopEnableEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetAttachmentFeedbackLoopEnableEXT': ${err}")
         return 
     })
     f(
@@ -34336,18 +28595,9 @@ pub fn get_screen_buffer_properties_qnx(
     device                                          C.Device,
     buffer                                          voidptr,
     p_properties                                    &ScreenBufferPropertiesQNX) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetScreenBufferPropertiesQNX(dl_loader.get_sym('vkGetScreenBufferPropertiesQNX'
+      f := VkGetScreenBufferPropertiesQNX((*loader_p).get_sym('vkGetScreenBufferPropertiesQNX'
     ) or { 
-        println("Couldn't load sym for 'vkGetScreenBufferPropertiesQNX': ${err}")
+        println("Couldn't load symbol for 'vkGetScreenBufferPropertiesQNX': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -34587,18 +28837,9 @@ pub fn create_acceleration_structure_khr(
     p_create_info                                   &AccelerationStructureCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_acceleration_structure                        &C.AccelerationStructureKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateAccelerationStructureKHR(dl_loader.get_sym('vkCreateAccelerationStructureKHR'
+      f := VkCreateAccelerationStructureKHR((*loader_p).get_sym('vkCreateAccelerationStructureKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateAccelerationStructureKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateAccelerationStructureKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -34615,18 +28856,9 @@ pub fn destroy_acceleration_structure_khr(
     device                                          C.Device,
     acceleration_structure                          C.AccelerationStructureKHR,
     p_allocator                                     &AllocationCallbacks)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkDestroyAccelerationStructureKHR(dl_loader.get_sym('vkDestroyAccelerationStructureKHR'
+      f := VkDestroyAccelerationStructureKHR((*loader_p).get_sym('vkDestroyAccelerationStructureKHR'
     ) or { 
-        println("Couldn't load sym for 'vkDestroyAccelerationStructureKHR': ${err}")
+        println("Couldn't load symbol for 'vkDestroyAccelerationStructureKHR': ${err}")
         return 
     })
     f(
@@ -34643,18 +28875,9 @@ pub fn cmd_build_acceleration_structures_khr(
     info_count                                      u32,
     p_infos                                         &AccelerationStructureBuildGeometryInfoKHR,
     pp_build_range_infos                            &AccelerationStructureBuildRangeInfoKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBuildAccelerationStructuresKHR(dl_loader.get_sym('vkCmdBuildAccelerationStructuresKHR'
+      f := VkCmdBuildAccelerationStructuresKHR((*loader_p).get_sym('vkCmdBuildAccelerationStructuresKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBuildAccelerationStructuresKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdBuildAccelerationStructuresKHR': ${err}")
         return 
     })
     f(
@@ -34674,18 +28897,9 @@ pub fn cmd_build_acceleration_structures_indirect_khr(
     p_indirect_device_addresses                     &DeviceAddress,
     p_indirect_strides                              &u32,
     pp_max_primitive_counts                         &u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdBuildAccelerationStructuresIndirectKHR(dl_loader.get_sym('vkCmdBuildAccelerationStructuresIndirectKHR'
+      f := VkCmdBuildAccelerationStructuresIndirectKHR((*loader_p).get_sym('vkCmdBuildAccelerationStructuresIndirectKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdBuildAccelerationStructuresIndirectKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdBuildAccelerationStructuresIndirectKHR': ${err}")
         return 
     })
     f(
@@ -34706,18 +28920,9 @@ pub fn build_acceleration_structures_khr(
     info_count                                      u32,
     p_infos                                         &AccelerationStructureBuildGeometryInfoKHR,
     pp_build_range_infos                            &AccelerationStructureBuildRangeInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkBuildAccelerationStructuresKHR(dl_loader.get_sym('vkBuildAccelerationStructuresKHR'
+      f := VkBuildAccelerationStructuresKHR((*loader_p).get_sym('vkBuildAccelerationStructuresKHR'
     ) or { 
-        println("Couldn't load sym for 'vkBuildAccelerationStructuresKHR': ${err}")
+        println("Couldn't load symbol for 'vkBuildAccelerationStructuresKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -34735,18 +28940,9 @@ pub fn copy_acceleration_structure_khr(
     device                                          C.Device,
     deferred_operation                              C.DeferredOperationKHR,
     p_info                                          &CopyAccelerationStructureInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCopyAccelerationStructureKHR(dl_loader.get_sym('vkCopyAccelerationStructureKHR'
+      f := VkCopyAccelerationStructureKHR((*loader_p).get_sym('vkCopyAccelerationStructureKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCopyAccelerationStructureKHR': ${err}")
+        println("Couldn't load symbol for 'vkCopyAccelerationStructureKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -34762,18 +28958,9 @@ pub fn copy_acceleration_structure_to_memory_khr(
     device                                          C.Device,
     deferred_operation                              C.DeferredOperationKHR,
     p_info                                          &CopyAccelerationStructureToMemoryInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCopyAccelerationStructureToMemoryKHR(dl_loader.get_sym('vkCopyAccelerationStructureToMemoryKHR'
+      f := VkCopyAccelerationStructureToMemoryKHR((*loader_p).get_sym('vkCopyAccelerationStructureToMemoryKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCopyAccelerationStructureToMemoryKHR': ${err}")
+        println("Couldn't load symbol for 'vkCopyAccelerationStructureToMemoryKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -34789,18 +28976,9 @@ pub fn copy_memory_to_acceleration_structure_khr(
     device                                          C.Device,
     deferred_operation                              C.DeferredOperationKHR,
     p_info                                          &CopyMemoryToAccelerationStructureInfoKHR) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCopyMemoryToAccelerationStructureKHR(dl_loader.get_sym('vkCopyMemoryToAccelerationStructureKHR'
+      f := VkCopyMemoryToAccelerationStructureKHR((*loader_p).get_sym('vkCopyMemoryToAccelerationStructureKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCopyMemoryToAccelerationStructureKHR': ${err}")
+        println("Couldn't load symbol for 'vkCopyMemoryToAccelerationStructureKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -34820,18 +28998,9 @@ pub fn write_acceleration_structures_properties_khr(
     data_size                                       usize,
     p_data                                          voidptr,
     stride                                          usize) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkWriteAccelerationStructuresPropertiesKHR(dl_loader.get_sym('vkWriteAccelerationStructuresPropertiesKHR'
+      f := VkWriteAccelerationStructuresPropertiesKHR((*loader_p).get_sym('vkWriteAccelerationStructuresPropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkWriteAccelerationStructuresPropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkWriteAccelerationStructuresPropertiesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -34850,18 +29019,9 @@ type VkCmdCopyAccelerationStructureKHR = fn (     C.CommandBuffer,     &CopyAcce
 pub fn cmd_copy_acceleration_structure_khr(
     command_buffer                                  C.CommandBuffer,
     p_info                                          &CopyAccelerationStructureInfoKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyAccelerationStructureKHR(dl_loader.get_sym('vkCmdCopyAccelerationStructureKHR'
+      f := VkCmdCopyAccelerationStructureKHR((*loader_p).get_sym('vkCmdCopyAccelerationStructureKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyAccelerationStructureKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyAccelerationStructureKHR': ${err}")
         return 
     })
     f(
@@ -34875,18 +29035,9 @@ type VkCmdCopyAccelerationStructureToMemoryKHR = fn (     C.CommandBuffer,     &
 pub fn cmd_copy_acceleration_structure_to_memory_khr(
     command_buffer                                  C.CommandBuffer,
     p_info                                          &CopyAccelerationStructureToMemoryInfoKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyAccelerationStructureToMemoryKHR(dl_loader.get_sym('vkCmdCopyAccelerationStructureToMemoryKHR'
+      f := VkCmdCopyAccelerationStructureToMemoryKHR((*loader_p).get_sym('vkCmdCopyAccelerationStructureToMemoryKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyAccelerationStructureToMemoryKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyAccelerationStructureToMemoryKHR': ${err}")
         return 
     })
     f(
@@ -34900,18 +29051,9 @@ type VkCmdCopyMemoryToAccelerationStructureKHR = fn (     C.CommandBuffer,     &
 pub fn cmd_copy_memory_to_acceleration_structure_khr(
     command_buffer                                  C.CommandBuffer,
     p_info                                          &CopyMemoryToAccelerationStructureInfoKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdCopyMemoryToAccelerationStructureKHR(dl_loader.get_sym('vkCmdCopyMemoryToAccelerationStructureKHR'
+      f := VkCmdCopyMemoryToAccelerationStructureKHR((*loader_p).get_sym('vkCmdCopyMemoryToAccelerationStructureKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdCopyMemoryToAccelerationStructureKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdCopyMemoryToAccelerationStructureKHR': ${err}")
         return 
     })
     f(
@@ -34925,16 +29067,9 @@ type VkGetAccelerationStructureDeviceAddressKHR = fn (     C.Device,     &Accele
 pub fn get_acceleration_structure_device_address_khr(
     device                                          C.Device,
     p_info                                          &AccelerationStructureDeviceAddressInfoKHR) DeviceAddress {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetAccelerationStructureDeviceAddressKHR(dl_loader.get_sym("vkGetAccelerationStructureDeviceAddressKHR"
+      f := VkGetAccelerationStructureDeviceAddressKHR((*loader_p).get_sym("vkGetAccelerationStructureDeviceAddressKHR"
     ) or { 
-        panic("Couldn't load sym for 'vkGetAccelerationStructureDeviceAddressKHR': ${err}") })
+        panic("Couldn't load symbol for 'vkGetAccelerationStructureDeviceAddressKHR': ${err}") })
     return f(
     device,
     p_info)
@@ -34950,18 +29085,9 @@ pub fn cmd_write_acceleration_structures_properties_khr(
     query_type                                      QueryType,
     query_pool                                      C.QueryPool,
     first_query                                     u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdWriteAccelerationStructuresPropertiesKHR(dl_loader.get_sym('vkCmdWriteAccelerationStructuresPropertiesKHR'
+      f := VkCmdWriteAccelerationStructuresPropertiesKHR((*loader_p).get_sym('vkCmdWriteAccelerationStructuresPropertiesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdWriteAccelerationStructuresPropertiesKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdWriteAccelerationStructuresPropertiesKHR': ${err}")
         return 
     })
     f(
@@ -34980,18 +29106,9 @@ pub fn get_device_acceleration_structure_compatibility_khr(
     device                                          C.Device,
     p_version_info                                  &AccelerationStructureVersionInfoKHR,
     p_compatibility                                 &AccelerationStructureCompatibilityKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetDeviceAccelerationStructureCompatibilityKHR(dl_loader.get_sym('vkGetDeviceAccelerationStructureCompatibilityKHR'
+      f := VkGetDeviceAccelerationStructureCompatibilityKHR((*loader_p).get_sym('vkGetDeviceAccelerationStructureCompatibilityKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetDeviceAccelerationStructureCompatibilityKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetDeviceAccelerationStructureCompatibilityKHR': ${err}")
         return 
     })
     f(
@@ -35009,18 +29126,9 @@ pub fn get_acceleration_structure_build_sizes_khr(
     p_build_info                                    &AccelerationStructureBuildGeometryInfoKHR,
     p_max_primitive_counts                          &u32,
     p_size_info                                     &AccelerationStructureBuildSizesInfoKHR)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetAccelerationStructureBuildSizesKHR(dl_loader.get_sym('vkGetAccelerationStructureBuildSizesKHR'
+      f := VkGetAccelerationStructureBuildSizesKHR((*loader_p).get_sym('vkGetAccelerationStructureBuildSizesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetAccelerationStructureBuildSizesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetAccelerationStructureBuildSizesKHR': ${err}")
         return 
     })
     f(
@@ -35137,18 +29245,9 @@ pub fn cmd_trace_rays_khr(
     width                                           u32,
     height                                          u32,
     depth                                           u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdTraceRaysKHR(dl_loader.get_sym('vkCmdTraceRaysKHR'
+      f := VkCmdTraceRaysKHR((*loader_p).get_sym('vkCmdTraceRaysKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdTraceRaysKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdTraceRaysKHR': ${err}")
         return 
     })
     f(
@@ -35173,18 +29272,9 @@ pub fn create_ray_tracing_pipelines_khr(
     p_create_infos                                  &RayTracingPipelineCreateInfoKHR,
     p_allocator                                     &AllocationCallbacks,
     p_pipelines                                     &C.Pipeline) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkCreateRayTracingPipelinesKHR(dl_loader.get_sym('vkCreateRayTracingPipelinesKHR'
+      f := VkCreateRayTracingPipelinesKHR((*loader_p).get_sym('vkCreateRayTracingPipelinesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCreateRayTracingPipelinesKHR': ${err}")
+        println("Couldn't load symbol for 'vkCreateRayTracingPipelinesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -35207,18 +29297,9 @@ pub fn get_ray_tracing_capture_replay_shader_group_handles_khr(
     group_count                                     u32,
     data_size                                       usize,
     p_data                                          voidptr) Result {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return Result.error_unknown
-    }
-    defer { dl_loader.unregister() }
-    f := VkGetRayTracingCaptureReplayShaderGroupHandlesKHR(dl_loader.get_sym('vkGetRayTracingCaptureReplayShaderGroupHandlesKHR'
+      f := VkGetRayTracingCaptureReplayShaderGroupHandlesKHR((*loader_p).get_sym('vkGetRayTracingCaptureReplayShaderGroupHandlesKHR'
     ) or { 
-        println("Couldn't load sym for 'vkGetRayTracingCaptureReplayShaderGroupHandlesKHR': ${err}")
+        println("Couldn't load symbol for 'vkGetRayTracingCaptureReplayShaderGroupHandlesKHR': ${err}")
         return Result.error_unknown
     })
     return f(
@@ -35240,18 +29321,9 @@ pub fn cmd_trace_rays_indirect_khr(
     p_hit_shader_binding_table                      &StridedDeviceAddressRegionKHR,
     p_callable_shader_binding_table                 &StridedDeviceAddressRegionKHR,
     indirect_device_address                         DeviceAddress)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdTraceRaysIndirectKHR(dl_loader.get_sym('vkCmdTraceRaysIndirectKHR'
+      f := VkCmdTraceRaysIndirectKHR((*loader_p).get_sym('vkCmdTraceRaysIndirectKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdTraceRaysIndirectKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdTraceRaysIndirectKHR': ${err}")
         return 
     })
     f(
@@ -35271,16 +29343,9 @@ pub fn get_ray_tracing_shader_group_stack_size_khr(
     pipeline                                        C.Pipeline,
     group                                           u32,
     group_shader                                    ShaderGroupShaderKHR) DeviceSize {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        panic("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        }
-    defer { dl_loader.unregister() }
-    f := VkGetRayTracingShaderGroupStackSizeKHR(dl_loader.get_sym("vkGetRayTracingShaderGroupStackSizeKHR"
+      f := VkGetRayTracingShaderGroupStackSizeKHR((*loader_p).get_sym("vkGetRayTracingShaderGroupStackSizeKHR"
     ) or { 
-        panic("Couldn't load sym for 'vkGetRayTracingShaderGroupStackSizeKHR': ${err}") })
+        panic("Couldn't load symbol for 'vkGetRayTracingShaderGroupStackSizeKHR': ${err}") })
     return f(
     device,
     pipeline,
@@ -35294,18 +29359,9 @@ type VkCmdSetRayTracingPipelineStackSizeKHR = fn (     C.CommandBuffer,     u32)
 pub fn cmd_set_ray_tracing_pipeline_stack_size_khr(
     command_buffer                                  C.CommandBuffer,
     pipeline_stack_size                             u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdSetRayTracingPipelineStackSizeKHR(dl_loader.get_sym('vkCmdSetRayTracingPipelineStackSizeKHR'
+      f := VkCmdSetRayTracingPipelineStackSizeKHR((*loader_p).get_sym('vkCmdSetRayTracingPipelineStackSizeKHR'
     ) or { 
-        println("Couldn't load sym for 'vkCmdSetRayTracingPipelineStackSizeKHR': ${err}")
+        println("Couldn't load symbol for 'vkCmdSetRayTracingPipelineStackSizeKHR': ${err}")
         return 
     })
     f(
@@ -35395,18 +29451,9 @@ pub fn cmd_draw_mesh_tasks_ext(
     group_count_x                                   u32,
     group_count_y                                   u32,
     group_count_z                                   u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawMeshTasksEXT(dl_loader.get_sym('vkCmdDrawMeshTasksEXT'
+      f := VkCmdDrawMeshTasksEXT((*loader_p).get_sym('vkCmdDrawMeshTasksEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawMeshTasksEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawMeshTasksEXT': ${err}")
         return 
     })
     f(
@@ -35425,18 +29472,9 @@ pub fn cmd_draw_mesh_tasks_indirect_ext(
     offset                                          DeviceSize,
     draw_count                                      u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawMeshTasksIndirectEXT(dl_loader.get_sym('vkCmdDrawMeshTasksIndirectEXT'
+      f := VkCmdDrawMeshTasksIndirectEXT((*loader_p).get_sym('vkCmdDrawMeshTasksIndirectEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawMeshTasksIndirectEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawMeshTasksIndirectEXT': ${err}")
         return 
     })
     f(
@@ -35458,18 +29496,9 @@ pub fn cmd_draw_mesh_tasks_indirect_count_ext(
     count_buffer_offset                             DeviceSize,
     max_draw_count                                  u32,
     stride                                          u32)  {
-    mut dl_loader := loader.get_or_create_dynamic_lib_loader(
-        key: "vulkan"
-        env_path: ""
-        paths: ["libvulkan.so.1", "vulkan-1.dll"]
-    ) or {
-        println("modules/vulkan/vulkan.v: Couldn't get or create dynamic lib loader: ${err}")
-        return
-    }
-    defer { dl_loader.unregister() }
-    f := VkCmdDrawMeshTasksIndirectCountEXT(dl_loader.get_sym('vkCmdDrawMeshTasksIndirectCountEXT'
+      f := VkCmdDrawMeshTasksIndirectCountEXT((*loader_p).get_sym('vkCmdDrawMeshTasksIndirectCountEXT'
     ) or { 
-        println("Couldn't load sym for 'vkCmdDrawMeshTasksIndirectCountEXT': ${err}")
+        println("Couldn't load symbol for 'vkCmdDrawMeshTasksIndirectCountEXT': ${err}")
         return 
     })
     f(

@@ -2,9 +2,12 @@ module main
 
 import vulkan as vk
 
-
 fn main() {
-	// This is vk.C.Instance = voidpointer in vulkan.v and filled in create_instance
+	// Use this to unload the vulkan shared library symbols
+	defer {
+		(*vk.loader_p).unregister()
+	}
+
 	mut instance := unsafe { nil }
 
 	create_info := vk.InstanceCreateInfo{
@@ -17,14 +20,15 @@ fn main() {
 		}
 		pp_enabled_layer_names: ''.str
 		enabled_layer_count: 0
-		enabled_extension_count: 0
 		pp_enabled_extension_names: ''.str
+		enabled_extension_count: 0
 	}
 
-	cur_result := vk.create_instance(&create_info, unsafe { nil }, &instance)
+	result := vk.create_instance(&create_info, unsafe { nil }, &instance)
 
-	if cur_result != vk.Result.success {
-		println("Couldn't create vulkan instance. VkResult: ${cur_result}")
+	if result != vk.Result.success {
+		println("Couldn't create vulkan instance. VkResult: ${result}")
+	} else {
+		println('Created VkInstance ${instance}')
 	}
-	println('Created VkInstance ${instance}')
 }
