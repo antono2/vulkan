@@ -29,6 +29,11 @@ git clone https://github.com/antono2/v_vulkan.git
 cd v_vulkan
 v run .
 ```
+You can use the `VK_INSTANCE_LAYERS` environment variable, e.g. to dump information when running.
+
+Explained [here](https://vulkan.lunarg.com/doc/view/latest/windows/layer_configuration.html) for different operating systems.
+
+`export VK_INSTANCE_LAYERS=VK_LAYER_LUNARG_api_dump:VK_LAYER_KHRONOS_validation`
 
 ## LICENSE
 SPDX-License-Identifier: `LGPL-2.1-only`
