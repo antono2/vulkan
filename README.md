@@ -25,8 +25,8 @@ Make sure to add the path to your `LD_LIBRARY_PATH` environment variable, like
 There is an app `vk_example.v`, which you can run with
 
 ```
-git clone https://github.com/antono2/v_vulkan.git
-cd v_vulkan
+git clone https://github.com/antono2/vulkan.git
+cd vulkan
 v run examples/vk_example.v
 ```
 You can use the `VK_INSTANCE_LAYERS` environment variable, e.g. to dump information when running.
