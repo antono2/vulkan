@@ -93,8 +93,6 @@ Alternatively we can load the function address whenever we first call it. Well, 
 There are some C. functions for GLFW at the bottom of the example. V bindings for GLFW are available, but I prefer to control the global namespace for C. functions, as they might overlap and cause issues later. This will change in future.
 ### Manipulating vulkan.v
 If you need to remove extensions or functions for later versions of vulkan, create your own `vulkan.v` and just pick the things you need. Nothing - except includes ofc. - outside that file is referenced.
-### ALL the headers
-Conditional compilation for code blocks will be added in the future. Vulkan features can then be guarded by compilation flags and unwanted headers will not be included.
 
 ## Pull Request
 There is always stuff to do and help is welcome. The goal is to cover some more vulkan functionality by example. Roughly like [this](https://github.com/SaschaWillems/Vulkan).
