@@ -109,6 +109,6 @@ In that case, please feel free to open an issue or start a discussion.
 
 
 # Thanks
-Big thanks to @spytheman for fixing my bugs in times of need.
+Big thanks to @spytheman for fixing my bugs in times of need.</br>
 To @JalonSolov for quick and solid answers to obscure questions.
 
