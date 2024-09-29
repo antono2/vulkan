@@ -1,45 +1,24 @@
 module vulkan
 
 /*
-** Copyright 2024 antono2@github.com.
+** Creator antono2@github.com.
 **
-** SPDX-License-Identifier: LGPL-2.1-only
+** License: Public Domain
 */
 
 /*
 ** This module is generated from the Khronos Vulkan XML API Registry.
 **
 */
-import dl
-import dl.loader
 
-#flag -I @VMODROOT/include/vk_video
-#include "vulkan_video_codec_h264std.h"
-#include "vulkan_video_codec_h264std_decode.h"
-#include "vulkan_video_codec_h264std_encode.h"
-#include "vulkan_video_codec_h265std.h"
-#include "vulkan_video_codec_h265std_decode.h"
-#include "vulkan_video_codec_h265std_encode.h"
-#include "vulkan_video_codecs_common.h"
-
-@[heap]
-pub const loader_p = loader.get_or_create_dynamic_lib_loader(loader.DynamicLibLoaderConfig{
-	flags: dl.rtld_lazy
-	key: 'vulkan'
-	env_path: '' // LD_LIBRARY_PATH environment variable is searched by default
-	paths: ['libvulkan.so.1', 'vulkan-1.dll']
-}) or { panic("Couldn't create vulkan loader") }
-
-// VK_VERSION_1_0 is a preprocessor guard. Do not pass it to API calls.
-const version_1_0 = 1
+#include "vk_platform.h"
 
 pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 	return variant << 29 | major << 22 | minor << 12 | patch
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 272
-
+pub const header_version = 290
 pub const header_version_complete = make_api_version(0, 1, 3, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -150,8 +129,9 @@ pub enum Result {
 	thread_done_khr                                    = int(1000268001)
 	operation_deferred_khr                             = int(1000268002)
 	operation_not_deferred_khr                         = int(1000268003)
+	error_invalid_video_std_parameters_khr             = int(-1000299000)
 	error_compression_exhausted_ext                    = int(-1000338000)
-	error_incompatible_shader_binary_ext               = int(1000482000)
+	incompatible_shader_binary_ext                     = int(1000482000)
 	result_max_enum                                    = int(0x7FFFFFFF)
 }
 
@@ -424,6 +404,34 @@ pub enum StructureType {
 	structure_type_cu_launch_info_nvx                                                  = int(1000029002)
 	structure_type_image_view_handle_info_nvx                                          = int(1000030000)
 	structure_type_image_view_address_properties_nvx                                   = int(1000030001)
+	structure_type_video_encode_h264_capabilities_khr                                  = int(1000038000)
+	structure_type_video_encode_h264_session_parameters_create_info_khr                = int(1000038001)
+	structure_type_video_encode_h264_session_parameters_add_info_khr                   = int(1000038002)
+	structure_type_video_encode_h264_picture_info_khr                                  = int(1000038003)
+	structure_type_video_encode_h264_dpb_slot_info_khr                                 = int(1000038004)
+	structure_type_video_encode_h264_nalu_slice_info_khr                               = int(1000038005)
+	structure_type_video_encode_h264_gop_remaining_frame_info_khr                      = int(1000038006)
+	structure_type_video_encode_h264_profile_info_khr                                  = int(1000038007)
+	structure_type_video_encode_h264_rate_control_info_khr                             = int(1000038008)
+	structure_type_video_encode_h264_rate_control_layer_info_khr                       = int(1000038009)
+	structure_type_video_encode_h264_session_create_info_khr                           = int(1000038010)
+	structure_type_video_encode_h264_quality_level_properties_khr                      = int(1000038011)
+	structure_type_video_encode_h264_session_parameters_get_info_khr                   = int(1000038012)
+	structure_type_video_encode_h264_session_parameters_feedback_info_khr              = int(1000038013)
+	structure_type_video_encode_h265_capabilities_khr                                  = int(1000039000)
+	structure_type_video_encode_h265_session_parameters_create_info_khr                = int(1000039001)
+	structure_type_video_encode_h265_session_parameters_add_info_khr                   = int(1000039002)
+	structure_type_video_encode_h265_picture_info_khr                                  = int(1000039003)
+	structure_type_video_encode_h265_dpb_slot_info_khr                                 = int(1000039004)
+	structure_type_video_encode_h265_nalu_slice_segment_info_khr                       = int(1000039005)
+	structure_type_video_encode_h265_gop_remaining_frame_info_khr                      = int(1000039006)
+	structure_type_video_encode_h265_profile_info_khr                                  = int(1000039007)
+	structure_type_video_encode_h265_rate_control_info_khr                             = int(1000039009)
+	structure_type_video_encode_h265_rate_control_layer_info_khr                       = int(1000039010)
+	structure_type_video_encode_h265_session_create_info_khr                           = int(1000039011)
+	structure_type_video_encode_h265_quality_level_properties_khr                      = int(1000039012)
+	structure_type_video_encode_h265_session_parameters_get_info_khr                   = int(1000039013)
+	structure_type_video_encode_h265_session_parameters_feedback_info_khr              = int(1000039014)
 	structure_type_video_decode_h264_capabilities_khr                                  = int(1000040000)
 	structure_type_video_decode_h264_picture_info_khr                                  = int(1000040001)
 	structure_type_video_decode_h264_profile_info_khr                                  = int(1000040003)
@@ -585,7 +593,6 @@ pub enum StructureType {
 	structure_type_physical_device_external_memory_host_properties_ext                 = int(1000178002)
 	structure_type_physical_device_shader_clock_features_khr                           = int(1000181000)
 	structure_type_pipeline_compiler_control_create_info_amd                           = int(1000183000)
-	structure_type_calibrated_timestamp_info_ext                                       = int(1000184000)
 	structure_type_physical_device_shader_core_properties_amd                          = int(1000185000)
 	structure_type_video_decode_h265_capabilities_khr                                  = int(1000187000)
 	structure_type_video_decode_h265_session_parameters_create_info_khr                = int(1000187001)
@@ -598,8 +605,6 @@ pub enum StructureType {
 	structure_type_queue_family_global_priority_properties_khr                         = int(1000388001)
 	structure_type_device_memory_overallocation_create_info_amd                        = int(1000189000)
 	structure_type_physical_device_vertex_attribute_divisor_properties_ext             = int(1000190000)
-	structure_type_pipeline_vertex_input_divisor_state_create_info_ext                 = int(1000190001)
-	structure_type_physical_device_vertex_attribute_divisor_features_ext               = int(1000190002)
 	structure_type_present_frame_token_ggp                                             = int(1000191000)
 	structure_type_physical_device_compute_shader_derivatives_features_nv              = int(1000201000)
 	structure_type_physical_device_mesh_shader_features_nv                             = int(1000202000)
@@ -631,7 +636,11 @@ pub enum StructureType {
 	structure_type_physical_device_fragment_shading_rate_khr                           = int(1000226004)
 	structure_type_physical_device_shader_core_properties_2_amd                        = int(1000227000)
 	structure_type_physical_device_coherent_memory_features_amd                        = int(1000229000)
+	structure_type_physical_device_dynamic_rendering_local_read_features_khr           = int(1000232000)
+	structure_type_rendering_attachment_location_info_khr                              = int(1000232001)
+	structure_type_rendering_input_attachment_index_info_khr                           = int(1000232002)
 	structure_type_physical_device_shader_image_atomic_int64_features_ext              = int(1000234000)
+	structure_type_physical_device_shader_quad_control_features_khr                    = int(1000235000)
 	structure_type_physical_device_memory_budget_properties_ext                        = int(1000237000)
 	structure_type_physical_device_memory_priority_features_ext                        = int(1000238000)
 	structure_type_memory_priority_allocate_info_ext                                   = int(1000238001)
@@ -656,11 +665,7 @@ pub enum StructureType {
 	structure_type_surface_capabilities_full_screen_exclusive_ext                      = int(1000255002)
 	structure_type_surface_full_screen_exclusive_win32_info_ext                        = int(1000255001)
 	structure_type_headless_surface_create_info_ext                                    = int(1000256000)
-	structure_type_physical_device_line_rasterization_features_ext                     = int(1000259000)
-	structure_type_pipeline_rasterization_line_state_create_info_ext                   = int(1000259001)
-	structure_type_physical_device_line_rasterization_properties_ext                   = int(1000259002)
 	structure_type_physical_device_shader_atomic_float_features_ext                    = int(1000260000)
-	structure_type_physical_device_index_type_uint8_features_ext                       = int(1000265000)
 	structure_type_physical_device_extended_dynamic_state_features_ext                 = int(1000267000)
 	structure_type_physical_device_pipeline_executable_properties_features_khr         = int(1000269000)
 	structure_type_pipeline_info_khr                                                   = int(1000269001)
@@ -680,6 +685,9 @@ pub enum StructureType {
 	structure_type_host_image_copy_device_performance_query_ext                        = int(1000270009)
 	structure_type_memory_map_info_khr                                                 = int(1000271000)
 	structure_type_memory_unmap_info_khr                                               = int(1000271001)
+	structure_type_physical_device_map_memory_placed_features_ext                      = int(1000272000)
+	structure_type_physical_device_map_memory_placed_properties_ext                    = int(1000272001)
+	structure_type_memory_map_placed_info_ext                                          = int(1000272002)
 	structure_type_physical_device_shader_atomic_float_2_features_ext                  = int(1000273000)
 	structure_type_surface_present_mode_ext                                            = int(1000274000)
 	structure_type_surface_present_scaling_capabilities_ext                            = int(1000274001)
@@ -720,6 +728,17 @@ pub enum StructureType {
 	structure_type_swapchain_present_barrier_create_info_nv                            = int(1000292002)
 	structure_type_present_id_khr                                                      = int(1000294000)
 	structure_type_physical_device_present_id_features_khr                             = int(1000294001)
+	structure_type_video_encode_info_khr                                               = int(1000299000)
+	structure_type_video_encode_rate_control_info_khr                                  = int(1000299001)
+	structure_type_video_encode_rate_control_layer_info_khr                            = int(1000299002)
+	structure_type_video_encode_capabilities_khr                                       = int(1000299003)
+	structure_type_video_encode_usage_info_khr                                         = int(1000299004)
+	structure_type_query_pool_video_encode_feedback_create_info_khr                    = int(1000299005)
+	structure_type_physical_device_video_encode_quality_level_info_khr                 = int(1000299006)
+	structure_type_video_encode_quality_level_properties_khr                           = int(1000299007)
+	structure_type_video_encode_quality_level_info_khr                                 = int(1000299008)
+	structure_type_video_encode_session_parameters_get_info_khr                        = int(1000299009)
+	structure_type_video_encode_session_parameters_feedback_info_khr                   = int(1000299010)
 	structure_type_physical_device_diagnostics_config_features_nv                      = int(1000300000)
 	structure_type_device_diagnostics_config_create_info_nv                            = int(1000300001)
 	structure_type_cuda_module_create_info_nv                                          = int(1000307000)
@@ -852,6 +871,7 @@ pub enum StructureType {
 	structure_type_sampler_border_color_component_mapping_create_info_ext              = int(1000411001)
 	structure_type_physical_device_pageable_device_local_memory_features_ext           = int(1000412000)
 	structure_type_physical_device_shader_core_properties_arm                          = int(1000415000)
+	structure_type_physical_device_shader_subgroup_rotate_features_khr                 = int(1000416000)
 	structure_type_device_queue_shader_core_control_create_info_arm                    = int(1000417000)
 	structure_type_physical_device_scheduling_controls_features_arm                    = int(1000417001)
 	structure_type_physical_device_scheduling_controls_properties_arm                  = int(1000417002)
@@ -878,6 +898,7 @@ pub enum StructureType {
 	structure_type_compute_pipeline_indirect_buffer_info_nv                            = int(1000428001)
 	structure_type_pipeline_indirect_device_address_info_nv                            = int(1000428002)
 	structure_type_physical_device_linear_color_attachment_features_nv                 = int(1000430000)
+	structure_type_physical_device_shader_maximal_reconvergence_features_khr           = int(1000434000)
 	structure_type_physical_device_image_compression_control_swapchain_features_ext    = int(1000437000)
 	structure_type_physical_device_image_processing_features_qcom                      = int(1000440000)
 	structure_type_physical_device_image_processing_properties_qcom                    = int(1000440001)
@@ -933,6 +954,8 @@ pub enum StructureType {
 	structure_type_physical_device_extended_sparse_address_space_properties_nv         = int(1000492001)
 	structure_type_physical_device_mutable_descriptor_type_features_ext                = int(1000351000)
 	structure_type_mutable_descriptor_type_create_info_ext                             = int(1000351002)
+	structure_type_physical_device_legacy_vertex_attributes_features_ext               = int(1000495000)
+	structure_type_physical_device_legacy_vertex_attributes_properties_ext             = int(1000495001)
 	structure_type_layer_settings_create_info_ext                                      = int(1000496000)
 	structure_type_physical_device_shader_core_builtins_features_arm                   = int(1000497000)
 	structure_type_physical_device_shader_core_builtins_properties_arm                 = int(1000497001)
@@ -952,6 +975,14 @@ pub enum StructureType {
 	structure_type_physical_device_cooperative_matrix_properties_khr                   = int(1000506002)
 	structure_type_physical_device_multiview_per_view_render_areas_features_qcom       = int(1000510000)
 	structure_type_multiview_per_view_render_areas_render_pass_begin_info_qcom         = int(1000510001)
+	structure_type_video_decode_av1_capabilities_khr                                   = int(1000512000)
+	structure_type_video_decode_av1_picture_info_khr                                   = int(1000512001)
+	structure_type_video_decode_av1_profile_info_khr                                   = int(1000512003)
+	structure_type_video_decode_av1_session_parameters_create_info_khr                 = int(1000512004)
+	structure_type_video_decode_av1_dpb_slot_info_khr                                  = int(1000512005)
+	structure_type_physical_device_video_maintenance_1_features_khr                    = int(1000515000)
+	structure_type_video_inline_query_info_khr                                         = int(1000515001)
+	structure_type_physical_device_per_stage_descriptor_set_features_nv                = int(1000516000)
 	structure_type_physical_device_image_processing_2_features_qcom                    = int(1000518000)
 	structure_type_physical_device_image_processing_2_properties_qcom                  = int(1000518001)
 	structure_type_sampler_block_match_window_create_info_qcom                         = int(1000518002)
@@ -962,13 +993,45 @@ pub enum StructureType {
 	structure_type_sampler_ycbcr_conversion_ycbcr_degamma_create_info_qcom             = int(1000520001)
 	structure_type_physical_device_cubic_clamp_features_qcom                           = int(1000521000)
 	structure_type_physical_device_attachment_feedback_loop_dynamic_state_features_ext = int(1000524000)
+	structure_type_physical_device_vertex_attribute_divisor_properties_khr             = int(1000525000)
+	structure_type_pipeline_vertex_input_divisor_state_create_info_khr                 = int(1000190001)
+	structure_type_physical_device_vertex_attribute_divisor_features_khr               = int(1000190002)
+	structure_type_physical_device_shader_float_controls_2_features_khr                = int(1000528000)
 	structure_type_screen_buffer_properties_qnx                                        = int(1000529000)
 	structure_type_screen_buffer_format_properties_qnx                                 = int(1000529001)
 	structure_type_import_screen_buffer_info_qnx                                       = int(1000529002)
 	structure_type_external_format_qnx                                                 = int(1000529003)
 	structure_type_physical_device_external_memory_screen_buffer_features_qnx          = int(1000529004)
 	structure_type_physical_device_layered_driver_properties_msft                      = int(1000530000)
+	structure_type_physical_device_index_type_uint8_features_khr                       = int(1000265000)
+	structure_type_physical_device_line_rasterization_features_khr                     = int(1000259000)
+	structure_type_pipeline_rasterization_line_state_create_info_khr                   = int(1000259001)
+	structure_type_physical_device_line_rasterization_properties_khr                   = int(1000259002)
+	structure_type_calibrated_timestamp_info_khr                                       = int(1000184000)
+	structure_type_physical_device_shader_expect_assume_features_khr                   = int(1000544000)
+	structure_type_physical_device_maintenance_6_features_khr                          = int(1000545000)
+	structure_type_physical_device_maintenance_6_properties_khr                        = int(1000545001)
+	structure_type_bind_memory_status_khr                                              = int(1000545002)
+	structure_type_bind_descriptor_sets_info_khr                                       = int(1000545003)
+	structure_type_push_constants_info_khr                                             = int(1000545004)
+	structure_type_push_descriptor_set_info_khr                                        = int(1000545005)
+	structure_type_push_descriptor_set_with_template_info_khr                          = int(1000545006)
+	structure_type_set_descriptor_buffer_offsets_info_ext                              = int(1000545007)
+	structure_type_bind_descriptor_buffer_embedded_samplers_info_ext                   = int(1000545008)
 	structure_type_physical_device_descriptor_pool_overallocation_features_nv          = int(1000546000)
+	structure_type_physical_device_raw_access_chains_features_nv                       = int(1000555000)
+	structure_type_physical_device_shader_relaxed_extended_instruction_features_khr    = int(1000558000)
+	structure_type_physical_device_maintenance_7_features_khr                          = int(1000562000)
+	structure_type_physical_device_maintenance_7_properties_khr                        = int(1000562001)
+	structure_type_physical_device_layered_api_properties_list_khr                     = int(1000562002)
+	structure_type_physical_device_layered_api_properties_khr                          = int(1000562003)
+	structure_type_physical_device_layered_api_vulkan_properties_khr                   = int(1000562004)
+	structure_type_physical_device_shader_atomic_float16_vector_features_nv            = int(1000563000)
+	structure_type_physical_device_shader_replicated_composites_features_ext           = int(1000564000)
+	structure_type_physical_device_ray_tracing_validation_features_nv                  = int(1000568000)
+	structure_type_physical_device_image_alignment_control_features_mesa               = int(1000575000)
+	structure_type_physical_device_image_alignment_control_properties_mesa             = int(1000575001)
+	structure_type_image_alignment_control_create_info_mesa                            = int(1000575002)
 	structure_type_max_enum                                                            = int(0x7FFFFFFF)
 }
 
@@ -1002,6 +1065,10 @@ pub enum ImageLayout {
 	image_layout_shared_present_khr                           = int(1000111000)
 	image_layout_fragment_density_map_optimal_ext             = int(1000218000)
 	image_layout_fragment_shading_rate_attachment_optimal_khr = int(1000164003)
+	image_layout_rendering_local_read_khr                     = int(1000232000)
+	image_layout_video_encode_dst_khr                         = int(1000299000)
+	image_layout_video_encode_src_khr                         = int(1000299001)
+	image_layout_video_encode_dpb_khr                         = int(1000299002)
 	image_layout_attachment_feedback_loop_optimal_ext         = int(1000339000)
 	image_layout_max_enum                                     = int(0x7FFFFFFF)
 }
@@ -1062,6 +1129,7 @@ pub enum ObjectType {
 }
 
 pub enum VendorId {
+	vendor_id_khronos  = int(0x10000)
 	vendor_id_viv      = int(0x10001)
 	vendor_id_vsi      = int(0x10002)
 	vendor_id_kazan    = int(0x10003)
@@ -1334,7 +1402,7 @@ pub enum Format {
 	format_pvrtc1_4bpp_srgb_block_img                 = int(1000054005)
 	format_pvrtc2_2bpp_srgb_block_img                 = int(1000054006)
 	format_pvrtc2_4bpp_srgb_block_img                 = int(1000054007)
-	format_r16g16_s10_5_nv                            = int(1000464000)
+	format_r16g16_sfixed5_nv                          = int(1000464000)
 	format_a1b5g5r5_unorm_pack16_khr                  = int(1000470000)
 	format_a8_unorm_khr                               = int(1000470001)
 	format_max_enum                                   = int(0x7FFFFFFF)
@@ -1374,6 +1442,7 @@ pub enum QueryType {
 	query_type_acceleration_structure_serialization_size_khr                  = int(1000150001)
 	query_type_acceleration_structure_compacted_size_nv                       = int(1000165000)
 	query_type_performance_query_intel                                        = int(1000210000)
+	query_type_video_encode_feedback_khr                                      = int(1000299000)
 	query_type_mesh_primitives_generated_ext                                  = int(1000328000)
 	query_type_primitives_generated_ext                                       = int(1000382000)
 	query_type_acceleration_structure_serialization_bottom_level_pointers_khr = int(1000386000)
@@ -1537,12 +1606,10 @@ pub enum DynamicState {
 	dynamic_state_exclusive_scissor_enable_nv             = int(1000205000)
 	dynamic_state_exclusive_scissor_nv                    = int(1000205001)
 	dynamic_state_fragment_shading_rate_khr               = int(1000226000)
-	dynamic_state_line_stipple_ext                        = int(1000259000)
 	dynamic_state_vertex_input_ext                        = int(1000352000)
 	dynamic_state_patch_control_points_ext                = int(1000377000)
 	dynamic_state_logic_op_ext                            = int(1000377003)
 	dynamic_state_color_write_enable_ext                  = int(1000381000)
-	dynamic_state_tessellation_domain_origin_ext          = int(1000455002)
 	dynamic_state_depth_clamp_enable_ext                  = int(1000455003)
 	dynamic_state_polygon_mode_ext                        = int(1000455004)
 	dynamic_state_rasterization_samples_ext               = int(1000455005)
@@ -1553,6 +1620,7 @@ pub enum DynamicState {
 	dynamic_state_color_blend_enable_ext                  = int(1000455010)
 	dynamic_state_color_blend_equation_ext                = int(1000455011)
 	dynamic_state_color_write_mask_ext                    = int(1000455012)
+	dynamic_state_tessellation_domain_origin_ext          = int(1000455002)
 	dynamic_state_rasterization_stream_ext                = int(1000455013)
 	dynamic_state_conservative_rasterization_mode_ext     = int(1000455014)
 	dynamic_state_extra_primitive_overestimation_size_ext = int(1000455015)
@@ -1574,6 +1642,7 @@ pub enum DynamicState {
 	dynamic_state_representative_fragment_test_enable_nv  = int(1000455031)
 	dynamic_state_coverage_reduction_mode_nv              = int(1000455032)
 	dynamic_state_attachment_feedback_loop_enable_ext     = int(1000524000)
+	dynamic_state_line_stipple_khr                        = int(1000259000)
 	dynamic_state_max_enum                                = int(0x7FFFFFFF)
 }
 
@@ -1703,7 +1772,7 @@ pub enum AttachmentLoadOp {
 	attachment_load_op_load      = int(0)
 	attachment_load_op_clear     = int(1)
 	attachment_load_op_dont_care = int(2)
-	attachment_load_op_none_ext  = int(1000400000)
+	attachment_load_op_none_khr  = int(1000400000)
 	attachment_load_op_max_enum  = int(0x7FFFFFFF)
 }
 
@@ -1732,14 +1801,14 @@ pub enum IndexType {
 	index_type_uint16    = int(0)
 	index_type_uint32    = int(1)
 	index_type_none_khr  = int(1000165000)
-	index_type_uint8_ext = int(1000265000)
+	index_type_uint8_khr = int(1000265000)
 	index_type_max_enum  = int(0x7FFFFFFF)
 }
 
 pub enum SubpassContents {
 	subpass_contents_inline                                   = int(0)
 	subpass_contents_secondary_command_buffers                = int(1)
-	subpass_contents_inline_and_secondary_command_buffers_ext = int(1000451000)
+	subpass_contents_inline_and_secondary_command_buffers_khr = int(1000451000)
 	subpass_contents_max_enum                                 = int(0x7FFFFFFF)
 }
 
@@ -1826,6 +1895,8 @@ pub enum FormatFeatureFlagBits {
 	format_feature_sampled_image_filter_cubic_bit_ext                                          = int(0x00002000)
 	format_feature_fragment_density_map_bit_ext                                                = int(0x01000000)
 	format_feature_fragment_shading_rate_attachment_bit_khr                                    = int(0x40000000)
+	format_feature_video_encode_input_bit_khr                                                  = int(0x08000000)
+	format_feature_video_encode_dpb_bit_khr                                                    = int(0x10000000)
 	format_feature_flag_bits_max_enum                                                          = int(0x7FFFFFFF)
 }
 
@@ -1851,6 +1922,7 @@ pub enum ImageCreateFlagBits {
 	image_create_multisampled_render_to_single_sampled_bit_ext = int(0x00040000)
 	image_create_2d_view_compatible_bit_ext                    = int(0x00020000)
 	image_create_fragment_density_map_offset_bit_qcom          = int(0x00008000)
+	image_create_video_profile_independent_bit_khr             = int(0x00100000)
 	image_create_flag_bits_max_enum                            = int(0x7FFFFFFF)
 }
 
@@ -1884,6 +1956,9 @@ pub enum ImageUsageFlagBits {
 	image_usage_fragment_density_map_bit_ext             = int(0x00000200)
 	image_usage_fragment_shading_rate_attachment_bit_khr = int(0x00000100)
 	image_usage_host_transfer_bit_ext                    = int(0x00400000)
+	image_usage_video_encode_dst_bit_khr                 = int(0x00002000)
+	image_usage_video_encode_src_bit_khr                 = int(0x00004000)
+	image_usage_video_encode_dpb_bit_khr                 = int(0x00008000)
 	image_usage_attachment_feedback_loop_bit_ext         = int(0x00080000)
 	image_usage_invocation_mask_bit_huawei               = int(0x00040000)
 	image_usage_sample_weight_bit_qcom                   = int(0x00100000)
@@ -1930,6 +2005,7 @@ pub enum QueueFlagBits {
 	queue_sparse_binding_bit   = int(0x00000008)
 	queue_protected_bit        = int(0x00000010)
 	queue_video_decode_bit_khr = int(0x00000020)
+	queue_video_encode_bit_khr = int(0x00000040)
 	queue_optical_flow_bit_nv  = int(0x00000100)
 	queue_flag_bits_max_enum   = int(0x7FFFFFFF)
 }
@@ -1976,6 +2052,12 @@ pub enum PipelineStageFlagBits {
 }
 
 pub type PipelineStageFlags = u32
+
+pub enum MemoryMapFlagBits {
+	memory_map_placed_bit_ext     = int(0x00000001)
+	memory_map_flag_bits_max_enum = int(0x7FFFFFFF)
+}
+
 pub type MemoryMapFlags = u32
 
 pub enum SparseMemoryBindFlagBits {
@@ -2048,6 +2130,7 @@ pub enum BufferCreateFlagBits {
 	buffer_create_protected_bit                            = int(0x00000008)
 	buffer_create_device_address_capture_replay_bit        = int(0x00000010)
 	buffer_create_descriptor_buffer_capture_replay_bit_ext = int(0x00000020)
+	buffer_create_video_profile_independent_bit_khr        = int(0x00000040)
 	buffer_create_flag_bits_max_enum                       = int(0x7FFFFFFF)
 }
 
@@ -2072,6 +2155,8 @@ pub enum BufferUsageFlagBits {
 	buffer_usage_acceleration_structure_build_input_read_only_bit_khr = int(0x00080000)
 	buffer_usage_acceleration_structure_storage_bit_khr               = int(0x00100000)
 	buffer_usage_shader_binding_table_bit_khr                         = int(0x00000400)
+	buffer_usage_video_encode_dst_bit_khr                             = int(0x00008000)
+	buffer_usage_video_encode_src_bit_khr                             = int(0x00010000)
 	buffer_usage_sampler_descriptor_buffer_bit_ext                    = int(0x00200000)
 	buffer_usage_resource_descriptor_buffer_bit_ext                   = int(0x00400000)
 	buffer_usage_push_descriptors_descriptor_buffer_bit_ext           = int(0x04000000)
@@ -2246,6 +2331,7 @@ pub enum DescriptorSetLayoutCreateFlagBits {
 	descriptor_set_layout_create_embedded_immutable_samplers_bit_ext = int(0x00000020)
 	descriptor_set_layout_create_indirect_bindable_bit_nv            = int(0x00000080)
 	descriptor_set_layout_create_host_only_pool_bit_ext              = int(0x00000004)
+	descriptor_set_layout_create_per_stage_bit_nv                    = int(0x00000040)
 	descriptor_set_layout_create_flag_bits_max_enum                  = int(0x7FFFFFFF)
 }
 
@@ -2345,51 +2431,51 @@ pub enum StencilFaceFlagBits {
 pub type StencilFaceFlags = u32
 
 pub struct Extent2D {
-mut:
+pub mut:
 	width  u32
 	height u32
 }
 
 pub struct Extent3D {
-mut:
+pub mut:
 	width  u32
 	height u32
 	depth  u32
 }
 
 pub struct Offset2D {
-mut:
+pub mut:
 	x i32
 	y i32
 }
 
 pub struct Offset3D {
-mut:
+pub mut:
 	x i32
 	y i32
 	z i32
 }
 
 pub struct Rect2D {
-mut:
+pub mut:
 	offset Offset2D
 	extent Extent2D
 }
 
 pub struct BaseInStructure {
-mut:
+pub mut:
 	s_type StructureType
 	p_next &BaseInStructure
 }
 
 pub struct BaseOutStructure {
-mut:
+pub mut:
 	s_type StructureType
 	p_next &BaseOutStructure
 }
 
 pub struct BufferMemoryBarrier {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	src_access_mask        AccessFlags
@@ -2402,14 +2488,14 @@ mut:
 }
 
 pub struct DispatchIndirectCommand {
-mut:
+pub mut:
 	x u32
 	y u32
 	z u32
 }
 
 pub struct DrawIndexedIndirectCommand {
-mut:
+pub mut:
 	index_count    u32
 	instance_count u32
 	first_index    u32
@@ -2418,7 +2504,7 @@ mut:
 }
 
 pub struct DrawIndirectCommand {
-mut:
+pub mut:
 	vertex_count   u32
 	instance_count u32
 	first_vertex   u32
@@ -2426,7 +2512,7 @@ mut:
 }
 
 pub struct ImageSubresourceRange {
-mut:
+pub mut:
 	aspect_mask      ImageAspectFlags
 	base_mip_level   u32
 	level_count      u32
@@ -2435,7 +2521,7 @@ mut:
 }
 
 pub struct ImageMemoryBarrier {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	src_access_mask        AccessFlags
@@ -2449,7 +2535,7 @@ mut:
 }
 
 pub struct MemoryBarrier {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	src_access_mask AccessFlags
@@ -2457,38 +2543,38 @@ mut:
 }
 
 pub struct PipelineCacheHeaderVersionOne {
-mut:
+pub mut:
 	header_size         u32
 	header_version      PipelineCacheHeaderVersion
 	vendor_id           u32
 	device_id           u32
-	pipeline_cache_uuid []u8
+	pipeline_cache_uuid [uuid_size]u8
 }
 
-pub type PFN_vkAllocationFunction = fn (pUserData voidptr, size usize, alignment usize, allocationScope SystemAllocationScope) voidptr
+pub type PFN_vkAllocationFunction = fn (pUserData voidptr, size usize, alignment usize, allocationScope SystemAllocationScope)
 
-pub type PFN_vkFreeFunction = fn (pUserData voidptr, pMemory voidptr) voidptr
+pub type PFN_vkFreeFunction = fn (pUserData voidptr, pMemory voidptr)
 
-pub type PFN_vkInternalAllocationNotification = fn (pUserData voidptr, size usize, allocationType InternalAllocationType, allocationScope SystemAllocationScope) voidptr
+pub type PFN_vkInternalAllocationNotification = fn (pUserData voidptr, size usize, allocationType InternalAllocationType, allocationScope SystemAllocationScope)
 
-pub type PFN_vkInternalFreeNotification = fn (pUserData voidptr, size usize, allocationType InternalAllocationType, allocationScope SystemAllocationScope) voidptr
+pub type PFN_vkInternalFreeNotification = fn (pUserData voidptr, size usize, allocationType InternalAllocationType, allocationScope SystemAllocationScope)
 
-pub type PFN_vkReallocationFunction = fn (pUserData voidptr, pOriginal voidptr, size usize, alignment usize, allocationScope SystemAllocationScope) voidptr
+pub type PFN_vkReallocationFunction = fn (pUserData voidptr, pOriginal voidptr, size usize, alignment usize, allocationScope SystemAllocationScope)
 
 pub type PFN_vkVoidFunction = fn ()
 
 pub struct AllocationCallbacks {
-mut:
+pub mut:
 	p_user_data             voidptr
-	pfn_allocation          PFN_vkAllocationFunction   = unsafe { nil }
-	pfn_reallocation        PFN_vkReallocationFunction = unsafe { nil }
-	pfn_free                PFN_vkFreeFunction = unsafe { nil }
+	pfn_allocation          PFN_vkAllocationFunction             = unsafe { nil }
+	pfn_reallocation        PFN_vkReallocationFunction           = unsafe { nil }
+	pfn_free                PFN_vkFreeFunction                   = unsafe { nil }
 	pfn_internal_allocation PFN_vkInternalAllocationNotification = unsafe { nil }
 	pfn_internal_free       PFN_vkInternalFreeNotification       = unsafe { nil }
 }
 
 pub struct ApplicationInfo {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	p_application_name  &char
@@ -2499,14 +2585,14 @@ mut:
 }
 
 pub struct FormatProperties {
-mut:
+pub mut:
 	linear_tiling_features  FormatFeatureFlags
 	optimal_tiling_features FormatFeatureFlags
 	buffer_features         FormatFeatureFlags
 }
 
 pub struct ImageFormatProperties {
-mut:
+pub mut:
 	max_extent        Extent3D
 	max_mip_levels    u32
 	max_array_layers  u32
@@ -2515,31 +2601,31 @@ mut:
 }
 
 pub struct InstanceCreateInfo {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	flags                      InstanceCreateFlags
 	p_application_info         &ApplicationInfo
 	enabled_layer_count        u32
-	pp_enabled_layer_names     &char
+	pp_enabled_layer_names     &&char
 	enabled_extension_count    u32
-	pp_enabled_extension_names &char
+	pp_enabled_extension_names &&char
 }
 
 pub struct MemoryHeap {
-mut:
+pub mut:
 	size  DeviceSize
 	flags MemoryHeapFlags
 }
 
 pub struct MemoryType {
-mut:
+pub mut:
 	property_flags MemoryPropertyFlags
 	heap_index     u32
 }
 
 pub struct PhysicalDeviceFeatures {
-mut:
+pub mut:
 	robust_buffer_access                         Bool32
 	full_draw_index_uint32                       Bool32
 	image_cube_array                             Bool32
@@ -2598,7 +2684,7 @@ mut:
 }
 
 pub struct PhysicalDeviceLimits {
-mut:
+pub mut:
 	max_image_dimension1_d                                u32
 	max_image_dimension2_d                                u32
 	max_image_dimension3_d                                u32
@@ -2651,9 +2737,9 @@ mut:
 	max_fragment_dual_src_attachments                     u32
 	max_fragment_combined_output_resources                u32
 	max_compute_shared_memory_size                        u32
-	max_compute_work_group_count                          []u32
+	max_compute_work_group_count                          [3]u32
 	max_compute_work_group_invocations                    u32
-	max_compute_work_group_size                           []u32
+	max_compute_work_group_size                           [3]u32
 	sub_pixel_precision_bits                              u32
 	sub_texel_precision_bits                              u32
 	mipmap_precision_bits                                 u32
@@ -2662,8 +2748,8 @@ mut:
 	max_sampler_lod_bias                                  f32
 	max_sampler_anisotropy                                f32
 	max_viewports                                         u32
-	max_viewport_dimensions                               []u32
-	viewport_bounds_range                                 []f32
+	max_viewport_dimensions                               [2]u32
+	viewport_bounds_range                                 [2]f32
 	viewport_sub_pixel_bits                               u32
 	min_memory_map_alignment                              usize
 	min_texel_buffer_offset_alignment                     DeviceSize
@@ -2696,8 +2782,8 @@ mut:
 	max_cull_distances                                    u32
 	max_combined_clip_and_cull_distances                  u32
 	discrete_queue_priorities                             u32
-	point_size_range                                      []f32
-	line_width_range                                      []f32
+	point_size_range                                      [2]f32
+	line_width_range                                      [2]f32
 	point_size_granularity                                f32
 	line_width_granularity                                f32
 	strict_lines                                          Bool32
@@ -2708,15 +2794,15 @@ mut:
 }
 
 pub struct PhysicalDeviceMemoryProperties {
-mut:
+pub mut:
 	memory_type_count u32
-	memory_types      []MemoryType
+	memory_types      [max_memory_types]MemoryType
 	memory_heap_count u32
-	memory_heaps      []MemoryHeap
+	memory_heaps      [max_memory_heaps]MemoryHeap
 }
 
 pub struct PhysicalDeviceSparseProperties {
-mut:
+pub mut:
 	residency_standard2_d_block_shape             Bool32
 	residency_standard2_d_multisample_block_shape Bool32
 	residency_standard3_d_block_shape             Bool32
@@ -2725,20 +2811,20 @@ mut:
 }
 
 pub struct PhysicalDeviceProperties {
-mut:
+pub mut:
 	api_version         u32
 	driver_version      u32
 	vendor_id           u32
 	device_id           u32
 	device_type         PhysicalDeviceType
-	device_name         []char
-	pipeline_cache_uuid []u8
+	device_name         [max_physical_device_name_size]char
+	pipeline_cache_uuid [uuid_size]u8
 	limits              PhysicalDeviceLimits
 	sparse_properties   PhysicalDeviceSparseProperties
 }
 
 pub struct QueueFamilyProperties {
-mut:
+pub mut:
 	queue_flags                    QueueFlags
 	queue_count                    u32
 	timestamp_valid_bits           u32
@@ -2746,7 +2832,7 @@ mut:
 }
 
 pub struct DeviceQueueCreateInfo {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	flags              DeviceQueueCreateFlags
@@ -2756,35 +2842,37 @@ mut:
 }
 
 pub struct DeviceCreateInfo {
-mut:
-	s_type                     StructureType
-	p_next                     voidptr
-	flags                      DeviceCreateFlags
-	queue_create_info_count    u32
-	p_queue_create_infos       &DeviceQueueCreateInfo
-	enabled_layer_count        u32
-	pp_enabled_layer_names     &char
+pub mut:
+	s_type                  StructureType
+	p_next                  voidptr
+	flags                   DeviceCreateFlags
+	queue_create_info_count u32
+	p_queue_create_infos    &DeviceQueueCreateInfo
+	// enabledLayerCount is deprecated and should not be used
+	enabled_layer_count u32
+	// ppEnabledLayerNames is deprecated and should not be used
+	pp_enabled_layer_names     &&char
 	enabled_extension_count    u32
-	pp_enabled_extension_names &char
+	pp_enabled_extension_names &&char
 	p_enabled_features         &PhysicalDeviceFeatures
 }
 
 pub struct ExtensionProperties {
-mut:
-	extension_name []char
+pub mut:
+	extension_name [max_extension_name_size]char
 	spec_version   u32
 }
 
 pub struct LayerProperties {
-mut:
-	layer_name             []char
+pub mut:
+	layer_name             [max_extension_name_size]char
 	spec_version           u32
 	implementation_version u32
-	description            []char
+	description            [max_description_size]char
 }
 
 pub struct SubmitInfo {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	wait_semaphore_count   u32
@@ -2797,7 +2885,7 @@ mut:
 }
 
 pub struct MappedMemoryRange {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	memory C.DeviceMemory
@@ -2806,7 +2894,7 @@ mut:
 }
 
 pub struct MemoryAllocateInfo {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	allocation_size   DeviceSize
@@ -2814,14 +2902,14 @@ mut:
 }
 
 pub struct MemoryRequirements {
-mut:
+pub mut:
 	size             DeviceSize
 	alignment        DeviceSize
 	memory_type_bits u32
 }
 
 pub struct SparseMemoryBind {
-mut:
+pub mut:
 	resource_offset DeviceSize
 	size            DeviceSize
 	memory          C.DeviceMemory
@@ -2830,28 +2918,28 @@ mut:
 }
 
 pub struct SparseBufferMemoryBindInfo {
-mut:
+pub mut:
 	buffer     C.Buffer
 	bind_count u32
 	p_binds    &SparseMemoryBind
 }
 
 pub struct SparseImageOpaqueMemoryBindInfo {
-mut:
+pub mut:
 	image      C.Image
 	bind_count u32
 	p_binds    &SparseMemoryBind
 }
 
 pub struct ImageSubresource {
-mut:
+pub mut:
 	aspect_mask ImageAspectFlags
 	mip_level   u32
 	array_layer u32
 }
 
 pub struct SparseImageMemoryBind {
-mut:
+pub mut:
 	subresource   ImageSubresource
 	offset        Offset3D
 	extent        Extent3D
@@ -2861,14 +2949,14 @@ mut:
 }
 
 pub struct SparseImageMemoryBindInfo {
-mut:
+pub mut:
 	image      C.Image
 	bind_count u32
 	p_binds    &SparseImageMemoryBind
 }
 
 pub struct BindSparseInfo {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	wait_semaphore_count    u32
@@ -2884,14 +2972,14 @@ mut:
 }
 
 pub struct SparseImageFormatProperties {
-mut:
+pub mut:
 	aspect_mask       ImageAspectFlags
 	image_granularity Extent3D
 	flags             SparseImageFormatFlags
 }
 
 pub struct SparseImageMemoryRequirements {
-mut:
+pub mut:
 	format_properties        SparseImageFormatProperties
 	image_mip_tail_first_lod u32
 	image_mip_tail_size      DeviceSize
@@ -2900,28 +2988,28 @@ mut:
 }
 
 pub struct FenceCreateInfo {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  FenceCreateFlags
 }
 
 pub struct SemaphoreCreateInfo {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  SemaphoreCreateFlags
 }
 
 pub struct EventCreateInfo {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  EventCreateFlags
 }
 
 pub struct QueryPoolCreateInfo {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	flags               QueryPoolCreateFlags
@@ -2931,7 +3019,7 @@ mut:
 }
 
 pub struct BufferCreateInfo {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	flags                    BufferCreateFlags
@@ -2943,7 +3031,7 @@ mut:
 }
 
 pub struct BufferViewCreateInfo {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  BufferViewCreateFlags
@@ -2954,7 +3042,7 @@ mut:
 }
 
 pub struct ImageCreateInfo {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	flags                    ImageCreateFlags
@@ -2973,7 +3061,7 @@ mut:
 }
 
 pub struct SubresourceLayout {
-mut:
+pub mut:
 	offset      DeviceSize
 	size        DeviceSize
 	row_pitch   DeviceSize
@@ -2982,7 +3070,7 @@ mut:
 }
 
 pub struct ComponentMapping {
-mut:
+pub mut:
 	r ComponentSwizzle
 	g ComponentSwizzle
 	b ComponentSwizzle
@@ -2990,7 +3078,7 @@ mut:
 }
 
 pub struct ImageViewCreateInfo {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	flags             ImageViewCreateFlags
@@ -3001,9 +3089,8 @@ mut:
 	subresource_range ImageSubresourceRange
 }
 
-// ShaderModuleCreateInfo extends VkPipelineShaderStageCreateInfo
 pub struct ShaderModuleCreateInfo {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	flags     ShaderModuleCreateFlags
@@ -3012,7 +3099,7 @@ mut:
 }
 
 pub struct PipelineCacheCreateInfo {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	flags             PipelineCacheCreateFlags
@@ -3021,14 +3108,14 @@ mut:
 }
 
 pub struct SpecializationMapEntry {
-mut:
+pub mut:
 	constant_id u32
 	offset      u32
 	size        usize
 }
 
 pub struct SpecializationInfo {
-mut:
+pub mut:
 	map_entry_count u32
 	p_map_entries   &SpecializationMapEntry
 	data_size       usize
@@ -3036,7 +3123,7 @@ mut:
 }
 
 pub struct PipelineShaderStageCreateInfo {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	flags                 PipelineShaderStageCreateFlags
@@ -3047,7 +3134,7 @@ mut:
 }
 
 pub struct ComputePipelineCreateInfo {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	flags                PipelineCreateFlags
@@ -3058,14 +3145,14 @@ mut:
 }
 
 pub struct VertexInputBindingDescription {
-mut:
+pub mut:
 	binding    u32
 	stride     u32
 	input_rate VertexInputRate
 }
 
 pub struct VertexInputAttributeDescription {
-mut:
+pub mut:
 	location u32
 	binding  u32
 	format   Format
@@ -3073,7 +3160,7 @@ mut:
 }
 
 pub struct PipelineVertexInputStateCreateInfo {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	flags                              PipelineVertexInputStateCreateFlags
@@ -3084,7 +3171,7 @@ mut:
 }
 
 pub struct PipelineInputAssemblyStateCreateInfo {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	flags                    PipelineInputAssemblyStateCreateFlags
@@ -3093,7 +3180,7 @@ mut:
 }
 
 pub struct PipelineTessellationStateCreateInfo {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	flags                PipelineTessellationStateCreateFlags
@@ -3101,7 +3188,7 @@ mut:
 }
 
 pub struct Viewport {
-mut:
+pub mut:
 	x         f32
 	y         f32
 	width     f32
@@ -3111,7 +3198,7 @@ mut:
 }
 
 pub struct PipelineViewportStateCreateInfo {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	flags          PipelineViewportStateCreateFlags
@@ -3122,7 +3209,7 @@ mut:
 }
 
 pub struct PipelineRasterizationStateCreateInfo {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	flags                      PipelineRasterizationStateCreateFlags
@@ -3139,7 +3226,7 @@ mut:
 }
 
 pub struct PipelineMultisampleStateCreateInfo {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	flags                    PipelineMultisampleStateCreateFlags
@@ -3152,7 +3239,7 @@ mut:
 }
 
 pub struct StencilOpState {
-mut:
+pub mut:
 	fail_op       StencilOp
 	pass_op       StencilOp
 	depth_fail_op StencilOp
@@ -3163,7 +3250,7 @@ mut:
 }
 
 pub struct PipelineDepthStencilStateCreateInfo {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	flags                    PipelineDepthStencilStateCreateFlags
@@ -3179,7 +3266,7 @@ mut:
 }
 
 pub struct PipelineColorBlendAttachmentState {
-mut:
+pub mut:
 	blend_enable           Bool32
 	src_color_blend_factor BlendFactor
 	dst_color_blend_factor BlendFactor
@@ -3191,7 +3278,7 @@ mut:
 }
 
 pub struct PipelineColorBlendStateCreateInfo {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	flags            PipelineColorBlendStateCreateFlags
@@ -3199,11 +3286,11 @@ mut:
 	logic_op         LogicOp
 	attachment_count u32
 	p_attachments    &PipelineColorBlendAttachmentState
-	blend_constants  []f32
+	blend_constants  [4]f32
 }
 
 pub struct PipelineDynamicStateCreateInfo {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	flags               PipelineDynamicStateCreateFlags
@@ -3212,7 +3299,7 @@ mut:
 }
 
 pub struct GraphicsPipelineCreateInfo {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	flags                  PipelineCreateFlags
@@ -3235,14 +3322,14 @@ mut:
 }
 
 pub struct PushConstantRange {
-mut:
+pub mut:
 	stage_flags ShaderStageFlags
 	offset      u32
 	size        u32
 }
 
 pub struct PipelineLayoutCreateInfo {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	flags                     PipelineLayoutCreateFlags
@@ -3253,7 +3340,7 @@ mut:
 }
 
 pub struct SamplerCreateInfo {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	flags                    SamplerCreateFlags
@@ -3275,7 +3362,7 @@ mut:
 }
 
 pub struct CopyDescriptorSet {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	src_set           C.DescriptorSet
@@ -3288,27 +3375,27 @@ mut:
 }
 
 pub struct DescriptorBufferInfo {
-mut:
+pub mut:
 	buffer C.Buffer
 	offset DeviceSize
 	range  DeviceSize
 }
 
 pub struct DescriptorImageInfo {
-mut:
+pub mut:
 	sampler      C.Sampler
 	image_view   C.ImageView
 	image_layout ImageLayout
 }
 
 pub struct DescriptorPoolSize {
-mut:
+pub mut:
 	vktype           DescriptorType
 	descriptor_count u32
 }
 
 pub struct DescriptorPoolCreateInfo {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	flags           DescriptorPoolCreateFlags
@@ -3318,7 +3405,7 @@ mut:
 }
 
 pub struct DescriptorSetAllocateInfo {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	descriptor_pool      C.DescriptorPool
@@ -3327,7 +3414,7 @@ mut:
 }
 
 pub struct DescriptorSetLayoutBinding {
-mut:
+pub mut:
 	binding              u32
 	descriptor_type      DescriptorType
 	descriptor_count     u32
@@ -3336,7 +3423,7 @@ mut:
 }
 
 pub struct DescriptorSetLayoutCreateInfo {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	flags         DescriptorSetLayoutCreateFlags
@@ -3345,7 +3432,7 @@ mut:
 }
 
 pub struct WriteDescriptorSet {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	dst_set             C.DescriptorSet
@@ -3359,7 +3446,7 @@ mut:
 }
 
 pub struct AttachmentDescription {
-mut:
+pub mut:
 	flags            AttachmentDescriptionFlags
 	format           Format
 	samples          SampleCountFlagBits
@@ -3372,13 +3459,13 @@ mut:
 }
 
 pub struct AttachmentReference {
-mut:
+pub mut:
 	attachment u32
 	layout     ImageLayout
 }
 
 pub struct FramebufferCreateInfo {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	flags            FramebufferCreateFlags
@@ -3391,7 +3478,7 @@ mut:
 }
 
 pub struct SubpassDescription {
-mut:
+pub mut:
 	flags                      SubpassDescriptionFlags
 	pipeline_bind_point        PipelineBindPoint
 	input_attachment_count     u32
@@ -3405,7 +3492,7 @@ mut:
 }
 
 pub struct SubpassDependency {
-mut:
+pub mut:
 	src_subpass      u32
 	dst_subpass      u32
 	src_stage_mask   PipelineStageFlags
@@ -3416,7 +3503,7 @@ mut:
 }
 
 pub struct RenderPassCreateInfo {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	flags            RenderPassCreateFlags
@@ -3429,7 +3516,7 @@ mut:
 }
 
 pub struct CommandPoolCreateInfo {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	flags              CommandPoolCreateFlags
@@ -3437,7 +3524,7 @@ mut:
 }
 
 pub struct CommandBufferAllocateInfo {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	command_pool         C.CommandPool
@@ -3446,7 +3533,7 @@ mut:
 }
 
 pub struct CommandBufferInheritanceInfo {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	render_pass            C.RenderPass
@@ -3458,7 +3545,7 @@ mut:
 }
 
 pub struct CommandBufferBeginInfo {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	flags              CommandBufferUsageFlags
@@ -3466,14 +3553,14 @@ mut:
 }
 
 pub struct BufferCopy {
-mut:
+pub mut:
 	src_offset DeviceSize
 	dst_offset DeviceSize
 	size       DeviceSize
 }
 
 pub struct ImageSubresourceLayers {
-mut:
+pub mut:
 	aspect_mask      ImageAspectFlags
 	mip_level        u32
 	base_array_layer u32
@@ -3481,7 +3568,7 @@ mut:
 }
 
 pub struct BufferImageCopy {
-mut:
+pub mut:
 	buffer_offset       DeviceSize
 	buffer_row_length   u32
 	buffer_image_height u32
@@ -3491,48 +3578,48 @@ mut:
 }
 
 pub union ClearColorValue {
-mut:
-	float32 []f32
-	int32   []i32
-	uint32  []u32
+pub mut:
+	float32 [4]f32
+	int32   [4]i32
+	uint32  [4]u32
 }
 
 pub struct ClearDepthStencilValue {
-mut:
+pub mut:
 	depth   f32
 	stencil u32
 }
 
 pub union ClearValue {
-mut:
+pub mut:
 	color         ClearColorValue
 	depth_stencil ClearDepthStencilValue
 }
 
 pub struct ClearAttachment {
-mut:
+pub mut:
 	aspect_mask      ImageAspectFlags
 	color_attachment u32
 	clear_value      ClearValue
 }
 
 pub struct ClearRect {
-mut:
+pub mut:
 	rect             Rect2D
 	base_array_layer u32
 	layer_count      u32
 }
 
 pub struct ImageBlit {
-mut:
+pub mut:
 	src_subresource ImageSubresourceLayers
-	src_offsets     []Offset3D
+	src_offsets     [2]Offset3D
 	dst_subresource ImageSubresourceLayers
-	dst_offsets     []Offset3D
+	dst_offsets     [2]Offset3D
 }
 
 pub struct ImageCopy {
-mut:
+pub mut:
 	src_subresource ImageSubresourceLayers
 	src_offset      Offset3D
 	dst_subresource ImageSubresourceLayers
@@ -3541,7 +3628,7 @@ mut:
 }
 
 pub struct ImageResolve {
-mut:
+pub mut:
 	src_subresource ImageSubresourceLayers
 	src_offset      Offset3D
 	dst_subresource ImageSubresourceLayers
@@ -3550,7 +3637,7 @@ mut:
 }
 
 pub struct RenderPassBeginInfo {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	render_pass       C.RenderPass
@@ -3560,1386 +3647,1489 @@ mut:
 	p_clear_values    &ClearValue
 }
 
-type VkCreateInstance = fn (&InstanceCreateInfo, &AllocationCallbacks, &C.Instance) Result
-
-pub fn create_instance(p_create_info &InstanceCreateInfo, p_allocator &AllocationCallbacks, p_instance &C.Instance) Result {
-	f := VkCreateInstance((*vulkan.loader_p).get_sym('vkCreateInstance') or {
-		println("Couldn't load symbol for 'vkCreateInstance': ${err}")
-		return Result.error_unknown
-	})
-	return f(p_create_info, p_allocator, p_instance)
+fn C.vkCreateInstance(&InstanceCreateInfo,
+	&AllocationCallbacks,
+	&C.Instance) Result
+pub fn create_instance(p_create_info &InstanceCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_instance &C.Instance) Result {
+	return C.vkCreateInstance(p_create_info, p_allocator, p_instance)
 }
 
-type VkDestroyInstance = fn (C.Instance, &AllocationCallbacks)
-
-pub fn destroy_instance(instance C.Instance, p_allocator &AllocationCallbacks) {
-	f := VkDestroyInstance((*vulkan.loader_p).get_sym('vkDestroyInstance') or {
-		println("Couldn't load symbol for 'vkDestroyInstance': ${err}")
-		return
-	})
-	f(instance, p_allocator)
+fn C.vkDestroyInstance(C.Instance,
+	&AllocationCallbacks)
+pub fn destroy_instance(instance C.Instance,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyInstance(instance, p_allocator)
 }
 
-type VkEnumeratePhysicalDevices = fn (C.Instance, &u32, &C.PhysicalDevice) Result
-
-pub fn enumerate_physical_devices(instance C.Instance, p_physical_device_count &u32, p_physical_devices &C.PhysicalDevice) Result {
-	f := VkEnumeratePhysicalDevices((*vulkan.loader_p).get_sym('vkEnumeratePhysicalDevices') or {
-		println("Couldn't load symbol for 'vkEnumeratePhysicalDevices': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_physical_device_count, p_physical_devices)
+fn C.vkEnumeratePhysicalDevices(C.Instance,
+	&u32,
+	&C.PhysicalDevice) Result
+pub fn enumerate_physical_devices(instance C.Instance,
+	p_physical_device_count &u32,
+	p_physical_devices &C.PhysicalDevice) Result {
+	return C.vkEnumeratePhysicalDevices(instance, p_physical_device_count, p_physical_devices)
 }
 
-type VkGetPhysicalDeviceFeatures = fn (C.PhysicalDevice, &PhysicalDeviceFeatures)
-
-pub fn get_physical_device_features(physical_device C.PhysicalDevice, p_features &PhysicalDeviceFeatures) {
-	f := VkGetPhysicalDeviceFeatures((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceFeatures') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceFeatures': ${err}")
-		return
-	})
-	f(physical_device, p_features)
+fn C.vkGetPhysicalDeviceFeatures(C.PhysicalDevice,
+	&PhysicalDeviceFeatures)
+pub fn get_physical_device_features(physical_device C.PhysicalDevice,
+	p_features &PhysicalDeviceFeatures) {
+	C.vkGetPhysicalDeviceFeatures(physical_device, p_features)
 }
 
-type VkGetPhysicalDeviceFormatProperties = fn (C.PhysicalDevice, Format, &FormatProperties)
-
-pub fn get_physical_device_format_properties(physical_device C.PhysicalDevice, format Format, p_format_properties &FormatProperties) {
-	f := VkGetPhysicalDeviceFormatProperties((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceFormatProperties') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceFormatProperties': ${err}")
-		return
-	})
-	f(physical_device, format, p_format_properties)
+fn C.vkGetPhysicalDeviceFormatProperties(C.PhysicalDevice,
+	Format,
+	&FormatProperties)
+pub fn get_physical_device_format_properties(physical_device C.PhysicalDevice,
+	format Format,
+	p_format_properties &FormatProperties) {
+	C.vkGetPhysicalDeviceFormatProperties(physical_device, format, p_format_properties)
 }
 
-type VkGetPhysicalDeviceImageFormatProperties = fn (C.PhysicalDevice, Format, ImageType, ImageTiling, ImageUsageFlags, ImageCreateFlags, &ImageFormatProperties) Result
-
-pub fn get_physical_device_image_format_properties(physical_device C.PhysicalDevice, format Format, vktype ImageType, tiling ImageTiling, usage ImageUsageFlags, flags ImageCreateFlags, p_image_format_properties &ImageFormatProperties) Result {
-	f := VkGetPhysicalDeviceImageFormatProperties((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceImageFormatProperties') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceImageFormatProperties': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, format, vktype, tiling, usage, flags, p_image_format_properties)
+fn C.vkGetPhysicalDeviceImageFormatProperties(C.PhysicalDevice,
+	Format,
+	ImageType,
+	ImageTiling,
+	ImageUsageFlags,
+	ImageCreateFlags,
+	&ImageFormatProperties) Result
+pub fn get_physical_device_image_format_properties(physical_device C.PhysicalDevice,
+	format Format,
+	vktype ImageType,
+	tiling ImageTiling,
+	usage ImageUsageFlags,
+	flags ImageCreateFlags,
+	p_image_format_properties &ImageFormatProperties) Result {
+	return C.vkGetPhysicalDeviceImageFormatProperties(physical_device, format, vktype,
+		tiling, usage, flags, p_image_format_properties)
 }
 
-type VkGetPhysicalDeviceProperties = fn (C.PhysicalDevice, &PhysicalDeviceProperties)
-
-pub fn get_physical_device_properties(physical_device C.PhysicalDevice, p_properties &PhysicalDeviceProperties) {
-	f := VkGetPhysicalDeviceProperties((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceProperties') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceProperties': ${err}")
-		return
-	})
-	f(physical_device, p_properties)
+fn C.vkGetPhysicalDeviceProperties(C.PhysicalDevice,
+	&PhysicalDeviceProperties)
+pub fn get_physical_device_properties(physical_device C.PhysicalDevice,
+	p_properties &PhysicalDeviceProperties) {
+	C.vkGetPhysicalDeviceProperties(physical_device, p_properties)
 }
 
-type VkGetPhysicalDeviceQueueFamilyProperties = fn (C.PhysicalDevice, &u32, &QueueFamilyProperties)
-
-pub fn get_physical_device_queue_family_properties(physical_device C.PhysicalDevice, p_queue_family_property_count &u32, p_queue_family_properties &QueueFamilyProperties) {
-	f := VkGetPhysicalDeviceQueueFamilyProperties((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceQueueFamilyProperties') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceQueueFamilyProperties': ${err}")
-		return
-	})
-	f(physical_device, p_queue_family_property_count, p_queue_family_properties)
+fn C.vkGetPhysicalDeviceQueueFamilyProperties(C.PhysicalDevice,
+	&u32,
+	&QueueFamilyProperties)
+pub fn get_physical_device_queue_family_properties(physical_device C.PhysicalDevice,
+	p_queue_family_property_count &u32,
+	p_queue_family_properties &QueueFamilyProperties) {
+	C.vkGetPhysicalDeviceQueueFamilyProperties(physical_device, p_queue_family_property_count,
+		p_queue_family_properties)
 }
 
-type VkGetPhysicalDeviceMemoryProperties = fn (C.PhysicalDevice, &PhysicalDeviceMemoryProperties)
-
-pub fn get_physical_device_memory_properties(physical_device C.PhysicalDevice, p_memory_properties &PhysicalDeviceMemoryProperties) {
-	f := VkGetPhysicalDeviceMemoryProperties((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceMemoryProperties') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceMemoryProperties': ${err}")
-		return
-	})
-	f(physical_device, p_memory_properties)
+fn C.vkGetPhysicalDeviceMemoryProperties(C.PhysicalDevice,
+	&PhysicalDeviceMemoryProperties)
+pub fn get_physical_device_memory_properties(physical_device C.PhysicalDevice,
+	p_memory_properties &PhysicalDeviceMemoryProperties) {
+	C.vkGetPhysicalDeviceMemoryProperties(physical_device, p_memory_properties)
 }
 
-type VkGetInstanceProcAddr = fn (C.Instance, &char) PFN_vkVoidFunction
-
-pub fn get_instance_proc_addr(instance C.Instance, p_name &char) PFN_vkVoidFunction {
-	f := VkGetInstanceProcAddr((*vulkan.loader_p).get_sym('vkGetInstanceProcAddr') or {
-		panic("Couldn't load symbol for 'vkGetInstanceProcAddr': ${err}")
-	})
-	return f(instance, p_name)
+fn C.vkGetInstanceProcAddr(C.Instance,
+	&char) PFN_vkVoidFunction
+pub fn get_instance_proc_addr(instance C.Instance,
+	p_name &char) PFN_vkVoidFunction {
+	return C.vkGetInstanceProcAddr(instance, p_name)
 }
 
-type VkGetDeviceProcAddr = fn (C.Device, &char) PFN_vkVoidFunction
-
-pub fn get_device_proc_addr(device C.Device, p_name &char) PFN_vkVoidFunction {
-	f := VkGetDeviceProcAddr((*vulkan.loader_p).get_sym('vkGetDeviceProcAddr') or {
-		panic("Couldn't load symbol for 'vkGetDeviceProcAddr': ${err}")
-	})
-	return f(device, p_name)
+fn C.vkGetDeviceProcAddr(C.Device,
+	&char) PFN_vkVoidFunction
+pub fn get_device_proc_addr(device C.Device,
+	p_name &char) PFN_vkVoidFunction {
+	return C.vkGetDeviceProcAddr(device, p_name)
 }
 
-type VkCreateDevice = fn (C.PhysicalDevice, &DeviceCreateInfo, &AllocationCallbacks, &C.Device) Result
-
-pub fn create_device(physical_device C.PhysicalDevice, p_create_info &DeviceCreateInfo, p_allocator &AllocationCallbacks, p_device &C.Device) Result {
-	f := VkCreateDevice((*vulkan.loader_p).get_sym('vkCreateDevice') or {
-		println("Couldn't load symbol for 'vkCreateDevice': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_create_info, p_allocator, p_device)
+fn C.vkCreateDevice(C.PhysicalDevice,
+	&DeviceCreateInfo,
+	&AllocationCallbacks,
+	&C.Device) Result
+pub fn create_device(physical_device C.PhysicalDevice,
+	p_create_info &DeviceCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_device &C.Device) Result {
+	return C.vkCreateDevice(physical_device, p_create_info, p_allocator, p_device)
 }
 
-type VkDestroyDevice = fn (C.Device, &AllocationCallbacks)
-
-pub fn destroy_device(device C.Device, p_allocator &AllocationCallbacks) {
-	f := VkDestroyDevice((*vulkan.loader_p).get_sym('vkDestroyDevice') or {
-		println("Couldn't load symbol for 'vkDestroyDevice': ${err}")
-		return
-	})
-	f(device, p_allocator)
+fn C.vkDestroyDevice(C.Device,
+	&AllocationCallbacks)
+pub fn destroy_device(device C.Device,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyDevice(device, p_allocator)
 }
 
-type VkEnumerateInstanceExtensionProperties = fn (&char, &u32, &ExtensionProperties) Result
-
-pub fn enumerate_instance_extension_properties(p_layer_name &char, p_property_count &u32, p_properties &ExtensionProperties) Result {
-	f := VkEnumerateInstanceExtensionProperties((*vulkan.loader_p).get_sym('vkEnumerateInstanceExtensionProperties') or {
-		println("Couldn't load symbol for 'vkEnumerateInstanceExtensionProperties': ${err}")
-		return Result.error_unknown
-	})
-	return f(p_layer_name, p_property_count, p_properties)
+fn C.vkEnumerateInstanceExtensionProperties(&char,
+	&u32,
+	&ExtensionProperties) Result
+pub fn enumerate_instance_extension_properties(p_layer_name &char,
+	p_property_count &u32,
+	p_properties &ExtensionProperties) Result {
+	return C.vkEnumerateInstanceExtensionProperties(p_layer_name, p_property_count, p_properties)
 }
 
-type VkEnumerateDeviceExtensionProperties = fn (C.PhysicalDevice, &char, &u32, &ExtensionProperties) Result
-
-pub fn enumerate_device_extension_properties(physical_device C.PhysicalDevice, p_layer_name &char, p_property_count &u32, p_properties &ExtensionProperties) Result {
-	f := VkEnumerateDeviceExtensionProperties((*vulkan.loader_p).get_sym('vkEnumerateDeviceExtensionProperties') or {
-		println("Couldn't load symbol for 'vkEnumerateDeviceExtensionProperties': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_layer_name, p_property_count, p_properties)
+fn C.vkEnumerateDeviceExtensionProperties(C.PhysicalDevice,
+	&char,
+	&u32,
+	&ExtensionProperties) Result
+pub fn enumerate_device_extension_properties(physical_device C.PhysicalDevice,
+	p_layer_name &char,
+	p_property_count &u32,
+	p_properties &ExtensionProperties) Result {
+	return C.vkEnumerateDeviceExtensionProperties(physical_device, p_layer_name, p_property_count,
+		p_properties)
 }
 
-type VkEnumerateInstanceLayerProperties = fn (&u32, &LayerProperties) Result
-
-pub fn enumerate_instance_layer_properties(p_property_count &u32, p_properties &LayerProperties) Result {
-	f := VkEnumerateInstanceLayerProperties((*vulkan.loader_p).get_sym('vkEnumerateInstanceLayerProperties') or {
-		println("Couldn't load symbol for 'vkEnumerateInstanceLayerProperties': ${err}")
-		return Result.error_unknown
-	})
-	return f(p_property_count, p_properties)
+fn C.vkEnumerateInstanceLayerProperties(&u32,
+	&LayerProperties) Result
+pub fn enumerate_instance_layer_properties(p_property_count &u32,
+	p_properties &LayerProperties) Result {
+	return C.vkEnumerateInstanceLayerProperties(p_property_count, p_properties)
 }
 
-type VkEnumerateDeviceLayerProperties = fn (C.PhysicalDevice, &u32, &LayerProperties) Result
-
-pub fn enumerate_device_layer_properties(physical_device C.PhysicalDevice, p_property_count &u32, p_properties &LayerProperties) Result {
-	f := VkEnumerateDeviceLayerProperties((*vulkan.loader_p).get_sym('vkEnumerateDeviceLayerProperties') or {
-		println("Couldn't load symbol for 'vkEnumerateDeviceLayerProperties': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_property_count, p_properties)
+fn C.vkEnumerateDeviceLayerProperties(C.PhysicalDevice,
+	&u32,
+	&LayerProperties) Result
+pub fn enumerate_device_layer_properties(physical_device C.PhysicalDevice,
+	p_property_count &u32,
+	p_properties &LayerProperties) Result {
+	return C.vkEnumerateDeviceLayerProperties(physical_device, p_property_count, p_properties)
 }
 
-type VkGetDeviceQueue = fn (C.Device, u32, u32, &C.Queue)
-
-pub fn get_device_queue(device C.Device, queue_family_index u32, queue_index u32, p_queue &C.Queue) {
-	f := VkGetDeviceQueue((*vulkan.loader_p).get_sym('vkGetDeviceQueue') or {
-		println("Couldn't load symbol for 'vkGetDeviceQueue': ${err}")
-		return
-	})
-	f(device, queue_family_index, queue_index, p_queue)
+fn C.vkGetDeviceQueue(C.Device,
+	u32,
+	u32,
+	&C.Queue)
+pub fn get_device_queue(device C.Device,
+	queue_family_index u32,
+	queue_index u32,
+	p_queue &C.Queue) {
+	C.vkGetDeviceQueue(device, queue_family_index, queue_index, p_queue)
 }
 
-type VkQueueSubmit = fn (C.Queue, u32, &SubmitInfo, C.Fence) Result
-
-pub fn queue_submit(queue C.Queue, submit_count u32, p_submits &SubmitInfo, fence C.Fence) Result {
-	f := VkQueueSubmit((*vulkan.loader_p).get_sym('vkQueueSubmit') or {
-		println("Couldn't load symbol for 'vkQueueSubmit': ${err}")
-		return Result.error_unknown
-	})
-	return f(queue, submit_count, p_submits, fence)
+fn C.vkQueueSubmit(C.Queue,
+	u32,
+	&SubmitInfo,
+	C.Fence) Result
+pub fn queue_submit(queue C.Queue,
+	submit_count u32,
+	p_submits &SubmitInfo,
+	fence C.Fence) Result {
+	return C.vkQueueSubmit(queue, submit_count, p_submits, fence)
 }
 
-type VkQueueWaitIdle = fn (C.Queue) Result
-
+fn C.vkQueueWaitIdle(C.Queue) Result
 pub fn queue_wait_idle(queue C.Queue) Result {
-	f := VkQueueWaitIdle((*vulkan.loader_p).get_sym('vkQueueWaitIdle') or {
-		println("Couldn't load symbol for 'vkQueueWaitIdle': ${err}")
-		return Result.error_unknown
-	})
-	return f(queue)
+	return C.vkQueueWaitIdle(queue)
 }
 
-type VkDeviceWaitIdle = fn (C.Device) Result
-
+fn C.vkDeviceWaitIdle(C.Device) Result
 pub fn device_wait_idle(device C.Device) Result {
-	f := VkDeviceWaitIdle((*vulkan.loader_p).get_sym('vkDeviceWaitIdle') or {
-		println("Couldn't load symbol for 'vkDeviceWaitIdle': ${err}")
-		return Result.error_unknown
-	})
-	return f(device)
-}
-
-type VkAllocateMemory = fn (C.Device, &MemoryAllocateInfo, &AllocationCallbacks, &C.DeviceMemory) Result
-
-pub fn allocate_memory(device C.Device, p_allocate_info &MemoryAllocateInfo, p_allocator &AllocationCallbacks, p_memory &C.DeviceMemory) Result {
-	f := VkAllocateMemory((*vulkan.loader_p).get_sym('vkAllocateMemory') or {
-		println("Couldn't load symbol for 'vkAllocateMemory': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_allocate_info, p_allocator, p_memory)
-}
-
-type VkFreeMemory = fn (C.Device, C.DeviceMemory, &AllocationCallbacks)
-
-pub fn free_memory(device C.Device, memory C.DeviceMemory, p_allocator &AllocationCallbacks) {
-	f := VkFreeMemory((*vulkan.loader_p).get_sym('vkFreeMemory') or {
-		println("Couldn't load symbol for 'vkFreeMemory': ${err}")
-		return
-	})
-	f(device, memory, p_allocator)
-}
-
-type VkMapMemory = fn (C.Device, C.DeviceMemory, DeviceSize, DeviceSize, MemoryMapFlags, &voidptr) Result
-
-pub fn map_memory(device C.Device, memory C.DeviceMemory, offset DeviceSize, size DeviceSize, flags MemoryMapFlags, pp_data &voidptr) Result {
-	f := VkMapMemory((*vulkan.loader_p).get_sym('vkMapMemory') or {
-		println("Couldn't load symbol for 'vkMapMemory': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, memory, offset, size, flags, pp_data)
-}
-
-type VkUnmapMemory = fn (C.Device, C.DeviceMemory)
-
-pub fn unmap_memory(device C.Device, memory C.DeviceMemory) {
-	f := VkUnmapMemory((*vulkan.loader_p).get_sym('vkUnmapMemory') or {
-		println("Couldn't load symbol for 'vkUnmapMemory': ${err}")
-		return
-	})
-	f(device, memory)
-}
-
-type VkFlushMappedMemoryRanges = fn (C.Device, u32, &MappedMemoryRange) Result
-
-pub fn flush_mapped_memory_ranges(device C.Device, memory_range_count u32, p_memory_ranges &MappedMemoryRange) Result {
-	f := VkFlushMappedMemoryRanges((*vulkan.loader_p).get_sym('vkFlushMappedMemoryRanges') or {
-		println("Couldn't load symbol for 'vkFlushMappedMemoryRanges': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, memory_range_count, p_memory_ranges)
-}
-
-type VkInvalidateMappedMemoryRanges = fn (C.Device, u32, &MappedMemoryRange) Result
-
-pub fn invalidate_mapped_memory_ranges(device C.Device, memory_range_count u32, p_memory_ranges &MappedMemoryRange) Result {
-	f := VkInvalidateMappedMemoryRanges((*vulkan.loader_p).get_sym('vkInvalidateMappedMemoryRanges') or {
-		println("Couldn't load symbol for 'vkInvalidateMappedMemoryRanges': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, memory_range_count, p_memory_ranges)
-}
-
-type VkGetDeviceMemoryCommitment = fn (C.Device, C.DeviceMemory, &DeviceSize)
-
-pub fn get_device_memory_commitment(device C.Device, memory C.DeviceMemory, p_committed_memory_in_bytes &DeviceSize) {
-	f := VkGetDeviceMemoryCommitment((*vulkan.loader_p).get_sym('vkGetDeviceMemoryCommitment') or {
-		println("Couldn't load symbol for 'vkGetDeviceMemoryCommitment': ${err}")
-		return
-	})
-	f(device, memory, p_committed_memory_in_bytes)
-}
-
-type VkBindBufferMemory = fn (C.Device, C.Buffer, C.DeviceMemory, DeviceSize) Result
-
-pub fn bind_buffer_memory(device C.Device, buffer C.Buffer, memory C.DeviceMemory, memory_offset DeviceSize) Result {
-	f := VkBindBufferMemory((*vulkan.loader_p).get_sym('vkBindBufferMemory') or {
-		println("Couldn't load symbol for 'vkBindBufferMemory': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, buffer, memory, memory_offset)
-}
-
-type VkBindImageMemory = fn (C.Device, C.Image, C.DeviceMemory, DeviceSize) Result
-
-pub fn bind_image_memory(device C.Device, image C.Image, memory C.DeviceMemory, memory_offset DeviceSize) Result {
-	f := VkBindImageMemory((*vulkan.loader_p).get_sym('vkBindImageMemory') or {
-		println("Couldn't load symbol for 'vkBindImageMemory': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, image, memory, memory_offset)
-}
-
-type VkGetBufferMemoryRequirements = fn (C.Device, C.Buffer, &MemoryRequirements)
-
-pub fn get_buffer_memory_requirements(device C.Device, buffer C.Buffer, p_memory_requirements &MemoryRequirements) {
-	f := VkGetBufferMemoryRequirements((*vulkan.loader_p).get_sym('vkGetBufferMemoryRequirements') or {
-		println("Couldn't load symbol for 'vkGetBufferMemoryRequirements': ${err}")
-		return
-	})
-	f(device, buffer, p_memory_requirements)
-}
-
-type VkGetImageMemoryRequirements = fn (C.Device, C.Image, &MemoryRequirements)
-
-pub fn get_image_memory_requirements(device C.Device, image C.Image, p_memory_requirements &MemoryRequirements) {
-	f := VkGetImageMemoryRequirements((*vulkan.loader_p).get_sym('vkGetImageMemoryRequirements') or {
-		println("Couldn't load symbol for 'vkGetImageMemoryRequirements': ${err}")
-		return
-	})
-	f(device, image, p_memory_requirements)
-}
-
-type VkGetImageSparseMemoryRequirements = fn (C.Device, C.Image, &u32, &SparseImageMemoryRequirements)
-
-pub fn get_image_sparse_memory_requirements(device C.Device, image C.Image, p_sparse_memory_requirement_count &u32, p_sparse_memory_requirements &SparseImageMemoryRequirements) {
-	f := VkGetImageSparseMemoryRequirements((*vulkan.loader_p).get_sym('vkGetImageSparseMemoryRequirements') or {
-		println("Couldn't load symbol for 'vkGetImageSparseMemoryRequirements': ${err}")
-		return
-	})
-	f(device, image, p_sparse_memory_requirement_count, p_sparse_memory_requirements)
-}
-
-type VkGetPhysicalDeviceSparseImageFormatProperties = fn (C.PhysicalDevice, Format, ImageType, SampleCountFlagBits, ImageUsageFlags, ImageTiling, &u32, &SparseImageFormatProperties)
-
-pub fn get_physical_device_sparse_image_format_properties(physical_device C.PhysicalDevice, format Format, vktype ImageType, samples SampleCountFlagBits, usage ImageUsageFlags, tiling ImageTiling, p_property_count &u32, p_properties &SparseImageFormatProperties) {
-	f := VkGetPhysicalDeviceSparseImageFormatProperties((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSparseImageFormatProperties') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSparseImageFormatProperties': ${err}")
-		return
-	})
-	f(physical_device, format, vktype, samples, usage, tiling, p_property_count, p_properties)
-}
-
-type VkQueueBindSparse = fn (C.Queue, u32, &BindSparseInfo, C.Fence) Result
-
-pub fn queue_bind_sparse(queue C.Queue, bind_info_count u32, p_bind_info &BindSparseInfo, fence C.Fence) Result {
-	f := VkQueueBindSparse((*vulkan.loader_p).get_sym('vkQueueBindSparse') or {
-		println("Couldn't load symbol for 'vkQueueBindSparse': ${err}")
-		return Result.error_unknown
-	})
-	return f(queue, bind_info_count, p_bind_info, fence)
-}
-
-type VkCreateFence = fn (C.Device, &FenceCreateInfo, &AllocationCallbacks, &C.Fence) Result
-
-pub fn create_fence(device C.Device, p_create_info &FenceCreateInfo, p_allocator &AllocationCallbacks, p_fence &C.Fence) Result {
-	f := VkCreateFence((*vulkan.loader_p).get_sym('vkCreateFence') or {
-		println("Couldn't load symbol for 'vkCreateFence': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_fence)
-}
-
-type VkDestroyFence = fn (C.Device, C.Fence, &AllocationCallbacks)
-
-pub fn destroy_fence(device C.Device, fence C.Fence, p_allocator &AllocationCallbacks) {
-	f := VkDestroyFence((*vulkan.loader_p).get_sym('vkDestroyFence') or {
-		println("Couldn't load symbol for 'vkDestroyFence': ${err}")
-		return
-	})
-	f(device, fence, p_allocator)
-}
-
-type VkResetFences = fn (C.Device, u32, &C.Fence) Result
-
-pub fn reset_fences(device C.Device, fence_count u32, p_fences &C.Fence) Result {
-	f := VkResetFences((*vulkan.loader_p).get_sym('vkResetFences') or {
-		println("Couldn't load symbol for 'vkResetFences': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, fence_count, p_fences)
-}
-
-type VkGetFenceStatus = fn (C.Device, C.Fence) Result
-
-pub fn get_fence_status(device C.Device, fence C.Fence) Result {
-	f := VkGetFenceStatus((*vulkan.loader_p).get_sym('vkGetFenceStatus') or {
-		println("Couldn't load symbol for 'vkGetFenceStatus': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, fence)
-}
-
-type VkWaitForFences = fn (C.Device, u32, &C.Fence, Bool32, u64) Result
-
-pub fn wait_for_fences(device C.Device, fence_count u32, p_fences &C.Fence, wait_all Bool32, timeout u64) Result {
-	f := VkWaitForFences((*vulkan.loader_p).get_sym('vkWaitForFences') or {
-		println("Couldn't load symbol for 'vkWaitForFences': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, fence_count, p_fences, wait_all, timeout)
-}
-
-type VkCreateSemaphore = fn (C.Device, &SemaphoreCreateInfo, &AllocationCallbacks, &C.Semaphore) Result
-
-pub fn create_semaphore(device C.Device, p_create_info &SemaphoreCreateInfo, p_allocator &AllocationCallbacks, p_semaphore &C.Semaphore) Result {
-	f := VkCreateSemaphore((*vulkan.loader_p).get_sym('vkCreateSemaphore') or {
-		println("Couldn't load symbol for 'vkCreateSemaphore': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_semaphore)
-}
-
-type VkDestroySemaphore = fn (C.Device, C.Semaphore, &AllocationCallbacks)
-
-pub fn destroy_semaphore(device C.Device, semaphore C.Semaphore, p_allocator &AllocationCallbacks) {
-	f := VkDestroySemaphore((*vulkan.loader_p).get_sym('vkDestroySemaphore') or {
-		println("Couldn't load symbol for 'vkDestroySemaphore': ${err}")
-		return
-	})
-	f(device, semaphore, p_allocator)
-}
-
-type VkCreateEvent = fn (C.Device, &EventCreateInfo, &AllocationCallbacks, &C.Event) Result
-
-pub fn create_event(device C.Device, p_create_info &EventCreateInfo, p_allocator &AllocationCallbacks, p_event &C.Event) Result {
-	f := VkCreateEvent((*vulkan.loader_p).get_sym('vkCreateEvent') or {
-		println("Couldn't load symbol for 'vkCreateEvent': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_event)
-}
-
-type VkDestroyEvent = fn (C.Device, C.Event, &AllocationCallbacks)
-
-pub fn destroy_event(device C.Device, event C.Event, p_allocator &AllocationCallbacks) {
-	f := VkDestroyEvent((*vulkan.loader_p).get_sym('vkDestroyEvent') or {
-		println("Couldn't load symbol for 'vkDestroyEvent': ${err}")
-		return
-	})
-	f(device, event, p_allocator)
-}
-
-type VkGetEventStatus = fn (C.Device, C.Event) Result
-
-pub fn get_event_status(device C.Device, event C.Event) Result {
-	f := VkGetEventStatus((*vulkan.loader_p).get_sym('vkGetEventStatus') or {
-		println("Couldn't load symbol for 'vkGetEventStatus': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, event)
-}
-
-type VkSetEvent = fn (C.Device, C.Event) Result
-
-pub fn set_event(device C.Device, event C.Event) Result {
-	f := VkSetEvent((*vulkan.loader_p).get_sym('vkSetEvent') or {
-		println("Couldn't load symbol for 'vkSetEvent': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, event)
-}
-
-type VkResetEvent = fn (C.Device, C.Event) Result
-
-pub fn reset_event(device C.Device, event C.Event) Result {
-	f := VkResetEvent((*vulkan.loader_p).get_sym('vkResetEvent') or {
-		println("Couldn't load symbol for 'vkResetEvent': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, event)
-}
-
-type VkCreateQueryPool = fn (C.Device, &QueryPoolCreateInfo, &AllocationCallbacks, &C.QueryPool) Result
-
-pub fn create_query_pool(device C.Device, p_create_info &QueryPoolCreateInfo, p_allocator &AllocationCallbacks, p_query_pool &C.QueryPool) Result {
-	f := VkCreateQueryPool((*vulkan.loader_p).get_sym('vkCreateQueryPool') or {
-		println("Couldn't load symbol for 'vkCreateQueryPool': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_query_pool)
-}
-
-type VkDestroyQueryPool = fn (C.Device, C.QueryPool, &AllocationCallbacks)
-
-pub fn destroy_query_pool(device C.Device, query_pool C.QueryPool, p_allocator &AllocationCallbacks) {
-	f := VkDestroyQueryPool((*vulkan.loader_p).get_sym('vkDestroyQueryPool') or {
-		println("Couldn't load symbol for 'vkDestroyQueryPool': ${err}")
-		return
-	})
-	f(device, query_pool, p_allocator)
-}
-
-type VkGetQueryPoolResults = fn (C.Device, C.QueryPool, u32, u32, usize, voidptr, DeviceSize, QueryResultFlags) Result
-
-pub fn get_query_pool_results(device C.Device, query_pool C.QueryPool, first_query u32, query_count u32, data_size usize, p_data voidptr, stride DeviceSize, flags QueryResultFlags) Result {
-	f := VkGetQueryPoolResults((*vulkan.loader_p).get_sym('vkGetQueryPoolResults') or {
-		println("Couldn't load symbol for 'vkGetQueryPoolResults': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, query_pool, first_query, query_count, data_size, p_data, stride,
-		flags)
-}
-
-type VkCreateBuffer = fn (C.Device, &BufferCreateInfo, &AllocationCallbacks, &C.Buffer) Result
-
-pub fn create_buffer(device C.Device, p_create_info &BufferCreateInfo, p_allocator &AllocationCallbacks, p_buffer &C.Buffer) Result {
-	f := VkCreateBuffer((*vulkan.loader_p).get_sym('vkCreateBuffer') or {
-		println("Couldn't load symbol for 'vkCreateBuffer': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_buffer)
-}
-
-type VkDestroyBuffer = fn (C.Device, C.Buffer, &AllocationCallbacks)
-
-pub fn destroy_buffer(device C.Device, buffer C.Buffer, p_allocator &AllocationCallbacks) {
-	f := VkDestroyBuffer((*vulkan.loader_p).get_sym('vkDestroyBuffer') or {
-		println("Couldn't load symbol for 'vkDestroyBuffer': ${err}")
-		return
-	})
-	f(device, buffer, p_allocator)
-}
-
-type VkCreateBufferView = fn (C.Device, &BufferViewCreateInfo, &AllocationCallbacks, &C.BufferView) Result
-
-pub fn create_buffer_view(device C.Device, p_create_info &BufferViewCreateInfo, p_allocator &AllocationCallbacks, p_view &C.BufferView) Result {
-	f := VkCreateBufferView((*vulkan.loader_p).get_sym('vkCreateBufferView') or {
-		println("Couldn't load symbol for 'vkCreateBufferView': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_view)
-}
-
-type VkDestroyBufferView = fn (C.Device, C.BufferView, &AllocationCallbacks)
-
-pub fn destroy_buffer_view(device C.Device, buffer_view C.BufferView, p_allocator &AllocationCallbacks) {
-	f := VkDestroyBufferView((*vulkan.loader_p).get_sym('vkDestroyBufferView') or {
-		println("Couldn't load symbol for 'vkDestroyBufferView': ${err}")
-		return
-	})
-	f(device, buffer_view, p_allocator)
-}
-
-type VkCreateImage = fn (C.Device, &ImageCreateInfo, &AllocationCallbacks, &C.Image) Result
-
-pub fn create_image(device C.Device, p_create_info &ImageCreateInfo, p_allocator &AllocationCallbacks, p_image &C.Image) Result {
-	f := VkCreateImage((*vulkan.loader_p).get_sym('vkCreateImage') or {
-		println("Couldn't load symbol for 'vkCreateImage': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_image)
-}
-
-type VkDestroyImage = fn (C.Device, C.Image, &AllocationCallbacks)
-
-pub fn destroy_image(device C.Device, image C.Image, p_allocator &AllocationCallbacks) {
-	f := VkDestroyImage((*vulkan.loader_p).get_sym('vkDestroyImage') or {
-		println("Couldn't load symbol for 'vkDestroyImage': ${err}")
-		return
-	})
-	f(device, image, p_allocator)
-}
-
-type VkGetImageSubresourceLayout = fn (C.Device, C.Image, &ImageSubresource, &SubresourceLayout)
-
-pub fn get_image_subresource_layout(device C.Device, image C.Image, p_subresource &ImageSubresource, p_layout &SubresourceLayout) {
-	f := VkGetImageSubresourceLayout((*vulkan.loader_p).get_sym('vkGetImageSubresourceLayout') or {
-		println("Couldn't load symbol for 'vkGetImageSubresourceLayout': ${err}")
-		return
-	})
-	f(device, image, p_subresource, p_layout)
-}
-
-type VkCreateImageView = fn (C.Device, &ImageViewCreateInfo, &AllocationCallbacks, &C.ImageView) Result
-
-pub fn create_image_view(device C.Device, p_create_info &ImageViewCreateInfo, p_allocator &AllocationCallbacks, p_view &C.ImageView) Result {
-	f := VkCreateImageView((*vulkan.loader_p).get_sym('vkCreateImageView') or {
-		println("Couldn't load symbol for 'vkCreateImageView': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_view)
-}
-
-type VkDestroyImageView = fn (C.Device, C.ImageView, &AllocationCallbacks)
-
-pub fn destroy_image_view(device C.Device, image_view C.ImageView, p_allocator &AllocationCallbacks) {
-	f := VkDestroyImageView((*vulkan.loader_p).get_sym('vkDestroyImageView') or {
-		println("Couldn't load symbol for 'vkDestroyImageView': ${err}")
-		return
-	})
-	f(device, image_view, p_allocator)
-}
-
-type VkCreateShaderModule = fn (C.Device, &ShaderModuleCreateInfo, &AllocationCallbacks, &C.ShaderModule) Result
-
-pub fn create_shader_module(device C.Device, p_create_info &ShaderModuleCreateInfo, p_allocator &AllocationCallbacks, p_shader_module &C.ShaderModule) Result {
-	f := VkCreateShaderModule((*vulkan.loader_p).get_sym('vkCreateShaderModule') or {
-		println("Couldn't load symbol for 'vkCreateShaderModule': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_shader_module)
-}
-
-type VkDestroyShaderModule = fn (C.Device, C.ShaderModule, &AllocationCallbacks)
-
-pub fn destroy_shader_module(device C.Device, shader_module C.ShaderModule, p_allocator &AllocationCallbacks) {
-	f := VkDestroyShaderModule((*vulkan.loader_p).get_sym('vkDestroyShaderModule') or {
-		println("Couldn't load symbol for 'vkDestroyShaderModule': ${err}")
-		return
-	})
-	f(device, shader_module, p_allocator)
-}
-
-type VkCreatePipelineCache = fn (C.Device, &PipelineCacheCreateInfo, &AllocationCallbacks, &C.PipelineCache) Result
-
-pub fn create_pipeline_cache(device C.Device, p_create_info &PipelineCacheCreateInfo, p_allocator &AllocationCallbacks, p_pipeline_cache &C.PipelineCache) Result {
-	f := VkCreatePipelineCache((*vulkan.loader_p).get_sym('vkCreatePipelineCache') or {
-		println("Couldn't load symbol for 'vkCreatePipelineCache': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_pipeline_cache)
-}
-
-type VkDestroyPipelineCache = fn (C.Device, C.PipelineCache, &AllocationCallbacks)
-
-pub fn destroy_pipeline_cache(device C.Device, pipeline_cache C.PipelineCache, p_allocator &AllocationCallbacks) {
-	f := VkDestroyPipelineCache((*vulkan.loader_p).get_sym('vkDestroyPipelineCache') or {
-		println("Couldn't load symbol for 'vkDestroyPipelineCache': ${err}")
-		return
-	})
-	f(device, pipeline_cache, p_allocator)
-}
-
-type VkGetPipelineCacheData = fn (C.Device, C.PipelineCache, &usize, voidptr) Result
-
-pub fn get_pipeline_cache_data(device C.Device, pipeline_cache C.PipelineCache, p_data_size &usize, p_data voidptr) Result {
-	f := VkGetPipelineCacheData((*vulkan.loader_p).get_sym('vkGetPipelineCacheData') or {
-		println("Couldn't load symbol for 'vkGetPipelineCacheData': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, pipeline_cache, p_data_size, p_data)
-}
-
-type VkMergePipelineCaches = fn (C.Device, C.PipelineCache, u32, &C.PipelineCache) Result
-
-pub fn merge_pipeline_caches(device C.Device, dst_cache C.PipelineCache, src_cache_count u32, p_src_caches &C.PipelineCache) Result {
-	f := VkMergePipelineCaches((*vulkan.loader_p).get_sym('vkMergePipelineCaches') or {
-		println("Couldn't load symbol for 'vkMergePipelineCaches': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, dst_cache, src_cache_count, p_src_caches)
-}
-
-type VkCreateGraphicsPipelines = fn (C.Device, C.PipelineCache, u32, &GraphicsPipelineCreateInfo, &AllocationCallbacks, &C.Pipeline) Result
-
-pub fn create_graphics_pipelines(device C.Device, pipeline_cache C.PipelineCache, create_info_count u32, p_create_infos &GraphicsPipelineCreateInfo, p_allocator &AllocationCallbacks, p_pipelines &C.Pipeline) Result {
-	f := VkCreateGraphicsPipelines((*vulkan.loader_p).get_sym('vkCreateGraphicsPipelines') or {
-		println("Couldn't load symbol for 'vkCreateGraphicsPipelines': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, pipeline_cache, create_info_count, p_create_infos, p_allocator, p_pipelines)
-}
-
-type VkCreateComputePipelines = fn (C.Device, C.PipelineCache, u32, &ComputePipelineCreateInfo, &AllocationCallbacks, &C.Pipeline) Result
-
-pub fn create_compute_pipelines(device C.Device, pipeline_cache C.PipelineCache, create_info_count u32, p_create_infos &ComputePipelineCreateInfo, p_allocator &AllocationCallbacks, p_pipelines &C.Pipeline) Result {
-	f := VkCreateComputePipelines((*vulkan.loader_p).get_sym('vkCreateComputePipelines') or {
-		println("Couldn't load symbol for 'vkCreateComputePipelines': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, pipeline_cache, create_info_count, p_create_infos, p_allocator, p_pipelines)
-}
-
-type VkDestroyPipeline = fn (C.Device, C.Pipeline, &AllocationCallbacks)
-
-pub fn destroy_pipeline(device C.Device, pipeline C.Pipeline, p_allocator &AllocationCallbacks) {
-	f := VkDestroyPipeline((*vulkan.loader_p).get_sym('vkDestroyPipeline') or {
-		println("Couldn't load symbol for 'vkDestroyPipeline': ${err}")
-		return
-	})
-	f(device, pipeline, p_allocator)
-}
-
-type VkCreatePipelineLayout = fn (C.Device, &PipelineLayoutCreateInfo, &AllocationCallbacks, &C.PipelineLayout) Result
-
-pub fn create_pipeline_layout(device C.Device, p_create_info &PipelineLayoutCreateInfo, p_allocator &AllocationCallbacks, p_pipeline_layout &C.PipelineLayout) Result {
-	f := VkCreatePipelineLayout((*vulkan.loader_p).get_sym('vkCreatePipelineLayout') or {
-		println("Couldn't load symbol for 'vkCreatePipelineLayout': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_pipeline_layout)
-}
-
-type VkDestroyPipelineLayout = fn (C.Device, C.PipelineLayout, &AllocationCallbacks)
-
-pub fn destroy_pipeline_layout(device C.Device, pipeline_layout C.PipelineLayout, p_allocator &AllocationCallbacks) {
-	f := VkDestroyPipelineLayout((*vulkan.loader_p).get_sym('vkDestroyPipelineLayout') or {
-		println("Couldn't load symbol for 'vkDestroyPipelineLayout': ${err}")
-		return
-	})
-	f(device, pipeline_layout, p_allocator)
-}
-
-type VkCreateSampler = fn (C.Device, &SamplerCreateInfo, &AllocationCallbacks, &C.Sampler) Result
-
-pub fn create_sampler(device C.Device, p_create_info &SamplerCreateInfo, p_allocator &AllocationCallbacks, p_sampler &C.Sampler) Result {
-	f := VkCreateSampler((*vulkan.loader_p).get_sym('vkCreateSampler') or {
-		println("Couldn't load symbol for 'vkCreateSampler': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_sampler)
-}
-
-type VkDestroySampler = fn (C.Device, C.Sampler, &AllocationCallbacks)
-
-pub fn destroy_sampler(device C.Device, sampler C.Sampler, p_allocator &AllocationCallbacks) {
-	f := VkDestroySampler((*vulkan.loader_p).get_sym('vkDestroySampler') or {
-		println("Couldn't load symbol for 'vkDestroySampler': ${err}")
-		return
-	})
-	f(device, sampler, p_allocator)
-}
-
-type VkCreateDescriptorSetLayout = fn (C.Device, &DescriptorSetLayoutCreateInfo, &AllocationCallbacks, &C.DescriptorSetLayout) Result
-
-pub fn create_descriptor_set_layout(device C.Device, p_create_info &DescriptorSetLayoutCreateInfo, p_allocator &AllocationCallbacks, p_set_layout &C.DescriptorSetLayout) Result {
-	f := VkCreateDescriptorSetLayout((*vulkan.loader_p).get_sym('vkCreateDescriptorSetLayout') or {
-		println("Couldn't load symbol for 'vkCreateDescriptorSetLayout': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_set_layout)
-}
-
-type VkDestroyDescriptorSetLayout = fn (C.Device, C.DescriptorSetLayout, &AllocationCallbacks)
-
-pub fn destroy_descriptor_set_layout(device C.Device, descriptor_set_layout C.DescriptorSetLayout, p_allocator &AllocationCallbacks) {
-	f := VkDestroyDescriptorSetLayout((*vulkan.loader_p).get_sym('vkDestroyDescriptorSetLayout') or {
-		println("Couldn't load symbol for 'vkDestroyDescriptorSetLayout': ${err}")
-		return
-	})
-	f(device, descriptor_set_layout, p_allocator)
-}
-
-type VkCreateDescriptorPool = fn (C.Device, &DescriptorPoolCreateInfo, &AllocationCallbacks, &C.DescriptorPool) Result
-
-pub fn create_descriptor_pool(device C.Device, p_create_info &DescriptorPoolCreateInfo, p_allocator &AllocationCallbacks, p_descriptor_pool &C.DescriptorPool) Result {
-	f := VkCreateDescriptorPool((*vulkan.loader_p).get_sym('vkCreateDescriptorPool') or {
-		println("Couldn't load symbol for 'vkCreateDescriptorPool': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_descriptor_pool)
-}
-
-type VkDestroyDescriptorPool = fn (C.Device, C.DescriptorPool, &AllocationCallbacks)
-
-pub fn destroy_descriptor_pool(device C.Device, descriptor_pool C.DescriptorPool, p_allocator &AllocationCallbacks) {
-	f := VkDestroyDescriptorPool((*vulkan.loader_p).get_sym('vkDestroyDescriptorPool') or {
-		println("Couldn't load symbol for 'vkDestroyDescriptorPool': ${err}")
-		return
-	})
-	f(device, descriptor_pool, p_allocator)
-}
-
-type VkResetDescriptorPool = fn (C.Device, C.DescriptorPool, DescriptorPoolResetFlags) Result
-
-pub fn reset_descriptor_pool(device C.Device, descriptor_pool C.DescriptorPool, flags DescriptorPoolResetFlags) Result {
-	f := VkResetDescriptorPool((*vulkan.loader_p).get_sym('vkResetDescriptorPool') or {
-		println("Couldn't load symbol for 'vkResetDescriptorPool': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, descriptor_pool, flags)
-}
-
-type VkAllocateDescriptorSets = fn (C.Device, &DescriptorSetAllocateInfo, &C.DescriptorSet) Result
-
-pub fn allocate_descriptor_sets(device C.Device, p_allocate_info &DescriptorSetAllocateInfo, p_descriptor_sets &C.DescriptorSet) Result {
-	f := VkAllocateDescriptorSets((*vulkan.loader_p).get_sym('vkAllocateDescriptorSets') or {
-		println("Couldn't load symbol for 'vkAllocateDescriptorSets': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_allocate_info, p_descriptor_sets)
-}
-
-type VkFreeDescriptorSets = fn (C.Device, C.DescriptorPool, u32, &C.DescriptorSet) Result
-
-pub fn free_descriptor_sets(device C.Device, descriptor_pool C.DescriptorPool, descriptor_set_count u32, p_descriptor_sets &C.DescriptorSet) Result {
-	f := VkFreeDescriptorSets((*vulkan.loader_p).get_sym('vkFreeDescriptorSets') or {
-		println("Couldn't load symbol for 'vkFreeDescriptorSets': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, descriptor_pool, descriptor_set_count, p_descriptor_sets)
-}
-
-type VkUpdateDescriptorSets = fn (C.Device, u32, &WriteDescriptorSet, u32, &CopyDescriptorSet)
-
-pub fn update_descriptor_sets(device C.Device, descriptor_write_count u32, p_descriptor_writes &WriteDescriptorSet, descriptor_copy_count u32, p_descriptor_copies &CopyDescriptorSet) {
-	f := VkUpdateDescriptorSets((*vulkan.loader_p).get_sym('vkUpdateDescriptorSets') or {
-		println("Couldn't load symbol for 'vkUpdateDescriptorSets': ${err}")
-		return
-	})
-	f(device, descriptor_write_count, p_descriptor_writes, descriptor_copy_count, p_descriptor_copies)
-}
-
-type VkCreateFramebuffer = fn (C.Device, &FramebufferCreateInfo, &AllocationCallbacks, &C.Framebuffer) Result
-
-pub fn create_framebuffer(device C.Device, p_create_info &FramebufferCreateInfo, p_allocator &AllocationCallbacks, p_framebuffer &C.Framebuffer) Result {
-	f := VkCreateFramebuffer((*vulkan.loader_p).get_sym('vkCreateFramebuffer') or {
-		println("Couldn't load symbol for 'vkCreateFramebuffer': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_framebuffer)
-}
-
-type VkDestroyFramebuffer = fn (C.Device, C.Framebuffer, &AllocationCallbacks)
-
-pub fn destroy_framebuffer(device C.Device, framebuffer C.Framebuffer, p_allocator &AllocationCallbacks) {
-	f := VkDestroyFramebuffer((*vulkan.loader_p).get_sym('vkDestroyFramebuffer') or {
-		println("Couldn't load symbol for 'vkDestroyFramebuffer': ${err}")
-		return
-	})
-	f(device, framebuffer, p_allocator)
-}
-
-type VkCreateRenderPass = fn (C.Device, &RenderPassCreateInfo, &AllocationCallbacks, &C.RenderPass) Result
-
-pub fn create_render_pass(device C.Device, p_create_info &RenderPassCreateInfo, p_allocator &AllocationCallbacks, p_render_pass &C.RenderPass) Result {
-	f := VkCreateRenderPass((*vulkan.loader_p).get_sym('vkCreateRenderPass') or {
-		println("Couldn't load symbol for 'vkCreateRenderPass': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_render_pass)
-}
-
-type VkDestroyRenderPass = fn (C.Device, C.RenderPass, &AllocationCallbacks)
-
-pub fn destroy_render_pass(device C.Device, render_pass C.RenderPass, p_allocator &AllocationCallbacks) {
-	f := VkDestroyRenderPass((*vulkan.loader_p).get_sym('vkDestroyRenderPass') or {
-		println("Couldn't load symbol for 'vkDestroyRenderPass': ${err}")
-		return
-	})
-	f(device, render_pass, p_allocator)
-}
-
-type VkGetRenderAreaGranularity = fn (C.Device, C.RenderPass, &Extent2D)
-
-pub fn get_render_area_granularity(device C.Device, render_pass C.RenderPass, p_granularity &Extent2D) {
-	f := VkGetRenderAreaGranularity((*vulkan.loader_p).get_sym('vkGetRenderAreaGranularity') or {
-		println("Couldn't load symbol for 'vkGetRenderAreaGranularity': ${err}")
-		return
-	})
-	f(device, render_pass, p_granularity)
-}
-
-type VkCreateCommandPool = fn (C.Device, &CommandPoolCreateInfo, &AllocationCallbacks, &C.CommandPool) Result
-
-pub fn create_command_pool(device C.Device, p_create_info &CommandPoolCreateInfo, p_allocator &AllocationCallbacks, p_command_pool &C.CommandPool) Result {
-	f := VkCreateCommandPool((*vulkan.loader_p).get_sym('vkCreateCommandPool') or {
-		println("Couldn't load symbol for 'vkCreateCommandPool': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_command_pool)
-}
-
-type VkDestroyCommandPool = fn (C.Device, C.CommandPool, &AllocationCallbacks)
-
-pub fn destroy_command_pool(device C.Device, command_pool C.CommandPool, p_allocator &AllocationCallbacks) {
-	f := VkDestroyCommandPool((*vulkan.loader_p).get_sym('vkDestroyCommandPool') or {
-		println("Couldn't load symbol for 'vkDestroyCommandPool': ${err}")
-		return
-	})
-	f(device, command_pool, p_allocator)
-}
-
-type VkResetCommandPool = fn (C.Device, C.CommandPool, CommandPoolResetFlags) Result
-
-pub fn reset_command_pool(device C.Device, command_pool C.CommandPool, flags CommandPoolResetFlags) Result {
-	f := VkResetCommandPool((*vulkan.loader_p).get_sym('vkResetCommandPool') or {
-		println("Couldn't load symbol for 'vkResetCommandPool': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, command_pool, flags)
-}
-
-type VkAllocateCommandBuffers = fn (C.Device, &CommandBufferAllocateInfo, &C.CommandBuffer) Result
-
-pub fn allocate_command_buffers(device C.Device, p_allocate_info &CommandBufferAllocateInfo, p_command_buffers &C.CommandBuffer) Result {
-	f := VkAllocateCommandBuffers((*vulkan.loader_p).get_sym('vkAllocateCommandBuffers') or {
-		println("Couldn't load symbol for 'vkAllocateCommandBuffers': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_allocate_info, p_command_buffers)
-}
-
-type VkFreeCommandBuffers = fn (C.Device, C.CommandPool, u32, &C.CommandBuffer)
-
-pub fn free_command_buffers(device C.Device, command_pool C.CommandPool, command_buffer_count u32, p_command_buffers &C.CommandBuffer) {
-	f := VkFreeCommandBuffers((*vulkan.loader_p).get_sym('vkFreeCommandBuffers') or {
-		println("Couldn't load symbol for 'vkFreeCommandBuffers': ${err}")
-		return
-	})
-	f(device, command_pool, command_buffer_count, p_command_buffers)
-}
-
-type VkBeginCommandBuffer = fn (C.CommandBuffer, &CommandBufferBeginInfo) Result
-
-pub fn begin_command_buffer(command_buffer C.CommandBuffer, p_begin_info &CommandBufferBeginInfo) Result {
-	f := VkBeginCommandBuffer((*vulkan.loader_p).get_sym('vkBeginCommandBuffer') or {
-		println("Couldn't load symbol for 'vkBeginCommandBuffer': ${err}")
-		return Result.error_unknown
-	})
-	return f(command_buffer, p_begin_info)
-}
-
-type VkEndCommandBuffer = fn (C.CommandBuffer) Result
-
+	return C.vkDeviceWaitIdle(device)
+}
+
+fn C.vkAllocateMemory(C.Device,
+	&MemoryAllocateInfo,
+	&AllocationCallbacks,
+	&C.DeviceMemory) Result
+pub fn allocate_memory(device C.Device,
+	p_allocate_info &MemoryAllocateInfo,
+	p_allocator &AllocationCallbacks,
+	p_memory &C.DeviceMemory) Result {
+	return C.vkAllocateMemory(device, p_allocate_info, p_allocator, p_memory)
+}
+
+fn C.vkFreeMemory(C.Device,
+	C.DeviceMemory,
+	&AllocationCallbacks)
+pub fn free_memory(device C.Device,
+	memory C.DeviceMemory,
+	p_allocator &AllocationCallbacks) {
+	C.vkFreeMemory(device, memory, p_allocator)
+}
+
+fn C.vkMapMemory(C.Device,
+	C.DeviceMemory,
+	DeviceSize,
+	DeviceSize,
+	MemoryMapFlags,
+	&voidptr) Result
+pub fn map_memory(device C.Device,
+	memory C.DeviceMemory,
+	offset DeviceSize,
+	size DeviceSize,
+	flags MemoryMapFlags,
+	pp_data &voidptr) Result {
+	return C.vkMapMemory(device, memory, offset, size, flags, pp_data)
+}
+
+fn C.vkUnmapMemory(C.Device,
+	C.DeviceMemory)
+pub fn unmap_memory(device C.Device,
+	memory C.DeviceMemory) {
+	C.vkUnmapMemory(device, memory)
+}
+
+fn C.vkFlushMappedMemoryRanges(C.Device,
+	u32,
+	&MappedMemoryRange) Result
+pub fn flush_mapped_memory_ranges(device C.Device,
+	memory_range_count u32,
+	p_memory_ranges &MappedMemoryRange) Result {
+	return C.vkFlushMappedMemoryRanges(device, memory_range_count, p_memory_ranges)
+}
+
+fn C.vkInvalidateMappedMemoryRanges(C.Device,
+	u32,
+	&MappedMemoryRange) Result
+pub fn invalidate_mapped_memory_ranges(device C.Device,
+	memory_range_count u32,
+	p_memory_ranges &MappedMemoryRange) Result {
+	return C.vkInvalidateMappedMemoryRanges(device, memory_range_count, p_memory_ranges)
+}
+
+fn C.vkGetDeviceMemoryCommitment(C.Device,
+	C.DeviceMemory,
+	&DeviceSize)
+pub fn get_device_memory_commitment(device C.Device,
+	memory C.DeviceMemory,
+	p_committed_memory_in_bytes &DeviceSize) {
+	C.vkGetDeviceMemoryCommitment(device, memory, p_committed_memory_in_bytes)
+}
+
+fn C.vkBindBufferMemory(C.Device,
+	C.Buffer,
+	C.DeviceMemory,
+	DeviceSize) Result
+pub fn bind_buffer_memory(device C.Device,
+	buffer C.Buffer,
+	memory C.DeviceMemory,
+	memory_offset DeviceSize) Result {
+	return C.vkBindBufferMemory(device, buffer, memory, memory_offset)
+}
+
+fn C.vkBindImageMemory(C.Device,
+	C.Image,
+	C.DeviceMemory,
+	DeviceSize) Result
+pub fn bind_image_memory(device C.Device,
+	image C.Image,
+	memory C.DeviceMemory,
+	memory_offset DeviceSize) Result {
+	return C.vkBindImageMemory(device, image, memory, memory_offset)
+}
+
+fn C.vkGetBufferMemoryRequirements(C.Device,
+	C.Buffer,
+	&MemoryRequirements)
+pub fn get_buffer_memory_requirements(device C.Device,
+	buffer C.Buffer,
+	p_memory_requirements &MemoryRequirements) {
+	C.vkGetBufferMemoryRequirements(device, buffer, p_memory_requirements)
+}
+
+fn C.vkGetImageMemoryRequirements(C.Device,
+	C.Image,
+	&MemoryRequirements)
+pub fn get_image_memory_requirements(device C.Device,
+	image C.Image,
+	p_memory_requirements &MemoryRequirements) {
+	C.vkGetImageMemoryRequirements(device, image, p_memory_requirements)
+}
+
+fn C.vkGetImageSparseMemoryRequirements(C.Device,
+	C.Image,
+	&u32,
+	&SparseImageMemoryRequirements)
+pub fn get_image_sparse_memory_requirements(device C.Device,
+	image C.Image,
+	p_sparse_memory_requirement_count &u32,
+	p_sparse_memory_requirements &SparseImageMemoryRequirements) {
+	C.vkGetImageSparseMemoryRequirements(device, image, p_sparse_memory_requirement_count,
+		p_sparse_memory_requirements)
+}
+
+fn C.vkGetPhysicalDeviceSparseImageFormatProperties(C.PhysicalDevice,
+	Format,
+	ImageType,
+	SampleCountFlagBits,
+	ImageUsageFlags,
+	ImageTiling,
+	&u32,
+	&SparseImageFormatProperties)
+pub fn get_physical_device_sparse_image_format_properties(physical_device C.PhysicalDevice,
+	format Format,
+	vktype ImageType,
+	samples SampleCountFlagBits,
+	usage ImageUsageFlags,
+	tiling ImageTiling,
+	p_property_count &u32,
+	p_properties &SparseImageFormatProperties) {
+	C.vkGetPhysicalDeviceSparseImageFormatProperties(physical_device, format, vktype,
+		samples, usage, tiling, p_property_count, p_properties)
+}
+
+fn C.vkQueueBindSparse(C.Queue,
+	u32,
+	&BindSparseInfo,
+	C.Fence) Result
+pub fn queue_bind_sparse(queue C.Queue,
+	bind_info_count u32,
+	p_bind_info &BindSparseInfo,
+	fence C.Fence) Result {
+	return C.vkQueueBindSparse(queue, bind_info_count, p_bind_info, fence)
+}
+
+fn C.vkCreateFence(C.Device,
+	&FenceCreateInfo,
+	&AllocationCallbacks,
+	&C.Fence) Result
+pub fn create_fence(device C.Device,
+	p_create_info &FenceCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_fence &C.Fence) Result {
+	return C.vkCreateFence(device, p_create_info, p_allocator, p_fence)
+}
+
+fn C.vkDestroyFence(C.Device,
+	C.Fence,
+	&AllocationCallbacks)
+pub fn destroy_fence(device C.Device,
+	fence C.Fence,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyFence(device, fence, p_allocator)
+}
+
+fn C.vkResetFences(C.Device,
+	u32,
+	&C.Fence) Result
+pub fn reset_fences(device C.Device,
+	fence_count u32,
+	p_fences &C.Fence) Result {
+	return C.vkResetFences(device, fence_count, p_fences)
+}
+
+fn C.vkGetFenceStatus(C.Device,
+	C.Fence) Result
+pub fn get_fence_status(device C.Device,
+	fence C.Fence) Result {
+	return C.vkGetFenceStatus(device, fence)
+}
+
+fn C.vkWaitForFences(C.Device,
+	u32,
+	&C.Fence,
+	Bool32,
+	u64) Result
+pub fn wait_for_fences(device C.Device,
+	fence_count u32,
+	p_fences &C.Fence,
+	wait_all Bool32,
+	timeout u64) Result {
+	return C.vkWaitForFences(device, fence_count, p_fences, wait_all, timeout)
+}
+
+fn C.vkCreateSemaphore(C.Device,
+	&SemaphoreCreateInfo,
+	&AllocationCallbacks,
+	&C.Semaphore) Result
+pub fn create_semaphore(device C.Device,
+	p_create_info &SemaphoreCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_semaphore &C.Semaphore) Result {
+	return C.vkCreateSemaphore(device, p_create_info, p_allocator, p_semaphore)
+}
+
+fn C.vkDestroySemaphore(C.Device,
+	C.Semaphore,
+	&AllocationCallbacks)
+pub fn destroy_semaphore(device C.Device,
+	semaphore C.Semaphore,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroySemaphore(device, semaphore, p_allocator)
+}
+
+fn C.vkCreateEvent(C.Device,
+	&EventCreateInfo,
+	&AllocationCallbacks,
+	&C.Event) Result
+pub fn create_event(device C.Device,
+	p_create_info &EventCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_event &C.Event) Result {
+	return C.vkCreateEvent(device, p_create_info, p_allocator, p_event)
+}
+
+fn C.vkDestroyEvent(C.Device,
+	C.Event,
+	&AllocationCallbacks)
+pub fn destroy_event(device C.Device,
+	event C.Event,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyEvent(device, event, p_allocator)
+}
+
+fn C.vkGetEventStatus(C.Device,
+	C.Event) Result
+pub fn get_event_status(device C.Device,
+	event C.Event) Result {
+	return C.vkGetEventStatus(device, event)
+}
+
+fn C.vkSetEvent(C.Device,
+	C.Event) Result
+pub fn set_event(device C.Device,
+	event C.Event) Result {
+	return C.vkSetEvent(device, event)
+}
+
+fn C.vkResetEvent(C.Device,
+	C.Event) Result
+pub fn reset_event(device C.Device,
+	event C.Event) Result {
+	return C.vkResetEvent(device, event)
+}
+
+fn C.vkCreateQueryPool(C.Device,
+	&QueryPoolCreateInfo,
+	&AllocationCallbacks,
+	&C.QueryPool) Result
+pub fn create_query_pool(device C.Device,
+	p_create_info &QueryPoolCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_query_pool &C.QueryPool) Result {
+	return C.vkCreateQueryPool(device, p_create_info, p_allocator, p_query_pool)
+}
+
+fn C.vkDestroyQueryPool(C.Device,
+	C.QueryPool,
+	&AllocationCallbacks)
+pub fn destroy_query_pool(device C.Device,
+	query_pool C.QueryPool,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyQueryPool(device, query_pool, p_allocator)
+}
+
+fn C.vkGetQueryPoolResults(C.Device,
+	C.QueryPool,
+	u32,
+	u32,
+	usize,
+	voidptr,
+	DeviceSize,
+	QueryResultFlags) Result
+pub fn get_query_pool_results(device C.Device,
+	query_pool C.QueryPool,
+	first_query u32,
+	query_count u32,
+	data_size usize,
+	p_data voidptr,
+	stride DeviceSize,
+	flags QueryResultFlags) Result {
+	return C.vkGetQueryPoolResults(device, query_pool, first_query, query_count, data_size,
+		p_data, stride, flags)
+}
+
+fn C.vkCreateBuffer(C.Device,
+	&BufferCreateInfo,
+	&AllocationCallbacks,
+	&C.Buffer) Result
+pub fn create_buffer(device C.Device,
+	p_create_info &BufferCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_buffer &C.Buffer) Result {
+	return C.vkCreateBuffer(device, p_create_info, p_allocator, p_buffer)
+}
+
+fn C.vkDestroyBuffer(C.Device,
+	C.Buffer,
+	&AllocationCallbacks)
+pub fn destroy_buffer(device C.Device,
+	buffer C.Buffer,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyBuffer(device, buffer, p_allocator)
+}
+
+fn C.vkCreateBufferView(C.Device,
+	&BufferViewCreateInfo,
+	&AllocationCallbacks,
+	&C.BufferView) Result
+pub fn create_buffer_view(device C.Device,
+	p_create_info &BufferViewCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_view &C.BufferView) Result {
+	return C.vkCreateBufferView(device, p_create_info, p_allocator, p_view)
+}
+
+fn C.vkDestroyBufferView(C.Device,
+	C.BufferView,
+	&AllocationCallbacks)
+pub fn destroy_buffer_view(device C.Device,
+	buffer_view C.BufferView,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyBufferView(device, buffer_view, p_allocator)
+}
+
+fn C.vkCreateImage(C.Device,
+	&ImageCreateInfo,
+	&AllocationCallbacks,
+	&C.Image) Result
+pub fn create_image(device C.Device,
+	p_create_info &ImageCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_image &C.Image) Result {
+	return C.vkCreateImage(device, p_create_info, p_allocator, p_image)
+}
+
+fn C.vkDestroyImage(C.Device,
+	C.Image,
+	&AllocationCallbacks)
+pub fn destroy_image(device C.Device,
+	image C.Image,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyImage(device, image, p_allocator)
+}
+
+fn C.vkGetImageSubresourceLayout(C.Device,
+	C.Image,
+	&ImageSubresource,
+	&SubresourceLayout)
+pub fn get_image_subresource_layout(device C.Device,
+	image C.Image,
+	p_subresource &ImageSubresource,
+	p_layout &SubresourceLayout) {
+	C.vkGetImageSubresourceLayout(device, image, p_subresource, p_layout)
+}
+
+fn C.vkCreateImageView(C.Device,
+	&ImageViewCreateInfo,
+	&AllocationCallbacks,
+	&C.ImageView) Result
+pub fn create_image_view(device C.Device,
+	p_create_info &ImageViewCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_view &C.ImageView) Result {
+	return C.vkCreateImageView(device, p_create_info, p_allocator, p_view)
+}
+
+fn C.vkDestroyImageView(C.Device,
+	C.ImageView,
+	&AllocationCallbacks)
+pub fn destroy_image_view(device C.Device,
+	image_view C.ImageView,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyImageView(device, image_view, p_allocator)
+}
+
+fn C.vkCreateShaderModule(C.Device,
+	&ShaderModuleCreateInfo,
+	&AllocationCallbacks,
+	&C.ShaderModule) Result
+pub fn create_shader_module(device C.Device,
+	p_create_info &ShaderModuleCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_shader_module &C.ShaderModule) Result {
+	return C.vkCreateShaderModule(device, p_create_info, p_allocator, p_shader_module)
+}
+
+fn C.vkDestroyShaderModule(C.Device,
+	C.ShaderModule,
+	&AllocationCallbacks)
+pub fn destroy_shader_module(device C.Device,
+	shader_module C.ShaderModule,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyShaderModule(device, shader_module, p_allocator)
+}
+
+fn C.vkCreatePipelineCache(C.Device,
+	&PipelineCacheCreateInfo,
+	&AllocationCallbacks,
+	&C.PipelineCache) Result
+pub fn create_pipeline_cache(device C.Device,
+	p_create_info &PipelineCacheCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_pipeline_cache &C.PipelineCache) Result {
+	return C.vkCreatePipelineCache(device, p_create_info, p_allocator, p_pipeline_cache)
+}
+
+fn C.vkDestroyPipelineCache(C.Device,
+	C.PipelineCache,
+	&AllocationCallbacks)
+pub fn destroy_pipeline_cache(device C.Device,
+	pipeline_cache C.PipelineCache,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyPipelineCache(device, pipeline_cache, p_allocator)
+}
+
+fn C.vkGetPipelineCacheData(C.Device,
+	C.PipelineCache,
+	&usize,
+	voidptr) Result
+pub fn get_pipeline_cache_data(device C.Device,
+	pipeline_cache C.PipelineCache,
+	p_data_size &usize,
+	p_data voidptr) Result {
+	return C.vkGetPipelineCacheData(device, pipeline_cache, p_data_size, p_data)
+}
+
+fn C.vkMergePipelineCaches(C.Device,
+	C.PipelineCache,
+	u32,
+	&C.PipelineCache) Result
+pub fn merge_pipeline_caches(device C.Device,
+	dst_cache C.PipelineCache,
+	src_cache_count u32,
+	p_src_caches &C.PipelineCache) Result {
+	return C.vkMergePipelineCaches(device, dst_cache, src_cache_count, p_src_caches)
+}
+
+fn C.vkCreateGraphicsPipelines(C.Device,
+	C.PipelineCache,
+	u32,
+	&GraphicsPipelineCreateInfo,
+	&AllocationCallbacks,
+	&C.Pipeline) Result
+pub fn create_graphics_pipelines(device C.Device,
+	pipeline_cache C.PipelineCache,
+	create_info_count u32,
+	p_create_infos &GraphicsPipelineCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_pipelines &C.Pipeline) Result {
+	return C.vkCreateGraphicsPipelines(device, pipeline_cache, create_info_count, p_create_infos,
+		p_allocator, p_pipelines)
+}
+
+fn C.vkCreateComputePipelines(C.Device,
+	C.PipelineCache,
+	u32,
+	&ComputePipelineCreateInfo,
+	&AllocationCallbacks,
+	&C.Pipeline) Result
+pub fn create_compute_pipelines(device C.Device,
+	pipeline_cache C.PipelineCache,
+	create_info_count u32,
+	p_create_infos &ComputePipelineCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_pipelines &C.Pipeline) Result {
+	return C.vkCreateComputePipelines(device, pipeline_cache, create_info_count, p_create_infos,
+		p_allocator, p_pipelines)
+}
+
+fn C.vkDestroyPipeline(C.Device,
+	C.Pipeline,
+	&AllocationCallbacks)
+pub fn destroy_pipeline(device C.Device,
+	pipeline C.Pipeline,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyPipeline(device, pipeline, p_allocator)
+}
+
+fn C.vkCreatePipelineLayout(C.Device,
+	&PipelineLayoutCreateInfo,
+	&AllocationCallbacks,
+	&C.PipelineLayout) Result
+pub fn create_pipeline_layout(device C.Device,
+	p_create_info &PipelineLayoutCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_pipeline_layout &C.PipelineLayout) Result {
+	return C.vkCreatePipelineLayout(device, p_create_info, p_allocator, p_pipeline_layout)
+}
+
+fn C.vkDestroyPipelineLayout(C.Device,
+	C.PipelineLayout,
+	&AllocationCallbacks)
+pub fn destroy_pipeline_layout(device C.Device,
+	pipeline_layout C.PipelineLayout,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyPipelineLayout(device, pipeline_layout, p_allocator)
+}
+
+fn C.vkCreateSampler(C.Device,
+	&SamplerCreateInfo,
+	&AllocationCallbacks,
+	&C.Sampler) Result
+pub fn create_sampler(device C.Device,
+	p_create_info &SamplerCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_sampler &C.Sampler) Result {
+	return C.vkCreateSampler(device, p_create_info, p_allocator, p_sampler)
+}
+
+fn C.vkDestroySampler(C.Device,
+	C.Sampler,
+	&AllocationCallbacks)
+pub fn destroy_sampler(device C.Device,
+	sampler C.Sampler,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroySampler(device, sampler, p_allocator)
+}
+
+fn C.vkCreateDescriptorSetLayout(C.Device,
+	&DescriptorSetLayoutCreateInfo,
+	&AllocationCallbacks,
+	&C.DescriptorSetLayout) Result
+pub fn create_descriptor_set_layout(device C.Device,
+	p_create_info &DescriptorSetLayoutCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_set_layout &C.DescriptorSetLayout) Result {
+	return C.vkCreateDescriptorSetLayout(device, p_create_info, p_allocator, p_set_layout)
+}
+
+fn C.vkDestroyDescriptorSetLayout(C.Device,
+	C.DescriptorSetLayout,
+	&AllocationCallbacks)
+pub fn destroy_descriptor_set_layout(device C.Device,
+	descriptor_set_layout C.DescriptorSetLayout,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyDescriptorSetLayout(device, descriptor_set_layout, p_allocator)
+}
+
+fn C.vkCreateDescriptorPool(C.Device,
+	&DescriptorPoolCreateInfo,
+	&AllocationCallbacks,
+	&C.DescriptorPool) Result
+pub fn create_descriptor_pool(device C.Device,
+	p_create_info &DescriptorPoolCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_descriptor_pool &C.DescriptorPool) Result {
+	return C.vkCreateDescriptorPool(device, p_create_info, p_allocator, p_descriptor_pool)
+}
+
+fn C.vkDestroyDescriptorPool(C.Device,
+	C.DescriptorPool,
+	&AllocationCallbacks)
+pub fn destroy_descriptor_pool(device C.Device,
+	descriptor_pool C.DescriptorPool,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyDescriptorPool(device, descriptor_pool, p_allocator)
+}
+
+fn C.vkResetDescriptorPool(C.Device,
+	C.DescriptorPool,
+	DescriptorPoolResetFlags) Result
+pub fn reset_descriptor_pool(device C.Device,
+	descriptor_pool C.DescriptorPool,
+	flags DescriptorPoolResetFlags) Result {
+	return C.vkResetDescriptorPool(device, descriptor_pool, flags)
+}
+
+fn C.vkAllocateDescriptorSets(C.Device,
+	&DescriptorSetAllocateInfo,
+	&C.DescriptorSet) Result
+pub fn allocate_descriptor_sets(device C.Device,
+	p_allocate_info &DescriptorSetAllocateInfo,
+	p_descriptor_sets &C.DescriptorSet) Result {
+	return C.vkAllocateDescriptorSets(device, p_allocate_info, p_descriptor_sets)
+}
+
+fn C.vkFreeDescriptorSets(C.Device,
+	C.DescriptorPool,
+	u32,
+	&C.DescriptorSet) Result
+pub fn free_descriptor_sets(device C.Device,
+	descriptor_pool C.DescriptorPool,
+	descriptor_set_count u32,
+	p_descriptor_sets &C.DescriptorSet) Result {
+	return C.vkFreeDescriptorSets(device, descriptor_pool, descriptor_set_count, p_descriptor_sets)
+}
+
+fn C.vkUpdateDescriptorSets(C.Device,
+	u32,
+	&WriteDescriptorSet,
+	u32,
+	&CopyDescriptorSet)
+pub fn update_descriptor_sets(device C.Device,
+	descriptor_write_count u32,
+	p_descriptor_writes &WriteDescriptorSet,
+	descriptor_copy_count u32,
+	p_descriptor_copies &CopyDescriptorSet) {
+	C.vkUpdateDescriptorSets(device, descriptor_write_count, p_descriptor_writes, descriptor_copy_count,
+		p_descriptor_copies)
+}
+
+fn C.vkCreateFramebuffer(C.Device,
+	&FramebufferCreateInfo,
+	&AllocationCallbacks,
+	&C.Framebuffer) Result
+pub fn create_framebuffer(device C.Device,
+	p_create_info &FramebufferCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_framebuffer &C.Framebuffer) Result {
+	return C.vkCreateFramebuffer(device, p_create_info, p_allocator, p_framebuffer)
+}
+
+fn C.vkDestroyFramebuffer(C.Device,
+	C.Framebuffer,
+	&AllocationCallbacks)
+pub fn destroy_framebuffer(device C.Device,
+	framebuffer C.Framebuffer,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyFramebuffer(device, framebuffer, p_allocator)
+}
+
+fn C.vkCreateRenderPass(C.Device,
+	&RenderPassCreateInfo,
+	&AllocationCallbacks,
+	&C.RenderPass) Result
+pub fn create_render_pass(device C.Device,
+	p_create_info &RenderPassCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_render_pass &C.RenderPass) Result {
+	return C.vkCreateRenderPass(device, p_create_info, p_allocator, p_render_pass)
+}
+
+fn C.vkDestroyRenderPass(C.Device,
+	C.RenderPass,
+	&AllocationCallbacks)
+pub fn destroy_render_pass(device C.Device,
+	render_pass C.RenderPass,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyRenderPass(device, render_pass, p_allocator)
+}
+
+fn C.vkGetRenderAreaGranularity(C.Device,
+	C.RenderPass,
+	&Extent2D)
+pub fn get_render_area_granularity(device C.Device,
+	render_pass C.RenderPass,
+	p_granularity &Extent2D) {
+	C.vkGetRenderAreaGranularity(device, render_pass, p_granularity)
+}
+
+fn C.vkCreateCommandPool(C.Device,
+	&CommandPoolCreateInfo,
+	&AllocationCallbacks,
+	&C.CommandPool) Result
+pub fn create_command_pool(device C.Device,
+	p_create_info &CommandPoolCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_command_pool &C.CommandPool) Result {
+	return C.vkCreateCommandPool(device, p_create_info, p_allocator, p_command_pool)
+}
+
+fn C.vkDestroyCommandPool(C.Device,
+	C.CommandPool,
+	&AllocationCallbacks)
+pub fn destroy_command_pool(device C.Device,
+	command_pool C.CommandPool,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyCommandPool(device, command_pool, p_allocator)
+}
+
+fn C.vkResetCommandPool(C.Device,
+	C.CommandPool,
+	CommandPoolResetFlags) Result
+pub fn reset_command_pool(device C.Device,
+	command_pool C.CommandPool,
+	flags CommandPoolResetFlags) Result {
+	return C.vkResetCommandPool(device, command_pool, flags)
+}
+
+fn C.vkAllocateCommandBuffers(C.Device,
+	&CommandBufferAllocateInfo,
+	&C.CommandBuffer) Result
+pub fn allocate_command_buffers(device C.Device,
+	p_allocate_info &CommandBufferAllocateInfo,
+	p_command_buffers &C.CommandBuffer) Result {
+	return C.vkAllocateCommandBuffers(device, p_allocate_info, p_command_buffers)
+}
+
+fn C.vkFreeCommandBuffers(C.Device,
+	C.CommandPool,
+	u32,
+	&C.CommandBuffer)
+pub fn free_command_buffers(device C.Device,
+	command_pool C.CommandPool,
+	command_buffer_count u32,
+	p_command_buffers &C.CommandBuffer) {
+	C.vkFreeCommandBuffers(device, command_pool, command_buffer_count, p_command_buffers)
+}
+
+fn C.vkBeginCommandBuffer(C.CommandBuffer,
+	&CommandBufferBeginInfo) Result
+pub fn begin_command_buffer(command_buffer C.CommandBuffer,
+	p_begin_info &CommandBufferBeginInfo) Result {
+	return C.vkBeginCommandBuffer(command_buffer, p_begin_info)
+}
+
+fn C.vkEndCommandBuffer(C.CommandBuffer) Result
 pub fn end_command_buffer(command_buffer C.CommandBuffer) Result {
-	f := VkEndCommandBuffer((*vulkan.loader_p).get_sym('vkEndCommandBuffer') or {
-		println("Couldn't load symbol for 'vkEndCommandBuffer': ${err}")
-		return Result.error_unknown
-	})
-	return f(command_buffer)
+	return C.vkEndCommandBuffer(command_buffer)
 }
 
-type VkResetCommandBuffer = fn (C.CommandBuffer, CommandBufferResetFlags) Result
-
-pub fn reset_command_buffer(command_buffer C.CommandBuffer, flags CommandBufferResetFlags) Result {
-	f := VkResetCommandBuffer((*vulkan.loader_p).get_sym('vkResetCommandBuffer') or {
-		println("Couldn't load symbol for 'vkResetCommandBuffer': ${err}")
-		return Result.error_unknown
-	})
-	return f(command_buffer, flags)
+fn C.vkResetCommandBuffer(C.CommandBuffer,
+	CommandBufferResetFlags) Result
+pub fn reset_command_buffer(command_buffer C.CommandBuffer,
+	flags CommandBufferResetFlags) Result {
+	return C.vkResetCommandBuffer(command_buffer, flags)
 }
 
-type VkCmdBindPipeline = fn (C.CommandBuffer, PipelineBindPoint, C.Pipeline)
-
-pub fn cmd_bind_pipeline(command_buffer C.CommandBuffer, pipeline_bind_point PipelineBindPoint, pipeline C.Pipeline) {
-	f := VkCmdBindPipeline((*vulkan.loader_p).get_sym('vkCmdBindPipeline') or {
-		println("Couldn't load symbol for 'vkCmdBindPipeline': ${err}")
-		return
-	})
-	f(command_buffer, pipeline_bind_point, pipeline)
+fn C.vkCmdBindPipeline(C.CommandBuffer,
+	PipelineBindPoint,
+	C.Pipeline)
+pub fn cmd_bind_pipeline(command_buffer C.CommandBuffer,
+	pipeline_bind_point PipelineBindPoint,
+	pipeline C.Pipeline) {
+	C.vkCmdBindPipeline(command_buffer, pipeline_bind_point, pipeline)
 }
 
-type VkCmdSetViewport = fn (C.CommandBuffer, u32, u32, &Viewport)
-
-pub fn cmd_set_viewport(command_buffer C.CommandBuffer, first_viewport u32, viewport_count u32, p_viewports &Viewport) {
-	f := VkCmdSetViewport((*vulkan.loader_p).get_sym('vkCmdSetViewport') or {
-		println("Couldn't load symbol for 'vkCmdSetViewport': ${err}")
-		return
-	})
-	f(command_buffer, first_viewport, viewport_count, p_viewports)
+fn C.vkCmdSetViewport(C.CommandBuffer,
+	u32,
+	u32,
+	&Viewport)
+pub fn cmd_set_viewport(command_buffer C.CommandBuffer,
+	first_viewport u32,
+	viewport_count u32,
+	p_viewports &Viewport) {
+	C.vkCmdSetViewport(command_buffer, first_viewport, viewport_count, p_viewports)
 }
 
-type VkCmdSetScissor = fn (C.CommandBuffer, u32, u32, &Rect2D)
-
-pub fn cmd_set_scissor(command_buffer C.CommandBuffer, first_scissor u32, scissor_count u32, p_scissors &Rect2D) {
-	f := VkCmdSetScissor((*vulkan.loader_p).get_sym('vkCmdSetScissor') or {
-		println("Couldn't load symbol for 'vkCmdSetScissor': ${err}")
-		return
-	})
-	f(command_buffer, first_scissor, scissor_count, p_scissors)
+fn C.vkCmdSetScissor(C.CommandBuffer,
+	u32,
+	u32,
+	&Rect2D)
+pub fn cmd_set_scissor(command_buffer C.CommandBuffer,
+	first_scissor u32,
+	scissor_count u32,
+	p_scissors &Rect2D) {
+	C.vkCmdSetScissor(command_buffer, first_scissor, scissor_count, p_scissors)
 }
 
-type VkCmdSetLineWidth = fn (C.CommandBuffer, f32)
-
-pub fn cmd_set_line_width(command_buffer C.CommandBuffer, line_width f32) {
-	f := VkCmdSetLineWidth((*vulkan.loader_p).get_sym('vkCmdSetLineWidth') or {
-		println("Couldn't load symbol for 'vkCmdSetLineWidth': ${err}")
-		return
-	})
-	f(command_buffer, line_width)
+fn C.vkCmdSetLineWidth(C.CommandBuffer,
+	f32)
+pub fn cmd_set_line_width(command_buffer C.CommandBuffer,
+	line_width f32) {
+	C.vkCmdSetLineWidth(command_buffer, line_width)
 }
 
-type VkCmdSetDepthBias = fn (C.CommandBuffer, f32, f32, f32)
-
-pub fn cmd_set_depth_bias(command_buffer C.CommandBuffer, depth_bias_constant_factor f32, depth_bias_clamp f32, depth_bias_slope_factor f32) {
-	f := VkCmdSetDepthBias((*vulkan.loader_p).get_sym('vkCmdSetDepthBias') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthBias': ${err}")
-		return
-	})
-	f(command_buffer, depth_bias_constant_factor, depth_bias_clamp, depth_bias_slope_factor)
+fn C.vkCmdSetDepthBias(C.CommandBuffer,
+	f32,
+	f32,
+	f32)
+pub fn cmd_set_depth_bias(command_buffer C.CommandBuffer,
+	depth_bias_constant_factor f32,
+	depth_bias_clamp f32,
+	depth_bias_slope_factor f32) {
+	C.vkCmdSetDepthBias(command_buffer, depth_bias_constant_factor, depth_bias_clamp,
+		depth_bias_slope_factor)
 }
 
-type VkCmdSetBlendConstants = fn (C.CommandBuffer, []f32)
-
-pub fn cmd_set_blend_constants(command_buffer C.CommandBuffer, blend_constants []f32) {
-	f := VkCmdSetBlendConstants((*vulkan.loader_p).get_sym('vkCmdSetBlendConstants') or {
-		println("Couldn't load symbol for 'vkCmdSetBlendConstants': ${err}")
-		return
-	})
-	f(command_buffer, blend_constants)
+fn C.vkCmdSetBlendConstants(C.CommandBuffer,
+	[4]f32)
+pub fn cmd_set_blend_constants(command_buffer C.CommandBuffer,
+	blend_constants [4]f32) {
+	C.vkCmdSetBlendConstants(command_buffer, blend_constants)
 }
 
-type VkCmdSetDepthBounds = fn (C.CommandBuffer, f32, f32)
-
-pub fn cmd_set_depth_bounds(command_buffer C.CommandBuffer, min_depth_bounds f32, max_depth_bounds f32) {
-	f := VkCmdSetDepthBounds((*vulkan.loader_p).get_sym('vkCmdSetDepthBounds') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthBounds': ${err}")
-		return
-	})
-	f(command_buffer, min_depth_bounds, max_depth_bounds)
+fn C.vkCmdSetDepthBounds(C.CommandBuffer,
+	f32,
+	f32)
+pub fn cmd_set_depth_bounds(command_buffer C.CommandBuffer,
+	min_depth_bounds f32,
+	max_depth_bounds f32) {
+	C.vkCmdSetDepthBounds(command_buffer, min_depth_bounds, max_depth_bounds)
 }
 
-type VkCmdSetStencilCompareMask = fn (C.CommandBuffer, StencilFaceFlags, u32)
-
-pub fn cmd_set_stencil_compare_mask(command_buffer C.CommandBuffer, face_mask StencilFaceFlags, compare_mask u32) {
-	f := VkCmdSetStencilCompareMask((*vulkan.loader_p).get_sym('vkCmdSetStencilCompareMask') or {
-		println("Couldn't load symbol for 'vkCmdSetStencilCompareMask': ${err}")
-		return
-	})
-	f(command_buffer, face_mask, compare_mask)
+fn C.vkCmdSetStencilCompareMask(C.CommandBuffer,
+	StencilFaceFlags,
+	u32)
+pub fn cmd_set_stencil_compare_mask(command_buffer C.CommandBuffer,
+	face_mask StencilFaceFlags,
+	compare_mask u32) {
+	C.vkCmdSetStencilCompareMask(command_buffer, face_mask, compare_mask)
 }
 
-type VkCmdSetStencilWriteMask = fn (C.CommandBuffer, StencilFaceFlags, u32)
-
-pub fn cmd_set_stencil_write_mask(command_buffer C.CommandBuffer, face_mask StencilFaceFlags, write_mask u32) {
-	f := VkCmdSetStencilWriteMask((*vulkan.loader_p).get_sym('vkCmdSetStencilWriteMask') or {
-		println("Couldn't load symbol for 'vkCmdSetStencilWriteMask': ${err}")
-		return
-	})
-	f(command_buffer, face_mask, write_mask)
+fn C.vkCmdSetStencilWriteMask(C.CommandBuffer,
+	StencilFaceFlags,
+	u32)
+pub fn cmd_set_stencil_write_mask(command_buffer C.CommandBuffer,
+	face_mask StencilFaceFlags,
+	write_mask u32) {
+	C.vkCmdSetStencilWriteMask(command_buffer, face_mask, write_mask)
 }
 
-type VkCmdSetStencilReference = fn (C.CommandBuffer, StencilFaceFlags, u32)
-
-pub fn cmd_set_stencil_reference(command_buffer C.CommandBuffer, face_mask StencilFaceFlags, reference u32) {
-	f := VkCmdSetStencilReference((*vulkan.loader_p).get_sym('vkCmdSetStencilReference') or {
-		println("Couldn't load symbol for 'vkCmdSetStencilReference': ${err}")
-		return
-	})
-	f(command_buffer, face_mask, reference)
+fn C.vkCmdSetStencilReference(C.CommandBuffer,
+	StencilFaceFlags,
+	u32)
+pub fn cmd_set_stencil_reference(command_buffer C.CommandBuffer,
+	face_mask StencilFaceFlags,
+	reference u32) {
+	C.vkCmdSetStencilReference(command_buffer, face_mask, reference)
 }
 
-type VkCmdBindDescriptorSets = fn (C.CommandBuffer, PipelineBindPoint, C.PipelineLayout, u32, u32, &C.DescriptorSet, u32, &u32)
-
-pub fn cmd_bind_descriptor_sets(command_buffer C.CommandBuffer, pipeline_bind_point PipelineBindPoint, layout C.PipelineLayout, first_set u32, descriptor_set_count u32, p_descriptor_sets &C.DescriptorSet, dynamic_offset_count u32, p_dynamic_offsets &u32) {
-	f := VkCmdBindDescriptorSets((*vulkan.loader_p).get_sym('vkCmdBindDescriptorSets') or {
-		println("Couldn't load symbol for 'vkCmdBindDescriptorSets': ${err}")
-		return
-	})
-	f(command_buffer, pipeline_bind_point, layout, first_set, descriptor_set_count, p_descriptor_sets,
-		dynamic_offset_count, p_dynamic_offsets)
+fn C.vkCmdBindDescriptorSets(C.CommandBuffer,
+	PipelineBindPoint,
+	C.PipelineLayout,
+	u32,
+	u32,
+	&C.DescriptorSet,
+	u32,
+	&u32)
+pub fn cmd_bind_descriptor_sets(command_buffer C.CommandBuffer,
+	pipeline_bind_point PipelineBindPoint,
+	layout C.PipelineLayout,
+	first_set u32,
+	descriptor_set_count u32,
+	p_descriptor_sets &C.DescriptorSet,
+	dynamic_offset_count u32,
+	p_dynamic_offsets &u32) {
+	C.vkCmdBindDescriptorSets(command_buffer, pipeline_bind_point, layout, first_set,
+		descriptor_set_count, p_descriptor_sets, dynamic_offset_count, p_dynamic_offsets)
 }
 
-type VkCmdBindIndexBuffer = fn (C.CommandBuffer, C.Buffer, DeviceSize, IndexType)
-
-pub fn cmd_bind_index_buffer(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, index_type IndexType) {
-	f := VkCmdBindIndexBuffer((*vulkan.loader_p).get_sym('vkCmdBindIndexBuffer') or {
-		println("Couldn't load symbol for 'vkCmdBindIndexBuffer': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, index_type)
+fn C.vkCmdBindIndexBuffer(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	IndexType)
+pub fn cmd_bind_index_buffer(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize,
+	index_type IndexType) {
+	C.vkCmdBindIndexBuffer(command_buffer, buffer, offset, index_type)
 }
 
-type VkCmdBindVertexBuffers = fn (C.CommandBuffer, u32, u32, &C.Buffer, &DeviceSize)
-
-pub fn cmd_bind_vertex_buffers(command_buffer C.CommandBuffer, first_binding u32, binding_count u32, p_buffers &C.Buffer, p_offsets &DeviceSize) {
-	f := VkCmdBindVertexBuffers((*vulkan.loader_p).get_sym('vkCmdBindVertexBuffers') or {
-		println("Couldn't load symbol for 'vkCmdBindVertexBuffers': ${err}")
-		return
-	})
-	f(command_buffer, first_binding, binding_count, p_buffers, p_offsets)
+fn C.vkCmdBindVertexBuffers(C.CommandBuffer,
+	u32,
+	u32,
+	&C.Buffer,
+	&DeviceSize)
+pub fn cmd_bind_vertex_buffers(command_buffer C.CommandBuffer,
+	first_binding u32,
+	binding_count u32,
+	p_buffers &C.Buffer,
+	p_offsets &DeviceSize) {
+	C.vkCmdBindVertexBuffers(command_buffer, first_binding, binding_count, p_buffers,
+		p_offsets)
 }
 
-type VkCmdDraw = fn (C.CommandBuffer, u32, u32, u32, u32)
-
-pub fn cmd_draw(command_buffer C.CommandBuffer, vertex_count u32, instance_count u32, first_vertex u32, first_instance u32) {
-	f := VkCmdDraw((*vulkan.loader_p).get_sym('vkCmdDraw') or {
-		println("Couldn't load symbol for 'vkCmdDraw': ${err}")
-		return
-	})
-	f(command_buffer, vertex_count, instance_count, first_vertex, first_instance)
+fn C.vkCmdDraw(C.CommandBuffer,
+	u32,
+	u32,
+	u32,
+	u32)
+pub fn cmd_draw(command_buffer C.CommandBuffer,
+	vertex_count u32,
+	instance_count u32,
+	first_vertex u32,
+	first_instance u32) {
+	C.vkCmdDraw(command_buffer, vertex_count, instance_count, first_vertex, first_instance)
 }
 
-type VkCmdDrawIndexed = fn (C.CommandBuffer, u32, u32, u32, i32, u32)
-
-pub fn cmd_draw_indexed(command_buffer C.CommandBuffer, index_count u32, instance_count u32, first_index u32, vertex_offset i32, first_instance u32) {
-	f := VkCmdDrawIndexed((*vulkan.loader_p).get_sym('vkCmdDrawIndexed') or {
-		println("Couldn't load symbol for 'vkCmdDrawIndexed': ${err}")
-		return
-	})
-	f(command_buffer, index_count, instance_count, first_index, vertex_offset, first_instance)
+fn C.vkCmdDrawIndexed(C.CommandBuffer,
+	u32,
+	u32,
+	u32,
+	i32,
+	u32)
+pub fn cmd_draw_indexed(command_buffer C.CommandBuffer,
+	index_count u32,
+	instance_count u32,
+	first_index u32,
+	vertex_offset i32,
+	first_instance u32) {
+	C.vkCmdDrawIndexed(command_buffer, index_count, instance_count, first_index, vertex_offset,
+		first_instance)
 }
 
-type VkCmdDrawIndirect = fn (C.CommandBuffer, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_indirect(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, draw_count u32, stride u32) {
-	f := VkCmdDrawIndirect((*vulkan.loader_p).get_sym('vkCmdDrawIndirect') or {
-		println("Couldn't load symbol for 'vkCmdDrawIndirect': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, draw_count, stride)
+fn C.vkCmdDrawIndirect(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	u32,
+	u32)
+pub fn cmd_draw_indirect(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize,
+	draw_count u32,
+	stride u32) {
+	C.vkCmdDrawIndirect(command_buffer, buffer, offset, draw_count, stride)
 }
 
-type VkCmdDrawIndexedIndirect = fn (C.CommandBuffer, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_indexed_indirect(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, draw_count u32, stride u32) {
-	f := VkCmdDrawIndexedIndirect((*vulkan.loader_p).get_sym('vkCmdDrawIndexedIndirect') or {
-		println("Couldn't load symbol for 'vkCmdDrawIndexedIndirect': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, draw_count, stride)
+fn C.vkCmdDrawIndexedIndirect(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	u32,
+	u32)
+pub fn cmd_draw_indexed_indirect(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize,
+	draw_count u32,
+	stride u32) {
+	C.vkCmdDrawIndexedIndirect(command_buffer, buffer, offset, draw_count, stride)
 }
 
-type VkCmdDispatch = fn (C.CommandBuffer, u32, u32, u32)
-
-pub fn cmd_dispatch(command_buffer C.CommandBuffer, group_count_x u32, group_count_y u32, group_count_z u32) {
-	f := VkCmdDispatch((*vulkan.loader_p).get_sym('vkCmdDispatch') or {
-		println("Couldn't load symbol for 'vkCmdDispatch': ${err}")
-		return
-	})
-	f(command_buffer, group_count_x, group_count_y, group_count_z)
+fn C.vkCmdDispatch(C.CommandBuffer,
+	u32,
+	u32,
+	u32)
+pub fn cmd_dispatch(command_buffer C.CommandBuffer,
+	group_count_x u32,
+	group_count_y u32,
+	group_count_z u32) {
+	C.vkCmdDispatch(command_buffer, group_count_x, group_count_y, group_count_z)
 }
 
-type VkCmdDispatchIndirect = fn (C.CommandBuffer, C.Buffer, DeviceSize)
-
-pub fn cmd_dispatch_indirect(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize) {
-	f := VkCmdDispatchIndirect((*vulkan.loader_p).get_sym('vkCmdDispatchIndirect') or {
-		println("Couldn't load symbol for 'vkCmdDispatchIndirect': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset)
+fn C.vkCmdDispatchIndirect(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize)
+pub fn cmd_dispatch_indirect(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize) {
+	C.vkCmdDispatchIndirect(command_buffer, buffer, offset)
 }
 
-type VkCmdCopyBuffer = fn (C.CommandBuffer, C.Buffer, C.Buffer, u32, &BufferCopy)
-
-pub fn cmd_copy_buffer(command_buffer C.CommandBuffer, src_buffer C.Buffer, dst_buffer C.Buffer, region_count u32, p_regions &BufferCopy) {
-	f := VkCmdCopyBuffer((*vulkan.loader_p).get_sym('vkCmdCopyBuffer') or {
-		println("Couldn't load symbol for 'vkCmdCopyBuffer': ${err}")
-		return
-	})
-	f(command_buffer, src_buffer, dst_buffer, region_count, p_regions)
+fn C.vkCmdCopyBuffer(C.CommandBuffer,
+	C.Buffer,
+	C.Buffer,
+	u32,
+	&BufferCopy)
+pub fn cmd_copy_buffer(command_buffer C.CommandBuffer,
+	src_buffer C.Buffer,
+	dst_buffer C.Buffer,
+	region_count u32,
+	p_regions &BufferCopy) {
+	C.vkCmdCopyBuffer(command_buffer, src_buffer, dst_buffer, region_count, p_regions)
 }
 
-type VkCmdCopyImage = fn (C.CommandBuffer, C.Image, ImageLayout, C.Image, ImageLayout, u32, &ImageCopy)
-
-pub fn cmd_copy_image(command_buffer C.CommandBuffer, src_image C.Image, src_image_layout ImageLayout, dst_image C.Image, dst_image_layout ImageLayout, region_count u32, p_regions &ImageCopy) {
-	f := VkCmdCopyImage((*vulkan.loader_p).get_sym('vkCmdCopyImage') or {
-		println("Couldn't load symbol for 'vkCmdCopyImage': ${err}")
-		return
-	})
-	f(command_buffer, src_image, src_image_layout, dst_image, dst_image_layout, region_count,
-		p_regions)
+fn C.vkCmdCopyImage(C.CommandBuffer,
+	C.Image,
+	ImageLayout,
+	C.Image,
+	ImageLayout,
+	u32,
+	&ImageCopy)
+pub fn cmd_copy_image(command_buffer C.CommandBuffer,
+	src_image C.Image,
+	src_image_layout ImageLayout,
+	dst_image C.Image,
+	dst_image_layout ImageLayout,
+	region_count u32,
+	p_regions &ImageCopy) {
+	C.vkCmdCopyImage(command_buffer, src_image, src_image_layout, dst_image, dst_image_layout,
+		region_count, p_regions)
 }
 
-type VkCmdBlitImage = fn (C.CommandBuffer, C.Image, ImageLayout, C.Image, ImageLayout, u32, &ImageBlit, Filter)
-
-pub fn cmd_blit_image(command_buffer C.CommandBuffer, src_image C.Image, src_image_layout ImageLayout, dst_image C.Image, dst_image_layout ImageLayout, region_count u32, p_regions &ImageBlit, filter Filter) {
-	f := VkCmdBlitImage((*vulkan.loader_p).get_sym('vkCmdBlitImage') or {
-		println("Couldn't load symbol for 'vkCmdBlitImage': ${err}")
-		return
-	})
-	f(command_buffer, src_image, src_image_layout, dst_image, dst_image_layout, region_count,
-		p_regions, filter)
+fn C.vkCmdBlitImage(C.CommandBuffer,
+	C.Image,
+	ImageLayout,
+	C.Image,
+	ImageLayout,
+	u32,
+	&ImageBlit,
+	Filter)
+pub fn cmd_blit_image(command_buffer C.CommandBuffer,
+	src_image C.Image,
+	src_image_layout ImageLayout,
+	dst_image C.Image,
+	dst_image_layout ImageLayout,
+	region_count u32,
+	p_regions &ImageBlit,
+	filter Filter) {
+	C.vkCmdBlitImage(command_buffer, src_image, src_image_layout, dst_image, dst_image_layout,
+		region_count, p_regions, filter)
 }
 
-type VkCmdCopyBufferToImage = fn (C.CommandBuffer, C.Buffer, C.Image, ImageLayout, u32, &BufferImageCopy)
-
-pub fn cmd_copy_buffer_to_image(command_buffer C.CommandBuffer, src_buffer C.Buffer, dst_image C.Image, dst_image_layout ImageLayout, region_count u32, p_regions &BufferImageCopy) {
-	f := VkCmdCopyBufferToImage((*vulkan.loader_p).get_sym('vkCmdCopyBufferToImage') or {
-		println("Couldn't load symbol for 'vkCmdCopyBufferToImage': ${err}")
-		return
-	})
-	f(command_buffer, src_buffer, dst_image, dst_image_layout, region_count, p_regions)
+fn C.vkCmdCopyBufferToImage(C.CommandBuffer,
+	C.Buffer,
+	C.Image,
+	ImageLayout,
+	u32,
+	&BufferImageCopy)
+pub fn cmd_copy_buffer_to_image(command_buffer C.CommandBuffer,
+	src_buffer C.Buffer,
+	dst_image C.Image,
+	dst_image_layout ImageLayout,
+	region_count u32,
+	p_regions &BufferImageCopy) {
+	C.vkCmdCopyBufferToImage(command_buffer, src_buffer, dst_image, dst_image_layout,
+		region_count, p_regions)
 }
 
-type VkCmdCopyImageToBuffer = fn (C.CommandBuffer, C.Image, ImageLayout, C.Buffer, u32, &BufferImageCopy)
-
-pub fn cmd_copy_image_to_buffer(command_buffer C.CommandBuffer, src_image C.Image, src_image_layout ImageLayout, dst_buffer C.Buffer, region_count u32, p_regions &BufferImageCopy) {
-	f := VkCmdCopyImageToBuffer((*vulkan.loader_p).get_sym('vkCmdCopyImageToBuffer') or {
-		println("Couldn't load symbol for 'vkCmdCopyImageToBuffer': ${err}")
-		return
-	})
-	f(command_buffer, src_image, src_image_layout, dst_buffer, region_count, p_regions)
+fn C.vkCmdCopyImageToBuffer(C.CommandBuffer,
+	C.Image,
+	ImageLayout,
+	C.Buffer,
+	u32,
+	&BufferImageCopy)
+pub fn cmd_copy_image_to_buffer(command_buffer C.CommandBuffer,
+	src_image C.Image,
+	src_image_layout ImageLayout,
+	dst_buffer C.Buffer,
+	region_count u32,
+	p_regions &BufferImageCopy) {
+	C.vkCmdCopyImageToBuffer(command_buffer, src_image, src_image_layout, dst_buffer,
+		region_count, p_regions)
 }
 
-type VkCmdUpdateBuffer = fn (C.CommandBuffer, C.Buffer, DeviceSize, DeviceSize, voidptr)
-
-pub fn cmd_update_buffer(command_buffer C.CommandBuffer, dst_buffer C.Buffer, dst_offset DeviceSize, data_size DeviceSize, p_data voidptr) {
-	f := VkCmdUpdateBuffer((*vulkan.loader_p).get_sym('vkCmdUpdateBuffer') or {
-		println("Couldn't load symbol for 'vkCmdUpdateBuffer': ${err}")
-		return
-	})
-	f(command_buffer, dst_buffer, dst_offset, data_size, p_data)
+fn C.vkCmdUpdateBuffer(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	DeviceSize,
+	voidptr)
+pub fn cmd_update_buffer(command_buffer C.CommandBuffer,
+	dst_buffer C.Buffer,
+	dst_offset DeviceSize,
+	data_size DeviceSize,
+	p_data voidptr) {
+	C.vkCmdUpdateBuffer(command_buffer, dst_buffer, dst_offset, data_size, p_data)
 }
 
-type VkCmdFillBuffer = fn (C.CommandBuffer, C.Buffer, DeviceSize, DeviceSize, u32)
-
-pub fn cmd_fill_buffer(command_buffer C.CommandBuffer, dst_buffer C.Buffer, dst_offset DeviceSize, size DeviceSize, data u32) {
-	f := VkCmdFillBuffer((*vulkan.loader_p).get_sym('vkCmdFillBuffer') or {
-		println("Couldn't load symbol for 'vkCmdFillBuffer': ${err}")
-		return
-	})
-	f(command_buffer, dst_buffer, dst_offset, size, data)
+fn C.vkCmdFillBuffer(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	DeviceSize,
+	u32)
+pub fn cmd_fill_buffer(command_buffer C.CommandBuffer,
+	dst_buffer C.Buffer,
+	dst_offset DeviceSize,
+	size DeviceSize,
+	data u32) {
+	C.vkCmdFillBuffer(command_buffer, dst_buffer, dst_offset, size, data)
 }
 
-type VkCmdClearColorImage = fn (C.CommandBuffer, C.Image, ImageLayout, &ClearColorValue, u32, &ImageSubresourceRange)
-
-pub fn cmd_clear_color_image(command_buffer C.CommandBuffer, image C.Image, image_layout ImageLayout, p_color &ClearColorValue, range_count u32, p_ranges &ImageSubresourceRange) {
-	f := VkCmdClearColorImage((*vulkan.loader_p).get_sym('vkCmdClearColorImage') or {
-		println("Couldn't load symbol for 'vkCmdClearColorImage': ${err}")
-		return
-	})
-	f(command_buffer, image, image_layout, p_color, range_count, p_ranges)
+fn C.vkCmdClearColorImage(C.CommandBuffer,
+	C.Image,
+	ImageLayout,
+	&ClearColorValue,
+	u32,
+	&ImageSubresourceRange)
+pub fn cmd_clear_color_image(command_buffer C.CommandBuffer,
+	image C.Image,
+	image_layout ImageLayout,
+	p_color &ClearColorValue,
+	range_count u32,
+	p_ranges &ImageSubresourceRange) {
+	C.vkCmdClearColorImage(command_buffer, image, image_layout, p_color, range_count,
+		p_ranges)
 }
 
-type VkCmdClearDepthStencilImage = fn (C.CommandBuffer, C.Image, ImageLayout, &ClearDepthStencilValue, u32, &ImageSubresourceRange)
-
-pub fn cmd_clear_depth_stencil_image(command_buffer C.CommandBuffer, image C.Image, image_layout ImageLayout, p_depth_stencil &ClearDepthStencilValue, range_count u32, p_ranges &ImageSubresourceRange) {
-	f := VkCmdClearDepthStencilImage((*vulkan.loader_p).get_sym('vkCmdClearDepthStencilImage') or {
-		println("Couldn't load symbol for 'vkCmdClearDepthStencilImage': ${err}")
-		return
-	})
-	f(command_buffer, image, image_layout, p_depth_stencil, range_count, p_ranges)
+fn C.vkCmdClearDepthStencilImage(C.CommandBuffer,
+	C.Image,
+	ImageLayout,
+	&ClearDepthStencilValue,
+	u32,
+	&ImageSubresourceRange)
+pub fn cmd_clear_depth_stencil_image(command_buffer C.CommandBuffer,
+	image C.Image,
+	image_layout ImageLayout,
+	p_depth_stencil &ClearDepthStencilValue,
+	range_count u32,
+	p_ranges &ImageSubresourceRange) {
+	C.vkCmdClearDepthStencilImage(command_buffer, image, image_layout, p_depth_stencil,
+		range_count, p_ranges)
 }
 
-type VkCmdClearAttachments = fn (C.CommandBuffer, u32, &ClearAttachment, u32, &ClearRect)
-
-pub fn cmd_clear_attachments(command_buffer C.CommandBuffer, attachment_count u32, p_attachments &ClearAttachment, rect_count u32, p_rects &ClearRect) {
-	f := VkCmdClearAttachments((*vulkan.loader_p).get_sym('vkCmdClearAttachments') or {
-		println("Couldn't load symbol for 'vkCmdClearAttachments': ${err}")
-		return
-	})
-	f(command_buffer, attachment_count, p_attachments, rect_count, p_rects)
+fn C.vkCmdClearAttachments(C.CommandBuffer,
+	u32,
+	&ClearAttachment,
+	u32,
+	&ClearRect)
+pub fn cmd_clear_attachments(command_buffer C.CommandBuffer,
+	attachment_count u32,
+	p_attachments &ClearAttachment,
+	rect_count u32,
+	p_rects &ClearRect) {
+	C.vkCmdClearAttachments(command_buffer, attachment_count, p_attachments, rect_count,
+		p_rects)
 }
 
-type VkCmdResolveImage = fn (C.CommandBuffer, C.Image, ImageLayout, C.Image, ImageLayout, u32, &ImageResolve)
-
-pub fn cmd_resolve_image(command_buffer C.CommandBuffer, src_image C.Image, src_image_layout ImageLayout, dst_image C.Image, dst_image_layout ImageLayout, region_count u32, p_regions &ImageResolve) {
-	f := VkCmdResolveImage((*vulkan.loader_p).get_sym('vkCmdResolveImage') or {
-		println("Couldn't load symbol for 'vkCmdResolveImage': ${err}")
-		return
-	})
-	f(command_buffer, src_image, src_image_layout, dst_image, dst_image_layout, region_count,
-		p_regions)
+fn C.vkCmdResolveImage(C.CommandBuffer,
+	C.Image,
+	ImageLayout,
+	C.Image,
+	ImageLayout,
+	u32,
+	&ImageResolve)
+pub fn cmd_resolve_image(command_buffer C.CommandBuffer,
+	src_image C.Image,
+	src_image_layout ImageLayout,
+	dst_image C.Image,
+	dst_image_layout ImageLayout,
+	region_count u32,
+	p_regions &ImageResolve) {
+	C.vkCmdResolveImage(command_buffer, src_image, src_image_layout, dst_image, dst_image_layout,
+		region_count, p_regions)
 }
 
-type VkCmdSetEvent = fn (C.CommandBuffer, C.Event, PipelineStageFlags)
-
-pub fn cmd_set_event(command_buffer C.CommandBuffer, event C.Event, stage_mask PipelineStageFlags) {
-	f := VkCmdSetEvent((*vulkan.loader_p).get_sym('vkCmdSetEvent') or {
-		println("Couldn't load symbol for 'vkCmdSetEvent': ${err}")
-		return
-	})
-	f(command_buffer, event, stage_mask)
+fn C.vkCmdSetEvent(C.CommandBuffer,
+	C.Event,
+	PipelineStageFlags)
+pub fn cmd_set_event(command_buffer C.CommandBuffer,
+	event C.Event,
+	stage_mask PipelineStageFlags) {
+	C.vkCmdSetEvent(command_buffer, event, stage_mask)
 }
 
-type VkCmdResetEvent = fn (C.CommandBuffer, C.Event, PipelineStageFlags)
-
-pub fn cmd_reset_event(command_buffer C.CommandBuffer, event C.Event, stage_mask PipelineStageFlags) {
-	f := VkCmdResetEvent((*vulkan.loader_p).get_sym('vkCmdResetEvent') or {
-		println("Couldn't load symbol for 'vkCmdResetEvent': ${err}")
-		return
-	})
-	f(command_buffer, event, stage_mask)
+fn C.vkCmdResetEvent(C.CommandBuffer,
+	C.Event,
+	PipelineStageFlags)
+pub fn cmd_reset_event(command_buffer C.CommandBuffer,
+	event C.Event,
+	stage_mask PipelineStageFlags) {
+	C.vkCmdResetEvent(command_buffer, event, stage_mask)
 }
 
-type VkCmdWaitEvents = fn (C.CommandBuffer, u32, &C.Event, PipelineStageFlags, PipelineStageFlags, u32, &MemoryBarrier, u32, &BufferMemoryBarrier, u32, &ImageMemoryBarrier)
-
-pub fn cmd_wait_events(command_buffer C.CommandBuffer, event_count u32, p_events &C.Event, src_stage_mask PipelineStageFlags, dst_stage_mask PipelineStageFlags, memory_barrier_count u32, p_memory_barriers &MemoryBarrier, buffer_memory_barrier_count u32, p_buffer_memory_barriers &BufferMemoryBarrier, image_memory_barrier_count u32, p_image_memory_barriers &ImageMemoryBarrier) {
-	f := VkCmdWaitEvents((*vulkan.loader_p).get_sym('vkCmdWaitEvents') or {
-		println("Couldn't load symbol for 'vkCmdWaitEvents': ${err}")
-		return
-	})
-	f(command_buffer, event_count, p_events, src_stage_mask, dst_stage_mask, memory_barrier_count,
-		p_memory_barriers, buffer_memory_barrier_count, p_buffer_memory_barriers, image_memory_barrier_count,
-		p_image_memory_barriers)
+fn C.vkCmdWaitEvents(C.CommandBuffer,
+	u32,
+	&C.Event,
+	PipelineStageFlags,
+	PipelineStageFlags,
+	u32,
+	&MemoryBarrier,
+	u32,
+	&BufferMemoryBarrier,
+	u32,
+	&ImageMemoryBarrier)
+pub fn cmd_wait_events(command_buffer C.CommandBuffer,
+	event_count u32,
+	p_events &C.Event,
+	src_stage_mask PipelineStageFlags,
+	dst_stage_mask PipelineStageFlags,
+	memory_barrier_count u32,
+	p_memory_barriers &MemoryBarrier,
+	buffer_memory_barrier_count u32,
+	p_buffer_memory_barriers &BufferMemoryBarrier,
+	image_memory_barrier_count u32,
+	p_image_memory_barriers &ImageMemoryBarrier) {
+	C.vkCmdWaitEvents(command_buffer, event_count, p_events, src_stage_mask, dst_stage_mask,
+		memory_barrier_count, p_memory_barriers, buffer_memory_barrier_count, p_buffer_memory_barriers,
+		image_memory_barrier_count, p_image_memory_barriers)
 }
 
-type VkCmdPipelineBarrier = fn (C.CommandBuffer, PipelineStageFlags, PipelineStageFlags, DependencyFlags, u32, &MemoryBarrier, u32, &BufferMemoryBarrier, u32, &ImageMemoryBarrier)
-
-pub fn cmd_pipeline_barrier(command_buffer C.CommandBuffer, src_stage_mask PipelineStageFlags, dst_stage_mask PipelineStageFlags, dependency_flags DependencyFlags, memory_barrier_count u32, p_memory_barriers &MemoryBarrier, buffer_memory_barrier_count u32, p_buffer_memory_barriers &BufferMemoryBarrier, image_memory_barrier_count u32, p_image_memory_barriers &ImageMemoryBarrier) {
-	f := VkCmdPipelineBarrier((*vulkan.loader_p).get_sym('vkCmdPipelineBarrier') or {
-		println("Couldn't load symbol for 'vkCmdPipelineBarrier': ${err}")
-		return
-	})
-	f(command_buffer, src_stage_mask, dst_stage_mask, dependency_flags, memory_barrier_count,
-		p_memory_barriers, buffer_memory_barrier_count, p_buffer_memory_barriers, image_memory_barrier_count,
-		p_image_memory_barriers)
+fn C.vkCmdPipelineBarrier(C.CommandBuffer,
+	PipelineStageFlags,
+	PipelineStageFlags,
+	DependencyFlags,
+	u32,
+	&MemoryBarrier,
+	u32,
+	&BufferMemoryBarrier,
+	u32,
+	&ImageMemoryBarrier)
+pub fn cmd_pipeline_barrier(command_buffer C.CommandBuffer,
+	src_stage_mask PipelineStageFlags,
+	dst_stage_mask PipelineStageFlags,
+	dependency_flags DependencyFlags,
+	memory_barrier_count u32,
+	p_memory_barriers &MemoryBarrier,
+	buffer_memory_barrier_count u32,
+	p_buffer_memory_barriers &BufferMemoryBarrier,
+	image_memory_barrier_count u32,
+	p_image_memory_barriers &ImageMemoryBarrier) {
+	C.vkCmdPipelineBarrier(command_buffer, src_stage_mask, dst_stage_mask, dependency_flags,
+		memory_barrier_count, p_memory_barriers, buffer_memory_barrier_count, p_buffer_memory_barriers,
+		image_memory_barrier_count, p_image_memory_barriers)
 }
 
-type VkCmdBeginQuery = fn (C.CommandBuffer, C.QueryPool, u32, QueryControlFlags)
-
-pub fn cmd_begin_query(command_buffer C.CommandBuffer, query_pool C.QueryPool, query u32, flags QueryControlFlags) {
-	f := VkCmdBeginQuery((*vulkan.loader_p).get_sym('vkCmdBeginQuery') or {
-		println("Couldn't load symbol for 'vkCmdBeginQuery': ${err}")
-		return
-	})
-	f(command_buffer, query_pool, query, flags)
+fn C.vkCmdBeginQuery(C.CommandBuffer,
+	C.QueryPool,
+	u32,
+	QueryControlFlags)
+pub fn cmd_begin_query(command_buffer C.CommandBuffer,
+	query_pool C.QueryPool,
+	query u32,
+	flags QueryControlFlags) {
+	C.vkCmdBeginQuery(command_buffer, query_pool, query, flags)
 }
 
-type VkCmdEndQuery = fn (C.CommandBuffer, C.QueryPool, u32)
-
-pub fn cmd_end_query(command_buffer C.CommandBuffer, query_pool C.QueryPool, query u32) {
-	f := VkCmdEndQuery((*vulkan.loader_p).get_sym('vkCmdEndQuery') or {
-		println("Couldn't load symbol for 'vkCmdEndQuery': ${err}")
-		return
-	})
-	f(command_buffer, query_pool, query)
+fn C.vkCmdEndQuery(C.CommandBuffer,
+	C.QueryPool,
+	u32)
+pub fn cmd_end_query(command_buffer C.CommandBuffer,
+	query_pool C.QueryPool,
+	query u32) {
+	C.vkCmdEndQuery(command_buffer, query_pool, query)
 }
 
-type VkCmdResetQueryPool = fn (C.CommandBuffer, C.QueryPool, u32, u32)
-
-pub fn cmd_reset_query_pool(command_buffer C.CommandBuffer, query_pool C.QueryPool, first_query u32, query_count u32) {
-	f := VkCmdResetQueryPool((*vulkan.loader_p).get_sym('vkCmdResetQueryPool') or {
-		println("Couldn't load symbol for 'vkCmdResetQueryPool': ${err}")
-		return
-	})
-	f(command_buffer, query_pool, first_query, query_count)
+fn C.vkCmdResetQueryPool(C.CommandBuffer,
+	C.QueryPool,
+	u32,
+	u32)
+pub fn cmd_reset_query_pool(command_buffer C.CommandBuffer,
+	query_pool C.QueryPool,
+	first_query u32,
+	query_count u32) {
+	C.vkCmdResetQueryPool(command_buffer, query_pool, first_query, query_count)
 }
 
-type VkCmdWriteTimestamp = fn (C.CommandBuffer, PipelineStageFlagBits, C.QueryPool, u32)
-
-pub fn cmd_write_timestamp(command_buffer C.CommandBuffer, pipeline_stage PipelineStageFlagBits, query_pool C.QueryPool, query u32) {
-	f := VkCmdWriteTimestamp((*vulkan.loader_p).get_sym('vkCmdWriteTimestamp') or {
-		println("Couldn't load symbol for 'vkCmdWriteTimestamp': ${err}")
-		return
-	})
-	f(command_buffer, pipeline_stage, query_pool, query)
+fn C.vkCmdWriteTimestamp(C.CommandBuffer,
+	PipelineStageFlagBits,
+	C.QueryPool,
+	u32)
+pub fn cmd_write_timestamp(command_buffer C.CommandBuffer,
+	pipeline_stage PipelineStageFlagBits,
+	query_pool C.QueryPool,
+	query u32) {
+	C.vkCmdWriteTimestamp(command_buffer, pipeline_stage, query_pool, query)
 }
 
-type VkCmdCopyQueryPoolResults = fn (C.CommandBuffer, C.QueryPool, u32, u32, C.Buffer, DeviceSize, DeviceSize, QueryResultFlags)
-
-pub fn cmd_copy_query_pool_results(command_buffer C.CommandBuffer, query_pool C.QueryPool, first_query u32, query_count u32, dst_buffer C.Buffer, dst_offset DeviceSize, stride DeviceSize, flags QueryResultFlags) {
-	f := VkCmdCopyQueryPoolResults((*vulkan.loader_p).get_sym('vkCmdCopyQueryPoolResults') or {
-		println("Couldn't load symbol for 'vkCmdCopyQueryPoolResults': ${err}")
-		return
-	})
-	f(command_buffer, query_pool, first_query, query_count, dst_buffer, dst_offset, stride,
-		flags)
+fn C.vkCmdCopyQueryPoolResults(C.CommandBuffer,
+	C.QueryPool,
+	u32,
+	u32,
+	C.Buffer,
+	DeviceSize,
+	DeviceSize,
+	QueryResultFlags)
+pub fn cmd_copy_query_pool_results(command_buffer C.CommandBuffer,
+	query_pool C.QueryPool,
+	first_query u32,
+	query_count u32,
+	dst_buffer C.Buffer,
+	dst_offset DeviceSize,
+	stride DeviceSize,
+	flags QueryResultFlags) {
+	C.vkCmdCopyQueryPoolResults(command_buffer, query_pool, first_query, query_count,
+		dst_buffer, dst_offset, stride, flags)
 }
 
-type VkCmdPushConstants = fn (C.CommandBuffer, C.PipelineLayout, ShaderStageFlags, u32, u32, voidptr)
-
-pub fn cmd_push_constants(command_buffer C.CommandBuffer, layout C.PipelineLayout, stage_flags ShaderStageFlags, offset u32, size u32, p_values voidptr) {
-	f := VkCmdPushConstants((*vulkan.loader_p).get_sym('vkCmdPushConstants') or {
-		println("Couldn't load symbol for 'vkCmdPushConstants': ${err}")
-		return
-	})
-	f(command_buffer, layout, stage_flags, offset, size, p_values)
+fn C.vkCmdPushConstants(C.CommandBuffer,
+	C.PipelineLayout,
+	ShaderStageFlags,
+	u32,
+	u32,
+	voidptr)
+pub fn cmd_push_constants(command_buffer C.CommandBuffer,
+	layout C.PipelineLayout,
+	stage_flags ShaderStageFlags,
+	offset u32,
+	size u32,
+	p_values voidptr) {
+	C.vkCmdPushConstants(command_buffer, layout, stage_flags, offset, size, p_values)
 }
 
-type VkCmdBeginRenderPass = fn (C.CommandBuffer, &RenderPassBeginInfo, SubpassContents)
-
-pub fn cmd_begin_render_pass(command_buffer C.CommandBuffer, p_render_pass_begin &RenderPassBeginInfo, contents SubpassContents) {
-	f := VkCmdBeginRenderPass((*vulkan.loader_p).get_sym('vkCmdBeginRenderPass') or {
-		println("Couldn't load symbol for 'vkCmdBeginRenderPass': ${err}")
-		return
-	})
-	f(command_buffer, p_render_pass_begin, contents)
+fn C.vkCmdBeginRenderPass(C.CommandBuffer,
+	&RenderPassBeginInfo,
+	SubpassContents)
+pub fn cmd_begin_render_pass(command_buffer C.CommandBuffer,
+	p_render_pass_begin &RenderPassBeginInfo,
+	contents SubpassContents) {
+	C.vkCmdBeginRenderPass(command_buffer, p_render_pass_begin, contents)
 }
 
-type VkCmdNextSubpass = fn (C.CommandBuffer, SubpassContents)
-
-pub fn cmd_next_subpass(command_buffer C.CommandBuffer, contents SubpassContents) {
-	f := VkCmdNextSubpass((*vulkan.loader_p).get_sym('vkCmdNextSubpass') or {
-		println("Couldn't load symbol for 'vkCmdNextSubpass': ${err}")
-		return
-	})
-	f(command_buffer, contents)
+fn C.vkCmdNextSubpass(C.CommandBuffer,
+	SubpassContents)
+pub fn cmd_next_subpass(command_buffer C.CommandBuffer,
+	contents SubpassContents) {
+	C.vkCmdNextSubpass(command_buffer, contents)
 }
 
-type VkCmdEndRenderPass = fn (C.CommandBuffer)
-
+fn C.vkCmdEndRenderPass(C.CommandBuffer)
 pub fn cmd_end_render_pass(command_buffer C.CommandBuffer) {
-	f := VkCmdEndRenderPass((*vulkan.loader_p).get_sym('vkCmdEndRenderPass') or {
-		println("Couldn't load symbol for 'vkCmdEndRenderPass': ${err}")
-		return
-	})
-	f(command_buffer)
+	C.vkCmdEndRenderPass(command_buffer)
 }
 
-type VkCmdExecuteCommands = fn (C.CommandBuffer, u32, &C.CommandBuffer)
-
-pub fn cmd_execute_commands(command_buffer C.CommandBuffer, command_buffer_count u32, p_command_buffers &C.CommandBuffer) {
-	f := VkCmdExecuteCommands((*vulkan.loader_p).get_sym('vkCmdExecuteCommands') or {
-		println("Couldn't load symbol for 'vkCmdExecuteCommands': ${err}")
-		return
-	})
-	f(command_buffer, command_buffer_count, p_command_buffers)
+fn C.vkCmdExecuteCommands(C.CommandBuffer,
+	u32,
+	&C.CommandBuffer)
+pub fn cmd_execute_commands(command_buffer C.CommandBuffer,
+	command_buffer_count u32,
+	p_command_buffers &C.CommandBuffer) {
+	C.vkCmdExecuteCommands(command_buffer, command_buffer_count, p_command_buffers)
 }
 
-// VK_VERSION_1_1 is a preprocessor guard. Do not pass it to API calls.
-const version_1_1 = 1
 // Vulkan 1.1 version number
 pub const api_version_1_1 = make_api_version(0, 1, 1, 0) // Patch version should always be set to 0
 
@@ -4990,16 +5180,18 @@ pub enum DescriptorUpdateTemplateType {
 }
 
 pub enum SubgroupFeatureFlagBits {
-	subgroup_feature_basic_bit            = int(0x00000001)
-	subgroup_feature_vote_bit             = int(0x00000002)
-	subgroup_feature_arithmetic_bit       = int(0x00000004)
-	subgroup_feature_ballot_bit           = int(0x00000008)
-	subgroup_feature_shuffle_bit          = int(0x00000010)
-	subgroup_feature_shuffle_relative_bit = int(0x00000020)
-	subgroup_feature_clustered_bit        = int(0x00000040)
-	subgroup_feature_quad_bit             = int(0x00000080)
-	subgroup_feature_partitioned_bit_nv   = int(0x00000100)
-	subgroup_feature_flag_bits_max_enum   = int(0x7FFFFFFF)
+	subgroup_feature_basic_bit                = int(0x00000001)
+	subgroup_feature_vote_bit                 = int(0x00000002)
+	subgroup_feature_arithmetic_bit           = int(0x00000004)
+	subgroup_feature_ballot_bit               = int(0x00000008)
+	subgroup_feature_shuffle_bit              = int(0x00000010)
+	subgroup_feature_shuffle_relative_bit     = int(0x00000020)
+	subgroup_feature_clustered_bit            = int(0x00000040)
+	subgroup_feature_quad_bit                 = int(0x00000080)
+	subgroup_feature_partitioned_bit_nv       = int(0x00000100)
+	subgroup_feature_rotate_bit_khr           = int(0x00000200)
+	subgroup_feature_rotate_clustered_bit_khr = int(0x00000400)
+	subgroup_feature_flag_bits_max_enum       = int(0x7FFFFFFF)
 }
 
 pub type SubgroupFeatureFlags = u32
@@ -5106,9 +5298,8 @@ pub enum ExternalSemaphoreFeatureFlagBits {
 
 pub type ExternalSemaphoreFeatureFlags = u32
 
-// PhysicalDeviceSubgroupProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceSubgroupProperties {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	subgroup_size                 u32
@@ -5118,7 +5309,7 @@ mut:
 }
 
 pub struct BindBufferMemoryInfo {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	buffer        C.Buffer
@@ -5127,7 +5318,7 @@ mut:
 }
 
 pub struct BindImageMemoryInfo {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	image         C.Image
@@ -5135,9 +5326,8 @@ mut:
 	memory_offset DeviceSize
 }
 
-// PhysicalDevice16BitStorageFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDevice16BitStorageFeatures {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	storage_buffer16_bit_access             Bool32
@@ -5146,36 +5336,32 @@ mut:
 	storage_input_output16                  Bool32
 }
 
-// MemoryDedicatedRequirements extends VkMemoryRequirements2
 pub struct MemoryDedicatedRequirements {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	prefers_dedicated_allocation  Bool32
 	requires_dedicated_allocation Bool32
 }
 
-// MemoryDedicatedAllocateInfo extends VkMemoryAllocateInfo
 pub struct MemoryDedicatedAllocateInfo {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	image  C.Image
 	buffer C.Buffer
 }
 
-// MemoryAllocateFlagsInfo extends VkMemoryAllocateInfo
 pub struct MemoryAllocateFlagsInfo {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	flags       MemoryAllocateFlags
 	device_mask u32
 }
 
-// DeviceGroupRenderPassBeginInfo extends VkRenderPassBeginInfo,VkRenderingInfo
 pub struct DeviceGroupRenderPassBeginInfo {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	device_mask              u32
@@ -5183,17 +5369,15 @@ mut:
 	p_device_render_areas    &Rect2D
 }
 
-// DeviceGroupCommandBufferBeginInfo extends VkCommandBufferBeginInfo
 pub struct DeviceGroupCommandBufferBeginInfo {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	device_mask u32
 }
 
-// DeviceGroupSubmitInfo extends VkSubmitInfo
 pub struct DeviceGroupSubmitInfo {
-mut:
+pub mut:
 	s_type                            StructureType
 	p_next                            voidptr
 	wait_semaphore_count              u32
@@ -5204,27 +5388,24 @@ mut:
 	p_signal_semaphore_device_indices &u32
 }
 
-// DeviceGroupBindSparseInfo extends VkBindSparseInfo
 pub struct DeviceGroupBindSparseInfo {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	resource_device_index u32
 	memory_device_index   u32
 }
 
-// BindBufferMemoryDeviceGroupInfo extends VkBindBufferMemoryInfo
 pub struct BindBufferMemoryDeviceGroupInfo {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	device_index_count u32
 	p_device_indices   &u32
 }
 
-// BindImageMemoryDeviceGroupInfo extends VkBindImageMemoryInfo
 pub struct BindImageMemoryDeviceGroupInfo {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	device_index_count               u32
@@ -5234,17 +5415,16 @@ mut:
 }
 
 pub struct PhysicalDeviceGroupProperties {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	physical_device_count u32
-	physical_devices      []C.PhysicalDevice
+	physical_devices      [max_device_group_size]C.PhysicalDevice
 	subset_allocation     Bool32
 }
 
-// DeviceGroupDeviceCreateInfo extends VkDeviceCreateInfo
 pub struct DeviceGroupDeviceCreateInfo {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	physical_device_count u32
@@ -5252,71 +5432,70 @@ mut:
 }
 
 pub struct BufferMemoryRequirementsInfo2 {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	buffer C.Buffer
 }
 
 pub struct ImageMemoryRequirementsInfo2 {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	image  C.Image
 }
 
 pub struct ImageSparseMemoryRequirementsInfo2 {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	image  C.Image
 }
 
 pub struct MemoryRequirements2 {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	memory_requirements MemoryRequirements
 }
 
 pub struct SparseImageMemoryRequirements2 {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	memory_requirements SparseImageMemoryRequirements
 }
 
-// PhysicalDeviceFeatures2 extends VkDeviceCreateInfo
 pub struct PhysicalDeviceFeatures2 {
-mut:
+pub mut:
 	s_type   StructureType
 	p_next   voidptr
 	features PhysicalDeviceFeatures
 }
 
 pub struct PhysicalDeviceProperties2 {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	properties PhysicalDeviceProperties
 }
 
 pub struct FormatProperties2 {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	format_properties FormatProperties
 }
 
 pub struct ImageFormatProperties2 {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	image_format_properties ImageFormatProperties
 }
 
 pub struct PhysicalDeviceImageFormatInfo2 {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	format Format
@@ -5327,28 +5506,28 @@ mut:
 }
 
 pub struct QueueFamilyProperties2 {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	queue_family_properties QueueFamilyProperties
 }
 
 pub struct PhysicalDeviceMemoryProperties2 {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	memory_properties PhysicalDeviceMemoryProperties
 }
 
 pub struct SparseImageFormatProperties2 {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	properties SparseImageFormatProperties
 }
 
 pub struct PhysicalDeviceSparseImageFormatInfo2 {
-mut:
+pub mut:
 	s_type  StructureType
 	p_next  voidptr
 	format  Format
@@ -5358,49 +5537,44 @@ mut:
 	tiling  ImageTiling
 }
 
-// PhysicalDevicePointClippingProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDevicePointClippingProperties {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	point_clipping_behavior PointClippingBehavior
 }
 
 pub struct InputAttachmentAspectReference {
-mut:
+pub mut:
 	subpass                u32
 	input_attachment_index u32
 	aspect_mask            ImageAspectFlags
 }
 
-// RenderPassInputAttachmentAspectCreateInfo extends VkRenderPassCreateInfo
 pub struct RenderPassInputAttachmentAspectCreateInfo {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	aspect_reference_count u32
 	p_aspect_references    &InputAttachmentAspectReference
 }
 
-// ImageViewUsageCreateInfo extends VkImageViewCreateInfo
 pub struct ImageViewUsageCreateInfo {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	usage  ImageUsageFlags
 }
 
-// PipelineTessellationDomainOriginStateCreateInfo extends VkPipelineTessellationStateCreateInfo
 pub struct PipelineTessellationDomainOriginStateCreateInfo {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	domain_origin TessellationDomainOrigin
 }
 
-// RenderPassMultiviewCreateInfo extends VkRenderPassCreateInfo
 pub struct RenderPassMultiviewCreateInfo {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	subpass_count          u32
@@ -5411,9 +5585,8 @@ mut:
 	p_correlation_masks    &u32
 }
 
-// PhysicalDeviceMultiviewFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceMultiviewFeatures {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	multiview                     Bool32
@@ -5421,18 +5594,16 @@ mut:
 	multiview_tessellation_shader Bool32
 }
 
-// PhysicalDeviceMultiviewProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceMultiviewProperties {
-mut:
+pub mut:
 	s_type                       StructureType
 	p_next                       voidptr
 	max_multiview_view_count     u32
 	max_multiview_instance_index u32
 }
 
-// PhysicalDeviceVariablePointersFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceVariablePointersFeatures {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	variable_pointers_storage_buffer Bool32
@@ -5441,24 +5612,22 @@ mut:
 
 pub type PhysicalDeviceVariablePointerFeatures = PhysicalDeviceVariablePointersFeatures
 
-// PhysicalDeviceProtectedMemoryFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceProtectedMemoryFeatures {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	protected_memory Bool32
 }
 
-// PhysicalDeviceProtectedMemoryProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceProtectedMemoryProperties {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	protected_no_fault Bool32
 }
 
 pub struct DeviceQueueInfo2 {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	flags              DeviceQueueCreateFlags
@@ -5466,16 +5635,15 @@ mut:
 	queue_index        u32
 }
 
-// ProtectedSubmitInfo extends VkSubmitInfo
 pub struct ProtectedSubmitInfo {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	protected_submit Bool32
 }
 
 pub struct SamplerYcbcrConversionCreateInfo {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	format                        Format
@@ -5488,48 +5656,43 @@ mut:
 	force_explicit_reconstruction Bool32
 }
 
-// SamplerYcbcrConversionInfo extends VkSamplerCreateInfo,VkImageViewCreateInfo
 pub struct SamplerYcbcrConversionInfo {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	conversion C.SamplerYcbcrConversion
 }
 
-// BindImagePlaneMemoryInfo extends VkBindImageMemoryInfo
 pub struct BindImagePlaneMemoryInfo {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	plane_aspect ImageAspectFlagBits
 }
 
-// ImagePlaneMemoryRequirementsInfo extends VkImageMemoryRequirementsInfo2
 pub struct ImagePlaneMemoryRequirementsInfo {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	plane_aspect ImageAspectFlagBits
 }
 
-// PhysicalDeviceSamplerYcbcrConversionFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceSamplerYcbcrConversionFeatures {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	sampler_ycbcr_conversion Bool32
 }
 
-// SamplerYcbcrConversionImageFormatProperties extends VkImageFormatProperties2
 pub struct SamplerYcbcrConversionImageFormatProperties {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	combined_image_sampler_descriptor_count u32
 }
 
 pub struct DescriptorUpdateTemplateEntry {
-mut:
+pub mut:
 	dst_binding       u32
 	dst_array_element u32
 	descriptor_count  u32
@@ -5539,7 +5702,7 @@ mut:
 }
 
 pub struct DescriptorUpdateTemplateCreateInfo {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	flags                         DescriptorUpdateTemplateCreateFlags
@@ -5553,30 +5716,28 @@ mut:
 }
 
 pub struct ExternalMemoryProperties {
-mut:
+pub mut:
 	external_memory_features          ExternalMemoryFeatureFlags
 	export_from_imported_handle_types ExternalMemoryHandleTypeFlags
 	compatible_handle_types           ExternalMemoryHandleTypeFlags
 }
 
-// PhysicalDeviceExternalImageFormatInfo extends VkPhysicalDeviceImageFormatInfo2
 pub struct PhysicalDeviceExternalImageFormatInfo {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	handle_type ExternalMemoryHandleTypeFlagBits
 }
 
-// ExternalImageFormatProperties extends VkImageFormatProperties2
 pub struct ExternalImageFormatProperties {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	external_memory_properties ExternalMemoryProperties
 }
 
 pub struct PhysicalDeviceExternalBufferInfo {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	flags       BufferCreateFlags
@@ -5585,57 +5746,53 @@ mut:
 }
 
 pub struct ExternalBufferProperties {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	external_memory_properties ExternalMemoryProperties
 }
 
-// PhysicalDeviceIDProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceIDProperties {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
-	device_uuid       []u8
-	driver_uuid       []u8
-	device_luid       []u8
+	device_uuid       [uuid_size]u8
+	driver_uuid       [uuid_size]u8
+	device_luid       [luid_size]u8
 	device_node_mask  u32
 	device_luid_valid Bool32
 }
 
-// ExternalMemoryImageCreateInfo extends VkImageCreateInfo
 pub struct ExternalMemoryImageCreateInfo {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	handle_types ExternalMemoryHandleTypeFlags
 }
 
-// ExternalMemoryBufferCreateInfo extends VkBufferCreateInfo
 pub struct ExternalMemoryBufferCreateInfo {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	handle_types ExternalMemoryHandleTypeFlags
 }
 
-// ExportMemoryAllocateInfo extends VkMemoryAllocateInfo
 pub struct ExportMemoryAllocateInfo {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	handle_types ExternalMemoryHandleTypeFlags
 }
 
 pub struct PhysicalDeviceExternalFenceInfo {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	handle_type ExternalFenceHandleTypeFlagBits
 }
 
 pub struct ExternalFenceProperties {
-mut:
+pub mut:
 	s_type                            StructureType
 	p_next                            voidptr
 	export_from_imported_handle_types ExternalFenceHandleTypeFlags
@@ -5643,31 +5800,29 @@ mut:
 	external_fence_features           ExternalFenceFeatureFlags
 }
 
-// ExportFenceCreateInfo extends VkFenceCreateInfo
 pub struct ExportFenceCreateInfo {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	handle_types ExternalFenceHandleTypeFlags
 }
 
-// ExportSemaphoreCreateInfo extends VkSemaphoreCreateInfo
 pub struct ExportSemaphoreCreateInfo {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	handle_types ExternalSemaphoreHandleTypeFlags
 }
 
 pub struct PhysicalDeviceExternalSemaphoreInfo {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	handle_type ExternalSemaphoreHandleTypeFlagBits
 }
 
 pub struct ExternalSemaphoreProperties {
-mut:
+pub mut:
 	s_type                            StructureType
 	p_next                            voidptr
 	export_from_imported_handle_types ExternalSemaphoreHandleTypeFlags
@@ -5675,9 +5830,8 @@ mut:
 	external_semaphore_features       ExternalSemaphoreFeatureFlags
 }
 
-// PhysicalDeviceMaintenance3Properties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceMaintenance3Properties {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	max_per_set_descriptors    u32
@@ -5685,15 +5839,14 @@ mut:
 }
 
 pub struct DescriptorSetLayoutSupport {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	supported Bool32
 }
 
-// PhysicalDeviceShaderDrawParametersFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceShaderDrawParametersFeatures {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	shader_draw_parameters Bool32
@@ -5701,289 +5854,279 @@ mut:
 
 pub type PhysicalDeviceShaderDrawParameterFeatures = PhysicalDeviceShaderDrawParametersFeatures
 
-type VkEnumerateInstanceVersion = fn (&u32) Result
-
+fn C.vkEnumerateInstanceVersion(&u32) Result
 pub fn enumerate_instance_version(p_api_version &u32) Result {
-	f := VkEnumerateInstanceVersion((*vulkan.loader_p).get_sym('vkEnumerateInstanceVersion') or {
-		println("Couldn't load symbol for 'vkEnumerateInstanceVersion': ${err}")
-		return Result.error_unknown
-	})
-	return f(p_api_version)
+	return C.vkEnumerateInstanceVersion(p_api_version)
 }
 
-type VkBindBufferMemory2 = fn (C.Device, u32, &BindBufferMemoryInfo) Result
-
-pub fn bind_buffer_memory2(device C.Device, bind_info_count u32, p_bind_infos &BindBufferMemoryInfo) Result {
-	f := VkBindBufferMemory2((*vulkan.loader_p).get_sym('vkBindBufferMemory2') or {
-		println("Couldn't load symbol for 'vkBindBufferMemory2': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, bind_info_count, p_bind_infos)
+fn C.vkBindBufferMemory2(C.Device,
+	u32,
+	&BindBufferMemoryInfo) Result
+pub fn bind_buffer_memory2(device C.Device,
+	bind_info_count u32,
+	p_bind_infos &BindBufferMemoryInfo) Result {
+	return C.vkBindBufferMemory2(device, bind_info_count, p_bind_infos)
 }
 
-type VkBindImageMemory2 = fn (C.Device, u32, &BindImageMemoryInfo) Result
-
-pub fn bind_image_memory2(device C.Device, bind_info_count u32, p_bind_infos &BindImageMemoryInfo) Result {
-	f := VkBindImageMemory2((*vulkan.loader_p).get_sym('vkBindImageMemory2') or {
-		println("Couldn't load symbol for 'vkBindImageMemory2': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, bind_info_count, p_bind_infos)
+fn C.vkBindImageMemory2(C.Device,
+	u32,
+	&BindImageMemoryInfo) Result
+pub fn bind_image_memory2(device C.Device,
+	bind_info_count u32,
+	p_bind_infos &BindImageMemoryInfo) Result {
+	return C.vkBindImageMemory2(device, bind_info_count, p_bind_infos)
 }
 
-type VkGetDeviceGroupPeerMemoryFeatures = fn (C.Device, u32, u32, u32, &PeerMemoryFeatureFlags)
-
-pub fn get_device_group_peer_memory_features(device C.Device, heap_index u32, local_device_index u32, remote_device_index u32, p_peer_memory_features &PeerMemoryFeatureFlags) {
-	f := VkGetDeviceGroupPeerMemoryFeatures((*vulkan.loader_p).get_sym('vkGetDeviceGroupPeerMemoryFeatures') or {
-		println("Couldn't load symbol for 'vkGetDeviceGroupPeerMemoryFeatures': ${err}")
-		return
-	})
-	f(device, heap_index, local_device_index, remote_device_index, p_peer_memory_features)
+fn C.vkGetDeviceGroupPeerMemoryFeatures(C.Device,
+	u32,
+	u32,
+	u32,
+	&PeerMemoryFeatureFlags)
+pub fn get_device_group_peer_memory_features(device C.Device,
+	heap_index u32,
+	local_device_index u32,
+	remote_device_index u32,
+	p_peer_memory_features &PeerMemoryFeatureFlags) {
+	C.vkGetDeviceGroupPeerMemoryFeatures(device, heap_index, local_device_index, remote_device_index,
+		p_peer_memory_features)
 }
 
-type VkCmdSetDeviceMask = fn (C.CommandBuffer, u32)
-
-pub fn cmd_set_device_mask(command_buffer C.CommandBuffer, device_mask u32) {
-	f := VkCmdSetDeviceMask((*vulkan.loader_p).get_sym('vkCmdSetDeviceMask') or {
-		println("Couldn't load symbol for 'vkCmdSetDeviceMask': ${err}")
-		return
-	})
-	f(command_buffer, device_mask)
+fn C.vkCmdSetDeviceMask(C.CommandBuffer,
+	u32)
+pub fn cmd_set_device_mask(command_buffer C.CommandBuffer,
+	device_mask u32) {
+	C.vkCmdSetDeviceMask(command_buffer, device_mask)
 }
 
-type VkCmdDispatchBase = fn (C.CommandBuffer, u32, u32, u32, u32, u32, u32)
-
-pub fn cmd_dispatch_base(command_buffer C.CommandBuffer, base_group_x u32, base_group_y u32, base_group_z u32, group_count_x u32, group_count_y u32, group_count_z u32) {
-	f := VkCmdDispatchBase((*vulkan.loader_p).get_sym('vkCmdDispatchBase') or {
-		println("Couldn't load symbol for 'vkCmdDispatchBase': ${err}")
-		return
-	})
-	f(command_buffer, base_group_x, base_group_y, base_group_z, group_count_x, group_count_y,
-		group_count_z)
+fn C.vkCmdDispatchBase(C.CommandBuffer,
+	u32,
+	u32,
+	u32,
+	u32,
+	u32,
+	u32)
+pub fn cmd_dispatch_base(command_buffer C.CommandBuffer,
+	base_group_x u32,
+	base_group_y u32,
+	base_group_z u32,
+	group_count_x u32,
+	group_count_y u32,
+	group_count_z u32) {
+	C.vkCmdDispatchBase(command_buffer, base_group_x, base_group_y, base_group_z, group_count_x,
+		group_count_y, group_count_z)
 }
 
-type VkEnumeratePhysicalDeviceGroups = fn (C.Instance, &u32, &PhysicalDeviceGroupProperties) Result
-
-pub fn enumerate_physical_device_groups(instance C.Instance, p_physical_device_group_count &u32, p_physical_device_group_properties &PhysicalDeviceGroupProperties) Result {
-	f := VkEnumeratePhysicalDeviceGroups((*vulkan.loader_p).get_sym('vkEnumeratePhysicalDeviceGroups') or {
-		println("Couldn't load symbol for 'vkEnumeratePhysicalDeviceGroups': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_physical_device_group_count, p_physical_device_group_properties)
+fn C.vkEnumeratePhysicalDeviceGroups(C.Instance,
+	&u32,
+	&PhysicalDeviceGroupProperties) Result
+pub fn enumerate_physical_device_groups(instance C.Instance,
+	p_physical_device_group_count &u32,
+	p_physical_device_group_properties &PhysicalDeviceGroupProperties) Result {
+	return C.vkEnumeratePhysicalDeviceGroups(instance, p_physical_device_group_count,
+		p_physical_device_group_properties)
 }
 
-type VkGetImageMemoryRequirements2 = fn (C.Device, &ImageMemoryRequirementsInfo2, &MemoryRequirements2)
-
-pub fn get_image_memory_requirements2(device C.Device, p_info &ImageMemoryRequirementsInfo2, p_memory_requirements &MemoryRequirements2) {
-	f := VkGetImageMemoryRequirements2((*vulkan.loader_p).get_sym('vkGetImageMemoryRequirements2') or {
-		println("Couldn't load symbol for 'vkGetImageMemoryRequirements2': ${err}")
-		return
-	})
-	f(device, p_info, p_memory_requirements)
+fn C.vkGetImageMemoryRequirements2(C.Device,
+	&ImageMemoryRequirementsInfo2,
+	&MemoryRequirements2)
+pub fn get_image_memory_requirements2(device C.Device,
+	p_info &ImageMemoryRequirementsInfo2,
+	p_memory_requirements &MemoryRequirements2) {
+	C.vkGetImageMemoryRequirements2(device, p_info, p_memory_requirements)
 }
 
-type VkGetBufferMemoryRequirements2 = fn (C.Device, &BufferMemoryRequirementsInfo2, &MemoryRequirements2)
-
-pub fn get_buffer_memory_requirements2(device C.Device, p_info &BufferMemoryRequirementsInfo2, p_memory_requirements &MemoryRequirements2) {
-	f := VkGetBufferMemoryRequirements2((*vulkan.loader_p).get_sym('vkGetBufferMemoryRequirements2') or {
-		println("Couldn't load symbol for 'vkGetBufferMemoryRequirements2': ${err}")
-		return
-	})
-	f(device, p_info, p_memory_requirements)
+fn C.vkGetBufferMemoryRequirements2(C.Device,
+	&BufferMemoryRequirementsInfo2,
+	&MemoryRequirements2)
+pub fn get_buffer_memory_requirements2(device C.Device,
+	p_info &BufferMemoryRequirementsInfo2,
+	p_memory_requirements &MemoryRequirements2) {
+	C.vkGetBufferMemoryRequirements2(device, p_info, p_memory_requirements)
 }
 
-type VkGetImageSparseMemoryRequirements2 = fn (C.Device, &ImageSparseMemoryRequirementsInfo2, &u32, &SparseImageMemoryRequirements2)
-
-pub fn get_image_sparse_memory_requirements2(device C.Device, p_info &ImageSparseMemoryRequirementsInfo2, p_sparse_memory_requirement_count &u32, p_sparse_memory_requirements &SparseImageMemoryRequirements2) {
-	f := VkGetImageSparseMemoryRequirements2((*vulkan.loader_p).get_sym('vkGetImageSparseMemoryRequirements2') or {
-		println("Couldn't load symbol for 'vkGetImageSparseMemoryRequirements2': ${err}")
-		return
-	})
-	f(device, p_info, p_sparse_memory_requirement_count, p_sparse_memory_requirements)
+fn C.vkGetImageSparseMemoryRequirements2(C.Device,
+	&ImageSparseMemoryRequirementsInfo2,
+	&u32,
+	&SparseImageMemoryRequirements2)
+pub fn get_image_sparse_memory_requirements2(device C.Device,
+	p_info &ImageSparseMemoryRequirementsInfo2,
+	p_sparse_memory_requirement_count &u32,
+	p_sparse_memory_requirements &SparseImageMemoryRequirements2) {
+	C.vkGetImageSparseMemoryRequirements2(device, p_info, p_sparse_memory_requirement_count,
+		p_sparse_memory_requirements)
 }
 
-type VkGetPhysicalDeviceFeatures2 = fn (C.PhysicalDevice, &PhysicalDeviceFeatures2)
-
-pub fn get_physical_device_features2(physical_device C.PhysicalDevice, p_features &PhysicalDeviceFeatures2) {
-	f := VkGetPhysicalDeviceFeatures2((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceFeatures2') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceFeatures2': ${err}")
-		return
-	})
-	f(physical_device, p_features)
+fn C.vkGetPhysicalDeviceFeatures2(C.PhysicalDevice,
+	&PhysicalDeviceFeatures2)
+pub fn get_physical_device_features2(physical_device C.PhysicalDevice,
+	p_features &PhysicalDeviceFeatures2) {
+	C.vkGetPhysicalDeviceFeatures2(physical_device, p_features)
 }
 
-type VkGetPhysicalDeviceProperties2 = fn (C.PhysicalDevice, &PhysicalDeviceProperties2)
-
-pub fn get_physical_device_properties2(physical_device C.PhysicalDevice, p_properties &PhysicalDeviceProperties2) {
-	f := VkGetPhysicalDeviceProperties2((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceProperties2') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceProperties2': ${err}")
-		return
-	})
-	f(physical_device, p_properties)
+fn C.vkGetPhysicalDeviceProperties2(C.PhysicalDevice,
+	&PhysicalDeviceProperties2)
+pub fn get_physical_device_properties2(physical_device C.PhysicalDevice,
+	p_properties &PhysicalDeviceProperties2) {
+	C.vkGetPhysicalDeviceProperties2(physical_device, p_properties)
 }
 
-type VkGetPhysicalDeviceFormatProperties2 = fn (C.PhysicalDevice, Format, &FormatProperties2)
-
-pub fn get_physical_device_format_properties2(physical_device C.PhysicalDevice, format Format, p_format_properties &FormatProperties2) {
-	f := VkGetPhysicalDeviceFormatProperties2((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceFormatProperties2') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceFormatProperties2': ${err}")
-		return
-	})
-	f(physical_device, format, p_format_properties)
+fn C.vkGetPhysicalDeviceFormatProperties2(C.PhysicalDevice,
+	Format,
+	&FormatProperties2)
+pub fn get_physical_device_format_properties2(physical_device C.PhysicalDevice,
+	format Format,
+	p_format_properties &FormatProperties2) {
+	C.vkGetPhysicalDeviceFormatProperties2(physical_device, format, p_format_properties)
 }
 
-type VkGetPhysicalDeviceImageFormatProperties2 = fn (C.PhysicalDevice, &PhysicalDeviceImageFormatInfo2, &ImageFormatProperties2) Result
-
-pub fn get_physical_device_image_format_properties2(physical_device C.PhysicalDevice, p_image_format_info &PhysicalDeviceImageFormatInfo2, p_image_format_properties &ImageFormatProperties2) Result {
-	f := VkGetPhysicalDeviceImageFormatProperties2((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceImageFormatProperties2') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceImageFormatProperties2': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_image_format_info, p_image_format_properties)
+fn C.vkGetPhysicalDeviceImageFormatProperties2(C.PhysicalDevice,
+	&PhysicalDeviceImageFormatInfo2,
+	&ImageFormatProperties2) Result
+pub fn get_physical_device_image_format_properties2(physical_device C.PhysicalDevice,
+	p_image_format_info &PhysicalDeviceImageFormatInfo2,
+	p_image_format_properties &ImageFormatProperties2) Result {
+	return C.vkGetPhysicalDeviceImageFormatProperties2(physical_device, p_image_format_info,
+		p_image_format_properties)
 }
 
-type VkGetPhysicalDeviceQueueFamilyProperties2 = fn (C.PhysicalDevice, &u32, &QueueFamilyProperties2)
-
-pub fn get_physical_device_queue_family_properties2(physical_device C.PhysicalDevice, p_queue_family_property_count &u32, p_queue_family_properties &QueueFamilyProperties2) {
-	f := VkGetPhysicalDeviceQueueFamilyProperties2((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceQueueFamilyProperties2') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceQueueFamilyProperties2': ${err}")
-		return
-	})
-	f(physical_device, p_queue_family_property_count, p_queue_family_properties)
+fn C.vkGetPhysicalDeviceQueueFamilyProperties2(C.PhysicalDevice,
+	&u32,
+	&QueueFamilyProperties2)
+pub fn get_physical_device_queue_family_properties2(physical_device C.PhysicalDevice,
+	p_queue_family_property_count &u32,
+	p_queue_family_properties &QueueFamilyProperties2) {
+	C.vkGetPhysicalDeviceQueueFamilyProperties2(physical_device, p_queue_family_property_count,
+		p_queue_family_properties)
 }
 
-type VkGetPhysicalDeviceMemoryProperties2 = fn (C.PhysicalDevice, &PhysicalDeviceMemoryProperties2)
-
-pub fn get_physical_device_memory_properties2(physical_device C.PhysicalDevice, p_memory_properties &PhysicalDeviceMemoryProperties2) {
-	f := VkGetPhysicalDeviceMemoryProperties2((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceMemoryProperties2') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceMemoryProperties2': ${err}")
-		return
-	})
-	f(physical_device, p_memory_properties)
+fn C.vkGetPhysicalDeviceMemoryProperties2(C.PhysicalDevice,
+	&PhysicalDeviceMemoryProperties2)
+pub fn get_physical_device_memory_properties2(physical_device C.PhysicalDevice,
+	p_memory_properties &PhysicalDeviceMemoryProperties2) {
+	C.vkGetPhysicalDeviceMemoryProperties2(physical_device, p_memory_properties)
 }
 
-type VkGetPhysicalDeviceSparseImageFormatProperties2 = fn (C.PhysicalDevice, &PhysicalDeviceSparseImageFormatInfo2, &u32, &SparseImageFormatProperties2)
-
-pub fn get_physical_device_sparse_image_format_properties2(physical_device C.PhysicalDevice, p_format_info &PhysicalDeviceSparseImageFormatInfo2, p_property_count &u32, p_properties &SparseImageFormatProperties2) {
-	f := VkGetPhysicalDeviceSparseImageFormatProperties2((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSparseImageFormatProperties2') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSparseImageFormatProperties2': ${err}")
-		return
-	})
-	f(physical_device, p_format_info, p_property_count, p_properties)
+fn C.vkGetPhysicalDeviceSparseImageFormatProperties2(C.PhysicalDevice,
+	&PhysicalDeviceSparseImageFormatInfo2,
+	&u32,
+	&SparseImageFormatProperties2)
+pub fn get_physical_device_sparse_image_format_properties2(physical_device C.PhysicalDevice,
+	p_format_info &PhysicalDeviceSparseImageFormatInfo2,
+	p_property_count &u32,
+	p_properties &SparseImageFormatProperties2) {
+	C.vkGetPhysicalDeviceSparseImageFormatProperties2(physical_device, p_format_info,
+		p_property_count, p_properties)
 }
 
-type VkTrimCommandPool = fn (C.Device, C.CommandPool, CommandPoolTrimFlags)
-
-pub fn trim_command_pool(device C.Device, command_pool C.CommandPool, flags CommandPoolTrimFlags) {
-	f := VkTrimCommandPool((*vulkan.loader_p).get_sym('vkTrimCommandPool') or {
-		println("Couldn't load symbol for 'vkTrimCommandPool': ${err}")
-		return
-	})
-	f(device, command_pool, flags)
+fn C.vkTrimCommandPool(C.Device,
+	C.CommandPool,
+	CommandPoolTrimFlags)
+pub fn trim_command_pool(device C.Device,
+	command_pool C.CommandPool,
+	flags CommandPoolTrimFlags) {
+	C.vkTrimCommandPool(device, command_pool, flags)
 }
 
-type VkGetDeviceQueue2 = fn (C.Device, &DeviceQueueInfo2, &C.Queue)
-
-pub fn get_device_queue2(device C.Device, p_queue_info &DeviceQueueInfo2, p_queue &C.Queue) {
-	f := VkGetDeviceQueue2((*vulkan.loader_p).get_sym('vkGetDeviceQueue2') or {
-		println("Couldn't load symbol for 'vkGetDeviceQueue2': ${err}")
-		return
-	})
-	f(device, p_queue_info, p_queue)
+fn C.vkGetDeviceQueue2(C.Device,
+	&DeviceQueueInfo2,
+	&C.Queue)
+pub fn get_device_queue2(device C.Device,
+	p_queue_info &DeviceQueueInfo2,
+	p_queue &C.Queue) {
+	C.vkGetDeviceQueue2(device, p_queue_info, p_queue)
 }
 
-type VkCreateSamplerYcbcrConversion = fn (C.Device, &SamplerYcbcrConversionCreateInfo, &AllocationCallbacks, &C.SamplerYcbcrConversion) Result
-
-pub fn create_sampler_ycbcr_conversion(device C.Device, p_create_info &SamplerYcbcrConversionCreateInfo, p_allocator &AllocationCallbacks, p_ycbcr_conversion &C.SamplerYcbcrConversion) Result {
-	f := VkCreateSamplerYcbcrConversion((*vulkan.loader_p).get_sym('vkCreateSamplerYcbcrConversion') or {
-		println("Couldn't load symbol for 'vkCreateSamplerYcbcrConversion': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_ycbcr_conversion)
+fn C.vkCreateSamplerYcbcrConversion(C.Device,
+	&SamplerYcbcrConversionCreateInfo,
+	&AllocationCallbacks,
+	&C.SamplerYcbcrConversion) Result
+pub fn create_sampler_ycbcr_conversion(device C.Device,
+	p_create_info &SamplerYcbcrConversionCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_ycbcr_conversion &C.SamplerYcbcrConversion) Result {
+	return C.vkCreateSamplerYcbcrConversion(device, p_create_info, p_allocator, p_ycbcr_conversion)
 }
 
-type VkDestroySamplerYcbcrConversion = fn (C.Device, C.SamplerYcbcrConversion, &AllocationCallbacks)
-
-pub fn destroy_sampler_ycbcr_conversion(device C.Device, ycbcr_conversion C.SamplerYcbcrConversion, p_allocator &AllocationCallbacks) {
-	f := VkDestroySamplerYcbcrConversion((*vulkan.loader_p).get_sym('vkDestroySamplerYcbcrConversion') or {
-		println("Couldn't load symbol for 'vkDestroySamplerYcbcrConversion': ${err}")
-		return
-	})
-	f(device, ycbcr_conversion, p_allocator)
+fn C.vkDestroySamplerYcbcrConversion(C.Device,
+	C.SamplerYcbcrConversion,
+	&AllocationCallbacks)
+pub fn destroy_sampler_ycbcr_conversion(device C.Device,
+	ycbcr_conversion C.SamplerYcbcrConversion,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroySamplerYcbcrConversion(device, ycbcr_conversion, p_allocator)
 }
 
-type VkCreateDescriptorUpdateTemplate = fn (C.Device, &DescriptorUpdateTemplateCreateInfo, &AllocationCallbacks, &C.DescriptorUpdateTemplate) Result
-
-pub fn create_descriptor_update_template(device C.Device, p_create_info &DescriptorUpdateTemplateCreateInfo, p_allocator &AllocationCallbacks, p_descriptor_update_template &C.DescriptorUpdateTemplate) Result {
-	f := VkCreateDescriptorUpdateTemplate((*vulkan.loader_p).get_sym('vkCreateDescriptorUpdateTemplate') or {
-		println("Couldn't load symbol for 'vkCreateDescriptorUpdateTemplate': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_descriptor_update_template)
+fn C.vkCreateDescriptorUpdateTemplate(C.Device,
+	&DescriptorUpdateTemplateCreateInfo,
+	&AllocationCallbacks,
+	&C.DescriptorUpdateTemplate) Result
+pub fn create_descriptor_update_template(device C.Device,
+	p_create_info &DescriptorUpdateTemplateCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_descriptor_update_template &C.DescriptorUpdateTemplate) Result {
+	return C.vkCreateDescriptorUpdateTemplate(device, p_create_info, p_allocator, p_descriptor_update_template)
 }
 
-type VkDestroyDescriptorUpdateTemplate = fn (C.Device, C.DescriptorUpdateTemplate, &AllocationCallbacks)
-
-pub fn destroy_descriptor_update_template(device C.Device, descriptor_update_template C.DescriptorUpdateTemplate, p_allocator &AllocationCallbacks) {
-	f := VkDestroyDescriptorUpdateTemplate((*vulkan.loader_p).get_sym('vkDestroyDescriptorUpdateTemplate') or {
-		println("Couldn't load symbol for 'vkDestroyDescriptorUpdateTemplate': ${err}")
-		return
-	})
-	f(device, descriptor_update_template, p_allocator)
+fn C.vkDestroyDescriptorUpdateTemplate(C.Device,
+	C.DescriptorUpdateTemplate,
+	&AllocationCallbacks)
+pub fn destroy_descriptor_update_template(device C.Device,
+	descriptor_update_template C.DescriptorUpdateTemplate,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyDescriptorUpdateTemplate(device, descriptor_update_template, p_allocator)
 }
 
-type VkUpdateDescriptorSetWithTemplate = fn (C.Device, C.DescriptorSet, C.DescriptorUpdateTemplate, voidptr)
-
-pub fn update_descriptor_set_with_template(device C.Device, descriptor_set C.DescriptorSet, descriptor_update_template C.DescriptorUpdateTemplate, p_data voidptr) {
-	f := VkUpdateDescriptorSetWithTemplate((*vulkan.loader_p).get_sym('vkUpdateDescriptorSetWithTemplate') or {
-		println("Couldn't load symbol for 'vkUpdateDescriptorSetWithTemplate': ${err}")
-		return
-	})
-	f(device, descriptor_set, descriptor_update_template, p_data)
+fn C.vkUpdateDescriptorSetWithTemplate(C.Device,
+	C.DescriptorSet,
+	C.DescriptorUpdateTemplate,
+	voidptr)
+pub fn update_descriptor_set_with_template(device C.Device,
+	descriptor_set C.DescriptorSet,
+	descriptor_update_template C.DescriptorUpdateTemplate,
+	p_data voidptr) {
+	C.vkUpdateDescriptorSetWithTemplate(device, descriptor_set, descriptor_update_template,
+		p_data)
 }
 
-type VkGetPhysicalDeviceExternalBufferProperties = fn (C.PhysicalDevice, &PhysicalDeviceExternalBufferInfo, &ExternalBufferProperties)
-
-pub fn get_physical_device_external_buffer_properties(physical_device C.PhysicalDevice, p_external_buffer_info &PhysicalDeviceExternalBufferInfo, p_external_buffer_properties &ExternalBufferProperties) {
-	f := VkGetPhysicalDeviceExternalBufferProperties((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceExternalBufferProperties') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalBufferProperties': ${err}")
-		return
-	})
-	f(physical_device, p_external_buffer_info, p_external_buffer_properties)
+fn C.vkGetPhysicalDeviceExternalBufferProperties(C.PhysicalDevice,
+	&PhysicalDeviceExternalBufferInfo,
+	&ExternalBufferProperties)
+pub fn get_physical_device_external_buffer_properties(physical_device C.PhysicalDevice,
+	p_external_buffer_info &PhysicalDeviceExternalBufferInfo,
+	p_external_buffer_properties &ExternalBufferProperties) {
+	C.vkGetPhysicalDeviceExternalBufferProperties(physical_device, p_external_buffer_info,
+		p_external_buffer_properties)
 }
 
-type VkGetPhysicalDeviceExternalFenceProperties = fn (C.PhysicalDevice, &PhysicalDeviceExternalFenceInfo, &ExternalFenceProperties)
-
-pub fn get_physical_device_external_fence_properties(physical_device C.PhysicalDevice, p_external_fence_info &PhysicalDeviceExternalFenceInfo, p_external_fence_properties &ExternalFenceProperties) {
-	f := VkGetPhysicalDeviceExternalFenceProperties((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceExternalFenceProperties') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalFenceProperties': ${err}")
-		return
-	})
-	f(physical_device, p_external_fence_info, p_external_fence_properties)
+fn C.vkGetPhysicalDeviceExternalFenceProperties(C.PhysicalDevice,
+	&PhysicalDeviceExternalFenceInfo,
+	&ExternalFenceProperties)
+pub fn get_physical_device_external_fence_properties(physical_device C.PhysicalDevice,
+	p_external_fence_info &PhysicalDeviceExternalFenceInfo,
+	p_external_fence_properties &ExternalFenceProperties) {
+	C.vkGetPhysicalDeviceExternalFenceProperties(physical_device, p_external_fence_info,
+		p_external_fence_properties)
 }
 
-type VkGetPhysicalDeviceExternalSemaphoreProperties = fn (C.PhysicalDevice, &PhysicalDeviceExternalSemaphoreInfo, &ExternalSemaphoreProperties)
-
-pub fn get_physical_device_external_semaphore_properties(physical_device C.PhysicalDevice, p_external_semaphore_info &PhysicalDeviceExternalSemaphoreInfo, p_external_semaphore_properties &ExternalSemaphoreProperties) {
-	f := VkGetPhysicalDeviceExternalSemaphoreProperties((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceExternalSemaphoreProperties') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalSemaphoreProperties': ${err}")
-		return
-	})
-	f(physical_device, p_external_semaphore_info, p_external_semaphore_properties)
+fn C.vkGetPhysicalDeviceExternalSemaphoreProperties(C.PhysicalDevice,
+	&PhysicalDeviceExternalSemaphoreInfo,
+	&ExternalSemaphoreProperties)
+pub fn get_physical_device_external_semaphore_properties(physical_device C.PhysicalDevice,
+	p_external_semaphore_info &PhysicalDeviceExternalSemaphoreInfo,
+	p_external_semaphore_properties &ExternalSemaphoreProperties) {
+	C.vkGetPhysicalDeviceExternalSemaphoreProperties(physical_device, p_external_semaphore_info,
+		p_external_semaphore_properties)
 }
 
-type VkGetDescriptorSetLayoutSupport = fn (C.Device, &DescriptorSetLayoutCreateInfo, &DescriptorSetLayoutSupport)
-
-pub fn get_descriptor_set_layout_support(device C.Device, p_create_info &DescriptorSetLayoutCreateInfo, p_support &DescriptorSetLayoutSupport) {
-	f := VkGetDescriptorSetLayoutSupport((*vulkan.loader_p).get_sym('vkGetDescriptorSetLayoutSupport') or {
-		println("Couldn't load symbol for 'vkGetDescriptorSetLayoutSupport': ${err}")
-		return
-	})
-	f(device, p_create_info, p_support)
+fn C.vkGetDescriptorSetLayoutSupport(C.Device,
+	&DescriptorSetLayoutCreateInfo,
+	&DescriptorSetLayoutSupport)
+pub fn get_descriptor_set_layout_support(device C.Device,
+	p_create_info &DescriptorSetLayoutCreateInfo,
+	p_support &DescriptorSetLayoutSupport) {
+	C.vkGetDescriptorSetLayoutSupport(device, p_create_info, p_support)
 }
 
-// VK_VERSION_1_2 is a preprocessor guard. Do not pass it to API calls.
-const version_1_2 = 1
 // Vulkan 1.2 version number
 pub const api_version_1_2 = make_api_version(0, 1, 2, 0) // Patch version should always be set to 0
 
@@ -6016,7 +6159,8 @@ pub enum DriverId {
 	driver_id_mesa_dozen                   = int(23)
 	driver_id_mesa_nvk                     = int(24)
 	driver_id_imagination_open_source_mesa = int(25)
-	driver_id_mesa_agxv                    = int(26)
+	driver_id_mesa_honeykrisp              = int(26)
+	driver_id_reserved_27                  = int(27)
 	driver_id_max_enum                     = int(0x7FFFFFFF)
 }
 
@@ -6070,9 +6214,8 @@ pub enum SemaphoreWaitFlagBits {
 
 pub type SemaphoreWaitFlags = u32
 
-// PhysicalDeviceVulkan11Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceVulkan11Features {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	storage_buffer16_bit_access             Bool32
@@ -6089,14 +6232,13 @@ mut:
 	shader_draw_parameters                  Bool32
 }
 
-// PhysicalDeviceVulkan11Properties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceVulkan11Properties {
-mut:
+pub mut:
 	s_type                                 StructureType
 	p_next                                 voidptr
-	device_uuid                            []u8
-	driver_uuid                            []u8
-	device_luid                            []u8
+	device_uuid                            [uuid_size]u8
+	driver_uuid                            [uuid_size]u8
+	device_luid                            [luid_size]u8
 	device_node_mask                       u32
 	device_luid_valid                      Bool32
 	subgroup_size                          u32
@@ -6111,9 +6253,8 @@ mut:
 	max_memory_allocation_size             DeviceSize
 }
 
-// PhysicalDeviceVulkan12Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceVulkan12Features {
-mut:
+pub mut:
 	s_type                                                    StructureType
 	p_next                                                    voidptr
 	sampler_mirror_clamp_to_edge                              Bool32
@@ -6166,21 +6307,20 @@ mut:
 }
 
 pub struct ConformanceVersion {
-mut:
+pub mut:
 	major    u8
 	minor    u8
 	subminor u8
 	patch    u8
 }
 
-// PhysicalDeviceVulkan12Properties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceVulkan12Properties {
-mut:
+pub mut:
 	s_type                                                       StructureType
 	p_next                                                       voidptr
 	driver_id                                                    DriverId
-	driver_name                                                  []char
-	driver_info                                                  []char
+	driver_name                                                  [max_driver_name_size]char
+	driver_info                                                  [max_driver_info_size]char
 	conformance_version                                          ConformanceVersion
 	denorm_behavior_independence                                 ShaderFloatControlsIndependence
 	rounding_mode_independence                                   ShaderFloatControlsIndependence
@@ -6232,9 +6372,8 @@ mut:
 	framebuffer_integer_color_sample_counts                      SampleCountFlags
 }
 
-// ImageFormatListCreateInfo extends VkImageCreateInfo,VkSwapchainCreateInfoKHR,VkPhysicalDeviceImageFormatInfo2
 pub struct ImageFormatListCreateInfo {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	view_format_count u32
@@ -6242,7 +6381,7 @@ mut:
 }
 
 pub struct AttachmentDescription2 {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	flags            AttachmentDescriptionFlags
@@ -6257,7 +6396,7 @@ mut:
 }
 
 pub struct AttachmentReference2 {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	attachment  u32
@@ -6266,7 +6405,7 @@ mut:
 }
 
 pub struct SubpassDescription2 {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	flags                      SubpassDescriptionFlags
@@ -6283,7 +6422,7 @@ mut:
 }
 
 pub struct SubpassDependency2 {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	src_subpass      u32
@@ -6297,7 +6436,7 @@ mut:
 }
 
 pub struct RenderPassCreateInfo2 {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	flags                      RenderPassCreateFlags
@@ -6312,21 +6451,20 @@ mut:
 }
 
 pub struct SubpassBeginInfo {
-mut:
+pub mut:
 	s_type   StructureType
 	p_next   voidptr
 	contents SubpassContents
 }
 
 pub struct SubpassEndInfo {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 }
 
-// PhysicalDevice8BitStorageFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDevice8BitStorageFeatures {
-mut:
+pub mut:
 	s_type                                 StructureType
 	p_next                                 voidptr
 	storage_buffer8_bit_access             Bool32
@@ -6334,38 +6472,34 @@ mut:
 	storage_push_constant8                 Bool32
 }
 
-// PhysicalDeviceDriverProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceDriverProperties {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	driver_id           DriverId
-	driver_name         []char
-	driver_info         []char
+	driver_name         [max_driver_name_size]char
+	driver_info         [max_driver_info_size]char
 	conformance_version ConformanceVersion
 }
 
-// PhysicalDeviceShaderAtomicInt64Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceShaderAtomicInt64Features {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	shader_buffer_int64_atomics Bool32
 	shader_shared_int64_atomics Bool32
 }
 
-// PhysicalDeviceShaderFloat16Int8Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceShaderFloat16Int8Features {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	shader_float16 Bool32
 	shader_int8    Bool32
 }
 
-// PhysicalDeviceFloatControlsProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceFloatControlsProperties {
-mut:
+pub mut:
 	s_type                                      StructureType
 	p_next                                      voidptr
 	denorm_behavior_independence                ShaderFloatControlsIndependence
@@ -6387,18 +6521,16 @@ mut:
 	shader_rounding_mode_rtz_float64            Bool32
 }
 
-// DescriptorSetLayoutBindingFlagsCreateInfo extends VkDescriptorSetLayoutCreateInfo
 pub struct DescriptorSetLayoutBindingFlagsCreateInfo {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	binding_count   u32
 	p_binding_flags &DescriptorBindingFlags
 }
 
-// PhysicalDeviceDescriptorIndexingFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceDescriptorIndexingFeatures {
-mut:
+pub mut:
 	s_type                                                    StructureType
 	p_next                                                    voidptr
 	shader_input_attachment_array_dynamic_indexing            Bool32
@@ -6423,9 +6555,8 @@ mut:
 	runtime_descriptor_array                                  Bool32
 }
 
-// PhysicalDeviceDescriptorIndexingProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceDescriptorIndexingProperties {
-mut:
+pub mut:
 	s_type                                                       StructureType
 	p_next                                                       voidptr
 	max_update_after_bind_descriptors_in_all_pools               u32
@@ -6453,26 +6584,23 @@ mut:
 	max_descriptor_set_update_after_bind_input_attachments       u32
 }
 
-// DescriptorSetVariableDescriptorCountAllocateInfo extends VkDescriptorSetAllocateInfo
 pub struct DescriptorSetVariableDescriptorCountAllocateInfo {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	descriptor_set_count u32
 	p_descriptor_counts  &u32
 }
 
-// DescriptorSetVariableDescriptorCountLayoutSupport extends VkDescriptorSetLayoutSupport
 pub struct DescriptorSetVariableDescriptorCountLayoutSupport {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	max_variable_descriptor_count u32
 }
 
-// SubpassDescriptionDepthStencilResolve extends VkSubpassDescription2
 pub struct SubpassDescriptionDepthStencilResolve {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	depth_resolve_mode                 ResolveModeFlagBits
@@ -6480,9 +6608,8 @@ mut:
 	p_depth_stencil_resolve_attachment &AttachmentReference2
 }
 
-// PhysicalDeviceDepthStencilResolveProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceDepthStencilResolveProperties {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	supported_depth_resolve_modes   ResolveModeFlags
@@ -6491,42 +6618,37 @@ mut:
 	independent_resolve             Bool32
 }
 
-// PhysicalDeviceScalarBlockLayoutFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceScalarBlockLayoutFeatures {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	scalar_block_layout Bool32
 }
 
-// ImageStencilUsageCreateInfo extends VkImageCreateInfo,VkPhysicalDeviceImageFormatInfo2
 pub struct ImageStencilUsageCreateInfo {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	stencil_usage ImageUsageFlags
 }
 
-// SamplerReductionModeCreateInfo extends VkSamplerCreateInfo
 pub struct SamplerReductionModeCreateInfo {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	reduction_mode SamplerReductionMode
 }
 
-// PhysicalDeviceSamplerFilterMinmaxProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceSamplerFilterMinmaxProperties {
-mut:
+pub mut:
 	s_type                                 StructureType
 	p_next                                 voidptr
 	filter_minmax_single_component_formats Bool32
 	filter_minmax_image_component_mapping  Bool32
 }
 
-// PhysicalDeviceVulkanMemoryModelFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceVulkanMemoryModelFeatures {
-mut:
+pub mut:
 	s_type                                             StructureType
 	p_next                                             voidptr
 	vulkan_memory_model                                Bool32
@@ -6534,16 +6656,15 @@ mut:
 	vulkan_memory_model_availability_visibility_chains Bool32
 }
 
-// PhysicalDeviceImagelessFramebufferFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceImagelessFramebufferFeatures {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	imageless_framebuffer Bool32
 }
 
 pub struct FramebufferAttachmentImageInfo {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	flags             ImageCreateFlags
@@ -6555,101 +6676,89 @@ mut:
 	p_view_formats    &Format
 }
 
-// FramebufferAttachmentsCreateInfo extends VkFramebufferCreateInfo
 pub struct FramebufferAttachmentsCreateInfo {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	attachment_image_info_count u32
 	p_attachment_image_infos    &FramebufferAttachmentImageInfo
 }
 
-// RenderPassAttachmentBeginInfo extends VkRenderPassBeginInfo
 pub struct RenderPassAttachmentBeginInfo {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	attachment_count u32
 	p_attachments    &C.ImageView
 }
 
-// PhysicalDeviceUniformBufferStandardLayoutFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceUniformBufferStandardLayoutFeatures {
-mut:
+pub mut:
 	s_type                         StructureType
 	p_next                         voidptr
 	uniform_buffer_standard_layout Bool32
 }
 
-// PhysicalDeviceShaderSubgroupExtendedTypesFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceShaderSubgroupExtendedTypesFeatures {
-mut:
+pub mut:
 	s_type                         StructureType
 	p_next                         voidptr
 	shader_subgroup_extended_types Bool32
 }
 
-// PhysicalDeviceSeparateDepthStencilLayoutsFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceSeparateDepthStencilLayoutsFeatures {
-mut:
+pub mut:
 	s_type                         StructureType
 	p_next                         voidptr
 	separate_depth_stencil_layouts Bool32
 }
 
-// AttachmentReferenceStencilLayout extends VkAttachmentReference2
 pub struct AttachmentReferenceStencilLayout {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	stencil_layout ImageLayout
 }
 
-// AttachmentDescriptionStencilLayout extends VkAttachmentDescription2
 pub struct AttachmentDescriptionStencilLayout {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	stencil_initial_layout ImageLayout
 	stencil_final_layout   ImageLayout
 }
 
-// PhysicalDeviceHostQueryResetFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceHostQueryResetFeatures {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	host_query_reset Bool32
 }
 
-// PhysicalDeviceTimelineSemaphoreFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceTimelineSemaphoreFeatures {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	timeline_semaphore Bool32
 }
 
-// PhysicalDeviceTimelineSemaphoreProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceTimelineSemaphoreProperties {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	max_timeline_semaphore_value_difference u64
 }
 
-// SemaphoreTypeCreateInfo extends VkSemaphoreCreateInfo,VkPhysicalDeviceExternalSemaphoreInfo
 pub struct SemaphoreTypeCreateInfo {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	semaphore_type SemaphoreType
 	initial_value  u64
 }
 
-// TimelineSemaphoreSubmitInfo extends VkSubmitInfo,VkBindSparseInfo
 pub struct TimelineSemaphoreSubmitInfo {
-mut:
+pub mut:
 	s_type                       StructureType
 	p_next                       voidptr
 	wait_semaphore_value_count   u32
@@ -6659,7 +6768,7 @@ mut:
 }
 
 pub struct SemaphoreWaitInfo {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	flags           SemaphoreWaitFlags
@@ -6669,16 +6778,15 @@ mut:
 }
 
 pub struct SemaphoreSignalInfo {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	semaphore C.Semaphore
 	value     u64
 }
 
-// PhysicalDeviceBufferDeviceAddressFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceBufferDeviceAddressFeatures {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	buffer_device_address                Bool32
@@ -6687,166 +6795,162 @@ mut:
 }
 
 pub struct BufferDeviceAddressInfo {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	buffer C.Buffer
 }
 
-// BufferOpaqueCaptureAddressCreateInfo extends VkBufferCreateInfo
 pub struct BufferOpaqueCaptureAddressCreateInfo {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	opaque_capture_address u64
 }
 
-// MemoryOpaqueCaptureAddressAllocateInfo extends VkMemoryAllocateInfo
 pub struct MemoryOpaqueCaptureAddressAllocateInfo {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	opaque_capture_address u64
 }
 
 pub struct DeviceMemoryOpaqueCaptureAddressInfo {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	memory C.DeviceMemory
 }
 
-type VkCmdDrawIndirectCount = fn (C.CommandBuffer, C.Buffer, DeviceSize, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_indirect_count(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, count_buffer C.Buffer, count_buffer_offset DeviceSize, max_draw_count u32, stride u32) {
-	f := VkCmdDrawIndirectCount((*vulkan.loader_p).get_sym('vkCmdDrawIndirectCount') or {
-		println("Couldn't load symbol for 'vkCmdDrawIndirectCount': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, count_buffer, count_buffer_offset, max_draw_count,
-		stride)
+fn C.vkCmdDrawIndirectCount(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	C.Buffer,
+	DeviceSize,
+	u32,
+	u32)
+pub fn cmd_draw_indirect_count(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize,
+	count_buffer C.Buffer,
+	count_buffer_offset DeviceSize,
+	max_draw_count u32,
+	stride u32) {
+	C.vkCmdDrawIndirectCount(command_buffer, buffer, offset, count_buffer, count_buffer_offset,
+		max_draw_count, stride)
 }
 
-type VkCmdDrawIndexedIndirectCount = fn (C.CommandBuffer, C.Buffer, DeviceSize, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_indexed_indirect_count(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, count_buffer C.Buffer, count_buffer_offset DeviceSize, max_draw_count u32, stride u32) {
-	f := VkCmdDrawIndexedIndirectCount((*vulkan.loader_p).get_sym('vkCmdDrawIndexedIndirectCount') or {
-		println("Couldn't load symbol for 'vkCmdDrawIndexedIndirectCount': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, count_buffer, count_buffer_offset, max_draw_count,
-		stride)
+fn C.vkCmdDrawIndexedIndirectCount(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	C.Buffer,
+	DeviceSize,
+	u32,
+	u32)
+pub fn cmd_draw_indexed_indirect_count(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize,
+	count_buffer C.Buffer,
+	count_buffer_offset DeviceSize,
+	max_draw_count u32,
+	stride u32) {
+	C.vkCmdDrawIndexedIndirectCount(command_buffer, buffer, offset, count_buffer, count_buffer_offset,
+		max_draw_count, stride)
 }
 
-type VkCreateRenderPass2 = fn (C.Device, &RenderPassCreateInfo2, &AllocationCallbacks, &C.RenderPass) Result
-
-pub fn create_render_pass2(device C.Device, p_create_info &RenderPassCreateInfo2, p_allocator &AllocationCallbacks, p_render_pass &C.RenderPass) Result {
-	f := VkCreateRenderPass2((*vulkan.loader_p).get_sym('vkCreateRenderPass2') or {
-		println("Couldn't load symbol for 'vkCreateRenderPass2': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_render_pass)
+fn C.vkCreateRenderPass2(C.Device,
+	&RenderPassCreateInfo2,
+	&AllocationCallbacks,
+	&C.RenderPass) Result
+pub fn create_render_pass2(device C.Device,
+	p_create_info &RenderPassCreateInfo2,
+	p_allocator &AllocationCallbacks,
+	p_render_pass &C.RenderPass) Result {
+	return C.vkCreateRenderPass2(device, p_create_info, p_allocator, p_render_pass)
 }
 
-type VkCmdBeginRenderPass2 = fn (C.CommandBuffer, &RenderPassBeginInfo, &SubpassBeginInfo)
-
-pub fn cmd_begin_render_pass2(command_buffer C.CommandBuffer, p_render_pass_begin &RenderPassBeginInfo, p_subpass_begin_info &SubpassBeginInfo) {
-	f := VkCmdBeginRenderPass2((*vulkan.loader_p).get_sym('vkCmdBeginRenderPass2') or {
-		println("Couldn't load symbol for 'vkCmdBeginRenderPass2': ${err}")
-		return
-	})
-	f(command_buffer, p_render_pass_begin, p_subpass_begin_info)
+fn C.vkCmdBeginRenderPass2(C.CommandBuffer,
+	&RenderPassBeginInfo,
+	&SubpassBeginInfo)
+pub fn cmd_begin_render_pass2(command_buffer C.CommandBuffer,
+	p_render_pass_begin &RenderPassBeginInfo,
+	p_subpass_begin_info &SubpassBeginInfo) {
+	C.vkCmdBeginRenderPass2(command_buffer, p_render_pass_begin, p_subpass_begin_info)
 }
 
-type VkCmdNextSubpass2 = fn (C.CommandBuffer, &SubpassBeginInfo, &SubpassEndInfo)
-
-pub fn cmd_next_subpass2(command_buffer C.CommandBuffer, p_subpass_begin_info &SubpassBeginInfo, p_subpass_end_info &SubpassEndInfo) {
-	f := VkCmdNextSubpass2((*vulkan.loader_p).get_sym('vkCmdNextSubpass2') or {
-		println("Couldn't load symbol for 'vkCmdNextSubpass2': ${err}")
-		return
-	})
-	f(command_buffer, p_subpass_begin_info, p_subpass_end_info)
+fn C.vkCmdNextSubpass2(C.CommandBuffer,
+	&SubpassBeginInfo,
+	&SubpassEndInfo)
+pub fn cmd_next_subpass2(command_buffer C.CommandBuffer,
+	p_subpass_begin_info &SubpassBeginInfo,
+	p_subpass_end_info &SubpassEndInfo) {
+	C.vkCmdNextSubpass2(command_buffer, p_subpass_begin_info, p_subpass_end_info)
 }
 
-type VkCmdEndRenderPass2 = fn (C.CommandBuffer, &SubpassEndInfo)
-
-pub fn cmd_end_render_pass2(command_buffer C.CommandBuffer, p_subpass_end_info &SubpassEndInfo) {
-	f := VkCmdEndRenderPass2((*vulkan.loader_p).get_sym('vkCmdEndRenderPass2') or {
-		println("Couldn't load symbol for 'vkCmdEndRenderPass2': ${err}")
-		return
-	})
-	f(command_buffer, p_subpass_end_info)
+fn C.vkCmdEndRenderPass2(C.CommandBuffer,
+	&SubpassEndInfo)
+pub fn cmd_end_render_pass2(command_buffer C.CommandBuffer,
+	p_subpass_end_info &SubpassEndInfo) {
+	C.vkCmdEndRenderPass2(command_buffer, p_subpass_end_info)
 }
 
-type VkResetQueryPool = fn (C.Device, C.QueryPool, u32, u32)
-
-pub fn reset_query_pool(device C.Device, query_pool C.QueryPool, first_query u32, query_count u32) {
-	f := VkResetQueryPool((*vulkan.loader_p).get_sym('vkResetQueryPool') or {
-		println("Couldn't load symbol for 'vkResetQueryPool': ${err}")
-		return
-	})
-	f(device, query_pool, first_query, query_count)
+fn C.vkResetQueryPool(C.Device,
+	C.QueryPool,
+	u32,
+	u32)
+pub fn reset_query_pool(device C.Device,
+	query_pool C.QueryPool,
+	first_query u32,
+	query_count u32) {
+	C.vkResetQueryPool(device, query_pool, first_query, query_count)
 }
 
-type VkGetSemaphoreCounterValue = fn (C.Device, C.Semaphore, &u64) Result
-
-pub fn get_semaphore_counter_value(device C.Device, semaphore C.Semaphore, p_value &u64) Result {
-	f := VkGetSemaphoreCounterValue((*vulkan.loader_p).get_sym('vkGetSemaphoreCounterValue') or {
-		println("Couldn't load symbol for 'vkGetSemaphoreCounterValue': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, semaphore, p_value)
+fn C.vkGetSemaphoreCounterValue(C.Device,
+	C.Semaphore,
+	&u64) Result
+pub fn get_semaphore_counter_value(device C.Device,
+	semaphore C.Semaphore,
+	p_value &u64) Result {
+	return C.vkGetSemaphoreCounterValue(device, semaphore, p_value)
 }
 
-type VkWaitSemaphores = fn (C.Device, &SemaphoreWaitInfo, u64) Result
-
-pub fn wait_semaphores(device C.Device, p_wait_info &SemaphoreWaitInfo, timeout u64) Result {
-	f := VkWaitSemaphores((*vulkan.loader_p).get_sym('vkWaitSemaphores') or {
-		println("Couldn't load symbol for 'vkWaitSemaphores': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_wait_info, timeout)
+fn C.vkWaitSemaphores(C.Device,
+	&SemaphoreWaitInfo,
+	u64) Result
+pub fn wait_semaphores(device C.Device,
+	p_wait_info &SemaphoreWaitInfo,
+	timeout u64) Result {
+	return C.vkWaitSemaphores(device, p_wait_info, timeout)
 }
 
-type VkSignalSemaphore = fn (C.Device, &SemaphoreSignalInfo) Result
-
-pub fn signal_semaphore(device C.Device, p_signal_info &SemaphoreSignalInfo) Result {
-	f := VkSignalSemaphore((*vulkan.loader_p).get_sym('vkSignalSemaphore') or {
-		println("Couldn't load symbol for 'vkSignalSemaphore': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_signal_info)
+fn C.vkSignalSemaphore(C.Device,
+	&SemaphoreSignalInfo) Result
+pub fn signal_semaphore(device C.Device,
+	p_signal_info &SemaphoreSignalInfo) Result {
+	return C.vkSignalSemaphore(device, p_signal_info)
 }
 
-type VkGetBufferDeviceAddress = fn (C.Device, &BufferDeviceAddressInfo) DeviceAddress
-
-pub fn get_buffer_device_address(device C.Device, p_info &BufferDeviceAddressInfo) DeviceAddress {
-	f := VkGetBufferDeviceAddress((*vulkan.loader_p).get_sym('vkGetBufferDeviceAddress') or {
-		panic("Couldn't load symbol for 'vkGetBufferDeviceAddress': ${err}")
-	})
-	return f(device, p_info)
+fn C.vkGetBufferDeviceAddress(C.Device,
+	&BufferDeviceAddressInfo) DeviceAddress
+pub fn get_buffer_device_address(device C.Device,
+	p_info &BufferDeviceAddressInfo) DeviceAddress {
+	return C.vkGetBufferDeviceAddress(device, p_info)
 }
 
-type VkGetBufferOpaqueCaptureAddress = fn (C.Device, &BufferDeviceAddressInfo) u64
-
-pub fn get_buffer_opaque_capture_address(device C.Device, p_info &BufferDeviceAddressInfo) u64 {
-	f := VkGetBufferOpaqueCaptureAddress((*vulkan.loader_p).get_sym('vkGetBufferOpaqueCaptureAddress') or {
-		panic("Couldn't load symbol for 'vkGetBufferOpaqueCaptureAddress': ${err}")
-	})
-	return f(device, p_info)
+fn C.vkGetBufferOpaqueCaptureAddress(C.Device,
+	&BufferDeviceAddressInfo) u64
+pub fn get_buffer_opaque_capture_address(device C.Device,
+	p_info &BufferDeviceAddressInfo) u64 {
+	return C.vkGetBufferOpaqueCaptureAddress(device, p_info)
 }
 
-type VkGetDeviceMemoryOpaqueCaptureAddress = fn (C.Device, &DeviceMemoryOpaqueCaptureAddressInfo) u64
-
-pub fn get_device_memory_opaque_capture_address(device C.Device, p_info &DeviceMemoryOpaqueCaptureAddressInfo) u64 {
-	f := VkGetDeviceMemoryOpaqueCaptureAddress((*vulkan.loader_p).get_sym('vkGetDeviceMemoryOpaqueCaptureAddress') or {
-		panic("Couldn't load symbol for 'vkGetDeviceMemoryOpaqueCaptureAddress': ${err}")
-	})
-	return f(device, p_info)
+fn C.vkGetDeviceMemoryOpaqueCaptureAddress(C.Device,
+	&DeviceMemoryOpaqueCaptureAddressInfo) u64
+pub fn get_device_memory_opaque_capture_address(device C.Device,
+	p_info &DeviceMemoryOpaqueCaptureAddressInfo) u64 {
+	return C.vkGetDeviceMemoryOpaqueCaptureAddress(device, p_info)
 }
 
-// VK_VERSION_1_3 is a preprocessor guard. Do not pass it to API calls.
-const version_1_3 = 1
 // Vulkan 1.3 version number
 pub const api_version_1_3 = make_api_version(0, 1, 3, 0) // Patch version should always be set to 0
 
@@ -6933,6 +7037,7 @@ pub const pipeline_stage_2_vertex_attribute_input_bit_khr = u32(pipeline_stage_2
 pub const pipeline_stage_2_pre_rasterization_shaders_bit = u64(0x4000000000)
 pub const pipeline_stage_2_pre_rasterization_shaders_bit_khr = pipeline_stage_2_pre_rasterization_shaders_bit
 pub const pipeline_stage_2_video_decode_bit_khr = u64(0x04000000)
+pub const pipeline_stage_2_video_encode_bit_khr = u64(0x08000000)
 pub const pipeline_stage_2_transform_feedback_bit_ext = u64(0x01000000)
 pub const pipeline_stage_2_conditional_rendering_bit_ext = u64(0x00040000)
 pub const pipeline_stage_2_command_preprocess_bit_nv = u64(0x00020000)
@@ -6948,6 +7053,7 @@ pub const pipeline_stage_2_mesh_shader_bit_nv = pipeline_stage_2_mesh_shader_bit
 pub const pipeline_stage_2_task_shader_bit_ext = u64(0x00080000)
 pub const pipeline_stage_2_mesh_shader_bit_ext = u64(0x00100000)
 pub const pipeline_stage_2_subpass_shader_bit_huawei = u64(0x8000000000)
+// VK_PIPELINE_STAGE_2_SUBPASS_SHADING_BIT_HUAWEI is a deprecated alias
 pub const pipeline_stage_2_subpass_shading_bit_huawei = u32(pipeline_stage_2_subpass_shader_bit_huawei)
 pub const pipeline_stage_2_invocation_mask_bit_huawei = u64(0x10000000000)
 pub const pipeline_stage_2_acceleration_structure_copy_bit_khr = u64(0x10000000)
@@ -7004,6 +7110,8 @@ pub const access_2_shader_storage_write_bit = u64(0x400000000)
 pub const access_2_shader_storage_write_bit_khr = access_2_shader_storage_write_bit
 pub const access_2_video_decode_read_bit_khr = u64(0x800000000)
 pub const access_2_video_decode_write_bit_khr = u64(0x1000000000)
+pub const access_2_video_encode_read_bit_khr = u64(0x2000000000)
+pub const access_2_video_encode_write_bit_khr = u64(0x4000000000)
 pub const access_2_transform_feedback_write_bit_ext = u64(0x02000000)
 pub const access_2_transform_feedback_counter_read_bit_ext = u64(0x04000000)
 pub const access_2_transform_feedback_counter_write_bit_ext = u64(0x08000000)
@@ -7037,8 +7145,8 @@ pub enum RenderingFlagBits {
 	rendering_contents_secondary_command_buffers_bit = int(0x00000001)
 	rendering_suspending_bit                         = int(0x00000002)
 	rendering_resuming_bit                           = int(0x00000004)
-	rendering_contents_inline_bit_ext                = int(0x00000010)
 	rendering_enable_legacy_dithering_bit_ext        = int(0x00000008)
+	rendering_contents_inline_bit_khr                = int(0x00000010)
 	rendering_flag_bits_max_enum                     = int(0x7FFFFFFF)
 }
 
@@ -7108,6 +7216,8 @@ pub const format_feature_2_acceleration_structure_vertex_buffer_bit_khr = u64(0x
 pub const format_feature_2_fragment_density_map_bit_ext = u64(0x01000000)
 pub const format_feature_2_fragment_shading_rate_attachment_bit_khr = u64(0x40000000)
 pub const format_feature_2_host_image_transfer_bit_ext = u64(0x400000000000)
+pub const format_feature_2_video_encode_input_bit_khr = u64(0x08000000)
+pub const format_feature_2_video_encode_dpb_bit_khr = u64(0x10000000)
 pub const format_feature_2_linear_color_attachment_bit_nv = u64(0x4000000000)
 pub const format_feature_2_weight_image_bit_qcom = u64(0x400000000)
 pub const format_feature_2_weight_sampled_image_bit_qcom = u64(0x800000000)
@@ -7117,9 +7227,8 @@ pub const format_feature_2_optical_flow_image_bit_nv = u64(0x10000000000)
 pub const format_feature_2_optical_flow_vector_bit_nv = u64(0x20000000000)
 pub const format_feature_2_optical_flow_cost_bit_nv = u64(0x40000000000)
 
-// PhysicalDeviceVulkan13Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceVulkan13Features {
-mut:
+pub mut:
 	s_type                                                    StructureType
 	p_next                                                    voidptr
 	robust_image_access                                       Bool32
@@ -7139,9 +7248,8 @@ mut:
 	maintenance4                                              Bool32
 }
 
-// PhysicalDeviceVulkan13Properties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceVulkan13Properties {
-mut:
+pub mut:
 	s_type                                                                                 StructureType
 	p_next                                                                                 voidptr
 	min_subgroup_size                                                                      u32
@@ -7192,14 +7300,13 @@ mut:
 }
 
 pub struct PipelineCreationFeedback {
-mut:
+pub mut:
 	flags    PipelineCreationFeedbackFlags
 	duration u64
 }
 
-// PipelineCreationFeedbackCreateInfo extends VkGraphicsPipelineCreateInfo,VkComputePipelineCreateInfo,VkRayTracingPipelineCreateInfoNV,VkRayTracingPipelineCreateInfoKHR,VkExecutionGraphPipelineCreateInfoAMDX
 pub struct PipelineCreationFeedbackCreateInfo {
-mut:
+pub mut:
 	s_type                                 StructureType
 	p_next                                 voidptr
 	p_pipeline_creation_feedback           &PipelineCreationFeedback
@@ -7207,67 +7314,61 @@ mut:
 	p_pipeline_stage_creation_feedbacks    &PipelineCreationFeedback
 }
 
-// PhysicalDeviceShaderTerminateInvocationFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceShaderTerminateInvocationFeatures {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	shader_terminate_invocation Bool32
 }
 
 pub struct PhysicalDeviceToolProperties {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
-	name        []char
-	version     []char
+	name        [max_extension_name_size]char
+	version     [max_extension_name_size]char
 	purposes    ToolPurposeFlags
-	description []char
-	layer       []char
+	description [max_description_size]char
+	layer       [max_extension_name_size]char
 }
 
-// PhysicalDeviceShaderDemoteToHelperInvocationFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceShaderDemoteToHelperInvocationFeatures {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	shader_demote_to_helper_invocation Bool32
 }
 
-// PhysicalDevicePrivateDataFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDevicePrivateDataFeatures {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	private_data Bool32
 }
 
-// DevicePrivateDataCreateInfo extends VkDeviceCreateInfo
 pub struct DevicePrivateDataCreateInfo {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	private_data_slot_request_count u32
 }
 
 pub struct PrivateDataSlotCreateInfo {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  PrivateDataSlotCreateFlags
 }
 
-// PhysicalDevicePipelineCreationCacheControlFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDevicePipelineCreationCacheControlFeatures {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	pipeline_creation_cache_control Bool32
 }
 
-// MemoryBarrier2 extends VkSubpassDependency2
 pub struct MemoryBarrier2 {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	src_stage_mask  PipelineStageFlags2
@@ -7277,7 +7378,7 @@ mut:
 }
 
 pub struct BufferMemoryBarrier2 {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	src_stage_mask         PipelineStageFlags2
@@ -7292,7 +7393,7 @@ mut:
 }
 
 pub struct ImageMemoryBarrier2 {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	src_stage_mask         PipelineStageFlags2
@@ -7308,7 +7409,7 @@ mut:
 }
 
 pub struct DependencyInfo {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	dependency_flags            DependencyFlags
@@ -7321,7 +7422,7 @@ mut:
 }
 
 pub struct SemaphoreSubmitInfo {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	semaphore    C.Semaphore
@@ -7331,7 +7432,7 @@ mut:
 }
 
 pub struct CommandBufferSubmitInfo {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	command_buffer C.CommandBuffer
@@ -7339,7 +7440,7 @@ mut:
 }
 
 pub struct SubmitInfo2 {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	flags                       SubmitFlags
@@ -7351,32 +7452,29 @@ mut:
 	p_signal_semaphore_infos    &SemaphoreSubmitInfo
 }
 
-// PhysicalDeviceSynchronization2Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceSynchronization2Features {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	synchronization2 Bool32
 }
 
-// PhysicalDeviceZeroInitializeWorkgroupMemoryFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceZeroInitializeWorkgroupMemoryFeatures {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	shader_zero_initialize_workgroup_memory Bool32
 }
 
-// PhysicalDeviceImageRobustnessFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceImageRobustnessFeatures {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	robust_image_access Bool32
 }
 
 pub struct BufferCopy2 {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	src_offset DeviceSize
@@ -7385,7 +7483,7 @@ mut:
 }
 
 pub struct CopyBufferInfo2 {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	src_buffer   C.Buffer
@@ -7395,7 +7493,7 @@ mut:
 }
 
 pub struct ImageCopy2 {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	src_subresource ImageSubresourceLayers
@@ -7406,7 +7504,7 @@ mut:
 }
 
 pub struct CopyImageInfo2 {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	src_image        C.Image
@@ -7418,7 +7516,7 @@ mut:
 }
 
 pub struct BufferImageCopy2 {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	buffer_offset       DeviceSize
@@ -7430,7 +7528,7 @@ mut:
 }
 
 pub struct CopyBufferToImageInfo2 {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	src_buffer       C.Buffer
@@ -7441,7 +7539,7 @@ mut:
 }
 
 pub struct CopyImageToBufferInfo2 {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	src_image        C.Image
@@ -7452,17 +7550,17 @@ mut:
 }
 
 pub struct ImageBlit2 {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	src_subresource ImageSubresourceLayers
-	src_offsets     []Offset3D
+	src_offsets     [2]Offset3D
 	dst_subresource ImageSubresourceLayers
-	dst_offsets     []Offset3D
+	dst_offsets     [2]Offset3D
 }
 
 pub struct BlitImageInfo2 {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	src_image        C.Image
@@ -7475,7 +7573,7 @@ mut:
 }
 
 pub struct ImageResolve2 {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	src_subresource ImageSubresourceLayers
@@ -7486,7 +7584,7 @@ mut:
 }
 
 pub struct ResolveImageInfo2 {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	src_image        C.Image
@@ -7497,18 +7595,16 @@ mut:
 	p_regions        &ImageResolve2
 }
 
-// PhysicalDeviceSubgroupSizeControlFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceSubgroupSizeControlFeatures {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	subgroup_size_control  Bool32
 	compute_full_subgroups Bool32
 }
 
-// PhysicalDeviceSubgroupSizeControlProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceSubgroupSizeControlProperties {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	min_subgroup_size               u32
@@ -7517,26 +7613,23 @@ mut:
 	required_subgroup_size_stages   ShaderStageFlags
 }
 
-// PipelineShaderStageRequiredSubgroupSizeCreateInfo extends VkPipelineShaderStageCreateInfo,VkShaderCreateInfoEXT
 pub struct PipelineShaderStageRequiredSubgroupSizeCreateInfo {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	required_subgroup_size u32
 }
 
-// PhysicalDeviceInlineUniformBlockFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceInlineUniformBlockFeatures {
-mut:
+pub mut:
 	s_type                                                    StructureType
 	p_next                                                    voidptr
 	inline_uniform_block                                      Bool32
 	descriptor_binding_inline_uniform_block_update_after_bind Bool32
 }
 
-// PhysicalDeviceInlineUniformBlockProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceInlineUniformBlockProperties {
-mut:
+pub mut:
 	s_type                                                           StructureType
 	p_next                                                           voidptr
 	max_inline_uniform_block_size                                    u32
@@ -7546,33 +7639,30 @@ mut:
 	max_descriptor_set_update_after_bind_inline_uniform_blocks       u32
 }
 
-// WriteDescriptorSetInlineUniformBlock extends VkWriteDescriptorSet
 pub struct WriteDescriptorSetInlineUniformBlock {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	data_size u32
 	p_data    voidptr
 }
 
-// DescriptorPoolInlineUniformBlockCreateInfo extends VkDescriptorPoolCreateInfo
 pub struct DescriptorPoolInlineUniformBlockCreateInfo {
-mut:
+pub mut:
 	s_type                            StructureType
 	p_next                            voidptr
 	max_inline_uniform_block_bindings u32
 }
 
-// PhysicalDeviceTextureCompressionASTCHDRFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceTextureCompressionASTCHDRFeatures {
-mut:
+pub mut:
 	s_type                       StructureType
 	p_next                       voidptr
 	texture_compression_astc_hdr Bool32
 }
 
 pub struct RenderingAttachmentInfo {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	image_view           C.ImageView
@@ -7586,7 +7676,7 @@ mut:
 }
 
 pub struct RenderingInfo {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	flags                  RenderingFlags
@@ -7599,9 +7689,8 @@ mut:
 	p_stencil_attachment   &RenderingAttachmentInfo
 }
 
-// PipelineRenderingCreateInfo extends VkGraphicsPipelineCreateInfo
 pub struct PipelineRenderingCreateInfo {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	view_mask                  u32
@@ -7611,17 +7700,15 @@ mut:
 	stencil_attachment_format  Format
 }
 
-// PhysicalDeviceDynamicRenderingFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceDynamicRenderingFeatures {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	dynamic_rendering Bool32
 }
 
-// CommandBufferInheritanceRenderingInfo extends VkCommandBufferInheritanceInfo
 pub struct CommandBufferInheritanceRenderingInfo {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	flags                      RenderingFlags
@@ -7633,17 +7720,15 @@ mut:
 	rasterization_samples      SampleCountFlagBits
 }
 
-// PhysicalDeviceShaderIntegerDotProductFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceShaderIntegerDotProductFeatures {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	shader_integer_dot_product Bool32
 }
 
-// PhysicalDeviceShaderIntegerDotProductProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceShaderIntegerDotProductProperties {
-mut:
+pub mut:
 	s_type                                                                                 StructureType
 	p_next                                                                                 voidptr
 	integer_dot_product8_bit_unsigned_accelerated                                          Bool32
@@ -7678,9 +7763,8 @@ mut:
 	integer_dot_product_accumulating_saturating64_bit_mixed_signedness_accelerated         Bool32
 }
 
-// PhysicalDeviceTexelBufferAlignmentProperties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceTexelBufferAlignmentProperties {
-mut:
+pub mut:
 	s_type                                             StructureType
 	p_next                                             voidptr
 	storage_texel_buffer_offset_alignment_bytes        DeviceSize
@@ -7689,9 +7773,8 @@ mut:
 	uniform_texel_buffer_offset_single_texel_alignment Bool32
 }
 
-// FormatProperties3 extends VkFormatProperties2
 pub struct FormatProperties3 {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	linear_tiling_features  FormatFeatureFlags2
@@ -7699,409 +7782,359 @@ mut:
 	buffer_features         FormatFeatureFlags2
 }
 
-// PhysicalDeviceMaintenance4Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceMaintenance4Features {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	maintenance4 Bool32
 }
 
-// PhysicalDeviceMaintenance4Properties extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceMaintenance4Properties {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	max_buffer_size DeviceSize
 }
 
 pub struct DeviceBufferMemoryRequirements {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	p_create_info &BufferCreateInfo
 }
 
 pub struct DeviceImageMemoryRequirements {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	p_create_info &ImageCreateInfo
 	plane_aspect  ImageAspectFlagBits
 }
 
-type VkGetPhysicalDeviceToolProperties = fn (C.PhysicalDevice, &u32, &PhysicalDeviceToolProperties) Result
-
-pub fn get_physical_device_tool_properties(physical_device C.PhysicalDevice, p_tool_count &u32, p_tool_properties &PhysicalDeviceToolProperties) Result {
-	f := VkGetPhysicalDeviceToolProperties((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceToolProperties') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceToolProperties': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_tool_count, p_tool_properties)
+fn C.vkGetPhysicalDeviceToolProperties(C.PhysicalDevice,
+	&u32,
+	&PhysicalDeviceToolProperties) Result
+pub fn get_physical_device_tool_properties(physical_device C.PhysicalDevice,
+	p_tool_count &u32,
+	p_tool_properties &PhysicalDeviceToolProperties) Result {
+	return C.vkGetPhysicalDeviceToolProperties(physical_device, p_tool_count, p_tool_properties)
 }
 
-type VkCreatePrivateDataSlot = fn (C.Device, &PrivateDataSlotCreateInfo, &AllocationCallbacks, &C.PrivateDataSlot) Result
-
-pub fn create_private_data_slot(device C.Device, p_create_info &PrivateDataSlotCreateInfo, p_allocator &AllocationCallbacks, p_private_data_slot &C.PrivateDataSlot) Result {
-	f := VkCreatePrivateDataSlot((*vulkan.loader_p).get_sym('vkCreatePrivateDataSlot') or {
-		println("Couldn't load symbol for 'vkCreatePrivateDataSlot': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_private_data_slot)
+fn C.vkCreatePrivateDataSlot(C.Device,
+	&PrivateDataSlotCreateInfo,
+	&AllocationCallbacks,
+	&C.PrivateDataSlot) Result
+pub fn create_private_data_slot(device C.Device,
+	p_create_info &PrivateDataSlotCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_private_data_slot &C.PrivateDataSlot) Result {
+	return C.vkCreatePrivateDataSlot(device, p_create_info, p_allocator, p_private_data_slot)
 }
 
-type VkDestroyPrivateDataSlot = fn (C.Device, C.PrivateDataSlot, &AllocationCallbacks)
-
-pub fn destroy_private_data_slot(device C.Device, private_data_slot C.PrivateDataSlot, p_allocator &AllocationCallbacks) {
-	f := VkDestroyPrivateDataSlot((*vulkan.loader_p).get_sym('vkDestroyPrivateDataSlot') or {
-		println("Couldn't load symbol for 'vkDestroyPrivateDataSlot': ${err}")
-		return
-	})
-	f(device, private_data_slot, p_allocator)
+fn C.vkDestroyPrivateDataSlot(C.Device,
+	C.PrivateDataSlot,
+	&AllocationCallbacks)
+pub fn destroy_private_data_slot(device C.Device,
+	private_data_slot C.PrivateDataSlot,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyPrivateDataSlot(device, private_data_slot, p_allocator)
 }
 
-type VkSetPrivateData = fn (C.Device, ObjectType, u64, C.PrivateDataSlot, u64) Result
-
-pub fn set_private_data(device C.Device, object_type ObjectType, object_handle u64, private_data_slot C.PrivateDataSlot, data u64) Result {
-	f := VkSetPrivateData((*vulkan.loader_p).get_sym('vkSetPrivateData') or {
-		println("Couldn't load symbol for 'vkSetPrivateData': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, object_type, object_handle, private_data_slot, data)
+fn C.vkSetPrivateData(C.Device,
+	ObjectType,
+	u64,
+	C.PrivateDataSlot,
+	u64) Result
+pub fn set_private_data(device C.Device,
+	object_type ObjectType,
+	object_handle u64,
+	private_data_slot C.PrivateDataSlot,
+	data u64) Result {
+	return C.vkSetPrivateData(device, object_type, object_handle, private_data_slot, data)
 }
 
-type VkGetPrivateData = fn (C.Device, ObjectType, u64, C.PrivateDataSlot, &u64)
-
-pub fn get_private_data(device C.Device, object_type ObjectType, object_handle u64, private_data_slot C.PrivateDataSlot, p_data &u64) {
-	f := VkGetPrivateData((*vulkan.loader_p).get_sym('vkGetPrivateData') or {
-		println("Couldn't load symbol for 'vkGetPrivateData': ${err}")
-		return
-	})
-	f(device, object_type, object_handle, private_data_slot, p_data)
+fn C.vkGetPrivateData(C.Device,
+	ObjectType,
+	u64,
+	C.PrivateDataSlot,
+	&u64)
+pub fn get_private_data(device C.Device,
+	object_type ObjectType,
+	object_handle u64,
+	private_data_slot C.PrivateDataSlot,
+	p_data &u64) {
+	C.vkGetPrivateData(device, object_type, object_handle, private_data_slot, p_data)
 }
 
-type VkCmdSetEvent2 = fn (C.CommandBuffer, C.Event, &DependencyInfo)
-
-pub fn cmd_set_event2(command_buffer C.CommandBuffer, event C.Event, p_dependency_info &DependencyInfo) {
-	f := VkCmdSetEvent2((*vulkan.loader_p).get_sym('vkCmdSetEvent2') or {
-		println("Couldn't load symbol for 'vkCmdSetEvent2': ${err}")
-		return
-	})
-	f(command_buffer, event, p_dependency_info)
+fn C.vkCmdSetEvent2(C.CommandBuffer,
+	C.Event,
+	&DependencyInfo)
+pub fn cmd_set_event2(command_buffer C.CommandBuffer,
+	event C.Event,
+	p_dependency_info &DependencyInfo) {
+	C.vkCmdSetEvent2(command_buffer, event, p_dependency_info)
 }
 
-type VkCmdResetEvent2 = fn (C.CommandBuffer, C.Event, PipelineStageFlags2)
-
-pub fn cmd_reset_event2(command_buffer C.CommandBuffer, event C.Event, stage_mask PipelineStageFlags2) {
-	f := VkCmdResetEvent2((*vulkan.loader_p).get_sym('vkCmdResetEvent2') or {
-		println("Couldn't load symbol for 'vkCmdResetEvent2': ${err}")
-		return
-	})
-	f(command_buffer, event, stage_mask)
+fn C.vkCmdResetEvent2(C.CommandBuffer,
+	C.Event,
+	PipelineStageFlags2)
+pub fn cmd_reset_event2(command_buffer C.CommandBuffer,
+	event C.Event,
+	stage_mask PipelineStageFlags2) {
+	C.vkCmdResetEvent2(command_buffer, event, stage_mask)
 }
 
-type VkCmdWaitEvents2 = fn (C.CommandBuffer, u32, &C.Event, &DependencyInfo)
-
-pub fn cmd_wait_events2(command_buffer C.CommandBuffer, event_count u32, p_events &C.Event, p_dependency_infos &DependencyInfo) {
-	f := VkCmdWaitEvents2((*vulkan.loader_p).get_sym('vkCmdWaitEvents2') or {
-		println("Couldn't load symbol for 'vkCmdWaitEvents2': ${err}")
-		return
-	})
-	f(command_buffer, event_count, p_events, p_dependency_infos)
+fn C.vkCmdWaitEvents2(C.CommandBuffer,
+	u32,
+	&C.Event,
+	&DependencyInfo)
+pub fn cmd_wait_events2(command_buffer C.CommandBuffer,
+	event_count u32,
+	p_events &C.Event,
+	p_dependency_infos &DependencyInfo) {
+	C.vkCmdWaitEvents2(command_buffer, event_count, p_events, p_dependency_infos)
 }
 
-type VkCmdPipelineBarrier2 = fn (C.CommandBuffer, &DependencyInfo)
-
-pub fn cmd_pipeline_barrier2(command_buffer C.CommandBuffer, p_dependency_info &DependencyInfo) {
-	f := VkCmdPipelineBarrier2((*vulkan.loader_p).get_sym('vkCmdPipelineBarrier2') or {
-		println("Couldn't load symbol for 'vkCmdPipelineBarrier2': ${err}")
-		return
-	})
-	f(command_buffer, p_dependency_info)
+fn C.vkCmdPipelineBarrier2(C.CommandBuffer,
+	&DependencyInfo)
+pub fn cmd_pipeline_barrier2(command_buffer C.CommandBuffer,
+	p_dependency_info &DependencyInfo) {
+	C.vkCmdPipelineBarrier2(command_buffer, p_dependency_info)
 }
 
-type VkCmdWriteTimestamp2 = fn (C.CommandBuffer, PipelineStageFlags2, C.QueryPool, u32)
-
-pub fn cmd_write_timestamp2(command_buffer C.CommandBuffer, stage PipelineStageFlags2, query_pool C.QueryPool, query u32) {
-	f := VkCmdWriteTimestamp2((*vulkan.loader_p).get_sym('vkCmdWriteTimestamp2') or {
-		println("Couldn't load symbol for 'vkCmdWriteTimestamp2': ${err}")
-		return
-	})
-	f(command_buffer, stage, query_pool, query)
+fn C.vkCmdWriteTimestamp2(C.CommandBuffer,
+	PipelineStageFlags2,
+	C.QueryPool,
+	u32)
+pub fn cmd_write_timestamp2(command_buffer C.CommandBuffer,
+	stage PipelineStageFlags2,
+	query_pool C.QueryPool,
+	query u32) {
+	C.vkCmdWriteTimestamp2(command_buffer, stage, query_pool, query)
 }
 
-type VkQueueSubmit2 = fn (C.Queue, u32, &SubmitInfo2, C.Fence) Result
-
-pub fn queue_submit2(queue C.Queue, submit_count u32, p_submits &SubmitInfo2, fence C.Fence) Result {
-	f := VkQueueSubmit2((*vulkan.loader_p).get_sym('vkQueueSubmit2') or {
-		println("Couldn't load symbol for 'vkQueueSubmit2': ${err}")
-		return Result.error_unknown
-	})
-	return f(queue, submit_count, p_submits, fence)
+fn C.vkQueueSubmit2(C.Queue,
+	u32,
+	&SubmitInfo2,
+	C.Fence) Result
+pub fn queue_submit2(queue C.Queue,
+	submit_count u32,
+	p_submits &SubmitInfo2,
+	fence C.Fence) Result {
+	return C.vkQueueSubmit2(queue, submit_count, p_submits, fence)
 }
 
-type VkCmdCopyBuffer2 = fn (C.CommandBuffer, &CopyBufferInfo2)
-
-pub fn cmd_copy_buffer2(command_buffer C.CommandBuffer, p_copy_buffer_info &CopyBufferInfo2) {
-	f := VkCmdCopyBuffer2((*vulkan.loader_p).get_sym('vkCmdCopyBuffer2') or {
-		println("Couldn't load symbol for 'vkCmdCopyBuffer2': ${err}")
-		return
-	})
-	f(command_buffer, p_copy_buffer_info)
+fn C.vkCmdCopyBuffer2(C.CommandBuffer,
+	&CopyBufferInfo2)
+pub fn cmd_copy_buffer2(command_buffer C.CommandBuffer,
+	p_copy_buffer_info &CopyBufferInfo2) {
+	C.vkCmdCopyBuffer2(command_buffer, p_copy_buffer_info)
 }
 
-type VkCmdCopyImage2 = fn (C.CommandBuffer, &CopyImageInfo2)
-
-pub fn cmd_copy_image2(command_buffer C.CommandBuffer, p_copy_image_info &CopyImageInfo2) {
-	f := VkCmdCopyImage2((*vulkan.loader_p).get_sym('vkCmdCopyImage2') or {
-		println("Couldn't load symbol for 'vkCmdCopyImage2': ${err}")
-		return
-	})
-	f(command_buffer, p_copy_image_info)
+fn C.vkCmdCopyImage2(C.CommandBuffer,
+	&CopyImageInfo2)
+pub fn cmd_copy_image2(command_buffer C.CommandBuffer,
+	p_copy_image_info &CopyImageInfo2) {
+	C.vkCmdCopyImage2(command_buffer, p_copy_image_info)
 }
 
-type VkCmdCopyBufferToImage2 = fn (C.CommandBuffer, &CopyBufferToImageInfo2)
-
-pub fn cmd_copy_buffer_to_image2(command_buffer C.CommandBuffer, p_copy_buffer_to_image_info &CopyBufferToImageInfo2) {
-	f := VkCmdCopyBufferToImage2((*vulkan.loader_p).get_sym('vkCmdCopyBufferToImage2') or {
-		println("Couldn't load symbol for 'vkCmdCopyBufferToImage2': ${err}")
-		return
-	})
-	f(command_buffer, p_copy_buffer_to_image_info)
+fn C.vkCmdCopyBufferToImage2(C.CommandBuffer,
+	&CopyBufferToImageInfo2)
+pub fn cmd_copy_buffer_to_image2(command_buffer C.CommandBuffer,
+	p_copy_buffer_to_image_info &CopyBufferToImageInfo2) {
+	C.vkCmdCopyBufferToImage2(command_buffer, p_copy_buffer_to_image_info)
 }
 
-type VkCmdCopyImageToBuffer2 = fn (C.CommandBuffer, &CopyImageToBufferInfo2)
-
-pub fn cmd_copy_image_to_buffer2(command_buffer C.CommandBuffer, p_copy_image_to_buffer_info &CopyImageToBufferInfo2) {
-	f := VkCmdCopyImageToBuffer2((*vulkan.loader_p).get_sym('vkCmdCopyImageToBuffer2') or {
-		println("Couldn't load symbol for 'vkCmdCopyImageToBuffer2': ${err}")
-		return
-	})
-	f(command_buffer, p_copy_image_to_buffer_info)
+fn C.vkCmdCopyImageToBuffer2(C.CommandBuffer,
+	&CopyImageToBufferInfo2)
+pub fn cmd_copy_image_to_buffer2(command_buffer C.CommandBuffer,
+	p_copy_image_to_buffer_info &CopyImageToBufferInfo2) {
+	C.vkCmdCopyImageToBuffer2(command_buffer, p_copy_image_to_buffer_info)
 }
 
-type VkCmdBlitImage2 = fn (C.CommandBuffer, &BlitImageInfo2)
-
-pub fn cmd_blit_image2(command_buffer C.CommandBuffer, p_blit_image_info &BlitImageInfo2) {
-	f := VkCmdBlitImage2((*vulkan.loader_p).get_sym('vkCmdBlitImage2') or {
-		println("Couldn't load symbol for 'vkCmdBlitImage2': ${err}")
-		return
-	})
-	f(command_buffer, p_blit_image_info)
+fn C.vkCmdBlitImage2(C.CommandBuffer,
+	&BlitImageInfo2)
+pub fn cmd_blit_image2(command_buffer C.CommandBuffer,
+	p_blit_image_info &BlitImageInfo2) {
+	C.vkCmdBlitImage2(command_buffer, p_blit_image_info)
 }
 
-type VkCmdResolveImage2 = fn (C.CommandBuffer, &ResolveImageInfo2)
-
-pub fn cmd_resolve_image2(command_buffer C.CommandBuffer, p_resolve_image_info &ResolveImageInfo2) {
-	f := VkCmdResolveImage2((*vulkan.loader_p).get_sym('vkCmdResolveImage2') or {
-		println("Couldn't load symbol for 'vkCmdResolveImage2': ${err}")
-		return
-	})
-	f(command_buffer, p_resolve_image_info)
+fn C.vkCmdResolveImage2(C.CommandBuffer,
+	&ResolveImageInfo2)
+pub fn cmd_resolve_image2(command_buffer C.CommandBuffer,
+	p_resolve_image_info &ResolveImageInfo2) {
+	C.vkCmdResolveImage2(command_buffer, p_resolve_image_info)
 }
 
-type VkCmdBeginRendering = fn (C.CommandBuffer, &RenderingInfo)
-
-pub fn cmd_begin_rendering(command_buffer C.CommandBuffer, p_rendering_info &RenderingInfo) {
-	f := VkCmdBeginRendering((*vulkan.loader_p).get_sym('vkCmdBeginRendering') or {
-		println("Couldn't load symbol for 'vkCmdBeginRendering': ${err}")
-		return
-	})
-	f(command_buffer, p_rendering_info)
+fn C.vkCmdBeginRendering(C.CommandBuffer,
+	&RenderingInfo)
+pub fn cmd_begin_rendering(command_buffer C.CommandBuffer,
+	p_rendering_info &RenderingInfo) {
+	C.vkCmdBeginRendering(command_buffer, p_rendering_info)
 }
 
-type VkCmdEndRendering = fn (C.CommandBuffer)
-
+fn C.vkCmdEndRendering(C.CommandBuffer)
 pub fn cmd_end_rendering(command_buffer C.CommandBuffer) {
-	f := VkCmdEndRendering((*vulkan.loader_p).get_sym('vkCmdEndRendering') or {
-		println("Couldn't load symbol for 'vkCmdEndRendering': ${err}")
-		return
-	})
-	f(command_buffer)
+	C.vkCmdEndRendering(command_buffer)
 }
 
-type VkCmdSetCullMode = fn (C.CommandBuffer, CullModeFlags)
-
-pub fn cmd_set_cull_mode(command_buffer C.CommandBuffer, cull_mode CullModeFlags) {
-	f := VkCmdSetCullMode((*vulkan.loader_p).get_sym('vkCmdSetCullMode') or {
-		println("Couldn't load symbol for 'vkCmdSetCullMode': ${err}")
-		return
-	})
-	f(command_buffer, cull_mode)
+fn C.vkCmdSetCullMode(C.CommandBuffer,
+	CullModeFlags)
+pub fn cmd_set_cull_mode(command_buffer C.CommandBuffer,
+	cull_mode CullModeFlags) {
+	C.vkCmdSetCullMode(command_buffer, cull_mode)
 }
 
-type VkCmdSetFrontFace = fn (C.CommandBuffer, FrontFace)
-
-pub fn cmd_set_front_face(command_buffer C.CommandBuffer, front_face FrontFace) {
-	f := VkCmdSetFrontFace((*vulkan.loader_p).get_sym('vkCmdSetFrontFace') or {
-		println("Couldn't load symbol for 'vkCmdSetFrontFace': ${err}")
-		return
-	})
-	f(command_buffer, front_face)
+fn C.vkCmdSetFrontFace(C.CommandBuffer,
+	FrontFace)
+pub fn cmd_set_front_face(command_buffer C.CommandBuffer,
+	front_face FrontFace) {
+	C.vkCmdSetFrontFace(command_buffer, front_face)
 }
 
-type VkCmdSetPrimitiveTopology = fn (C.CommandBuffer, PrimitiveTopology)
-
-pub fn cmd_set_primitive_topology(command_buffer C.CommandBuffer, primitive_topology PrimitiveTopology) {
-	f := VkCmdSetPrimitiveTopology((*vulkan.loader_p).get_sym('vkCmdSetPrimitiveTopology') or {
-		println("Couldn't load symbol for 'vkCmdSetPrimitiveTopology': ${err}")
-		return
-	})
-	f(command_buffer, primitive_topology)
+fn C.vkCmdSetPrimitiveTopology(C.CommandBuffer,
+	PrimitiveTopology)
+pub fn cmd_set_primitive_topology(command_buffer C.CommandBuffer,
+	primitive_topology PrimitiveTopology) {
+	C.vkCmdSetPrimitiveTopology(command_buffer, primitive_topology)
 }
 
-type VkCmdSetViewportWithCount = fn (C.CommandBuffer, u32, &Viewport)
-
-pub fn cmd_set_viewport_with_count(command_buffer C.CommandBuffer, viewport_count u32, p_viewports &Viewport) {
-	f := VkCmdSetViewportWithCount((*vulkan.loader_p).get_sym('vkCmdSetViewportWithCount') or {
-		println("Couldn't load symbol for 'vkCmdSetViewportWithCount': ${err}")
-		return
-	})
-	f(command_buffer, viewport_count, p_viewports)
+fn C.vkCmdSetViewportWithCount(C.CommandBuffer,
+	u32,
+	&Viewport)
+pub fn cmd_set_viewport_with_count(command_buffer C.CommandBuffer,
+	viewport_count u32,
+	p_viewports &Viewport) {
+	C.vkCmdSetViewportWithCount(command_buffer, viewport_count, p_viewports)
 }
 
-type VkCmdSetScissorWithCount = fn (C.CommandBuffer, u32, &Rect2D)
-
-pub fn cmd_set_scissor_with_count(command_buffer C.CommandBuffer, scissor_count u32, p_scissors &Rect2D) {
-	f := VkCmdSetScissorWithCount((*vulkan.loader_p).get_sym('vkCmdSetScissorWithCount') or {
-		println("Couldn't load symbol for 'vkCmdSetScissorWithCount': ${err}")
-		return
-	})
-	f(command_buffer, scissor_count, p_scissors)
+fn C.vkCmdSetScissorWithCount(C.CommandBuffer,
+	u32,
+	&Rect2D)
+pub fn cmd_set_scissor_with_count(command_buffer C.CommandBuffer,
+	scissor_count u32,
+	p_scissors &Rect2D) {
+	C.vkCmdSetScissorWithCount(command_buffer, scissor_count, p_scissors)
 }
 
-type VkCmdBindVertexBuffers2 = fn (C.CommandBuffer, u32, u32, &C.Buffer, &DeviceSize, &DeviceSize, &DeviceSize)
-
-pub fn cmd_bind_vertex_buffers2(command_buffer C.CommandBuffer, first_binding u32, binding_count u32, p_buffers &C.Buffer, p_offsets &DeviceSize, p_sizes &DeviceSize, p_strides &DeviceSize) {
-	f := VkCmdBindVertexBuffers2((*vulkan.loader_p).get_sym('vkCmdBindVertexBuffers2') or {
-		println("Couldn't load symbol for 'vkCmdBindVertexBuffers2': ${err}")
-		return
-	})
-	f(command_buffer, first_binding, binding_count, p_buffers, p_offsets, p_sizes, p_strides)
+fn C.vkCmdBindVertexBuffers2(C.CommandBuffer,
+	u32,
+	u32,
+	&C.Buffer,
+	&DeviceSize,
+	&DeviceSize,
+	&DeviceSize)
+pub fn cmd_bind_vertex_buffers2(command_buffer C.CommandBuffer,
+	first_binding u32,
+	binding_count u32,
+	p_buffers &C.Buffer,
+	p_offsets &DeviceSize,
+	p_sizes &DeviceSize,
+	p_strides &DeviceSize) {
+	C.vkCmdBindVertexBuffers2(command_buffer, first_binding, binding_count, p_buffers,
+		p_offsets, p_sizes, p_strides)
 }
 
-type VkCmdSetDepthTestEnable = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_test_enable(command_buffer C.CommandBuffer, depth_test_enable Bool32) {
-	f := VkCmdSetDepthTestEnable((*vulkan.loader_p).get_sym('vkCmdSetDepthTestEnable') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthTestEnable': ${err}")
-		return
-	})
-	f(command_buffer, depth_test_enable)
+fn C.vkCmdSetDepthTestEnable(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_depth_test_enable(command_buffer C.CommandBuffer,
+	depth_test_enable Bool32) {
+	C.vkCmdSetDepthTestEnable(command_buffer, depth_test_enable)
 }
 
-type VkCmdSetDepthWriteEnable = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_write_enable(command_buffer C.CommandBuffer, depth_write_enable Bool32) {
-	f := VkCmdSetDepthWriteEnable((*vulkan.loader_p).get_sym('vkCmdSetDepthWriteEnable') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthWriteEnable': ${err}")
-		return
-	})
-	f(command_buffer, depth_write_enable)
+fn C.vkCmdSetDepthWriteEnable(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_depth_write_enable(command_buffer C.CommandBuffer,
+	depth_write_enable Bool32) {
+	C.vkCmdSetDepthWriteEnable(command_buffer, depth_write_enable)
 }
 
-type VkCmdSetDepthCompareOp = fn (C.CommandBuffer, CompareOp)
-
-pub fn cmd_set_depth_compare_op(command_buffer C.CommandBuffer, depth_compare_op CompareOp) {
-	f := VkCmdSetDepthCompareOp((*vulkan.loader_p).get_sym('vkCmdSetDepthCompareOp') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthCompareOp': ${err}")
-		return
-	})
-	f(command_buffer, depth_compare_op)
+fn C.vkCmdSetDepthCompareOp(C.CommandBuffer,
+	CompareOp)
+pub fn cmd_set_depth_compare_op(command_buffer C.CommandBuffer,
+	depth_compare_op CompareOp) {
+	C.vkCmdSetDepthCompareOp(command_buffer, depth_compare_op)
 }
 
-type VkCmdSetDepthBoundsTestEnable = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_bounds_test_enable(command_buffer C.CommandBuffer, depth_bounds_test_enable Bool32) {
-	f := VkCmdSetDepthBoundsTestEnable((*vulkan.loader_p).get_sym('vkCmdSetDepthBoundsTestEnable') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthBoundsTestEnable': ${err}")
-		return
-	})
-	f(command_buffer, depth_bounds_test_enable)
+fn C.vkCmdSetDepthBoundsTestEnable(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_depth_bounds_test_enable(command_buffer C.CommandBuffer,
+	depth_bounds_test_enable Bool32) {
+	C.vkCmdSetDepthBoundsTestEnable(command_buffer, depth_bounds_test_enable)
 }
 
-type VkCmdSetStencilTestEnable = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_stencil_test_enable(command_buffer C.CommandBuffer, stencil_test_enable Bool32) {
-	f := VkCmdSetStencilTestEnable((*vulkan.loader_p).get_sym('vkCmdSetStencilTestEnable') or {
-		println("Couldn't load symbol for 'vkCmdSetStencilTestEnable': ${err}")
-		return
-	})
-	f(command_buffer, stencil_test_enable)
+fn C.vkCmdSetStencilTestEnable(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_stencil_test_enable(command_buffer C.CommandBuffer,
+	stencil_test_enable Bool32) {
+	C.vkCmdSetStencilTestEnable(command_buffer, stencil_test_enable)
 }
 
-type VkCmdSetStencilOp = fn (C.CommandBuffer, StencilFaceFlags, StencilOp, StencilOp, StencilOp, CompareOp)
-
-pub fn cmd_set_stencil_op(command_buffer C.CommandBuffer, face_mask StencilFaceFlags, fail_op StencilOp, pass_op StencilOp, depth_fail_op StencilOp, compare_op CompareOp) {
-	f := VkCmdSetStencilOp((*vulkan.loader_p).get_sym('vkCmdSetStencilOp') or {
-		println("Couldn't load symbol for 'vkCmdSetStencilOp': ${err}")
-		return
-	})
-	f(command_buffer, face_mask, fail_op, pass_op, depth_fail_op, compare_op)
+fn C.vkCmdSetStencilOp(C.CommandBuffer,
+	StencilFaceFlags,
+	StencilOp,
+	StencilOp,
+	StencilOp,
+	CompareOp)
+pub fn cmd_set_stencil_op(command_buffer C.CommandBuffer,
+	face_mask StencilFaceFlags,
+	fail_op StencilOp,
+	pass_op StencilOp,
+	depth_fail_op StencilOp,
+	compare_op CompareOp) {
+	C.vkCmdSetStencilOp(command_buffer, face_mask, fail_op, pass_op, depth_fail_op, compare_op)
 }
 
-type VkCmdSetRasterizerDiscardEnable = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_rasterizer_discard_enable(command_buffer C.CommandBuffer, rasterizer_discard_enable Bool32) {
-	f := VkCmdSetRasterizerDiscardEnable((*vulkan.loader_p).get_sym('vkCmdSetRasterizerDiscardEnable') or {
-		println("Couldn't load symbol for 'vkCmdSetRasterizerDiscardEnable': ${err}")
-		return
-	})
-	f(command_buffer, rasterizer_discard_enable)
+fn C.vkCmdSetRasterizerDiscardEnable(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_rasterizer_discard_enable(command_buffer C.CommandBuffer,
+	rasterizer_discard_enable Bool32) {
+	C.vkCmdSetRasterizerDiscardEnable(command_buffer, rasterizer_discard_enable)
 }
 
-type VkCmdSetDepthBiasEnable = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_bias_enable(command_buffer C.CommandBuffer, depth_bias_enable Bool32) {
-	f := VkCmdSetDepthBiasEnable((*vulkan.loader_p).get_sym('vkCmdSetDepthBiasEnable') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthBiasEnable': ${err}")
-		return
-	})
-	f(command_buffer, depth_bias_enable)
+fn C.vkCmdSetDepthBiasEnable(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_depth_bias_enable(command_buffer C.CommandBuffer,
+	depth_bias_enable Bool32) {
+	C.vkCmdSetDepthBiasEnable(command_buffer, depth_bias_enable)
 }
 
-type VkCmdSetPrimitiveRestartEnable = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_primitive_restart_enable(command_buffer C.CommandBuffer, primitive_restart_enable Bool32) {
-	f := VkCmdSetPrimitiveRestartEnable((*vulkan.loader_p).get_sym('vkCmdSetPrimitiveRestartEnable') or {
-		println("Couldn't load symbol for 'vkCmdSetPrimitiveRestartEnable': ${err}")
-		return
-	})
-	f(command_buffer, primitive_restart_enable)
+fn C.vkCmdSetPrimitiveRestartEnable(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_primitive_restart_enable(command_buffer C.CommandBuffer,
+	primitive_restart_enable Bool32) {
+	C.vkCmdSetPrimitiveRestartEnable(command_buffer, primitive_restart_enable)
 }
 
-type VkGetDeviceBufferMemoryRequirements = fn (C.Device, &DeviceBufferMemoryRequirements, &MemoryRequirements2)
-
-pub fn get_device_buffer_memory_requirements(device C.Device, p_info &DeviceBufferMemoryRequirements, p_memory_requirements &MemoryRequirements2) {
-	f := VkGetDeviceBufferMemoryRequirements((*vulkan.loader_p).get_sym('vkGetDeviceBufferMemoryRequirements') or {
-		println("Couldn't load symbol for 'vkGetDeviceBufferMemoryRequirements': ${err}")
-		return
-	})
-	f(device, p_info, p_memory_requirements)
+fn C.vkGetDeviceBufferMemoryRequirements(C.Device,
+	&DeviceBufferMemoryRequirements,
+	&MemoryRequirements2)
+pub fn get_device_buffer_memory_requirements(device C.Device,
+	p_info &DeviceBufferMemoryRequirements,
+	p_memory_requirements &MemoryRequirements2) {
+	C.vkGetDeviceBufferMemoryRequirements(device, p_info, p_memory_requirements)
 }
 
-type VkGetDeviceImageMemoryRequirements = fn (C.Device, &DeviceImageMemoryRequirements, &MemoryRequirements2)
-
-pub fn get_device_image_memory_requirements(device C.Device, p_info &DeviceImageMemoryRequirements, p_memory_requirements &MemoryRequirements2) {
-	f := VkGetDeviceImageMemoryRequirements((*vulkan.loader_p).get_sym('vkGetDeviceImageMemoryRequirements') or {
-		println("Couldn't load symbol for 'vkGetDeviceImageMemoryRequirements': ${err}")
-		return
-	})
-	f(device, p_info, p_memory_requirements)
+fn C.vkGetDeviceImageMemoryRequirements(C.Device,
+	&DeviceImageMemoryRequirements,
+	&MemoryRequirements2)
+pub fn get_device_image_memory_requirements(device C.Device,
+	p_info &DeviceImageMemoryRequirements,
+	p_memory_requirements &MemoryRequirements2) {
+	C.vkGetDeviceImageMemoryRequirements(device, p_info, p_memory_requirements)
 }
 
-type VkGetDeviceImageSparseMemoryRequirements = fn (C.Device, &DeviceImageMemoryRequirements, &u32, &SparseImageMemoryRequirements2)
-
-pub fn get_device_image_sparse_memory_requirements(device C.Device, p_info &DeviceImageMemoryRequirements, p_sparse_memory_requirement_count &u32, p_sparse_memory_requirements &SparseImageMemoryRequirements2) {
-	f := VkGetDeviceImageSparseMemoryRequirements((*vulkan.loader_p).get_sym('vkGetDeviceImageSparseMemoryRequirements') or {
-		println("Couldn't load symbol for 'vkGetDeviceImageSparseMemoryRequirements': ${err}")
-		return
-	})
-	f(device, p_info, p_sparse_memory_requirement_count, p_sparse_memory_requirements)
+fn C.vkGetDeviceImageSparseMemoryRequirements(C.Device,
+	&DeviceImageMemoryRequirements,
+	&u32,
+	&SparseImageMemoryRequirements2)
+pub fn get_device_image_sparse_memory_requirements(device C.Device,
+	p_info &DeviceImageMemoryRequirements,
+	p_sparse_memory_requirement_count &u32,
+	p_sparse_memory_requirements &SparseImageMemoryRequirements2) {
+	C.vkGetDeviceImageSparseMemoryRequirements(device, p_info, p_sparse_memory_requirement_count,
+		p_sparse_memory_requirements)
 }
-
-// VK_KHR_surface is a preprocessor guard. Do not pass it to API calls.
-const khr_surface = 1
 
 pub type C.SurfaceKHR = voidptr
 
@@ -8163,7 +8196,7 @@ pub type CompositeAlphaFlagsKHR = u32
 pub type SurfaceTransformFlagsKHR = u32
 
 pub struct SurfaceCapabilitiesKHR {
-mut:
+pub mut:
 	min_image_count           u32
 	max_image_count           u32
 	current_extent            Extent2D
@@ -8177,63 +8210,64 @@ mut:
 }
 
 pub struct SurfaceFormatKHR {
-mut:
+pub mut:
 	format      Format
 	color_space ColorSpaceKHR
 }
 
-type VkDestroySurfaceKHR = fn (C.Instance, C.SurfaceKHR, &AllocationCallbacks)
-
-pub fn destroy_surface_khr(instance C.Instance, surface C.SurfaceKHR, p_allocator &AllocationCallbacks) {
-	f := VkDestroySurfaceKHR((*vulkan.loader_p).get_sym('vkDestroySurfaceKHR') or {
-		println("Couldn't load symbol for 'vkDestroySurfaceKHR': ${err}")
-		return
-	})
-	f(instance, surface, p_allocator)
+fn C.vkDestroySurfaceKHR(C.Instance,
+	C.SurfaceKHR,
+	&AllocationCallbacks)
+pub fn destroy_surface_khr(instance C.Instance,
+	surface C.SurfaceKHR,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroySurfaceKHR(instance, surface, p_allocator)
 }
 
-type VkGetPhysicalDeviceSurfaceSupportKHR = fn (C.PhysicalDevice, u32, C.SurfaceKHR, &Bool32) Result
-
-pub fn get_physical_device_surface_support_khr(physical_device C.PhysicalDevice, queue_family_index u32, surface C.SurfaceKHR, p_supported &Bool32) Result {
-	f := VkGetPhysicalDeviceSurfaceSupportKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSurfaceSupportKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceSupportKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, queue_family_index, surface, p_supported)
+fn C.vkGetPhysicalDeviceSurfaceSupportKHR(C.PhysicalDevice,
+	u32,
+	C.SurfaceKHR,
+	&Bool32) Result
+pub fn get_physical_device_surface_support_khr(physical_device C.PhysicalDevice,
+	queue_family_index u32,
+	surface C.SurfaceKHR,
+	p_supported &Bool32) Result {
+	return C.vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, queue_family_index,
+		surface, p_supported)
 }
 
-type VkGetPhysicalDeviceSurfaceCapabilitiesKHR = fn (C.PhysicalDevice, C.SurfaceKHR, &SurfaceCapabilitiesKHR) Result
-
-pub fn get_physical_device_surface_capabilities_khr(physical_device C.PhysicalDevice, surface C.SurfaceKHR, p_surface_capabilities &SurfaceCapabilitiesKHR) Result {
-	f := VkGetPhysicalDeviceSurfaceCapabilitiesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSurfaceCapabilitiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceCapabilitiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, surface, p_surface_capabilities)
+fn C.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(C.PhysicalDevice,
+	C.SurfaceKHR,
+	&SurfaceCapabilitiesKHR) Result
+pub fn get_physical_device_surface_capabilities_khr(physical_device C.PhysicalDevice,
+	surface C.SurfaceKHR,
+	p_surface_capabilities &SurfaceCapabilitiesKHR) Result {
+	return C.vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, p_surface_capabilities)
 }
 
-type VkGetPhysicalDeviceSurfaceFormatsKHR = fn (C.PhysicalDevice, C.SurfaceKHR, &u32, &SurfaceFormatKHR) Result
-
-pub fn get_physical_device_surface_formats_khr(physical_device C.PhysicalDevice, surface C.SurfaceKHR, p_surface_format_count &u32, p_surface_formats &SurfaceFormatKHR) Result {
-	f := VkGetPhysicalDeviceSurfaceFormatsKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSurfaceFormatsKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceFormatsKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, surface, p_surface_format_count, p_surface_formats)
+fn C.vkGetPhysicalDeviceSurfaceFormatsKHR(C.PhysicalDevice,
+	C.SurfaceKHR,
+	&u32,
+	&SurfaceFormatKHR) Result
+pub fn get_physical_device_surface_formats_khr(physical_device C.PhysicalDevice,
+	surface C.SurfaceKHR,
+	p_surface_format_count &u32,
+	p_surface_formats &SurfaceFormatKHR) Result {
+	return C.vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, p_surface_format_count,
+		p_surface_formats)
 }
 
-type VkGetPhysicalDeviceSurfacePresentModesKHR = fn (C.PhysicalDevice, C.SurfaceKHR, &u32, &PresentModeKHR) Result
-
-pub fn get_physical_device_surface_present_modes_khr(physical_device C.PhysicalDevice, surface C.SurfaceKHR, p_present_mode_count &u32, p_present_modes &PresentModeKHR) Result {
-	f := VkGetPhysicalDeviceSurfacePresentModesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSurfacePresentModesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfacePresentModesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, surface, p_present_mode_count, p_present_modes)
+fn C.vkGetPhysicalDeviceSurfacePresentModesKHR(C.PhysicalDevice,
+	C.SurfaceKHR,
+	&u32,
+	&PresentModeKHR) Result
+pub fn get_physical_device_surface_present_modes_khr(physical_device C.PhysicalDevice,
+	surface C.SurfaceKHR,
+	p_present_mode_count &u32,
+	p_present_modes &PresentModeKHR) Result {
+	return C.vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, p_present_mode_count,
+		p_present_modes)
 }
-
-// VK_KHR_swapchain is a preprocessor guard. Do not pass it to API calls.
-const khr_swapchain = 1
 
 pub type C.SwapchainKHR = voidptr
 
@@ -8261,7 +8295,7 @@ pub enum DeviceGroupPresentModeFlagBitsKHR {
 pub type DeviceGroupPresentModeFlagsKHR = u32
 
 pub struct SwapchainCreateInfoKHR {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	flags                    SwapchainCreateFlagsKHR
@@ -8283,7 +8317,7 @@ mut:
 }
 
 pub struct PresentInfoKHR {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	wait_semaphore_count u32
@@ -8294,17 +8328,15 @@ mut:
 	p_results            &Result
 }
 
-// ImageSwapchainCreateInfoKHR extends VkImageCreateInfo
 pub struct ImageSwapchainCreateInfoKHR {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	swapchain C.SwapchainKHR
 }
 
-// BindImageMemorySwapchainInfoKHR extends VkBindImageMemoryInfo
 pub struct BindImageMemorySwapchainInfoKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	swapchain   C.SwapchainKHR
@@ -8312,7 +8344,7 @@ mut:
 }
 
 pub struct AcquireNextImageInfoKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	swapchain   C.SwapchainKHR
@@ -8323,16 +8355,15 @@ mut:
 }
 
 pub struct DeviceGroupPresentCapabilitiesKHR {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
-	present_mask []u32
+	present_mask [max_device_group_size]u32
 	modes        DeviceGroupPresentModeFlagsKHR
 }
 
-// DeviceGroupPresentInfoKHR extends VkPresentInfoKHR
 pub struct DeviceGroupPresentInfoKHR {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	swapchain_count u32
@@ -8340,106 +8371,102 @@ mut:
 	mode            DeviceGroupPresentModeFlagBitsKHR
 }
 
-// DeviceGroupSwapchainCreateInfoKHR extends VkSwapchainCreateInfoKHR
 pub struct DeviceGroupSwapchainCreateInfoKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	modes  DeviceGroupPresentModeFlagsKHR
 }
 
-type VkCreateSwapchainKHR = fn (C.Device, &SwapchainCreateInfoKHR, &AllocationCallbacks, &C.SwapchainKHR) Result
-
-pub fn create_swapchain_khr(device C.Device, p_create_info &SwapchainCreateInfoKHR, p_allocator &AllocationCallbacks, p_swapchain &C.SwapchainKHR) Result {
-	f := VkCreateSwapchainKHR((*vulkan.loader_p).get_sym('vkCreateSwapchainKHR') or {
-		println("Couldn't load symbol for 'vkCreateSwapchainKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_swapchain)
+fn C.vkCreateSwapchainKHR(C.Device,
+	&SwapchainCreateInfoKHR,
+	&AllocationCallbacks,
+	&C.SwapchainKHR) Result
+pub fn create_swapchain_khr(device C.Device,
+	p_create_info &SwapchainCreateInfoKHR,
+	p_allocator &AllocationCallbacks,
+	p_swapchain &C.SwapchainKHR) Result {
+	return C.vkCreateSwapchainKHR(device, p_create_info, p_allocator, p_swapchain)
 }
 
-type VkDestroySwapchainKHR = fn (C.Device, C.SwapchainKHR, &AllocationCallbacks)
-
-pub fn destroy_swapchain_khr(device C.Device, swapchain C.SwapchainKHR, p_allocator &AllocationCallbacks) {
-	f := VkDestroySwapchainKHR((*vulkan.loader_p).get_sym('vkDestroySwapchainKHR') or {
-		println("Couldn't load symbol for 'vkDestroySwapchainKHR': ${err}")
-		return
-	})
-	f(device, swapchain, p_allocator)
+fn C.vkDestroySwapchainKHR(C.Device,
+	C.SwapchainKHR,
+	&AllocationCallbacks)
+pub fn destroy_swapchain_khr(device C.Device,
+	swapchain C.SwapchainKHR,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroySwapchainKHR(device, swapchain, p_allocator)
 }
 
-type VkGetSwapchainImagesKHR = fn (C.Device, C.SwapchainKHR, &u32, &C.Image) Result
-
-pub fn get_swapchain_images_khr(device C.Device, swapchain C.SwapchainKHR, p_swapchain_image_count &u32, p_swapchain_images &C.Image) Result {
-	f := VkGetSwapchainImagesKHR((*vulkan.loader_p).get_sym('vkGetSwapchainImagesKHR') or {
-		println("Couldn't load symbol for 'vkGetSwapchainImagesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain, p_swapchain_image_count, p_swapchain_images)
+fn C.vkGetSwapchainImagesKHR(C.Device,
+	C.SwapchainKHR,
+	&u32,
+	&C.Image) Result
+pub fn get_swapchain_images_khr(device C.Device,
+	swapchain C.SwapchainKHR,
+	p_swapchain_image_count &u32,
+	p_swapchain_images &C.Image) Result {
+	return C.vkGetSwapchainImagesKHR(device, swapchain, p_swapchain_image_count, p_swapchain_images)
 }
 
-type VkAcquireNextImageKHR = fn (C.Device, C.SwapchainKHR, u64, C.Semaphore, C.Fence, &u32) Result
-
-pub fn acquire_next_image_khr(device C.Device, swapchain C.SwapchainKHR, timeout u64, semaphore C.Semaphore, fence C.Fence, p_image_index &u32) Result {
-	f := VkAcquireNextImageKHR((*vulkan.loader_p).get_sym('vkAcquireNextImageKHR') or {
-		println("Couldn't load symbol for 'vkAcquireNextImageKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain, timeout, semaphore, fence, p_image_index)
+fn C.vkAcquireNextImageKHR(C.Device,
+	C.SwapchainKHR,
+	u64,
+	C.Semaphore,
+	C.Fence,
+	&u32) Result
+pub fn acquire_next_image_khr(device C.Device,
+	swapchain C.SwapchainKHR,
+	timeout u64,
+	semaphore C.Semaphore,
+	fence C.Fence,
+	p_image_index &u32) Result {
+	return C.vkAcquireNextImageKHR(device, swapchain, timeout, semaphore, fence, p_image_index)
 }
 
-type VkQueuePresentKHR = fn (C.Queue, &PresentInfoKHR) Result
-
-pub fn queue_present_khr(queue C.Queue, p_present_info &PresentInfoKHR) Result {
-	f := VkQueuePresentKHR((*vulkan.loader_p).get_sym('vkQueuePresentKHR') or {
-		println("Couldn't load symbol for 'vkQueuePresentKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(queue, p_present_info)
+fn C.vkQueuePresentKHR(C.Queue,
+	&PresentInfoKHR) Result
+pub fn queue_present_khr(queue C.Queue,
+	p_present_info &PresentInfoKHR) Result {
+	return C.vkQueuePresentKHR(queue, p_present_info)
 }
 
-type VkGetDeviceGroupPresentCapabilitiesKHR = fn (C.Device, &DeviceGroupPresentCapabilitiesKHR) Result
-
-pub fn get_device_group_present_capabilities_khr(device C.Device, p_device_group_present_capabilities &DeviceGroupPresentCapabilitiesKHR) Result {
-	f := VkGetDeviceGroupPresentCapabilitiesKHR((*vulkan.loader_p).get_sym('vkGetDeviceGroupPresentCapabilitiesKHR') or {
-		println("Couldn't load symbol for 'vkGetDeviceGroupPresentCapabilitiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_device_group_present_capabilities)
+fn C.vkGetDeviceGroupPresentCapabilitiesKHR(C.Device,
+	&DeviceGroupPresentCapabilitiesKHR) Result
+pub fn get_device_group_present_capabilities_khr(device C.Device,
+	p_device_group_present_capabilities &DeviceGroupPresentCapabilitiesKHR) Result {
+	return C.vkGetDeviceGroupPresentCapabilitiesKHR(device, p_device_group_present_capabilities)
 }
 
-type VkGetDeviceGroupSurfacePresentModesKHR = fn (C.Device, C.SurfaceKHR, &DeviceGroupPresentModeFlagsKHR) Result
-
-pub fn get_device_group_surface_present_modes_khr(device C.Device, surface C.SurfaceKHR, p_modes &DeviceGroupPresentModeFlagsKHR) Result {
-	f := VkGetDeviceGroupSurfacePresentModesKHR((*vulkan.loader_p).get_sym('vkGetDeviceGroupSurfacePresentModesKHR') or {
-		println("Couldn't load symbol for 'vkGetDeviceGroupSurfacePresentModesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, surface, p_modes)
+fn C.vkGetDeviceGroupSurfacePresentModesKHR(C.Device,
+	C.SurfaceKHR,
+	&DeviceGroupPresentModeFlagsKHR) Result
+pub fn get_device_group_surface_present_modes_khr(device C.Device,
+	surface C.SurfaceKHR,
+	p_modes &DeviceGroupPresentModeFlagsKHR) Result {
+	return C.vkGetDeviceGroupSurfacePresentModesKHR(device, surface, p_modes)
 }
 
-type VkGetPhysicalDevicePresentRectanglesKHR = fn (C.PhysicalDevice, C.SurfaceKHR, &u32, &Rect2D) Result
-
-pub fn get_physical_device_present_rectangles_khr(physical_device C.PhysicalDevice, surface C.SurfaceKHR, p_rect_count &u32, p_rects &Rect2D) Result {
-	f := VkGetPhysicalDevicePresentRectanglesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDevicePresentRectanglesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDevicePresentRectanglesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, surface, p_rect_count, p_rects)
+fn C.vkGetPhysicalDevicePresentRectanglesKHR(C.PhysicalDevice,
+	C.SurfaceKHR,
+	&u32,
+	&Rect2D) Result
+pub fn get_physical_device_present_rectangles_khr(physical_device C.PhysicalDevice,
+	surface C.SurfaceKHR,
+	p_rect_count &u32,
+	p_rects &Rect2D) Result {
+	return C.vkGetPhysicalDevicePresentRectanglesKHR(physical_device, surface, p_rect_count,
+		p_rects)
 }
 
-type VkAcquireNextImage2KHR = fn (C.Device, &AcquireNextImageInfoKHR, &u32) Result
-
-pub fn acquire_next_image2_khr(device C.Device, p_acquire_info &AcquireNextImageInfoKHR, p_image_index &u32) Result {
-	f := VkAcquireNextImage2KHR((*vulkan.loader_p).get_sym('vkAcquireNextImage2KHR') or {
-		println("Couldn't load symbol for 'vkAcquireNextImage2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_acquire_info, p_image_index)
+fn C.vkAcquireNextImage2KHR(C.Device,
+	&AcquireNextImageInfoKHR,
+	&u32) Result
+pub fn acquire_next_image2_khr(device C.Device,
+	p_acquire_info &AcquireNextImageInfoKHR,
+	p_image_index &u32) Result {
+	return C.vkAcquireNextImage2KHR(device, p_acquire_info, p_image_index)
 }
-
-// VK_KHR_display is a preprocessor guard. Do not pass it to API calls.
-const khr_display = 1
 
 pub type C.DisplayKHR = voidptr
 pub type C.DisplayModeKHR = voidptr
@@ -8461,13 +8488,13 @@ pub type DisplayPlaneAlphaFlagsKHR = u32
 pub type DisplaySurfaceCreateFlagsKHR = u32
 
 pub struct DisplayModeParametersKHR {
-mut:
+pub mut:
 	visible_region Extent2D
 	refresh_rate   u32
 }
 
 pub struct DisplayModeCreateInfoKHR {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	flags      DisplayModeCreateFlagsKHR
@@ -8475,13 +8502,13 @@ mut:
 }
 
 pub struct DisplayModePropertiesKHR {
-mut:
+pub mut:
 	display_mode C.DisplayModeKHR
 	parameters   DisplayModeParametersKHR
 }
 
 pub struct DisplayPlaneCapabilitiesKHR {
-mut:
+pub mut:
 	supported_alpha  DisplayPlaneAlphaFlagsKHR
 	min_src_position Offset2D
 	max_src_position Offset2D
@@ -8494,13 +8521,13 @@ mut:
 }
 
 pub struct DisplayPlanePropertiesKHR {
-mut:
+pub mut:
 	current_display     C.DisplayKHR
 	current_stack_index u32
 }
 
 pub struct DisplayPropertiesKHR {
-mut:
+pub mut:
 	display                C.DisplayKHR
 	display_name           &char
 	physical_dimensions    Extent2D
@@ -8511,7 +8538,7 @@ mut:
 }
 
 pub struct DisplaySurfaceCreateInfoKHR {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	flags             DisplaySurfaceCreateFlagsKHR
@@ -8524,83 +8551,91 @@ mut:
 	image_extent      Extent2D
 }
 
-type VkGetPhysicalDeviceDisplayPropertiesKHR = fn (C.PhysicalDevice, &u32, &DisplayPropertiesKHR) Result
-
-pub fn get_physical_device_display_properties_khr(physical_device C.PhysicalDevice, p_property_count &u32, p_properties &DisplayPropertiesKHR) Result {
-	f := VkGetPhysicalDeviceDisplayPropertiesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceDisplayPropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceDisplayPropertiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_property_count, p_properties)
+fn C.vkGetPhysicalDeviceDisplayPropertiesKHR(C.PhysicalDevice,
+	&u32,
+	&DisplayPropertiesKHR) Result
+pub fn get_physical_device_display_properties_khr(physical_device C.PhysicalDevice,
+	p_property_count &u32,
+	p_properties &DisplayPropertiesKHR) Result {
+	return C.vkGetPhysicalDeviceDisplayPropertiesKHR(physical_device, p_property_count,
+		p_properties)
 }
 
-type VkGetPhysicalDeviceDisplayPlanePropertiesKHR = fn (C.PhysicalDevice, &u32, &DisplayPlanePropertiesKHR) Result
-
-pub fn get_physical_device_display_plane_properties_khr(physical_device C.PhysicalDevice, p_property_count &u32, p_properties &DisplayPlanePropertiesKHR) Result {
-	f := VkGetPhysicalDeviceDisplayPlanePropertiesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceDisplayPlanePropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceDisplayPlanePropertiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_property_count, p_properties)
+fn C.vkGetPhysicalDeviceDisplayPlanePropertiesKHR(C.PhysicalDevice,
+	&u32,
+	&DisplayPlanePropertiesKHR) Result
+pub fn get_physical_device_display_plane_properties_khr(physical_device C.PhysicalDevice,
+	p_property_count &u32,
+	p_properties &DisplayPlanePropertiesKHR) Result {
+	return C.vkGetPhysicalDeviceDisplayPlanePropertiesKHR(physical_device, p_property_count,
+		p_properties)
 }
 
-type VkGetDisplayPlaneSupportedDisplaysKHR = fn (C.PhysicalDevice, u32, &u32, &C.DisplayKHR) Result
-
-pub fn get_display_plane_supported_displays_khr(physical_device C.PhysicalDevice, plane_index u32, p_display_count &u32, p_displays &C.DisplayKHR) Result {
-	f := VkGetDisplayPlaneSupportedDisplaysKHR((*vulkan.loader_p).get_sym('vkGetDisplayPlaneSupportedDisplaysKHR') or {
-		println("Couldn't load symbol for 'vkGetDisplayPlaneSupportedDisplaysKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, plane_index, p_display_count, p_displays)
+fn C.vkGetDisplayPlaneSupportedDisplaysKHR(C.PhysicalDevice,
+	u32,
+	&u32,
+	&C.DisplayKHR) Result
+pub fn get_display_plane_supported_displays_khr(physical_device C.PhysicalDevice,
+	plane_index u32,
+	p_display_count &u32,
+	p_displays &C.DisplayKHR) Result {
+	return C.vkGetDisplayPlaneSupportedDisplaysKHR(physical_device, plane_index, p_display_count,
+		p_displays)
 }
 
-type VkGetDisplayModePropertiesKHR = fn (C.PhysicalDevice, C.DisplayKHR, &u32, &DisplayModePropertiesKHR) Result
-
-pub fn get_display_mode_properties_khr(physical_device C.PhysicalDevice, display C.DisplayKHR, p_property_count &u32, p_properties &DisplayModePropertiesKHR) Result {
-	f := VkGetDisplayModePropertiesKHR((*vulkan.loader_p).get_sym('vkGetDisplayModePropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetDisplayModePropertiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, display, p_property_count, p_properties)
+fn C.vkGetDisplayModePropertiesKHR(C.PhysicalDevice,
+	C.DisplayKHR,
+	&u32,
+	&DisplayModePropertiesKHR) Result
+pub fn get_display_mode_properties_khr(physical_device C.PhysicalDevice,
+	display C.DisplayKHR,
+	p_property_count &u32,
+	p_properties &DisplayModePropertiesKHR) Result {
+	return C.vkGetDisplayModePropertiesKHR(physical_device, display, p_property_count,
+		p_properties)
 }
 
-type VkCreateDisplayModeKHR = fn (C.PhysicalDevice, C.DisplayKHR, &DisplayModeCreateInfoKHR, &AllocationCallbacks, &C.DisplayModeKHR) Result
-
-pub fn create_display_mode_khr(physical_device C.PhysicalDevice, display C.DisplayKHR, p_create_info &DisplayModeCreateInfoKHR, p_allocator &AllocationCallbacks, p_mode &C.DisplayModeKHR) Result {
-	f := VkCreateDisplayModeKHR((*vulkan.loader_p).get_sym('vkCreateDisplayModeKHR') or {
-		println("Couldn't load symbol for 'vkCreateDisplayModeKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, display, p_create_info, p_allocator, p_mode)
+fn C.vkCreateDisplayModeKHR(C.PhysicalDevice,
+	C.DisplayKHR,
+	&DisplayModeCreateInfoKHR,
+	&AllocationCallbacks,
+	&C.DisplayModeKHR) Result
+pub fn create_display_mode_khr(physical_device C.PhysicalDevice,
+	display C.DisplayKHR,
+	p_create_info &DisplayModeCreateInfoKHR,
+	p_allocator &AllocationCallbacks,
+	p_mode &C.DisplayModeKHR) Result {
+	return C.vkCreateDisplayModeKHR(physical_device, display, p_create_info, p_allocator,
+		p_mode)
 }
 
-type VkGetDisplayPlaneCapabilitiesKHR = fn (C.PhysicalDevice, C.DisplayModeKHR, u32, &DisplayPlaneCapabilitiesKHR) Result
-
-pub fn get_display_plane_capabilities_khr(physical_device C.PhysicalDevice, mode C.DisplayModeKHR, plane_index u32, p_capabilities &DisplayPlaneCapabilitiesKHR) Result {
-	f := VkGetDisplayPlaneCapabilitiesKHR((*vulkan.loader_p).get_sym('vkGetDisplayPlaneCapabilitiesKHR') or {
-		println("Couldn't load symbol for 'vkGetDisplayPlaneCapabilitiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, mode, plane_index, p_capabilities)
+fn C.vkGetDisplayPlaneCapabilitiesKHR(C.PhysicalDevice,
+	C.DisplayModeKHR,
+	u32,
+	&DisplayPlaneCapabilitiesKHR) Result
+pub fn get_display_plane_capabilities_khr(physical_device C.PhysicalDevice,
+	mode C.DisplayModeKHR,
+	plane_index u32,
+	p_capabilities &DisplayPlaneCapabilitiesKHR) Result {
+	return C.vkGetDisplayPlaneCapabilitiesKHR(physical_device, mode, plane_index, p_capabilities)
 }
 
-type VkCreateDisplayPlaneSurfaceKHR = fn (C.Instance, &DisplaySurfaceCreateInfoKHR, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_display_plane_surface_khr(instance C.Instance, p_create_info &DisplaySurfaceCreateInfoKHR, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateDisplayPlaneSurfaceKHR((*vulkan.loader_p).get_sym('vkCreateDisplayPlaneSurfaceKHR') or {
-		println("Couldn't load symbol for 'vkCreateDisplayPlaneSurfaceKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
+fn C.vkCreateDisplayPlaneSurfaceKHR(C.Instance,
+	&DisplaySurfaceCreateInfoKHR,
+	&AllocationCallbacks,
+	&C.SurfaceKHR) Result
+pub fn create_display_plane_surface_khr(instance C.Instance,
+	p_create_info &DisplaySurfaceCreateInfoKHR,
+	p_allocator &AllocationCallbacks,
+	p_surface &C.SurfaceKHR) Result {
+	return C.vkCreateDisplayPlaneSurfaceKHR(instance, p_create_info, p_allocator, p_surface)
 }
 
-// VK_KHR_display_swapchain is a preprocessor guard. Do not pass it to API calls.
-const khr_display_swapchain = 1
 pub const khr_display_swapchain_spec_version = 10
 pub const khr_display_swapchain_extension_name = 'VK_KHR_display_swapchain'
-// DisplayPresentInfoKHR extends VkPresentInfoKHR
+
 pub struct DisplayPresentInfoKHR {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	src_rect   Rect2D
@@ -8608,188 +8643,22 @@ mut:
 	persistent Bool32
 }
 
-type VkCreateSharedSwapchainsKHR = fn (C.Device, u32, &SwapchainCreateInfoKHR, &AllocationCallbacks, &C.SwapchainKHR) Result
-
-pub fn create_shared_swapchains_khr(device C.Device, swapchain_count u32, p_create_infos &SwapchainCreateInfoKHR, p_allocator &AllocationCallbacks, p_swapchains &C.SwapchainKHR) Result {
-	f := VkCreateSharedSwapchainsKHR((*vulkan.loader_p).get_sym('vkCreateSharedSwapchainsKHR') or {
-		println("Couldn't load symbol for 'vkCreateSharedSwapchainsKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain_count, p_create_infos, p_allocator, p_swapchains)
+fn C.vkCreateSharedSwapchainsKHR(C.Device,
+	u32,
+	&SwapchainCreateInfoKHR,
+	&AllocationCallbacks,
+	&C.SwapchainKHR) Result
+pub fn create_shared_swapchains_khr(device C.Device,
+	swapchain_count u32,
+	p_create_infos &SwapchainCreateInfoKHR,
+	p_allocator &AllocationCallbacks,
+	p_swapchains &C.SwapchainKHR) Result {
+	return C.vkCreateSharedSwapchainsKHR(device, swapchain_count, p_create_infos, p_allocator,
+		p_swapchains)
 }
 
-// VK_KHR_xlib_surface is a preprocessor guard. Do not pass it to API calls.
-const khr_xlib_surface = 1
-pub const khr_xlib_surface_spec_version = 6
-pub const khr_xlib_surface_extension_name = 'VK_KHR_xlib_surface'
-
-pub type XlibSurfaceCreateFlagsKHR = u32
-
-pub struct XlibSurfaceCreateInfoKHR {
-mut:
-	s_type StructureType
-	p_next voidptr
-	flags  XlibSurfaceCreateFlagsKHR
-	dpy    &C.DisplayKHR
-	window voidptr
-}
-
-type VkCreateXlibSurfaceKHR = fn (C.Instance, &XlibSurfaceCreateInfoKHR, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_xlib_surface_khr(instance C.Instance, p_create_info &XlibSurfaceCreateInfoKHR, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateXlibSurfaceKHR((*vulkan.loader_p).get_sym('vkCreateXlibSurfaceKHR') or {
-		println("Couldn't load symbol for 'vkCreateXlibSurfaceKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-type VkGetPhysicalDeviceXlibPresentationSupportKHR = fn (C.PhysicalDevice, u32, &C.DisplayKHR, voidptr) Bool32
-
-pub fn get_physical_device_xlib_presentation_support_khr(physical_device C.PhysicalDevice, queue_family_index u32, dpy &C.DisplayKHR, visual_id voidptr) Bool32 {
-	f := VkGetPhysicalDeviceXlibPresentationSupportKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceXlibPresentationSupportKHR') or {
-		panic("Couldn't load symbol for 'vkGetPhysicalDeviceXlibPresentationSupportKHR': ${err}")
-	})
-	return f(physical_device, queue_family_index, dpy, visual_id)
-}
-
-// VK_KHR_xcb_surface is a preprocessor guard. Do not pass it to API calls.
-const khr_xcb_surface = 1
-pub const khr_xcb_surface_spec_version = 6
-pub const khr_xcb_surface_extension_name = 'VK_KHR_xcb_surface'
-
-pub type XcbSurfaceCreateFlagsKHR = u32
-
-pub struct XcbSurfaceCreateInfoKHR {
-mut:
-	s_type     StructureType
-	p_next     voidptr
-	flags      XcbSurfaceCreateFlagsKHR
-	connection voidptr
-	window     voidptr
-}
-
-type VkCreateXcbSurfaceKHR = fn (C.Instance, &XcbSurfaceCreateInfoKHR, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_xcb_surface_khr(instance C.Instance, p_create_info &XcbSurfaceCreateInfoKHR, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateXcbSurfaceKHR((*vulkan.loader_p).get_sym('vkCreateXcbSurfaceKHR') or {
-		println("Couldn't load symbol for 'vkCreateXcbSurfaceKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-type VkGetPhysicalDeviceXcbPresentationSupportKHR = fn (C.PhysicalDevice, u32, voidptr, voidptr) Bool32
-
-pub fn get_physical_device_xcb_presentation_support_khr(physical_device C.PhysicalDevice, queue_family_index u32, connection voidptr, visual_id voidptr) Bool32 {
-	f := VkGetPhysicalDeviceXcbPresentationSupportKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceXcbPresentationSupportKHR') or {
-		panic("Couldn't load symbol for 'vkGetPhysicalDeviceXcbPresentationSupportKHR': ${err}")
-	})
-	return f(physical_device, queue_family_index, connection, visual_id)
-}
-
-// VK_KHR_wayland_surface is a preprocessor guard. Do not pass it to API calls.
-const khr_wayland_surface = 1
-pub const khr_wayland_surface_spec_version = 6
-pub const khr_wayland_surface_extension_name = 'VK_KHR_wayland_surface'
-
-pub type WaylandSurfaceCreateFlagsKHR = u32
-
-pub struct WaylandSurfaceCreateInfoKHR {
-mut:
-	s_type  StructureType
-	p_next  voidptr
-	flags   WaylandSurfaceCreateFlagsKHR
-	display voidptr
-	surface voidptr
-}
-
-type VkCreateWaylandSurfaceKHR = fn (C.Instance, &WaylandSurfaceCreateInfoKHR, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_wayland_surface_khr(instance C.Instance, p_create_info &WaylandSurfaceCreateInfoKHR, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateWaylandSurfaceKHR((*vulkan.loader_p).get_sym('vkCreateWaylandSurfaceKHR') or {
-		println("Couldn't load symbol for 'vkCreateWaylandSurfaceKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-type VkGetPhysicalDeviceWaylandPresentationSupportKHR = fn (C.PhysicalDevice, u32, voidptr) Bool32
-
-pub fn get_physical_device_wayland_presentation_support_khr(physical_device C.PhysicalDevice, queue_family_index u32, display voidptr) Bool32 {
-	f := VkGetPhysicalDeviceWaylandPresentationSupportKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceWaylandPresentationSupportKHR') or {
-		panic("Couldn't load symbol for 'vkGetPhysicalDeviceWaylandPresentationSupportKHR': ${err}")
-	})
-	return f(physical_device, queue_family_index, display)
-}
-
-// VK_KHR_android_surface is a preprocessor guard. Do not pass it to API calls.
-const khr_android_surface = 1
-pub const khr_android_surface_spec_version = 6
-pub const khr_android_surface_extension_name = 'VK_KHR_android_surface'
-
-pub type AndroidSurfaceCreateFlagsKHR = u32
-
-pub struct AndroidSurfaceCreateInfoKHR {
-mut:
-	s_type StructureType
-	p_next voidptr
-	flags  AndroidSurfaceCreateFlagsKHR
-	window voidptr
-}
-
-type VkCreateAndroidSurfaceKHR = fn (C.Instance, &AndroidSurfaceCreateInfoKHR, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_android_surface_khr(instance C.Instance, p_create_info &AndroidSurfaceCreateInfoKHR, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateAndroidSurfaceKHR((*vulkan.loader_p).get_sym('vkCreateAndroidSurfaceKHR') or {
-		println("Couldn't load symbol for 'vkCreateAndroidSurfaceKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-// VK_KHR_win32_surface is a preprocessor guard. Do not pass it to API calls.
-const khr_win32_surface = 1
-pub const khr_win32_surface_spec_version = 6
-pub const khr_win32_surface_extension_name = 'VK_KHR_win32_surface'
-
-pub type Win32SurfaceCreateFlagsKHR = u32
-
-pub struct Win32SurfaceCreateInfoKHR {
-mut:
-	s_type    StructureType
-	p_next    voidptr
-	flags     Win32SurfaceCreateFlagsKHR
-	hinstance voidptr
-	hwnd      voidptr
-}
-
-type VkCreateWin32SurfaceKHR = fn (C.Instance, &Win32SurfaceCreateInfoKHR, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_win32_surface_khr(instance C.Instance, p_create_info &Win32SurfaceCreateInfoKHR, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateWin32SurfaceKHR((*vulkan.loader_p).get_sym('vkCreateWin32SurfaceKHR') or {
-		println("Couldn't load symbol for 'vkCreateWin32SurfaceKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-type VkGetPhysicalDeviceWin32PresentationSupportKHR = fn (C.PhysicalDevice, u32) Bool32
-
-pub fn get_physical_device_win32_presentation_support_khr(physical_device C.PhysicalDevice, queue_family_index u32) Bool32 {
-	f := VkGetPhysicalDeviceWin32PresentationSupportKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceWin32PresentationSupportKHR') or {
-		panic("Couldn't load symbol for 'vkGetPhysicalDeviceWin32PresentationSupportKHR': ${err}")
-	})
-	return f(physical_device, queue_family_index)
-}
-
-// VK_KHR_sampler_mirror_clamp_to_edge is a preprocessor guard. Do not pass it to API calls.
-const khr_sampler_mirror_clamp_to_edge = 1
 pub const khr_sampler_mirror_clamp_to_edge_spec_version = 3
 pub const khr_sampler_mirror_clamp_to_edge_extension_name = 'VK_KHR_sampler_mirror_clamp_to_edge'
-
-// VK_KHR_video_queue is a preprocessor guard. Do not pass it to API calls.
-const khr_video_queue = 1
 
 pub type C.VideoSessionKHR = voidptr
 pub type C.VideoSessionParametersKHR = voidptr
@@ -8807,8 +8676,11 @@ pub enum QueryResultStatusKHR {
 
 pub enum VideoCodecOperationFlagBitsKHR {
 	video_codec_operation_none_khr               = int(0)
+	video_codec_operation_encode_h264_bit_khr    = int(0x00010000)
+	video_codec_operation_encode_h265_bit_khr    = int(0x00020000)
 	video_codec_operation_decode_h264_bit_khr    = int(0x00000001)
 	video_codec_operation_decode_h265_bit_khr    = int(0x00000002)
+	video_codec_operation_decode_av1_bit_khr     = int(0x00000004)
 	video_codec_operation_flag_bits_max_enum_khr = int(0x7FFFFFFF)
 }
 
@@ -8844,8 +8716,10 @@ pub enum VideoCapabilityFlagBitsKHR {
 pub type VideoCapabilityFlagsKHR = u32
 
 pub enum VideoSessionCreateFlagBitsKHR {
-	video_session_create_protected_content_bit_khr = int(0x00000001)
-	video_session_create_flag_bits_max_enum_khr    = int(0x7FFFFFFF)
+	video_session_create_protected_content_bit_khr                    = int(0x00000001)
+	video_session_create_allow_encode_parameter_optimizations_bit_khr = int(0x00000002)
+	video_session_create_inline_queries_bit_khr                       = int(0x00000004)
+	video_session_create_flag_bits_max_enum_khr                       = int(0x7FFFFFFF)
 }
 
 pub type VideoSessionCreateFlagsKHR = u32
@@ -8854,31 +8728,30 @@ pub type VideoBeginCodingFlagsKHR = u32
 pub type VideoEndCodingFlagsKHR = u32
 
 pub enum VideoCodingControlFlagBitsKHR {
-	video_coding_control_reset_bit_khr          = int(0x00000001)
-	video_coding_control_flag_bits_max_enum_khr = int(0x7FFFFFFF)
+	video_coding_control_reset_bit_khr                = int(0x00000001)
+	video_coding_control_encode_rate_control_bit_khr  = int(0x00000002)
+	video_coding_control_encode_quality_level_bit_khr = int(0x00000004)
+	video_coding_control_flag_bits_max_enum_khr       = int(0x7FFFFFFF)
 }
 
 pub type VideoCodingControlFlagsKHR = u32
 
-// QueueFamilyQueryResultStatusPropertiesKHR extends VkQueueFamilyProperties2
 pub struct QueueFamilyQueryResultStatusPropertiesKHR {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	query_result_status_support Bool32
 }
 
-// QueueFamilyVideoPropertiesKHR extends VkQueueFamilyProperties2
 pub struct QueueFamilyVideoPropertiesKHR {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	video_codec_operations VideoCodecOperationFlagsKHR
 }
 
-// VideoProfileInfoKHR extends VkQueryPoolCreateInfo
 pub struct VideoProfileInfoKHR {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	video_codec_operation VideoCodecOperationFlagBitsKHR
@@ -8887,9 +8760,8 @@ mut:
 	chroma_bit_depth      VideoComponentBitDepthFlagsKHR
 }
 
-// VideoProfileListInfoKHR extends VkPhysicalDeviceImageFormatInfo2,VkPhysicalDeviceVideoFormatInfoKHR,VkImageCreateInfo,VkBufferCreateInfo
 pub struct VideoProfileListInfoKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	profile_count u32
@@ -8897,7 +8769,7 @@ mut:
 }
 
 pub struct VideoCapabilitiesKHR {
-mut:
+pub mut:
 	s_type                                StructureType
 	p_next                                voidptr
 	flags                                 VideoCapabilityFlagsKHR
@@ -8912,14 +8784,14 @@ mut:
 }
 
 pub struct PhysicalDeviceVideoFormatInfoKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	image_usage ImageUsageFlags
 }
 
 pub struct VideoFormatPropertiesKHR {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	format             Format
@@ -8931,7 +8803,7 @@ mut:
 }
 
 pub struct VideoPictureResourceInfoKHR {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	coded_offset       Offset2D
@@ -8941,7 +8813,7 @@ mut:
 }
 
 pub struct VideoReferenceSlotInfoKHR {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	slot_index         i32
@@ -8949,7 +8821,7 @@ mut:
 }
 
 pub struct VideoSessionMemoryRequirementsKHR {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	memory_bind_index   u32
@@ -8957,7 +8829,7 @@ mut:
 }
 
 pub struct BindVideoSessionMemoryInfoKHR {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	memory_bind_index u32
@@ -8967,7 +8839,7 @@ mut:
 }
 
 pub struct VideoSessionCreateInfoKHR {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	queue_family_index            u32
@@ -8982,7 +8854,7 @@ mut:
 }
 
 pub struct VideoSessionParametersCreateInfoKHR {
-mut:
+pub mut:
 	s_type                            StructureType
 	p_next                            voidptr
 	flags                             VideoSessionParametersCreateFlagsKHR
@@ -8991,14 +8863,14 @@ mut:
 }
 
 pub struct VideoSessionParametersUpdateInfoKHR {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	update_sequence_count u32
 }
 
 pub struct VideoBeginCodingInfoKHR {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	flags                    VideoBeginCodingFlagsKHR
@@ -9009,142 +8881,136 @@ mut:
 }
 
 pub struct VideoEndCodingInfoKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  VideoEndCodingFlagsKHR
 }
 
 pub struct VideoCodingControlInfoKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  VideoCodingControlFlagsKHR
 }
 
-type VkGetPhysicalDeviceVideoCapabilitiesKHR = fn (C.PhysicalDevice, &VideoProfileInfoKHR, &VideoCapabilitiesKHR) Result
-
-pub fn get_physical_device_video_capabilities_khr(physical_device C.PhysicalDevice, p_video_profile &VideoProfileInfoKHR, p_capabilities &VideoCapabilitiesKHR) Result {
-	f := VkGetPhysicalDeviceVideoCapabilitiesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceVideoCapabilitiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceVideoCapabilitiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_video_profile, p_capabilities)
+fn C.vkGetPhysicalDeviceVideoCapabilitiesKHR(C.PhysicalDevice,
+	&VideoProfileInfoKHR,
+	&VideoCapabilitiesKHR) Result
+pub fn get_physical_device_video_capabilities_khr(physical_device C.PhysicalDevice,
+	p_video_profile &VideoProfileInfoKHR,
+	p_capabilities &VideoCapabilitiesKHR) Result {
+	return C.vkGetPhysicalDeviceVideoCapabilitiesKHR(physical_device, p_video_profile,
+		p_capabilities)
 }
 
-type VkGetPhysicalDeviceVideoFormatPropertiesKHR = fn (C.PhysicalDevice, &PhysicalDeviceVideoFormatInfoKHR, &u32, &VideoFormatPropertiesKHR) Result
-
-pub fn get_physical_device_video_format_properties_khr(physical_device C.PhysicalDevice, p_video_format_info &PhysicalDeviceVideoFormatInfoKHR, p_video_format_property_count &u32, p_video_format_properties &VideoFormatPropertiesKHR) Result {
-	f := VkGetPhysicalDeviceVideoFormatPropertiesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceVideoFormatPropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceVideoFormatPropertiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_video_format_info, p_video_format_property_count, p_video_format_properties)
+fn C.vkGetPhysicalDeviceVideoFormatPropertiesKHR(C.PhysicalDevice,
+	&PhysicalDeviceVideoFormatInfoKHR,
+	&u32,
+	&VideoFormatPropertiesKHR) Result
+pub fn get_physical_device_video_format_properties_khr(physical_device C.PhysicalDevice,
+	p_video_format_info &PhysicalDeviceVideoFormatInfoKHR,
+	p_video_format_property_count &u32,
+	p_video_format_properties &VideoFormatPropertiesKHR) Result {
+	return C.vkGetPhysicalDeviceVideoFormatPropertiesKHR(physical_device, p_video_format_info,
+		p_video_format_property_count, p_video_format_properties)
 }
 
-type VkCreateVideoSessionKHR = fn (C.Device, &VideoSessionCreateInfoKHR, &AllocationCallbacks, &C.VideoSessionKHR) Result
-
-pub fn create_video_session_khr(device C.Device, p_create_info &VideoSessionCreateInfoKHR, p_allocator &AllocationCallbacks, p_video_session &C.VideoSessionKHR) Result {
-	f := VkCreateVideoSessionKHR((*vulkan.loader_p).get_sym('vkCreateVideoSessionKHR') or {
-		println("Couldn't load symbol for 'vkCreateVideoSessionKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_video_session)
+fn C.vkCreateVideoSessionKHR(C.Device,
+	&VideoSessionCreateInfoKHR,
+	&AllocationCallbacks,
+	&C.VideoSessionKHR) Result
+pub fn create_video_session_khr(device C.Device,
+	p_create_info &VideoSessionCreateInfoKHR,
+	p_allocator &AllocationCallbacks,
+	p_video_session &C.VideoSessionKHR) Result {
+	return C.vkCreateVideoSessionKHR(device, p_create_info, p_allocator, p_video_session)
 }
 
-type VkDestroyVideoSessionKHR = fn (C.Device, C.VideoSessionKHR, &AllocationCallbacks)
-
-pub fn destroy_video_session_khr(device C.Device, video_session C.VideoSessionKHR, p_allocator &AllocationCallbacks) {
-	f := VkDestroyVideoSessionKHR((*vulkan.loader_p).get_sym('vkDestroyVideoSessionKHR') or {
-		println("Couldn't load symbol for 'vkDestroyVideoSessionKHR': ${err}")
-		return
-	})
-	f(device, video_session, p_allocator)
+fn C.vkDestroyVideoSessionKHR(C.Device,
+	C.VideoSessionKHR,
+	&AllocationCallbacks)
+pub fn destroy_video_session_khr(device C.Device,
+	video_session C.VideoSessionKHR,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyVideoSessionKHR(device, video_session, p_allocator)
 }
 
-type VkGetVideoSessionMemoryRequirementsKHR = fn (C.Device, C.VideoSessionKHR, &u32, &VideoSessionMemoryRequirementsKHR) Result
-
-pub fn get_video_session_memory_requirements_khr(device C.Device, video_session C.VideoSessionKHR, p_memory_requirements_count &u32, p_memory_requirements &VideoSessionMemoryRequirementsKHR) Result {
-	f := VkGetVideoSessionMemoryRequirementsKHR((*vulkan.loader_p).get_sym('vkGetVideoSessionMemoryRequirementsKHR') or {
-		println("Couldn't load symbol for 'vkGetVideoSessionMemoryRequirementsKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, video_session, p_memory_requirements_count, p_memory_requirements)
+fn C.vkGetVideoSessionMemoryRequirementsKHR(C.Device,
+	C.VideoSessionKHR,
+	&u32,
+	&VideoSessionMemoryRequirementsKHR) Result
+pub fn get_video_session_memory_requirements_khr(device C.Device,
+	video_session C.VideoSessionKHR,
+	p_memory_requirements_count &u32,
+	p_memory_requirements &VideoSessionMemoryRequirementsKHR) Result {
+	return C.vkGetVideoSessionMemoryRequirementsKHR(device, video_session, p_memory_requirements_count,
+		p_memory_requirements)
 }
 
-type VkBindVideoSessionMemoryKHR = fn (C.Device, C.VideoSessionKHR, u32, &BindVideoSessionMemoryInfoKHR) Result
-
-pub fn bind_video_session_memory_khr(device C.Device, video_session C.VideoSessionKHR, bind_session_memory_info_count u32, p_bind_session_memory_infos &BindVideoSessionMemoryInfoKHR) Result {
-	f := VkBindVideoSessionMemoryKHR((*vulkan.loader_p).get_sym('vkBindVideoSessionMemoryKHR') or {
-		println("Couldn't load symbol for 'vkBindVideoSessionMemoryKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, video_session, bind_session_memory_info_count, p_bind_session_memory_infos)
+fn C.vkBindVideoSessionMemoryKHR(C.Device,
+	C.VideoSessionKHR,
+	u32,
+	&BindVideoSessionMemoryInfoKHR) Result
+pub fn bind_video_session_memory_khr(device C.Device,
+	video_session C.VideoSessionKHR,
+	bind_session_memory_info_count u32,
+	p_bind_session_memory_infos &BindVideoSessionMemoryInfoKHR) Result {
+	return C.vkBindVideoSessionMemoryKHR(device, video_session, bind_session_memory_info_count,
+		p_bind_session_memory_infos)
 }
 
-type VkCreateVideoSessionParametersKHR = fn (C.Device, &VideoSessionParametersCreateInfoKHR, &AllocationCallbacks, &C.VideoSessionParametersKHR) Result
-
-pub fn create_video_session_parameters_khr(device C.Device, p_create_info &VideoSessionParametersCreateInfoKHR, p_allocator &AllocationCallbacks, p_video_session_parameters &C.VideoSessionParametersKHR) Result {
-	f := VkCreateVideoSessionParametersKHR((*vulkan.loader_p).get_sym('vkCreateVideoSessionParametersKHR') or {
-		println("Couldn't load symbol for 'vkCreateVideoSessionParametersKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_video_session_parameters)
+fn C.vkCreateVideoSessionParametersKHR(C.Device,
+	&VideoSessionParametersCreateInfoKHR,
+	&AllocationCallbacks,
+	&C.VideoSessionParametersKHR) Result
+pub fn create_video_session_parameters_khr(device C.Device,
+	p_create_info &VideoSessionParametersCreateInfoKHR,
+	p_allocator &AllocationCallbacks,
+	p_video_session_parameters &C.VideoSessionParametersKHR) Result {
+	return C.vkCreateVideoSessionParametersKHR(device, p_create_info, p_allocator, p_video_session_parameters)
 }
 
-type VkUpdateVideoSessionParametersKHR = fn (C.Device, C.VideoSessionParametersKHR, &VideoSessionParametersUpdateInfoKHR) Result
-
-pub fn update_video_session_parameters_khr(device C.Device, video_session_parameters C.VideoSessionParametersKHR, p_update_info &VideoSessionParametersUpdateInfoKHR) Result {
-	f := VkUpdateVideoSessionParametersKHR((*vulkan.loader_p).get_sym('vkUpdateVideoSessionParametersKHR') or {
-		println("Couldn't load symbol for 'vkUpdateVideoSessionParametersKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, video_session_parameters, p_update_info)
+fn C.vkUpdateVideoSessionParametersKHR(C.Device,
+	C.VideoSessionParametersKHR,
+	&VideoSessionParametersUpdateInfoKHR) Result
+pub fn update_video_session_parameters_khr(device C.Device,
+	video_session_parameters C.VideoSessionParametersKHR,
+	p_update_info &VideoSessionParametersUpdateInfoKHR) Result {
+	return C.vkUpdateVideoSessionParametersKHR(device, video_session_parameters, p_update_info)
 }
 
-type VkDestroyVideoSessionParametersKHR = fn (C.Device, C.VideoSessionParametersKHR, &AllocationCallbacks)
-
-pub fn destroy_video_session_parameters_khr(device C.Device, video_session_parameters C.VideoSessionParametersKHR, p_allocator &AllocationCallbacks) {
-	f := VkDestroyVideoSessionParametersKHR((*vulkan.loader_p).get_sym('vkDestroyVideoSessionParametersKHR') or {
-		println("Couldn't load symbol for 'vkDestroyVideoSessionParametersKHR': ${err}")
-		return
-	})
-	f(device, video_session_parameters, p_allocator)
+fn C.vkDestroyVideoSessionParametersKHR(C.Device,
+	C.VideoSessionParametersKHR,
+	&AllocationCallbacks)
+pub fn destroy_video_session_parameters_khr(device C.Device,
+	video_session_parameters C.VideoSessionParametersKHR,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyVideoSessionParametersKHR(device, video_session_parameters, p_allocator)
 }
 
-type VkCmdBeginVideoCodingKHR = fn (C.CommandBuffer, &VideoBeginCodingInfoKHR)
-
-pub fn cmd_begin_video_coding_khr(command_buffer C.CommandBuffer, p_begin_info &VideoBeginCodingInfoKHR) {
-	f := VkCmdBeginVideoCodingKHR((*vulkan.loader_p).get_sym('vkCmdBeginVideoCodingKHR') or {
-		println("Couldn't load symbol for 'vkCmdBeginVideoCodingKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_begin_info)
+fn C.vkCmdBeginVideoCodingKHR(C.CommandBuffer,
+	&VideoBeginCodingInfoKHR)
+pub fn cmd_begin_video_coding_khr(command_buffer C.CommandBuffer,
+	p_begin_info &VideoBeginCodingInfoKHR) {
+	C.vkCmdBeginVideoCodingKHR(command_buffer, p_begin_info)
 }
 
-type VkCmdEndVideoCodingKHR = fn (C.CommandBuffer, &VideoEndCodingInfoKHR)
-
-pub fn cmd_end_video_coding_khr(command_buffer C.CommandBuffer, p_end_coding_info &VideoEndCodingInfoKHR) {
-	f := VkCmdEndVideoCodingKHR((*vulkan.loader_p).get_sym('vkCmdEndVideoCodingKHR') or {
-		println("Couldn't load symbol for 'vkCmdEndVideoCodingKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_end_coding_info)
+fn C.vkCmdEndVideoCodingKHR(C.CommandBuffer,
+	&VideoEndCodingInfoKHR)
+pub fn cmd_end_video_coding_khr(command_buffer C.CommandBuffer,
+	p_end_coding_info &VideoEndCodingInfoKHR) {
+	C.vkCmdEndVideoCodingKHR(command_buffer, p_end_coding_info)
 }
 
-type VkCmdControlVideoCodingKHR = fn (C.CommandBuffer, &VideoCodingControlInfoKHR)
-
-pub fn cmd_control_video_coding_khr(command_buffer C.CommandBuffer, p_coding_control_info &VideoCodingControlInfoKHR) {
-	f := VkCmdControlVideoCodingKHR((*vulkan.loader_p).get_sym('vkCmdControlVideoCodingKHR') or {
-		println("Couldn't load symbol for 'vkCmdControlVideoCodingKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_coding_control_info)
+fn C.vkCmdControlVideoCodingKHR(C.CommandBuffer,
+	&VideoCodingControlInfoKHR)
+pub fn cmd_control_video_coding_khr(command_buffer C.CommandBuffer,
+	p_coding_control_info &VideoCodingControlInfoKHR) {
+	C.vkCmdControlVideoCodingKHR(command_buffer, p_coding_control_info)
 }
 
-// VK_KHR_video_decode_queue is a preprocessor guard. Do not pass it to API calls.
-const khr_video_decode_queue = 1
-pub const khr_video_decode_queue_spec_version = 7
+pub const khr_video_decode_queue_spec_version = 8
 pub const khr_video_decode_queue_extension_name = 'VK_KHR_video_decode_queue'
 
 pub enum VideoDecodeCapabilityFlagBitsKHR {
@@ -9166,24 +9032,22 @@ pub enum VideoDecodeUsageFlagBitsKHR {
 pub type VideoDecodeUsageFlagsKHR = u32
 pub type VideoDecodeFlagsKHR = u32
 
-// VideoDecodeCapabilitiesKHR extends VkVideoCapabilitiesKHR
 pub struct VideoDecodeCapabilitiesKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  VideoDecodeCapabilityFlagsKHR
 }
 
-// VideoDecodeUsageInfoKHR extends VkVideoProfileInfoKHR,VkQueryPoolCreateInfo
 pub struct VideoDecodeUsageInfoKHR {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	video_usage_hints VideoDecodeUsageFlagsKHR
 }
 
 pub struct VideoDecodeInfoKHR {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	flags                  VideoDecodeFlagsKHR
@@ -9196,19 +9060,476 @@ mut:
 	p_reference_slots      &VideoReferenceSlotInfoKHR
 }
 
-type VkCmdDecodeVideoKHR = fn (C.CommandBuffer, &VideoDecodeInfoKHR)
-
-pub fn cmd_decode_video_khr(command_buffer C.CommandBuffer, p_decode_info &VideoDecodeInfoKHR) {
-	f := VkCmdDecodeVideoKHR((*vulkan.loader_p).get_sym('vkCmdDecodeVideoKHR') or {
-		println("Couldn't load symbol for 'vkCmdDecodeVideoKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_decode_info)
+fn C.vkCmdDecodeVideoKHR(C.CommandBuffer,
+	&VideoDecodeInfoKHR)
+pub fn cmd_decode_video_khr(command_buffer C.CommandBuffer,
+	p_decode_info &VideoDecodeInfoKHR) {
+	C.vkCmdDecodeVideoKHR(command_buffer, p_decode_info)
 }
 
-// VK_KHR_video_decode_h264 is a preprocessor guard. Do not pass it to API calls.
-const khr_video_decode_h264 = 1
-pub const khr_video_decode_h264_spec_version = 8
+#include "vk_video/vulkan_video_codec_h264std.h"
+#include "vk_video/vulkan_video_codec_h264std_encode.h"
+
+pub const khr_video_encode_h264_spec_version = 14
+pub const khr_video_encode_h264_extension_name = 'VK_KHR_video_encode_h264'
+
+pub enum VideoEncodeH264CapabilityFlagBitsKHR {
+	video_encode_h264_capability_hrd_compliance_bit_khr                    = int(0x00000001)
+	video_encode_h264_capability_prediction_weight_table_generated_bit_khr = int(0x00000002)
+	video_encode_h264_capability_row_unaligned_slice_bit_khr               = int(0x00000004)
+	video_encode_h264_capability_different_slice_type_bit_khr              = int(0x00000008)
+	video_encode_h264_capability_b_frame_in_l0_list_bit_khr                = int(0x00000010)
+	video_encode_h264_capability_b_frame_in_l1_list_bit_khr                = int(0x00000020)
+	video_encode_h264_capability_per_picture_type_min_max_qp_bit_khr       = int(0x00000040)
+	video_encode_h264_capability_per_slice_constant_qp_bit_khr             = int(0x00000080)
+	video_encode_h264_capability_generate_prefix_nalu_bit_khr              = int(0x00000100)
+	video_encode_h264_capability_flag_bits_max_enum_khr                    = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeH264CapabilityFlagsKHR = u32
+
+pub enum VideoEncodeH264StdFlagBitsKHR {
+	video_encode_h264_std_separate_color_plane_flag_set_bit_khr            = int(0x00000001)
+	video_encode_h264_std_qpprime_y_zero_transform_bypass_flag_set_bit_khr = int(0x00000002)
+	video_encode_h264_std_scaling_matrix_present_flag_set_bit_khr          = int(0x00000004)
+	video_encode_h264_std_chroma_qp_index_offset_bit_khr                   = int(0x00000008)
+	video_encode_h264_std_second_chroma_qp_index_offset_bit_khr            = int(0x00000010)
+	video_encode_h264_std_pic_init_qp_minus26_bit_khr                      = int(0x00000020)
+	video_encode_h264_std_weighted_pred_flag_set_bit_khr                   = int(0x00000040)
+	video_encode_h264_std_weighted_bipred_idc_explicit_bit_khr             = int(0x00000080)
+	video_encode_h264_std_weighted_bipred_idc_implicit_bit_khr             = int(0x00000100)
+	video_encode_h264_std_transform_8x8_mode_flag_set_bit_khr              = int(0x00000200)
+	video_encode_h264_std_direct_spatial_mv_pred_flag_unset_bit_khr        = int(0x00000400)
+	video_encode_h264_std_entropy_coding_mode_flag_unset_bit_khr           = int(0x00000800)
+	video_encode_h264_std_entropy_coding_mode_flag_set_bit_khr             = int(0x00001000)
+	video_encode_h264_std_direct_8x8_inference_flag_unset_bit_khr          = int(0x00002000)
+	video_encode_h264_std_constrained_intra_pred_flag_set_bit_khr          = int(0x00004000)
+	video_encode_h264_std_deblocking_filter_disabled_bit_khr               = int(0x00008000)
+	video_encode_h264_std_deblocking_filter_enabled_bit_khr                = int(0x00010000)
+	video_encode_h264_std_deblocking_filter_partial_bit_khr                = int(0x00020000)
+	video_encode_h264_std_slice_qp_delta_bit_khr                           = int(0x00080000)
+	video_encode_h264_std_different_slice_qp_delta_bit_khr                 = int(0x00100000)
+	video_encode_h264_std_flag_bits_max_enum_khr                           = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeH264StdFlagsKHR = u32
+
+pub enum VideoEncodeH264RateControlFlagBitsKHR {
+	video_encode_h264_rate_control_attempt_hrd_compliance_bit_khr        = int(0x00000001)
+	video_encode_h264_rate_control_regular_gop_bit_khr                   = int(0x00000002)
+	video_encode_h264_rate_control_reference_pattern_flat_bit_khr        = int(0x00000004)
+	video_encode_h264_rate_control_reference_pattern_dyadic_bit_khr      = int(0x00000008)
+	video_encode_h264_rate_control_temporal_layer_pattern_dyadic_bit_khr = int(0x00000010)
+	video_encode_h264_rate_control_flag_bits_max_enum_khr                = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeH264RateControlFlagsKHR = u32
+
+pub struct VideoEncodeH264CapabilitiesKHR {
+pub mut:
+	s_type                               StructureType
+	p_next                               voidptr
+	flags                                VideoEncodeH264CapabilityFlagsKHR
+	max_level_idc                        C.StdVideoH264LevelIdc
+	max_slice_count                      u32
+	max_p_picture_l0_reference_count     u32
+	max_b_picture_l0_reference_count     u32
+	max_l1_reference_count               u32
+	max_temporal_layer_count             u32
+	expect_dyadic_temporal_layer_pattern Bool32
+	min_qp                               i32
+	max_qp                               i32
+	prefers_gop_remaining_frames         Bool32
+	requires_gop_remaining_frames        Bool32
+	std_syntax_flags                     VideoEncodeH264StdFlagsKHR
+}
+
+pub struct VideoEncodeH264QpKHR {
+pub mut:
+	qp_i i32
+	qp_p i32
+	qp_b i32
+}
+
+pub struct VideoEncodeH264QualityLevelPropertiesKHR {
+pub mut:
+	s_type                                 StructureType
+	p_next                                 voidptr
+	preferred_rate_control_flags           VideoEncodeH264RateControlFlagsKHR
+	preferred_gop_frame_count              u32
+	preferred_idr_period                   u32
+	preferred_consecutive_b_frame_count    u32
+	preferred_temporal_layer_count         u32
+	preferred_constant_qp                  VideoEncodeH264QpKHR
+	preferred_max_l0_reference_count       u32
+	preferred_max_l1_reference_count       u32
+	preferred_std_entropy_coding_mode_flag Bool32
+}
+
+pub struct VideoEncodeH264SessionCreateInfoKHR {
+pub mut:
+	s_type            StructureType
+	p_next            voidptr
+	use_max_level_idc Bool32
+	max_level_idc     C.StdVideoH264LevelIdc
+}
+
+pub struct VideoEncodeH264SessionParametersAddInfoKHR {
+pub mut:
+	s_type        StructureType
+	p_next        voidptr
+	std_sps_count u32
+	p_std_sp_ss   &C.StdVideoH264SequenceParameterSet
+	std_pps_count u32
+	p_std_pp_ss   &C.StdVideoH264PictureParameterSet
+}
+
+pub struct VideoEncodeH264SessionParametersCreateInfoKHR {
+pub mut:
+	s_type                StructureType
+	p_next                voidptr
+	max_std_sps_count     u32
+	max_std_pps_count     u32
+	p_parameters_add_info &VideoEncodeH264SessionParametersAddInfoKHR
+}
+
+pub struct VideoEncodeH264SessionParametersGetInfoKHR {
+pub mut:
+	s_type        StructureType
+	p_next        voidptr
+	write_std_sps Bool32
+	write_std_pps Bool32
+	std_sps_id    u32
+	std_pps_id    u32
+}
+
+pub struct VideoEncodeH264SessionParametersFeedbackInfoKHR {
+pub mut:
+	s_type                StructureType
+	p_next                voidptr
+	has_std_sps_overrides Bool32
+	has_std_pps_overrides Bool32
+}
+
+pub struct VideoEncodeH264NaluSliceInfoKHR {
+pub mut:
+	s_type             StructureType
+	p_next             voidptr
+	constant_qp        i32
+	p_std_slice_header &C.StdVideoEncodeH264SliceHeader
+}
+
+pub struct VideoEncodeH264PictureInfoKHR {
+pub mut:
+	s_type                 StructureType
+	p_next                 voidptr
+	nalu_slice_entry_count u32
+	p_nalu_slice_entries   &VideoEncodeH264NaluSliceInfoKHR
+	p_std_picture_info     &C.StdVideoEncodeH264PictureInfo
+	generate_prefix_nalu   Bool32
+}
+
+pub struct VideoEncodeH264DpbSlotInfoKHR {
+pub mut:
+	s_type               StructureType
+	p_next               voidptr
+	p_std_reference_info &C.StdVideoEncodeH264ReferenceInfo
+}
+
+pub struct VideoEncodeH264ProfileInfoKHR {
+pub mut:
+	s_type          StructureType
+	p_next          voidptr
+	std_profile_idc C.StdVideoH264ProfileIdc
+}
+
+pub struct VideoEncodeH264RateControlInfoKHR {
+pub mut:
+	s_type                    StructureType
+	p_next                    voidptr
+	flags                     VideoEncodeH264RateControlFlagsKHR
+	gop_frame_count           u32
+	idr_period                u32
+	consecutive_b_frame_count u32
+	temporal_layer_count      u32
+}
+
+pub struct VideoEncodeH264FrameSizeKHR {
+pub mut:
+	frame_i_size u32
+	frame_p_size u32
+	frame_b_size u32
+}
+
+pub struct VideoEncodeH264RateControlLayerInfoKHR {
+pub mut:
+	s_type             StructureType
+	p_next             voidptr
+	use_min_qp         Bool32
+	min_qp             VideoEncodeH264QpKHR
+	use_max_qp         Bool32
+	max_qp             VideoEncodeH264QpKHR
+	use_max_frame_size Bool32
+	max_frame_size     VideoEncodeH264FrameSizeKHR
+}
+
+pub struct VideoEncodeH264GopRemainingFrameInfoKHR {
+pub mut:
+	s_type                   StructureType
+	p_next                   voidptr
+	use_gop_remaining_frames Bool32
+	gop_remaining_i          u32
+	gop_remaining_p          u32
+	gop_remaining_b          u32
+}
+
+#include "vk_video/vulkan_video_codec_h265std.h"
+#include "vk_video/vulkan_video_codec_h265std_encode.h"
+
+pub const khr_video_encode_h265_spec_version = 14
+pub const khr_video_encode_h265_extension_name = 'VK_KHR_video_encode_h265'
+
+pub enum VideoEncodeH265CapabilityFlagBitsKHR {
+	video_encode_h265_capability_hrd_compliance_bit_khr                    = int(0x00000001)
+	video_encode_h265_capability_prediction_weight_table_generated_bit_khr = int(0x00000002)
+	video_encode_h265_capability_row_unaligned_slice_segment_bit_khr       = int(0x00000004)
+	video_encode_h265_capability_different_slice_segment_type_bit_khr      = int(0x00000008)
+	video_encode_h265_capability_b_frame_in_l0_list_bit_khr                = int(0x00000010)
+	video_encode_h265_capability_b_frame_in_l1_list_bit_khr                = int(0x00000020)
+	video_encode_h265_capability_per_picture_type_min_max_qp_bit_khr       = int(0x00000040)
+	video_encode_h265_capability_per_slice_segment_constant_qp_bit_khr     = int(0x00000080)
+	video_encode_h265_capability_multiple_tiles_per_slice_segment_bit_khr  = int(0x00000100)
+	video_encode_h265_capability_multiple_slice_segments_per_tile_bit_khr  = int(0x00000200)
+	video_encode_h265_capability_flag_bits_max_enum_khr                    = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeH265CapabilityFlagsKHR = u32
+
+pub enum VideoEncodeH265StdFlagBitsKHR {
+	video_encode_h265_std_separate_color_plane_flag_set_bit_khr                = int(0x00000001)
+	video_encode_h265_std_sample_adaptive_offset_enabled_flag_set_bit_khr      = int(0x00000002)
+	video_encode_h265_std_scaling_list_data_present_flag_set_bit_khr           = int(0x00000004)
+	video_encode_h265_std_pcm_enabled_flag_set_bit_khr                         = int(0x00000008)
+	video_encode_h265_std_sps_temporal_mvp_enabled_flag_set_bit_khr            = int(0x00000010)
+	video_encode_h265_std_init_qp_minus26_bit_khr                              = int(0x00000020)
+	video_encode_h265_std_weighted_pred_flag_set_bit_khr                       = int(0x00000040)
+	video_encode_h265_std_weighted_bipred_flag_set_bit_khr                     = int(0x00000080)
+	video_encode_h265_std_log2_parallel_merge_level_minus2_bit_khr             = int(0x00000100)
+	video_encode_h265_std_sign_data_hiding_enabled_flag_set_bit_khr            = int(0x00000200)
+	video_encode_h265_std_transform_skip_enabled_flag_set_bit_khr              = int(0x00000400)
+	video_encode_h265_std_transform_skip_enabled_flag_unset_bit_khr            = int(0x00000800)
+	video_encode_h265_std_pps_slice_chroma_qp_offsets_present_flag_set_bit_khr = int(0x00001000)
+	video_encode_h265_std_transquant_bypass_enabled_flag_set_bit_khr           = int(0x00002000)
+	video_encode_h265_std_constrained_intra_pred_flag_set_bit_khr              = int(0x00004000)
+	video_encode_h265_std_entropy_coding_sync_enabled_flag_set_bit_khr         = int(0x00008000)
+	video_encode_h265_std_deblocking_filter_override_enabled_flag_set_bit_khr  = int(0x00010000)
+	video_encode_h265_std_dependent_slice_segments_enabled_flag_set_bit_khr    = int(0x00020000)
+	video_encode_h265_std_dependent_slice_segment_flag_set_bit_khr             = int(0x00040000)
+	video_encode_h265_std_slice_qp_delta_bit_khr                               = int(0x00080000)
+	video_encode_h265_std_different_slice_qp_delta_bit_khr                     = int(0x00100000)
+	video_encode_h265_std_flag_bits_max_enum_khr                               = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeH265StdFlagsKHR = u32
+
+pub enum VideoEncodeH265CtbSizeFlagBitsKHR {
+	video_encode_h265_ctb_size_16_bit_khr             = int(0x00000001)
+	video_encode_h265_ctb_size_32_bit_khr             = int(0x00000002)
+	video_encode_h265_ctb_size_64_bit_khr             = int(0x00000004)
+	video_encode_h265_ctb_size_flag_bits_max_enum_khr = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeH265CtbSizeFlagsKHR = u32
+
+pub enum VideoEncodeH265TransformBlockSizeFlagBitsKHR {
+	video_encode_h265_transform_block_size_4_bit_khr              = int(0x00000001)
+	video_encode_h265_transform_block_size_8_bit_khr              = int(0x00000002)
+	video_encode_h265_transform_block_size_16_bit_khr             = int(0x00000004)
+	video_encode_h265_transform_block_size_32_bit_khr             = int(0x00000008)
+	video_encode_h265_transform_block_size_flag_bits_max_enum_khr = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeH265TransformBlockSizeFlagsKHR = u32
+
+pub enum VideoEncodeH265RateControlFlagBitsKHR {
+	video_encode_h265_rate_control_attempt_hrd_compliance_bit_khr            = int(0x00000001)
+	video_encode_h265_rate_control_regular_gop_bit_khr                       = int(0x00000002)
+	video_encode_h265_rate_control_reference_pattern_flat_bit_khr            = int(0x00000004)
+	video_encode_h265_rate_control_reference_pattern_dyadic_bit_khr          = int(0x00000008)
+	video_encode_h265_rate_control_temporal_sub_layer_pattern_dyadic_bit_khr = int(0x00000010)
+	video_encode_h265_rate_control_flag_bits_max_enum_khr                    = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeH265RateControlFlagsKHR = u32
+
+pub struct VideoEncodeH265CapabilitiesKHR {
+pub mut:
+	s_type                                   StructureType
+	p_next                                   voidptr
+	flags                                    VideoEncodeH265CapabilityFlagsKHR
+	max_level_idc                            u32
+	max_slice_segment_count                  u32
+	max_tiles                                Extent2D
+	ctb_sizes                                VideoEncodeH265CtbSizeFlagsKHR
+	transform_block_sizes                    VideoEncodeH265TransformBlockSizeFlagsKHR
+	max_p_picture_l0_reference_count         u32
+	max_b_picture_l0_reference_count         u32
+	max_l1_reference_count                   u32
+	max_sub_layer_count                      u32
+	expect_dyadic_temporal_sub_layer_pattern Bool32
+	min_qp                                   i32
+	max_qp                                   i32
+	prefers_gop_remaining_frames             Bool32
+	requires_gop_remaining_frames            Bool32
+	std_syntax_flags                         VideoEncodeH265StdFlagsKHR
+}
+
+pub struct VideoEncodeH265SessionCreateInfoKHR {
+pub mut:
+	s_type            StructureType
+	p_next            voidptr
+	use_max_level_idc Bool32
+	max_level_idc     u32
+}
+
+pub struct VideoEncodeH265QpKHR {
+pub mut:
+	qp_i i32
+	qp_p i32
+	qp_b i32
+}
+
+pub struct VideoEncodeH265QualityLevelPropertiesKHR {
+pub mut:
+	s_type                              StructureType
+	p_next                              voidptr
+	preferred_rate_control_flags        VideoEncodeH265RateControlFlagsKHR
+	preferred_gop_frame_count           u32
+	preferred_idr_period                u32
+	preferred_consecutive_b_frame_count u32
+	preferred_sub_layer_count           u32
+	preferred_constant_qp               VideoEncodeH265QpKHR
+	preferred_max_l0_reference_count    u32
+	preferred_max_l1_reference_count    u32
+}
+
+pub struct VideoEncodeH265SessionParametersAddInfoKHR {
+pub mut:
+	s_type        StructureType
+	p_next        voidptr
+	std_vps_count u32
+	p_std_vp_ss   &C.StdVideoH265VideoParameterSet
+	std_sps_count u32
+	p_std_sp_ss   &C.StdVideoH265SequenceParameterSet
+	std_pps_count u32
+	p_std_pp_ss   &C.StdVideoH265PictureParameterSet
+}
+
+pub struct VideoEncodeH265SessionParametersCreateInfoKHR {
+pub mut:
+	s_type                StructureType
+	p_next                voidptr
+	max_std_vps_count     u32
+	max_std_sps_count     u32
+	max_std_pps_count     u32
+	p_parameters_add_info &VideoEncodeH265SessionParametersAddInfoKHR
+}
+
+pub struct VideoEncodeH265SessionParametersGetInfoKHR {
+pub mut:
+	s_type        StructureType
+	p_next        voidptr
+	write_std_vps Bool32
+	write_std_sps Bool32
+	write_std_pps Bool32
+	std_vps_id    u32
+	std_sps_id    u32
+	std_pps_id    u32
+}
+
+pub struct VideoEncodeH265SessionParametersFeedbackInfoKHR {
+pub mut:
+	s_type                StructureType
+	p_next                voidptr
+	has_std_vps_overrides Bool32
+	has_std_sps_overrides Bool32
+	has_std_pps_overrides Bool32
+}
+
+pub struct VideoEncodeH265NaluSliceSegmentInfoKHR {
+pub mut:
+	s_type                     StructureType
+	p_next                     voidptr
+	constant_qp                i32
+	p_std_slice_segment_header &C.StdVideoEncodeH265SliceSegmentHeader
+}
+
+pub struct VideoEncodeH265PictureInfoKHR {
+pub mut:
+	s_type                         StructureType
+	p_next                         voidptr
+	nalu_slice_segment_entry_count u32
+	p_nalu_slice_segment_entries   &VideoEncodeH265NaluSliceSegmentInfoKHR
+	p_std_picture_info             &C.StdVideoEncodeH265PictureInfo
+}
+
+pub struct VideoEncodeH265DpbSlotInfoKHR {
+pub mut:
+	s_type               StructureType
+	p_next               voidptr
+	p_std_reference_info &C.StdVideoEncodeH265ReferenceInfo
+}
+
+pub struct VideoEncodeH265ProfileInfoKHR {
+pub mut:
+	s_type          StructureType
+	p_next          voidptr
+	std_profile_idc C.StdVideoH265ProfileIdc
+}
+
+pub struct VideoEncodeH265RateControlInfoKHR {
+pub mut:
+	s_type                    StructureType
+	p_next                    voidptr
+	flags                     VideoEncodeH265RateControlFlagsKHR
+	gop_frame_count           u32
+	idr_period                u32
+	consecutive_b_frame_count u32
+	sub_layer_count           u32
+}
+
+pub struct VideoEncodeH265FrameSizeKHR {
+pub mut:
+	frame_i_size u32
+	frame_p_size u32
+	frame_b_size u32
+}
+
+pub struct VideoEncodeH265RateControlLayerInfoKHR {
+pub mut:
+	s_type             StructureType
+	p_next             voidptr
+	use_min_qp         Bool32
+	min_qp             VideoEncodeH265QpKHR
+	use_max_qp         Bool32
+	max_qp             VideoEncodeH265QpKHR
+	use_max_frame_size Bool32
+	max_frame_size     VideoEncodeH265FrameSizeKHR
+}
+
+pub struct VideoEncodeH265GopRemainingFrameInfoKHR {
+pub mut:
+	s_type                   StructureType
+	p_next                   voidptr
+	use_gop_remaining_frames Bool32
+	gop_remaining_i          u32
+	gop_remaining_p          u32
+	gop_remaining_b          u32
+}
+
+#include "vk_video/vulkan_video_codec_h264std_decode.h"
+
+pub const khr_video_decode_h264_spec_version = 9
 pub const khr_video_decode_h264_extension_name = 'VK_KHR_video_decode_h264'
 
 pub enum VideoDecodeH264PictureLayoutFlagBitsKHR {
@@ -9220,27 +9541,24 @@ pub enum VideoDecodeH264PictureLayoutFlagBitsKHR {
 
 pub type VideoDecodeH264PictureLayoutFlagsKHR = u32
 
-// VideoDecodeH264ProfileInfoKHR extends VkVideoProfileInfoKHR,VkQueryPoolCreateInfo
 pub struct VideoDecodeH264ProfileInfoKHR {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	std_profile_idc C.StdVideoH264ProfileIdc
 	picture_layout  VideoDecodeH264PictureLayoutFlagBitsKHR
 }
 
-// VideoDecodeH264CapabilitiesKHR extends VkVideoCapabilitiesKHR
 pub struct VideoDecodeH264CapabilitiesKHR {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	max_level_idc            C.StdVideoH264LevelIdc
 	field_offset_granularity Offset2D
 }
 
-// VideoDecodeH264SessionParametersAddInfoKHR extends VkVideoSessionParametersUpdateInfoKHR
 pub struct VideoDecodeH264SessionParametersAddInfoKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	std_sps_count u32
@@ -9249,9 +9567,8 @@ mut:
 	p_std_pp_ss   &C.StdVideoH264PictureParameterSet
 }
 
-// VideoDecodeH264SessionParametersCreateInfoKHR extends VkVideoSessionParametersCreateInfoKHR
 pub struct VideoDecodeH264SessionParametersCreateInfoKHR {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	max_std_sps_count     u32
@@ -9259,9 +9576,8 @@ mut:
 	p_parameters_add_info &VideoDecodeH264SessionParametersAddInfoKHR
 }
 
-// VideoDecodeH264PictureInfoKHR extends VkVideoDecodeInfoKHR
 pub struct VideoDecodeH264PictureInfoKHR {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	p_std_picture_info &C.StdVideoDecodeH264PictureInfo
@@ -9269,19 +9585,17 @@ mut:
 	p_slice_offsets    &u32
 }
 
-// VideoDecodeH264DpbSlotInfoKHR extends VkVideoReferenceSlotInfoKHR
 pub struct VideoDecodeH264DpbSlotInfoKHR {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	p_std_reference_info &C.StdVideoDecodeH264ReferenceInfo
 }
 
-// VK_KHR_dynamic_rendering is a preprocessor guard. Do not pass it to API calls.
-const khr_dynamic_rendering = 1
 pub const khr_dynamic_rendering_spec_version = 1
 pub const khr_dynamic_rendering_extension_name = 'VK_KHR_dynamic_rendering'
 
+pub type RenderingFlagsKHR = u32
 pub type RenderingFlagBitsKHR = RenderingFlagBits
 
 pub type RenderingInfoKHR = RenderingInfo
@@ -9294,9 +9608,8 @@ pub type PhysicalDeviceDynamicRenderingFeaturesKHR = PhysicalDeviceDynamicRender
 
 pub type CommandBufferInheritanceRenderingInfoKHR = CommandBufferInheritanceRenderingInfo
 
-// RenderingFragmentShadingRateAttachmentInfoKHR extends VkRenderingInfo
 pub struct RenderingFragmentShadingRateAttachmentInfoKHR {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	image_view                         C.ImageView
@@ -9304,18 +9617,16 @@ mut:
 	shading_rate_attachment_texel_size Extent2D
 }
 
-// RenderingFragmentDensityMapAttachmentInfoEXT extends VkRenderingInfo
 pub struct RenderingFragmentDensityMapAttachmentInfoEXT {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	image_view   C.ImageView
 	image_layout ImageLayout
 }
 
-// AttachmentSampleCountInfoAMD extends VkCommandBufferInheritanceInfo,VkGraphicsPipelineCreateInfo
 pub struct AttachmentSampleCountInfoAMD {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	color_attachment_count           u32
@@ -9325,37 +9636,14 @@ mut:
 
 pub type AttachmentSampleCountInfoNV = AttachmentSampleCountInfoAMD
 
-// MultiviewPerViewAttributesInfoNVX extends VkCommandBufferInheritanceInfo,VkGraphicsPipelineCreateInfo,VkRenderingInfo
 pub struct MultiviewPerViewAttributesInfoNVX {
-mut:
+pub mut:
 	s_type                              StructureType
 	p_next                              voidptr
 	per_view_attributes                 Bool32
 	per_view_attributes_position_x_only Bool32
 }
 
-type VkCmdBeginRenderingKHR = fn (C.CommandBuffer, &RenderingInfo)
-
-pub fn cmd_begin_rendering_khr(command_buffer C.CommandBuffer, p_rendering_info &RenderingInfo) {
-	f := VkCmdBeginRenderingKHR((*vulkan.loader_p).get_sym('vkCmdBeginRenderingKHR') or {
-		println("Couldn't load symbol for 'vkCmdBeginRenderingKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_rendering_info)
-}
-
-type VkCmdEndRenderingKHR = fn (C.CommandBuffer)
-
-pub fn cmd_end_rendering_khr(command_buffer C.CommandBuffer) {
-	f := VkCmdEndRenderingKHR((*vulkan.loader_p).get_sym('vkCmdEndRenderingKHR') or {
-		println("Couldn't load symbol for 'vkCmdEndRenderingKHR': ${err}")
-		return
-	})
-	f(command_buffer)
-}
-
-// VK_KHR_multiview is a preprocessor guard. Do not pass it to API calls.
-const khr_multiview = 1
 pub const khr_multiview_spec_version = 1
 pub const khr_multiview_extension_name = 'VK_KHR_multiview'
 
@@ -9365,8 +9653,6 @@ pub type PhysicalDeviceMultiviewFeaturesKHR = PhysicalDeviceMultiviewFeatures
 
 pub type PhysicalDeviceMultiviewPropertiesKHR = PhysicalDeviceMultiviewProperties
 
-// VK_KHR_get_physical_device_properties2 is a preprocessor guard. Do not pass it to API calls.
-const khr_get_physical_device_properties2 = 1
 pub const khr_get_physical_device_properties_2_spec_version = 2
 pub const khr_get_physical_device_properties_2_extension_name = 'VK_KHR_get_physical_device_properties2'
 
@@ -9388,83 +9674,13 @@ pub type SparseImageFormatProperties2KHR = SparseImageFormatProperties2
 
 pub type PhysicalDeviceSparseImageFormatInfo2KHR = PhysicalDeviceSparseImageFormatInfo2
 
-type VkGetPhysicalDeviceFeatures2KHR = fn (C.PhysicalDevice, &PhysicalDeviceFeatures2)
-
-pub fn get_physical_device_features2_khr(physical_device C.PhysicalDevice, p_features &PhysicalDeviceFeatures2) {
-	f := VkGetPhysicalDeviceFeatures2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceFeatures2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceFeatures2KHR': ${err}")
-		return
-	})
-	f(physical_device, p_features)
-}
-
-type VkGetPhysicalDeviceProperties2KHR = fn (C.PhysicalDevice, &PhysicalDeviceProperties2)
-
-pub fn get_physical_device_properties2_khr(physical_device C.PhysicalDevice, p_properties &PhysicalDeviceProperties2) {
-	f := VkGetPhysicalDeviceProperties2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceProperties2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceProperties2KHR': ${err}")
-		return
-	})
-	f(physical_device, p_properties)
-}
-
-type VkGetPhysicalDeviceFormatProperties2KHR = fn (C.PhysicalDevice, Format, &FormatProperties2)
-
-pub fn get_physical_device_format_properties2_khr(physical_device C.PhysicalDevice, format Format, p_format_properties &FormatProperties2) {
-	f := VkGetPhysicalDeviceFormatProperties2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceFormatProperties2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceFormatProperties2KHR': ${err}")
-		return
-	})
-	f(physical_device, format, p_format_properties)
-}
-
-type VkGetPhysicalDeviceImageFormatProperties2KHR = fn (C.PhysicalDevice, &PhysicalDeviceImageFormatInfo2, &ImageFormatProperties2) Result
-
-pub fn get_physical_device_image_format_properties2_khr(physical_device C.PhysicalDevice, p_image_format_info &PhysicalDeviceImageFormatInfo2, p_image_format_properties &ImageFormatProperties2) Result {
-	f := VkGetPhysicalDeviceImageFormatProperties2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceImageFormatProperties2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceImageFormatProperties2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_image_format_info, p_image_format_properties)
-}
-
-type VkGetPhysicalDeviceQueueFamilyProperties2KHR = fn (C.PhysicalDevice, &u32, &QueueFamilyProperties2)
-
-pub fn get_physical_device_queue_family_properties2_khr(physical_device C.PhysicalDevice, p_queue_family_property_count &u32, p_queue_family_properties &QueueFamilyProperties2) {
-	f := VkGetPhysicalDeviceQueueFamilyProperties2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceQueueFamilyProperties2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceQueueFamilyProperties2KHR': ${err}")
-		return
-	})
-	f(physical_device, p_queue_family_property_count, p_queue_family_properties)
-}
-
-type VkGetPhysicalDeviceMemoryProperties2KHR = fn (C.PhysicalDevice, &PhysicalDeviceMemoryProperties2)
-
-pub fn get_physical_device_memory_properties2_khr(physical_device C.PhysicalDevice, p_memory_properties &PhysicalDeviceMemoryProperties2) {
-	f := VkGetPhysicalDeviceMemoryProperties2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceMemoryProperties2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceMemoryProperties2KHR': ${err}")
-		return
-	})
-	f(physical_device, p_memory_properties)
-}
-
-type VkGetPhysicalDeviceSparseImageFormatProperties2KHR = fn (C.PhysicalDevice, &PhysicalDeviceSparseImageFormatInfo2, &u32, &SparseImageFormatProperties2)
-
-pub fn get_physical_device_sparse_image_format_properties2_khr(physical_device C.PhysicalDevice, p_format_info &PhysicalDeviceSparseImageFormatInfo2, p_property_count &u32, p_properties &SparseImageFormatProperties2) {
-	f := VkGetPhysicalDeviceSparseImageFormatProperties2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSparseImageFormatProperties2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSparseImageFormatProperties2KHR': ${err}")
-		return
-	})
-	f(physical_device, p_format_info, p_property_count, p_properties)
-}
-
-// VK_KHR_device_group is a preprocessor guard. Do not pass it to API calls.
-const khr_device_group = 1
 pub const khr_device_group_spec_version = 4
 pub const khr_device_group_extension_name = 'VK_KHR_device_group'
 
+pub type PeerMemoryFeatureFlagsKHR = u32
 pub type PeerMemoryFeatureFlagBitsKHR = PeerMemoryFeatureFlagBits
 
+pub type MemoryAllocateFlagsKHR = u32
 pub type MemoryAllocateFlagBitsKHR = MemoryAllocateFlagBits
 
 pub type MemoryAllocateFlagsInfoKHR = MemoryAllocateFlagsInfo
@@ -9481,61 +9697,18 @@ pub type BindBufferMemoryDeviceGroupInfoKHR = BindBufferMemoryDeviceGroupInfo
 
 pub type BindImageMemoryDeviceGroupInfoKHR = BindImageMemoryDeviceGroupInfo
 
-type VkGetDeviceGroupPeerMemoryFeaturesKHR = fn (C.Device, u32, u32, u32, &PeerMemoryFeatureFlags)
-
-pub fn get_device_group_peer_memory_features_khr(device C.Device, heap_index u32, local_device_index u32, remote_device_index u32, p_peer_memory_features &PeerMemoryFeatureFlags) {
-	f := VkGetDeviceGroupPeerMemoryFeaturesKHR((*vulkan.loader_p).get_sym('vkGetDeviceGroupPeerMemoryFeaturesKHR') or {
-		println("Couldn't load symbol for 'vkGetDeviceGroupPeerMemoryFeaturesKHR': ${err}")
-		return
-	})
-	f(device, heap_index, local_device_index, remote_device_index, p_peer_memory_features)
-}
-
-type VkCmdSetDeviceMaskKHR = fn (C.CommandBuffer, u32)
-
-pub fn cmd_set_device_mask_khr(command_buffer C.CommandBuffer, device_mask u32) {
-	f := VkCmdSetDeviceMaskKHR((*vulkan.loader_p).get_sym('vkCmdSetDeviceMaskKHR') or {
-		println("Couldn't load symbol for 'vkCmdSetDeviceMaskKHR': ${err}")
-		return
-	})
-	f(command_buffer, device_mask)
-}
-
-type VkCmdDispatchBaseKHR = fn (C.CommandBuffer, u32, u32, u32, u32, u32, u32)
-
-pub fn cmd_dispatch_base_khr(command_buffer C.CommandBuffer, base_group_x u32, base_group_y u32, base_group_z u32, group_count_x u32, group_count_y u32, group_count_z u32) {
-	f := VkCmdDispatchBaseKHR((*vulkan.loader_p).get_sym('vkCmdDispatchBaseKHR') or {
-		println("Couldn't load symbol for 'vkCmdDispatchBaseKHR': ${err}")
-		return
-	})
-	f(command_buffer, base_group_x, base_group_y, base_group_z, group_count_x, group_count_y,
-		group_count_z)
-}
-
-// VK_KHR_shader_draw_parameters is a preprocessor guard. Do not pass it to API calls.
-const khr_shader_draw_parameters = 1
 pub const khr_shader_draw_parameters_spec_version = 1
 pub const khr_shader_draw_parameters_extension_name = 'VK_KHR_shader_draw_parameters'
 
-// VK_KHR_maintenance1 is a preprocessor guard. Do not pass it to API calls.
-const khr_maintenance1 = 1
 pub const khr_maintenance_1_spec_version = 2
 pub const khr_maintenance_1_extension_name = 'VK_KHR_maintenance1'
+// VK_KHR_MAINTENANCE1_SPEC_VERSION is a deprecated alias
 pub const khr_maintenance1_spec_version = khr_maintenance_1_spec_version
+// VK_KHR_MAINTENANCE1_EXTENSION_NAME is a deprecated alias
 pub const khr_maintenance1_extension_name = khr_maintenance_1_extension_name
 
-type VkTrimCommandPoolKHR = fn (C.Device, C.CommandPool, CommandPoolTrimFlags)
+pub type CommandPoolTrimFlagsKHR = u32
 
-pub fn trim_command_pool_khr(device C.Device, command_pool C.CommandPool, flags CommandPoolTrimFlags) {
-	f := VkTrimCommandPoolKHR((*vulkan.loader_p).get_sym('vkTrimCommandPoolKHR') or {
-		println("Couldn't load symbol for 'vkTrimCommandPoolKHR': ${err}")
-		return
-	})
-	f(device, command_pool, flags)
-}
-
-// VK_KHR_device_group_creation is a preprocessor guard. Do not pass it to API calls.
-const khr_device_group_creation = 1
 pub const khr_device_group_creation_spec_version = 1
 pub const khr_device_group_creation_extension_name = 'VK_KHR_device_group_creation'
 pub const max_device_group_size_khr = max_device_group_size
@@ -9544,24 +9717,14 @@ pub type PhysicalDeviceGroupPropertiesKHR = PhysicalDeviceGroupProperties
 
 pub type DeviceGroupDeviceCreateInfoKHR = DeviceGroupDeviceCreateInfo
 
-type VkEnumeratePhysicalDeviceGroupsKHR = fn (C.Instance, &u32, &PhysicalDeviceGroupProperties) Result
-
-pub fn enumerate_physical_device_groups_khr(instance C.Instance, p_physical_device_group_count &u32, p_physical_device_group_properties &PhysicalDeviceGroupProperties) Result {
-	f := VkEnumeratePhysicalDeviceGroupsKHR((*vulkan.loader_p).get_sym('vkEnumeratePhysicalDeviceGroupsKHR') or {
-		println("Couldn't load symbol for 'vkEnumeratePhysicalDeviceGroupsKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_physical_device_group_count, p_physical_device_group_properties)
-}
-
-// VK_KHR_external_memory_capabilities is a preprocessor guard. Do not pass it to API calls.
-const khr_external_memory_capabilities = 1
 pub const khr_external_memory_capabilities_spec_version = 1
 pub const khr_external_memory_capabilities_extension_name = 'VK_KHR_external_memory_capabilities'
 pub const luid_size_khr = luid_size
 
+pub type ExternalMemoryHandleTypeFlagsKHR = u32
 pub type ExternalMemoryHandleTypeFlagBitsKHR = ExternalMemoryHandleTypeFlagBits
 
+pub type ExternalMemoryFeatureFlagsKHR = u32
 pub type ExternalMemoryFeatureFlagBitsKHR = ExternalMemoryFeatureFlagBits
 
 pub type ExternalMemoryPropertiesKHR = ExternalMemoryProperties
@@ -9576,18 +9739,6 @@ pub type ExternalBufferPropertiesKHR = ExternalBufferProperties
 
 pub type PhysicalDeviceIDPropertiesKHR = PhysicalDeviceIDProperties
 
-type VkGetPhysicalDeviceExternalBufferPropertiesKHR = fn (C.PhysicalDevice, &PhysicalDeviceExternalBufferInfo, &ExternalBufferProperties)
-
-pub fn get_physical_device_external_buffer_properties_khr(physical_device C.PhysicalDevice, p_external_buffer_info &PhysicalDeviceExternalBufferInfo, p_external_buffer_properties &ExternalBufferProperties) {
-	f := VkGetPhysicalDeviceExternalBufferPropertiesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceExternalBufferPropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalBufferPropertiesKHR': ${err}")
-		return
-	})
-	f(physical_device, p_external_buffer_info, p_external_buffer_properties)
-}
-
-// VK_KHR_external_memory is a preprocessor guard. Do not pass it to API calls.
-const khr_external_memory = 1
 pub const khr_external_memory_spec_version = 1
 pub const khr_external_memory_extension_name = 'VK_KHR_external_memory'
 pub const queue_family_external_khr = queue_family_external
@@ -9598,72 +9749,11 @@ pub type ExternalMemoryBufferCreateInfoKHR = ExternalMemoryBufferCreateInfo
 
 pub type ExportMemoryAllocateInfoKHR = ExportMemoryAllocateInfo
 
-// VK_KHR_external_memory_win32 is a preprocessor guard. Do not pass it to API calls.
-const khr_external_memory_win32 = 1
-pub const khr_external_memory_win32_spec_version = 1
-pub const khr_external_memory_win32_extension_name = 'VK_KHR_external_memory_win32'
-// ImportMemoryWin32HandleInfoKHR extends VkMemoryAllocateInfo
-pub struct ImportMemoryWin32HandleInfoKHR {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	handle_type ExternalMemoryHandleTypeFlagBits
-	handle      voidptr
-	name        string
-}
-
-// ExportMemoryWin32HandleInfoKHR extends VkMemoryAllocateInfo
-pub struct ExportMemoryWin32HandleInfoKHR {
-mut:
-	s_type       StructureType
-	p_next       voidptr
-	p_attributes voidptr
-	dw_access    u32
-	name         string
-}
-
-pub struct MemoryWin32HandlePropertiesKHR {
-mut:
-	s_type           StructureType
-	p_next           voidptr
-	memory_type_bits u32
-}
-
-pub struct MemoryGetWin32HandleInfoKHR {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	memory      C.DeviceMemory
-	handle_type ExternalMemoryHandleTypeFlagBits
-}
-
-type VkGetMemoryWin32HandleKHR = fn (C.Device, &MemoryGetWin32HandleInfoKHR, &voidptr) Result
-
-pub fn get_memory_win32_handle_khr(device C.Device, p_get_win32_handle_info &MemoryGetWin32HandleInfoKHR, p_handle &voidptr) Result {
-	f := VkGetMemoryWin32HandleKHR((*vulkan.loader_p).get_sym('vkGetMemoryWin32HandleKHR') or {
-		println("Couldn't load symbol for 'vkGetMemoryWin32HandleKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_get_win32_handle_info, p_handle)
-}
-
-type VkGetMemoryWin32HandlePropertiesKHR = fn (C.Device, ExternalMemoryHandleTypeFlagBits, voidptr, &MemoryWin32HandlePropertiesKHR) Result
-
-pub fn get_memory_win32_handle_properties_khr(device C.Device, handle_type ExternalMemoryHandleTypeFlagBits, handle voidptr, p_memory_win32_handle_properties &MemoryWin32HandlePropertiesKHR) Result {
-	f := VkGetMemoryWin32HandlePropertiesKHR((*vulkan.loader_p).get_sym('vkGetMemoryWin32HandlePropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetMemoryWin32HandlePropertiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, handle_type, handle, p_memory_win32_handle_properties)
-}
-
-// VK_KHR_external_memory_fd is a preprocessor guard. Do not pass it to API calls.
-const khr_external_memory_fd = 1
 pub const khr_external_memory_fd_spec_version = 1
 pub const khr_external_memory_fd_extension_name = 'VK_KHR_external_memory_fd'
-// ImportMemoryFdInfoKHR extends VkMemoryAllocateInfo
+
 pub struct ImportMemoryFdInfoKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	handle_type ExternalMemoryHandleTypeFlagBits
@@ -9671,162 +9761,66 @@ mut:
 }
 
 pub struct MemoryFdPropertiesKHR {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	memory_type_bits u32
 }
 
 pub struct MemoryGetFdInfoKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	memory      C.DeviceMemory
 	handle_type ExternalMemoryHandleTypeFlagBits
 }
 
-type VkGetMemoryFdKHR = fn (C.Device, &MemoryGetFdInfoKHR, &int) Result
-
-pub fn get_memory_fd_khr(device C.Device, p_get_fd_info &MemoryGetFdInfoKHR, p_fd &int) Result {
-	f := VkGetMemoryFdKHR((*vulkan.loader_p).get_sym('vkGetMemoryFdKHR') or {
-		println("Couldn't load symbol for 'vkGetMemoryFdKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_get_fd_info, p_fd)
+fn C.vkGetMemoryFdKHR(C.Device,
+	&MemoryGetFdInfoKHR,
+	&int) Result
+pub fn get_memory_fd_khr(device C.Device,
+	p_get_fd_info &MemoryGetFdInfoKHR,
+	p_fd &int) Result {
+	return C.vkGetMemoryFdKHR(device, p_get_fd_info, p_fd)
 }
 
-type VkGetMemoryFdPropertiesKHR = fn (C.Device, ExternalMemoryHandleTypeFlagBits, int, &MemoryFdPropertiesKHR) Result
-
-pub fn get_memory_fd_properties_khr(device C.Device, handle_type ExternalMemoryHandleTypeFlagBits, fd int, p_memory_fd_properties &MemoryFdPropertiesKHR) Result {
-	f := VkGetMemoryFdPropertiesKHR((*vulkan.loader_p).get_sym('vkGetMemoryFdPropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetMemoryFdPropertiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, handle_type, fd, p_memory_fd_properties)
+fn C.vkGetMemoryFdPropertiesKHR(C.Device,
+	ExternalMemoryHandleTypeFlagBits,
+	int,
+	&MemoryFdPropertiesKHR) Result
+pub fn get_memory_fd_properties_khr(device C.Device,
+	handle_type ExternalMemoryHandleTypeFlagBits,
+	fd int,
+	p_memory_fd_properties &MemoryFdPropertiesKHR) Result {
+	return C.vkGetMemoryFdPropertiesKHR(device, handle_type, fd, p_memory_fd_properties)
 }
 
-// VK_KHR_win32_keyed_mutex is a preprocessor guard. Do not pass it to API calls.
-const khr_win32_keyed_mutex = 1
-pub const khr_win32_keyed_mutex_spec_version = 1
-pub const khr_win32_keyed_mutex_extension_name = 'VK_KHR_win32_keyed_mutex'
-// Win32KeyedMutexAcquireReleaseInfoKHR extends VkSubmitInfo,VkSubmitInfo2
-pub struct Win32KeyedMutexAcquireReleaseInfoKHR {
-mut:
-	s_type             StructureType
-	p_next             voidptr
-	acquire_count      u32
-	p_acquire_syncs    &C.DeviceMemory
-	p_acquire_keys     &u64
-	p_acquire_timeouts &u32
-	release_count      u32
-	p_release_syncs    &C.DeviceMemory
-	p_release_keys     &u64
-}
-
-// VK_KHR_external_semaphore_capabilities is a preprocessor guard. Do not pass it to API calls.
-const khr_external_semaphore_capabilities = 1
 pub const khr_external_semaphore_capabilities_spec_version = 1
 pub const khr_external_semaphore_capabilities_extension_name = 'VK_KHR_external_semaphore_capabilities'
 
+pub type ExternalSemaphoreHandleTypeFlagsKHR = u32
 pub type ExternalSemaphoreHandleTypeFlagBitsKHR = ExternalSemaphoreHandleTypeFlagBits
 
+pub type ExternalSemaphoreFeatureFlagsKHR = u32
 pub type ExternalSemaphoreFeatureFlagBitsKHR = ExternalSemaphoreFeatureFlagBits
 
 pub type PhysicalDeviceExternalSemaphoreInfoKHR = PhysicalDeviceExternalSemaphoreInfo
 
 pub type ExternalSemaphorePropertiesKHR = ExternalSemaphoreProperties
 
-type VkGetPhysicalDeviceExternalSemaphorePropertiesKHR = fn (C.PhysicalDevice, &PhysicalDeviceExternalSemaphoreInfo, &ExternalSemaphoreProperties)
-
-pub fn get_physical_device_external_semaphore_properties_khr(physical_device C.PhysicalDevice, p_external_semaphore_info &PhysicalDeviceExternalSemaphoreInfo, p_external_semaphore_properties &ExternalSemaphoreProperties) {
-	f := VkGetPhysicalDeviceExternalSemaphorePropertiesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceExternalSemaphorePropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalSemaphorePropertiesKHR': ${err}")
-		return
-	})
-	f(physical_device, p_external_semaphore_info, p_external_semaphore_properties)
-}
-
-// VK_KHR_external_semaphore is a preprocessor guard. Do not pass it to API calls.
-const khr_external_semaphore = 1
 pub const khr_external_semaphore_spec_version = 1
 pub const khr_external_semaphore_extension_name = 'VK_KHR_external_semaphore'
 
+pub type SemaphoreImportFlagsKHR = u32
 pub type SemaphoreImportFlagBitsKHR = SemaphoreImportFlagBits
 
 pub type ExportSemaphoreCreateInfoKHR = ExportSemaphoreCreateInfo
 
-// VK_KHR_external_semaphore_win32 is a preprocessor guard. Do not pass it to API calls.
-const khr_external_semaphore_win32 = 1
-pub const khr_external_semaphore_win32_spec_version = 1
-pub const khr_external_semaphore_win32_extension_name = 'VK_KHR_external_semaphore_win32'
-
-pub struct ImportSemaphoreWin32HandleInfoKHR {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	semaphore   C.Semaphore
-	flags       SemaphoreImportFlags
-	handle_type ExternalSemaphoreHandleTypeFlagBits
-	handle      voidptr
-	name        string
-}
-
-// ExportSemaphoreWin32HandleInfoKHR extends VkSemaphoreCreateInfo
-pub struct ExportSemaphoreWin32HandleInfoKHR {
-mut:
-	s_type       StructureType
-	p_next       voidptr
-	p_attributes voidptr
-	dw_access    u32
-	name         string
-}
-
-// D3D12FenceSubmitInfoKHR extends VkSubmitInfo
-pub struct D3D12FenceSubmitInfoKHR {
-mut:
-	s_type                        StructureType
-	p_next                        voidptr
-	wait_semaphore_values_count   u32
-	p_wait_semaphore_values       &u64
-	signal_semaphore_values_count u32
-	p_signal_semaphore_values     &u64
-}
-
-pub struct SemaphoreGetWin32HandleInfoKHR {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	semaphore   C.Semaphore
-	handle_type ExternalSemaphoreHandleTypeFlagBits
-}
-
-type VkImportSemaphoreWin32HandleKHR = fn (C.Device, &ImportSemaphoreWin32HandleInfoKHR) Result
-
-pub fn import_semaphore_win32_handle_khr(device C.Device, p_import_semaphore_win32_handle_info &ImportSemaphoreWin32HandleInfoKHR) Result {
-	f := VkImportSemaphoreWin32HandleKHR((*vulkan.loader_p).get_sym('vkImportSemaphoreWin32HandleKHR') or {
-		println("Couldn't load symbol for 'vkImportSemaphoreWin32HandleKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_import_semaphore_win32_handle_info)
-}
-
-type VkGetSemaphoreWin32HandleKHR = fn (C.Device, &SemaphoreGetWin32HandleInfoKHR, &voidptr) Result
-
-pub fn get_semaphore_win32_handle_khr(device C.Device, p_get_win32_handle_info &SemaphoreGetWin32HandleInfoKHR, p_handle &voidptr) Result {
-	f := VkGetSemaphoreWin32HandleKHR((*vulkan.loader_p).get_sym('vkGetSemaphoreWin32HandleKHR') or {
-		println("Couldn't load symbol for 'vkGetSemaphoreWin32HandleKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_get_win32_handle_info, p_handle)
-}
-
-// VK_KHR_external_semaphore_fd is a preprocessor guard. Do not pass it to API calls.
-const khr_external_semaphore_fd = 1
 pub const khr_external_semaphore_fd_spec_version = 1
 pub const khr_external_semaphore_fd_extension_name = 'VK_KHR_external_semaphore_fd'
 
 pub struct ImportSemaphoreFdInfoKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	semaphore   C.Semaphore
@@ -9836,67 +9830,69 @@ mut:
 }
 
 pub struct SemaphoreGetFdInfoKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	semaphore   C.Semaphore
 	handle_type ExternalSemaphoreHandleTypeFlagBits
 }
 
-type VkImportSemaphoreFdKHR = fn (C.Device, &ImportSemaphoreFdInfoKHR) Result
-
-pub fn import_semaphore_fd_khr(device C.Device, p_import_semaphore_fd_info &ImportSemaphoreFdInfoKHR) Result {
-	f := VkImportSemaphoreFdKHR((*vulkan.loader_p).get_sym('vkImportSemaphoreFdKHR') or {
-		println("Couldn't load symbol for 'vkImportSemaphoreFdKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_import_semaphore_fd_info)
+fn C.vkImportSemaphoreFdKHR(C.Device,
+	&ImportSemaphoreFdInfoKHR) Result
+pub fn import_semaphore_fd_khr(device C.Device,
+	p_import_semaphore_fd_info &ImportSemaphoreFdInfoKHR) Result {
+	return C.vkImportSemaphoreFdKHR(device, p_import_semaphore_fd_info)
 }
 
-type VkGetSemaphoreFdKHR = fn (C.Device, &SemaphoreGetFdInfoKHR, &int) Result
-
-pub fn get_semaphore_fd_khr(device C.Device, p_get_fd_info &SemaphoreGetFdInfoKHR, p_fd &int) Result {
-	f := VkGetSemaphoreFdKHR((*vulkan.loader_p).get_sym('vkGetSemaphoreFdKHR') or {
-		println("Couldn't load symbol for 'vkGetSemaphoreFdKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_get_fd_info, p_fd)
+fn C.vkGetSemaphoreFdKHR(C.Device,
+	&SemaphoreGetFdInfoKHR,
+	&int) Result
+pub fn get_semaphore_fd_khr(device C.Device,
+	p_get_fd_info &SemaphoreGetFdInfoKHR,
+	p_fd &int) Result {
+	return C.vkGetSemaphoreFdKHR(device, p_get_fd_info, p_fd)
 }
 
-// VK_KHR_push_descriptor is a preprocessor guard. Do not pass it to API calls.
-const khr_push_descriptor = 1
 pub const khr_push_descriptor_spec_version = 2
 pub const khr_push_descriptor_extension_name = 'VK_KHR_push_descriptor'
-// PhysicalDevicePushDescriptorPropertiesKHR extends VkPhysicalDeviceProperties2
+
 pub struct PhysicalDevicePushDescriptorPropertiesKHR {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	max_push_descriptors u32
 }
 
-type VkCmdPushDescriptorSetKHR = fn (C.CommandBuffer, PipelineBindPoint, C.PipelineLayout, u32, u32, &WriteDescriptorSet)
-
-pub fn cmd_push_descriptor_set_khr(command_buffer C.CommandBuffer, pipeline_bind_point PipelineBindPoint, layout C.PipelineLayout, set u32, descriptor_write_count u32, p_descriptor_writes &WriteDescriptorSet) {
-	f := VkCmdPushDescriptorSetKHR((*vulkan.loader_p).get_sym('vkCmdPushDescriptorSetKHR') or {
-		println("Couldn't load symbol for 'vkCmdPushDescriptorSetKHR': ${err}")
-		return
-	})
-	f(command_buffer, pipeline_bind_point, layout, set, descriptor_write_count, p_descriptor_writes)
+fn C.vkCmdPushDescriptorSetKHR(C.CommandBuffer,
+	PipelineBindPoint,
+	C.PipelineLayout,
+	u32,
+	u32,
+	&WriteDescriptorSet)
+pub fn cmd_push_descriptor_set_khr(command_buffer C.CommandBuffer,
+	pipeline_bind_point PipelineBindPoint,
+	layout C.PipelineLayout,
+	set u32,
+	descriptor_write_count u32,
+	p_descriptor_writes &WriteDescriptorSet) {
+	C.vkCmdPushDescriptorSetKHR(command_buffer, pipeline_bind_point, layout, set, descriptor_write_count,
+		p_descriptor_writes)
 }
 
-type VkCmdPushDescriptorSetWithTemplateKHR = fn (C.CommandBuffer, C.DescriptorUpdateTemplate, C.PipelineLayout, u32, voidptr)
-
-pub fn cmd_push_descriptor_set_with_template_khr(command_buffer C.CommandBuffer, descriptor_update_template C.DescriptorUpdateTemplate, layout C.PipelineLayout, set u32, p_data voidptr) {
-	f := VkCmdPushDescriptorSetWithTemplateKHR((*vulkan.loader_p).get_sym('vkCmdPushDescriptorSetWithTemplateKHR') or {
-		println("Couldn't load symbol for 'vkCmdPushDescriptorSetWithTemplateKHR': ${err}")
-		return
-	})
-	f(command_buffer, descriptor_update_template, layout, set, p_data)
+fn C.vkCmdPushDescriptorSetWithTemplateKHR(C.CommandBuffer,
+	C.DescriptorUpdateTemplate,
+	C.PipelineLayout,
+	u32,
+	voidptr)
+pub fn cmd_push_descriptor_set_with_template_khr(command_buffer C.CommandBuffer,
+	descriptor_update_template C.DescriptorUpdateTemplate,
+	layout C.PipelineLayout,
+	set u32,
+	p_data voidptr) {
+	C.vkCmdPushDescriptorSetWithTemplateKHR(command_buffer, descriptor_update_template,
+		layout, set, p_data)
 }
 
-// VK_KHR_shader_float16_int8 is a preprocessor guard. Do not pass it to API calls.
-const khr_shader_float16_int8 = 1
 pub const khr_shader_float16_int8_spec_version = 1
 pub const khr_shader_float16_int8_extension_name = 'VK_KHR_shader_float16_int8'
 
@@ -9904,83 +9900,47 @@ pub type PhysicalDeviceShaderFloat16Int8FeaturesKHR = PhysicalDeviceShaderFloat1
 
 pub type PhysicalDeviceFloat16Int8FeaturesKHR = PhysicalDeviceShaderFloat16Int8Features
 
-// VK_KHR_16bit_storage is a preprocessor guard. Do not pass it to API calls.
-const khr_16bit_storage = 1
 pub const khr_16bit_storage_spec_version = 1
 pub const khr_16bit_storage_extension_name = 'VK_KHR_16bit_storage'
 
 pub type PhysicalDevice16BitStorageFeaturesKHR = PhysicalDevice16BitStorageFeatures
 
-// VK_KHR_incremental_present is a preprocessor guard. Do not pass it to API calls.
-const khr_incremental_present = 1
 pub const khr_incremental_present_spec_version = 2
 pub const khr_incremental_present_extension_name = 'VK_KHR_incremental_present'
 
 pub struct RectLayerKHR {
-mut:
+pub mut:
 	offset Offset2D
 	extent Extent2D
 	layer  u32
 }
 
 pub struct PresentRegionKHR {
-mut:
+pub mut:
 	rectangle_count u32
 	p_rectangles    &RectLayerKHR
 }
 
-// PresentRegionsKHR extends VkPresentInfoKHR
 pub struct PresentRegionsKHR {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	swapchain_count u32
 	p_regions       &PresentRegionKHR
 }
 
-// VK_KHR_descriptor_update_template is a preprocessor guard. Do not pass it to API calls.
-const khr_descriptor_update_template = 1
+pub type DescriptorUpdateTemplateKHR = voidptr
+
 pub const khr_descriptor_update_template_spec_version = 1
 pub const khr_descriptor_update_template_extension_name = 'VK_KHR_descriptor_update_template'
 
 pub type DescriptorUpdateTemplateTypeKHR = DescriptorUpdateTemplateType
 
+pub type DescriptorUpdateTemplateCreateFlagsKHR = u32
 pub type DescriptorUpdateTemplateEntryKHR = DescriptorUpdateTemplateEntry
 
 pub type DescriptorUpdateTemplateCreateInfoKHR = DescriptorUpdateTemplateCreateInfo
 
-type VkCreateDescriptorUpdateTemplateKHR = fn (C.Device, &DescriptorUpdateTemplateCreateInfo, &AllocationCallbacks, &C.DescriptorUpdateTemplate) Result
-
-pub fn create_descriptor_update_template_khr(device C.Device, p_create_info &DescriptorUpdateTemplateCreateInfo, p_allocator &AllocationCallbacks, p_descriptor_update_template &C.DescriptorUpdateTemplate) Result {
-	f := VkCreateDescriptorUpdateTemplateKHR((*vulkan.loader_p).get_sym('vkCreateDescriptorUpdateTemplateKHR') or {
-		println("Couldn't load symbol for 'vkCreateDescriptorUpdateTemplateKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_descriptor_update_template)
-}
-
-type VkDestroyDescriptorUpdateTemplateKHR = fn (C.Device, C.DescriptorUpdateTemplate, &AllocationCallbacks)
-
-pub fn destroy_descriptor_update_template_khr(device C.Device, descriptor_update_template C.DescriptorUpdateTemplate, p_allocator &AllocationCallbacks) {
-	f := VkDestroyDescriptorUpdateTemplateKHR((*vulkan.loader_p).get_sym('vkDestroyDescriptorUpdateTemplateKHR') or {
-		println("Couldn't load symbol for 'vkDestroyDescriptorUpdateTemplateKHR': ${err}")
-		return
-	})
-	f(device, descriptor_update_template, p_allocator)
-}
-
-type VkUpdateDescriptorSetWithTemplateKHR = fn (C.Device, C.DescriptorSet, C.DescriptorUpdateTemplate, voidptr)
-
-pub fn update_descriptor_set_with_template_khr(device C.Device, descriptor_set C.DescriptorSet, descriptor_update_template C.DescriptorUpdateTemplate, p_data voidptr) {
-	f := VkUpdateDescriptorSetWithTemplateKHR((*vulkan.loader_p).get_sym('vkUpdateDescriptorSetWithTemplateKHR') or {
-		println("Couldn't load symbol for 'vkUpdateDescriptorSetWithTemplateKHR': ${err}")
-		return
-	})
-	f(device, descriptor_set, descriptor_update_template, p_data)
-}
-
-// VK_KHR_imageless_framebuffer is a preprocessor guard. Do not pass it to API calls.
-const khr_imageless_framebuffer = 1
 pub const khr_imageless_framebuffer_spec_version = 1
 pub const khr_imageless_framebuffer_extension_name = 'VK_KHR_imageless_framebuffer'
 
@@ -9992,8 +9952,6 @@ pub type FramebufferAttachmentImageInfoKHR = FramebufferAttachmentImageInfo
 
 pub type RenderPassAttachmentBeginInfoKHR = RenderPassAttachmentBeginInfo
 
-// VK_KHR_create_renderpass2 is a preprocessor guard. Do not pass it to API calls.
-const khr_create_renderpass2 = 1
 pub const khr_create_renderpass_2_spec_version = 1
 pub const khr_create_renderpass_2_extension_name = 'VK_KHR_create_renderpass2'
 
@@ -10011,161 +9969,49 @@ pub type SubpassBeginInfoKHR = SubpassBeginInfo
 
 pub type SubpassEndInfoKHR = SubpassEndInfo
 
-type VkCreateRenderPass2KHR = fn (C.Device, &RenderPassCreateInfo2, &AllocationCallbacks, &C.RenderPass) Result
-
-pub fn create_render_pass2_khr(device C.Device, p_create_info &RenderPassCreateInfo2, p_allocator &AllocationCallbacks, p_render_pass &C.RenderPass) Result {
-	f := VkCreateRenderPass2KHR((*vulkan.loader_p).get_sym('vkCreateRenderPass2KHR') or {
-		println("Couldn't load symbol for 'vkCreateRenderPass2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_render_pass)
-}
-
-type VkCmdBeginRenderPass2KHR = fn (C.CommandBuffer, &RenderPassBeginInfo, &SubpassBeginInfo)
-
-pub fn cmd_begin_render_pass2_khr(command_buffer C.CommandBuffer, p_render_pass_begin &RenderPassBeginInfo, p_subpass_begin_info &SubpassBeginInfo) {
-	f := VkCmdBeginRenderPass2KHR((*vulkan.loader_p).get_sym('vkCmdBeginRenderPass2KHR') or {
-		println("Couldn't load symbol for 'vkCmdBeginRenderPass2KHR': ${err}")
-		return
-	})
-	f(command_buffer, p_render_pass_begin, p_subpass_begin_info)
-}
-
-type VkCmdNextSubpass2KHR = fn (C.CommandBuffer, &SubpassBeginInfo, &SubpassEndInfo)
-
-pub fn cmd_next_subpass2_khr(command_buffer C.CommandBuffer, p_subpass_begin_info &SubpassBeginInfo, p_subpass_end_info &SubpassEndInfo) {
-	f := VkCmdNextSubpass2KHR((*vulkan.loader_p).get_sym('vkCmdNextSubpass2KHR') or {
-		println("Couldn't load symbol for 'vkCmdNextSubpass2KHR': ${err}")
-		return
-	})
-	f(command_buffer, p_subpass_begin_info, p_subpass_end_info)
-}
-
-type VkCmdEndRenderPass2KHR = fn (C.CommandBuffer, &SubpassEndInfo)
-
-pub fn cmd_end_render_pass2_khr(command_buffer C.CommandBuffer, p_subpass_end_info &SubpassEndInfo) {
-	f := VkCmdEndRenderPass2KHR((*vulkan.loader_p).get_sym('vkCmdEndRenderPass2KHR') or {
-		println("Couldn't load symbol for 'vkCmdEndRenderPass2KHR': ${err}")
-		return
-	})
-	f(command_buffer, p_subpass_end_info)
-}
-
-// VK_KHR_shared_presentable_image is a preprocessor guard. Do not pass it to API calls.
-const khr_shared_presentable_image = 1
 pub const khr_shared_presentable_image_spec_version = 1
 pub const khr_shared_presentable_image_extension_name = 'VK_KHR_shared_presentable_image'
-// SharedPresentSurfaceCapabilitiesKHR extends VkSurfaceCapabilities2KHR
+
 pub struct SharedPresentSurfaceCapabilitiesKHR {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	shared_present_supported_usage_flags ImageUsageFlags
 }
 
-type VkGetSwapchainStatusKHR = fn (C.Device, C.SwapchainKHR) Result
-
-pub fn get_swapchain_status_khr(device C.Device, swapchain C.SwapchainKHR) Result {
-	f := VkGetSwapchainStatusKHR((*vulkan.loader_p).get_sym('vkGetSwapchainStatusKHR') or {
-		println("Couldn't load symbol for 'vkGetSwapchainStatusKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain)
+fn C.vkGetSwapchainStatusKHR(C.Device,
+	C.SwapchainKHR) Result
+pub fn get_swapchain_status_khr(device C.Device,
+	swapchain C.SwapchainKHR) Result {
+	return C.vkGetSwapchainStatusKHR(device, swapchain)
 }
 
-// VK_KHR_external_fence_capabilities is a preprocessor guard. Do not pass it to API calls.
-const khr_external_fence_capabilities = 1
 pub const khr_external_fence_capabilities_spec_version = 1
 pub const khr_external_fence_capabilities_extension_name = 'VK_KHR_external_fence_capabilities'
 
+pub type ExternalFenceHandleTypeFlagsKHR = u32
 pub type ExternalFenceHandleTypeFlagBitsKHR = ExternalFenceHandleTypeFlagBits
 
+pub type ExternalFenceFeatureFlagsKHR = u32
 pub type ExternalFenceFeatureFlagBitsKHR = ExternalFenceFeatureFlagBits
 
 pub type PhysicalDeviceExternalFenceInfoKHR = PhysicalDeviceExternalFenceInfo
 
 pub type ExternalFencePropertiesKHR = ExternalFenceProperties
 
-type VkGetPhysicalDeviceExternalFencePropertiesKHR = fn (C.PhysicalDevice, &PhysicalDeviceExternalFenceInfo, &ExternalFenceProperties)
-
-pub fn get_physical_device_external_fence_properties_khr(physical_device C.PhysicalDevice, p_external_fence_info &PhysicalDeviceExternalFenceInfo, p_external_fence_properties &ExternalFenceProperties) {
-	f := VkGetPhysicalDeviceExternalFencePropertiesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceExternalFencePropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalFencePropertiesKHR': ${err}")
-		return
-	})
-	f(physical_device, p_external_fence_info, p_external_fence_properties)
-}
-
-// VK_KHR_external_fence is a preprocessor guard. Do not pass it to API calls.
-const khr_external_fence = 1
 pub const khr_external_fence_spec_version = 1
 pub const khr_external_fence_extension_name = 'VK_KHR_external_fence'
 
+pub type FenceImportFlagsKHR = u32
 pub type FenceImportFlagBitsKHR = FenceImportFlagBits
 
 pub type ExportFenceCreateInfoKHR = ExportFenceCreateInfo
 
-// VK_KHR_external_fence_win32 is a preprocessor guard. Do not pass it to API calls.
-const khr_external_fence_win32 = 1
-pub const khr_external_fence_win32_spec_version = 1
-pub const khr_external_fence_win32_extension_name = 'VK_KHR_external_fence_win32'
-
-pub struct ImportFenceWin32HandleInfoKHR {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	fence       C.Fence
-	flags       FenceImportFlags
-	handle_type ExternalFenceHandleTypeFlagBits
-	handle      voidptr
-	name        string
-}
-
-// ExportFenceWin32HandleInfoKHR extends VkFenceCreateInfo
-pub struct ExportFenceWin32HandleInfoKHR {
-mut:
-	s_type       StructureType
-	p_next       voidptr
-	p_attributes voidptr
-	dw_access    u32
-	name         string
-}
-
-pub struct FenceGetWin32HandleInfoKHR {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	fence       C.Fence
-	handle_type ExternalFenceHandleTypeFlagBits
-}
-
-type VkImportFenceWin32HandleKHR = fn (C.Device, &ImportFenceWin32HandleInfoKHR) Result
-
-pub fn import_fence_win32_handle_khr(device C.Device, p_import_fence_win32_handle_info &ImportFenceWin32HandleInfoKHR) Result {
-	f := VkImportFenceWin32HandleKHR((*vulkan.loader_p).get_sym('vkImportFenceWin32HandleKHR') or {
-		println("Couldn't load symbol for 'vkImportFenceWin32HandleKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_import_fence_win32_handle_info)
-}
-
-type VkGetFenceWin32HandleKHR = fn (C.Device, &FenceGetWin32HandleInfoKHR, &voidptr) Result
-
-pub fn get_fence_win32_handle_khr(device C.Device, p_get_win32_handle_info &FenceGetWin32HandleInfoKHR, p_handle &voidptr) Result {
-	f := VkGetFenceWin32HandleKHR((*vulkan.loader_p).get_sym('vkGetFenceWin32HandleKHR') or {
-		println("Couldn't load symbol for 'vkGetFenceWin32HandleKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_get_win32_handle_info, p_handle)
-}
-
-// VK_KHR_external_fence_fd is a preprocessor guard. Do not pass it to API calls.
-const khr_external_fence_fd = 1
 pub const khr_external_fence_fd_spec_version = 1
 pub const khr_external_fence_fd_extension_name = 'VK_KHR_external_fence_fd'
 
 pub struct ImportFenceFdInfoKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	fence       C.Fence
@@ -10175,35 +10021,29 @@ mut:
 }
 
 pub struct FenceGetFdInfoKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	fence       C.Fence
 	handle_type ExternalFenceHandleTypeFlagBits
 }
 
-type VkImportFenceFdKHR = fn (C.Device, &ImportFenceFdInfoKHR) Result
-
-pub fn import_fence_fd_khr(device C.Device, p_import_fence_fd_info &ImportFenceFdInfoKHR) Result {
-	f := VkImportFenceFdKHR((*vulkan.loader_p).get_sym('vkImportFenceFdKHR') or {
-		println("Couldn't load symbol for 'vkImportFenceFdKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_import_fence_fd_info)
+fn C.vkImportFenceFdKHR(C.Device,
+	&ImportFenceFdInfoKHR) Result
+pub fn import_fence_fd_khr(device C.Device,
+	p_import_fence_fd_info &ImportFenceFdInfoKHR) Result {
+	return C.vkImportFenceFdKHR(device, p_import_fence_fd_info)
 }
 
-type VkGetFenceFdKHR = fn (C.Device, &FenceGetFdInfoKHR, &int) Result
-
-pub fn get_fence_fd_khr(device C.Device, p_get_fd_info &FenceGetFdInfoKHR, p_fd &int) Result {
-	f := VkGetFenceFdKHR((*vulkan.loader_p).get_sym('vkGetFenceFdKHR') or {
-		println("Couldn't load symbol for 'vkGetFenceFdKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_get_fd_info, p_fd)
+fn C.vkGetFenceFdKHR(C.Device,
+	&FenceGetFdInfoKHR,
+	&int) Result
+pub fn get_fence_fd_khr(device C.Device,
+	p_get_fd_info &FenceGetFdInfoKHR,
+	p_fd &int) Result {
+	return C.vkGetFenceFdKHR(device, p_get_fd_info, p_fd)
 }
 
-// VK_KHR_performance_query is a preprocessor guard. Do not pass it to API calls.
-const khr_performance_query = 1
 pub const khr_performance_query_spec_version = 1
 pub const khr_performance_query_extension_name = 'VK_KHR_performance_query'
 
@@ -10253,46 +10093,43 @@ pub enum AcquireProfilingLockFlagBitsKHR {
 
 pub type AcquireProfilingLockFlagsKHR = u32
 
-// PhysicalDevicePerformanceQueryFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDevicePerformanceQueryFeaturesKHR {
-mut:
+pub mut:
 	s_type                                   StructureType
 	p_next                                   voidptr
 	performance_counter_query_pools          Bool32
 	performance_counter_multiple_query_pools Bool32
 }
 
-// PhysicalDevicePerformanceQueryPropertiesKHR extends VkPhysicalDeviceProperties2
 pub struct PhysicalDevicePerformanceQueryPropertiesKHR {
-mut:
+pub mut:
 	s_type                            StructureType
 	p_next                            voidptr
 	allow_command_buffer_query_copies Bool32
 }
 
 pub struct PerformanceCounterKHR {
-mut:
+pub mut:
 	s_type  StructureType
 	p_next  voidptr
 	unit    PerformanceCounterUnitKHR
 	scope   PerformanceCounterScopeKHR
 	storage PerformanceCounterStorageKHR
-	uuid    []u8
+	uuid    [uuid_size]u8
 }
 
 pub struct PerformanceCounterDescriptionKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	flags       PerformanceCounterDescriptionFlagsKHR
-	name        []char
-	category    []char
-	description []char
+	name        [max_description_size]char
+	category    [max_description_size]char
+	description [max_description_size]char
 }
 
-// QueryPoolPerformanceCreateInfoKHR extends VkQueryPoolCreateInfo
 pub struct QueryPoolPerformanceCreateInfoKHR {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	queue_family_index  u32
@@ -10301,7 +10138,7 @@ mut:
 }
 
 pub union PerformanceCounterResultKHR {
-mut:
+pub mut:
 	int32   i32
 	int64   i64
 	uint32  u32
@@ -10311,66 +10148,61 @@ mut:
 }
 
 pub struct AcquireProfilingLockInfoKHR {
-mut:
+pub mut:
 	s_type  StructureType
 	p_next  voidptr
 	flags   AcquireProfilingLockFlagsKHR
 	timeout u64
 }
 
-// PerformanceQuerySubmitInfoKHR extends VkSubmitInfo,VkSubmitInfo2
 pub struct PerformanceQuerySubmitInfoKHR {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	counter_pass_index u32
 }
 
-type VkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR = fn (C.PhysicalDevice, u32, &u32, &PerformanceCounterKHR, &PerformanceCounterDescriptionKHR) Result
-
-pub fn enumerate_physical_device_queue_family_performance_query_counters_khr(physical_device C.PhysicalDevice, queue_family_index u32, p_counter_count &u32, p_counters &PerformanceCounterKHR, p_counter_descriptions &PerformanceCounterDescriptionKHR) Result {
-	f := VkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR((*vulkan.loader_p).get_sym('vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR') or {
-		println("Couldn't load symbol for 'vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, queue_family_index, p_counter_count, p_counters, p_counter_descriptions)
+fn C.vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR(C.PhysicalDevice,
+	u32,
+	&u32,
+	&PerformanceCounterKHR,
+	&PerformanceCounterDescriptionKHR) Result
+pub fn enumerate_physical_device_queue_family_performance_query_counters_khr(physical_device C.PhysicalDevice,
+	queue_family_index u32,
+	p_counter_count &u32,
+	p_counters &PerformanceCounterKHR,
+	p_counter_descriptions &PerformanceCounterDescriptionKHR) Result {
+	return C.vkEnumeratePhysicalDeviceQueueFamilyPerformanceQueryCountersKHR(physical_device,
+		queue_family_index, p_counter_count, p_counters, p_counter_descriptions)
 }
 
-type VkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR = fn (C.PhysicalDevice, &QueryPoolPerformanceCreateInfoKHR, &u32)
-
-pub fn get_physical_device_queue_family_performance_query_passes_khr(physical_device C.PhysicalDevice, p_performance_query_create_info &QueryPoolPerformanceCreateInfoKHR, p_num_passes &u32) {
-	f := VkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR': ${err}")
-		return
-	})
-	f(physical_device, p_performance_query_create_info, p_num_passes)
+fn C.vkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR(C.PhysicalDevice,
+	&QueryPoolPerformanceCreateInfoKHR,
+	&u32)
+pub fn get_physical_device_queue_family_performance_query_passes_khr(physical_device C.PhysicalDevice,
+	p_performance_query_create_info &QueryPoolPerformanceCreateInfoKHR,
+	p_num_passes &u32) {
+	C.vkGetPhysicalDeviceQueueFamilyPerformanceQueryPassesKHR(physical_device, p_performance_query_create_info,
+		p_num_passes)
 }
 
-type VkAcquireProfilingLockKHR = fn (C.Device, &AcquireProfilingLockInfoKHR) Result
-
-pub fn acquire_profiling_lock_khr(device C.Device, p_info &AcquireProfilingLockInfoKHR) Result {
-	f := VkAcquireProfilingLockKHR((*vulkan.loader_p).get_sym('vkAcquireProfilingLockKHR') or {
-		println("Couldn't load symbol for 'vkAcquireProfilingLockKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_info)
+fn C.vkAcquireProfilingLockKHR(C.Device,
+	&AcquireProfilingLockInfoKHR) Result
+pub fn acquire_profiling_lock_khr(device C.Device,
+	p_info &AcquireProfilingLockInfoKHR) Result {
+	return C.vkAcquireProfilingLockKHR(device, p_info)
 }
 
-type VkReleaseProfilingLockKHR = fn (C.Device)
-
+fn C.vkReleaseProfilingLockKHR(C.Device)
 pub fn release_profiling_lock_khr(device C.Device) {
-	f := VkReleaseProfilingLockKHR((*vulkan.loader_p).get_sym('vkReleaseProfilingLockKHR') or {
-		println("Couldn't load symbol for 'vkReleaseProfilingLockKHR': ${err}")
-		return
-	})
-	f(device)
+	C.vkReleaseProfilingLockKHR(device)
 }
 
-// VK_KHR_maintenance2 is a preprocessor guard. Do not pass it to API calls.
-const khr_maintenance2 = 1
 pub const khr_maintenance_2_spec_version = 1
 pub const khr_maintenance_2_extension_name = 'VK_KHR_maintenance2'
+// VK_KHR_MAINTENANCE2_SPEC_VERSION is a deprecated alias
 pub const khr_maintenance2_spec_version = khr_maintenance_2_spec_version
+// VK_KHR_MAINTENANCE2_EXTENSION_NAME is a deprecated alias
 pub const khr_maintenance2_extension_name = khr_maintenance_2_extension_name
 
 pub type PointClippingBehaviorKHR = PointClippingBehavior
@@ -10387,54 +10219,52 @@ pub type ImageViewUsageCreateInfoKHR = ImageViewUsageCreateInfo
 
 pub type PipelineTessellationDomainOriginStateCreateInfoKHR = PipelineTessellationDomainOriginStateCreateInfo
 
-// VK_KHR_get_surface_capabilities2 is a preprocessor guard. Do not pass it to API calls.
-const khr_get_surface_capabilities2 = 1
 pub const khr_get_surface_capabilities_2_spec_version = 1
 pub const khr_get_surface_capabilities_2_extension_name = 'VK_KHR_get_surface_capabilities2'
 
 pub struct PhysicalDeviceSurfaceInfo2KHR {
-mut:
+pub mut:
 	s_type  StructureType
 	p_next  voidptr
 	surface C.SurfaceKHR
 }
 
 pub struct SurfaceCapabilities2KHR {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	surface_capabilities SurfaceCapabilitiesKHR
 }
 
 pub struct SurfaceFormat2KHR {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	surface_format SurfaceFormatKHR
 }
 
-type VkGetPhysicalDeviceSurfaceCapabilities2KHR = fn (C.PhysicalDevice, &PhysicalDeviceSurfaceInfo2KHR, &SurfaceCapabilities2KHR) Result
-
-pub fn get_physical_device_surface_capabilities2_khr(physical_device C.PhysicalDevice, p_surface_info &PhysicalDeviceSurfaceInfo2KHR, p_surface_capabilities &SurfaceCapabilities2KHR) Result {
-	f := VkGetPhysicalDeviceSurfaceCapabilities2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSurfaceCapabilities2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceCapabilities2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_surface_info, p_surface_capabilities)
+fn C.vkGetPhysicalDeviceSurfaceCapabilities2KHR(C.PhysicalDevice,
+	&PhysicalDeviceSurfaceInfo2KHR,
+	&SurfaceCapabilities2KHR) Result
+pub fn get_physical_device_surface_capabilities2_khr(physical_device C.PhysicalDevice,
+	p_surface_info &PhysicalDeviceSurfaceInfo2KHR,
+	p_surface_capabilities &SurfaceCapabilities2KHR) Result {
+	return C.vkGetPhysicalDeviceSurfaceCapabilities2KHR(physical_device, p_surface_info,
+		p_surface_capabilities)
 }
 
-type VkGetPhysicalDeviceSurfaceFormats2KHR = fn (C.PhysicalDevice, &PhysicalDeviceSurfaceInfo2KHR, &u32, &SurfaceFormat2KHR) Result
-
-pub fn get_physical_device_surface_formats2_khr(physical_device C.PhysicalDevice, p_surface_info &PhysicalDeviceSurfaceInfo2KHR, p_surface_format_count &u32, p_surface_formats &SurfaceFormat2KHR) Result {
-	f := VkGetPhysicalDeviceSurfaceFormats2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSurfaceFormats2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceFormats2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_surface_info, p_surface_format_count, p_surface_formats)
+fn C.vkGetPhysicalDeviceSurfaceFormats2KHR(C.PhysicalDevice,
+	&PhysicalDeviceSurfaceInfo2KHR,
+	&u32,
+	&SurfaceFormat2KHR) Result
+pub fn get_physical_device_surface_formats2_khr(physical_device C.PhysicalDevice,
+	p_surface_info &PhysicalDeviceSurfaceInfo2KHR,
+	p_surface_format_count &u32,
+	p_surface_formats &SurfaceFormat2KHR) Result {
+	return C.vkGetPhysicalDeviceSurfaceFormats2KHR(physical_device, p_surface_info, p_surface_format_count,
+		p_surface_formats)
 }
 
-// VK_KHR_variable_pointers is a preprocessor guard. Do not pass it to API calls.
-const khr_variable_pointers = 1
 pub const khr_variable_pointers_spec_version = 1
 pub const khr_variable_pointers_extension_name = 'VK_KHR_variable_pointers'
 
@@ -10442,34 +10272,32 @@ pub type PhysicalDeviceVariablePointerFeaturesKHR = PhysicalDeviceVariablePointe
 
 pub type PhysicalDeviceVariablePointersFeaturesKHR = PhysicalDeviceVariablePointersFeatures
 
-// VK_KHR_get_display_properties2 is a preprocessor guard. Do not pass it to API calls.
-const khr_get_display_properties2 = 1
 pub const khr_get_display_properties_2_spec_version = 1
 pub const khr_get_display_properties_2_extension_name = 'VK_KHR_get_display_properties2'
 
 pub struct DisplayProperties2KHR {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	display_properties DisplayPropertiesKHR
 }
 
 pub struct DisplayPlaneProperties2KHR {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	display_plane_properties DisplayPlanePropertiesKHR
 }
 
 pub struct DisplayModeProperties2KHR {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	display_mode_properties DisplayModePropertiesKHR
 }
 
 pub struct DisplayPlaneInfo2KHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	mode        C.DisplayModeKHR
@@ -10477,54 +10305,54 @@ mut:
 }
 
 pub struct DisplayPlaneCapabilities2KHR {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	capabilities DisplayPlaneCapabilitiesKHR
 }
 
-type VkGetPhysicalDeviceDisplayProperties2KHR = fn (C.PhysicalDevice, &u32, &DisplayProperties2KHR) Result
-
-pub fn get_physical_device_display_properties2_khr(physical_device C.PhysicalDevice, p_property_count &u32, p_properties &DisplayProperties2KHR) Result {
-	f := VkGetPhysicalDeviceDisplayProperties2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceDisplayProperties2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceDisplayProperties2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_property_count, p_properties)
+fn C.vkGetPhysicalDeviceDisplayProperties2KHR(C.PhysicalDevice,
+	&u32,
+	&DisplayProperties2KHR) Result
+pub fn get_physical_device_display_properties2_khr(physical_device C.PhysicalDevice,
+	p_property_count &u32,
+	p_properties &DisplayProperties2KHR) Result {
+	return C.vkGetPhysicalDeviceDisplayProperties2KHR(physical_device, p_property_count,
+		p_properties)
 }
 
-type VkGetPhysicalDeviceDisplayPlaneProperties2KHR = fn (C.PhysicalDevice, &u32, &DisplayPlaneProperties2KHR) Result
-
-pub fn get_physical_device_display_plane_properties2_khr(physical_device C.PhysicalDevice, p_property_count &u32, p_properties &DisplayPlaneProperties2KHR) Result {
-	f := VkGetPhysicalDeviceDisplayPlaneProperties2KHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceDisplayPlaneProperties2KHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceDisplayPlaneProperties2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_property_count, p_properties)
+fn C.vkGetPhysicalDeviceDisplayPlaneProperties2KHR(C.PhysicalDevice,
+	&u32,
+	&DisplayPlaneProperties2KHR) Result
+pub fn get_physical_device_display_plane_properties2_khr(physical_device C.PhysicalDevice,
+	p_property_count &u32,
+	p_properties &DisplayPlaneProperties2KHR) Result {
+	return C.vkGetPhysicalDeviceDisplayPlaneProperties2KHR(physical_device, p_property_count,
+		p_properties)
 }
 
-type VkGetDisplayModeProperties2KHR = fn (C.PhysicalDevice, C.DisplayKHR, &u32, &DisplayModeProperties2KHR) Result
-
-pub fn get_display_mode_properties2_khr(physical_device C.PhysicalDevice, display C.DisplayKHR, p_property_count &u32, p_properties &DisplayModeProperties2KHR) Result {
-	f := VkGetDisplayModeProperties2KHR((*vulkan.loader_p).get_sym('vkGetDisplayModeProperties2KHR') or {
-		println("Couldn't load symbol for 'vkGetDisplayModeProperties2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, display, p_property_count, p_properties)
+fn C.vkGetDisplayModeProperties2KHR(C.PhysicalDevice,
+	C.DisplayKHR,
+	&u32,
+	&DisplayModeProperties2KHR) Result
+pub fn get_display_mode_properties2_khr(physical_device C.PhysicalDevice,
+	display C.DisplayKHR,
+	p_property_count &u32,
+	p_properties &DisplayModeProperties2KHR) Result {
+	return C.vkGetDisplayModeProperties2KHR(physical_device, display, p_property_count,
+		p_properties)
 }
 
-type VkGetDisplayPlaneCapabilities2KHR = fn (C.PhysicalDevice, &DisplayPlaneInfo2KHR, &DisplayPlaneCapabilities2KHR) Result
-
-pub fn get_display_plane_capabilities2_khr(physical_device C.PhysicalDevice, p_display_plane_info &DisplayPlaneInfo2KHR, p_capabilities &DisplayPlaneCapabilities2KHR) Result {
-	f := VkGetDisplayPlaneCapabilities2KHR((*vulkan.loader_p).get_sym('vkGetDisplayPlaneCapabilities2KHR') or {
-		println("Couldn't load symbol for 'vkGetDisplayPlaneCapabilities2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_display_plane_info, p_capabilities)
+fn C.vkGetDisplayPlaneCapabilities2KHR(C.PhysicalDevice,
+	&DisplayPlaneInfo2KHR,
+	&DisplayPlaneCapabilities2KHR) Result
+pub fn get_display_plane_capabilities2_khr(physical_device C.PhysicalDevice,
+	p_display_plane_info &DisplayPlaneInfo2KHR,
+	p_capabilities &DisplayPlaneCapabilities2KHR) Result {
+	return C.vkGetDisplayPlaneCapabilities2KHR(physical_device, p_display_plane_info,
+		p_capabilities)
 }
 
-// VK_KHR_dedicated_allocation is a preprocessor guard. Do not pass it to API calls.
-const khr_dedicated_allocation = 1
 pub const khr_dedicated_allocation_spec_version = 3
 pub const khr_dedicated_allocation_extension_name = 'VK_KHR_dedicated_allocation'
 
@@ -10532,18 +10360,12 @@ pub type MemoryDedicatedRequirementsKHR = MemoryDedicatedRequirements
 
 pub type MemoryDedicatedAllocateInfoKHR = MemoryDedicatedAllocateInfo
 
-// VK_KHR_storage_buffer_storage_class is a preprocessor guard. Do not pass it to API calls.
-const khr_storage_buffer_storage_class = 1
 pub const khr_storage_buffer_storage_class_spec_version = 1
 pub const khr_storage_buffer_storage_class_extension_name = 'VK_KHR_storage_buffer_storage_class'
 
-// VK_KHR_relaxed_block_layout is a preprocessor guard. Do not pass it to API calls.
-const khr_relaxed_block_layout = 1
 pub const khr_relaxed_block_layout_spec_version = 1
 pub const khr_relaxed_block_layout_extension_name = 'VK_KHR_relaxed_block_layout'
 
-// VK_KHR_get_memory_requirements2 is a preprocessor guard. Do not pass it to API calls.
-const khr_get_memory_requirements2 = 1
 pub const khr_get_memory_requirements_2_spec_version = 1
 pub const khr_get_memory_requirements_2_extension_name = 'VK_KHR_get_memory_requirements2'
 
@@ -10557,45 +10379,13 @@ pub type MemoryRequirements2KHR = MemoryRequirements2
 
 pub type SparseImageMemoryRequirements2KHR = SparseImageMemoryRequirements2
 
-type VkGetImageMemoryRequirements2KHR = fn (C.Device, &ImageMemoryRequirementsInfo2, &MemoryRequirements2)
-
-pub fn get_image_memory_requirements2_khr(device C.Device, p_info &ImageMemoryRequirementsInfo2, p_memory_requirements &MemoryRequirements2) {
-	f := VkGetImageMemoryRequirements2KHR((*vulkan.loader_p).get_sym('vkGetImageMemoryRequirements2KHR') or {
-		println("Couldn't load symbol for 'vkGetImageMemoryRequirements2KHR': ${err}")
-		return
-	})
-	f(device, p_info, p_memory_requirements)
-}
-
-type VkGetBufferMemoryRequirements2KHR = fn (C.Device, &BufferMemoryRequirementsInfo2, &MemoryRequirements2)
-
-pub fn get_buffer_memory_requirements2_khr(device C.Device, p_info &BufferMemoryRequirementsInfo2, p_memory_requirements &MemoryRequirements2) {
-	f := VkGetBufferMemoryRequirements2KHR((*vulkan.loader_p).get_sym('vkGetBufferMemoryRequirements2KHR') or {
-		println("Couldn't load symbol for 'vkGetBufferMemoryRequirements2KHR': ${err}")
-		return
-	})
-	f(device, p_info, p_memory_requirements)
-}
-
-type VkGetImageSparseMemoryRequirements2KHR = fn (C.Device, &ImageSparseMemoryRequirementsInfo2, &u32, &SparseImageMemoryRequirements2)
-
-pub fn get_image_sparse_memory_requirements2_khr(device C.Device, p_info &ImageSparseMemoryRequirementsInfo2, p_sparse_memory_requirement_count &u32, p_sparse_memory_requirements &SparseImageMemoryRequirements2) {
-	f := VkGetImageSparseMemoryRequirements2KHR((*vulkan.loader_p).get_sym('vkGetImageSparseMemoryRequirements2KHR') or {
-		println("Couldn't load symbol for 'vkGetImageSparseMemoryRequirements2KHR': ${err}")
-		return
-	})
-	f(device, p_info, p_sparse_memory_requirement_count, p_sparse_memory_requirements)
-}
-
-// VK_KHR_image_format_list is a preprocessor guard. Do not pass it to API calls.
-const khr_image_format_list = 1
 pub const khr_image_format_list_spec_version = 1
 pub const khr_image_format_list_extension_name = 'VK_KHR_image_format_list'
 
 pub type ImageFormatListCreateInfoKHR = ImageFormatListCreateInfo
 
-// VK_KHR_sampler_ycbcr_conversion is a preprocessor guard. Do not pass it to API calls.
-const khr_sampler_ycbcr_conversion = 1
+pub type SamplerYcbcrConversionKHR = voidptr
+
 pub const khr_sampler_ycbcr_conversion_spec_version = 14
 pub const khr_sampler_ycbcr_conversion_extension_name = 'VK_KHR_sampler_ycbcr_conversion'
 
@@ -10617,28 +10407,6 @@ pub type PhysicalDeviceSamplerYcbcrConversionFeaturesKHR = PhysicalDeviceSampler
 
 pub type SamplerYcbcrConversionImageFormatPropertiesKHR = SamplerYcbcrConversionImageFormatProperties
 
-type VkCreateSamplerYcbcrConversionKHR = fn (C.Device, &SamplerYcbcrConversionCreateInfo, &AllocationCallbacks, &C.SamplerYcbcrConversion) Result
-
-pub fn create_sampler_ycbcr_conversion_khr(device C.Device, p_create_info &SamplerYcbcrConversionCreateInfo, p_allocator &AllocationCallbacks, p_ycbcr_conversion &C.SamplerYcbcrConversion) Result {
-	f := VkCreateSamplerYcbcrConversionKHR((*vulkan.loader_p).get_sym('vkCreateSamplerYcbcrConversionKHR') or {
-		println("Couldn't load symbol for 'vkCreateSamplerYcbcrConversionKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_ycbcr_conversion)
-}
-
-type VkDestroySamplerYcbcrConversionKHR = fn (C.Device, C.SamplerYcbcrConversion, &AllocationCallbacks)
-
-pub fn destroy_sampler_ycbcr_conversion_khr(device C.Device, ycbcr_conversion C.SamplerYcbcrConversion, p_allocator &AllocationCallbacks) {
-	f := VkDestroySamplerYcbcrConversionKHR((*vulkan.loader_p).get_sym('vkDestroySamplerYcbcrConversionKHR') or {
-		println("Couldn't load symbol for 'vkDestroySamplerYcbcrConversionKHR': ${err}")
-		return
-	})
-	f(device, ycbcr_conversion, p_allocator)
-}
-
-// VK_KHR_bind_memory2 is a preprocessor guard. Do not pass it to API calls.
-const khr_bind_memory2 = 1
 pub const khr_bind_memory_2_spec_version = 1
 pub const khr_bind_memory_2_extension_name = 'VK_KHR_bind_memory2'
 
@@ -10646,165 +10414,67 @@ pub type BindBufferMemoryInfoKHR = BindBufferMemoryInfo
 
 pub type BindImageMemoryInfoKHR = BindImageMemoryInfo
 
-type VkBindBufferMemory2KHR = fn (C.Device, u32, &BindBufferMemoryInfo) Result
-
-pub fn bind_buffer_memory2_khr(device C.Device, bind_info_count u32, p_bind_infos &BindBufferMemoryInfo) Result {
-	f := VkBindBufferMemory2KHR((*vulkan.loader_p).get_sym('vkBindBufferMemory2KHR') or {
-		println("Couldn't load symbol for 'vkBindBufferMemory2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, bind_info_count, p_bind_infos)
-}
-
-type VkBindImageMemory2KHR = fn (C.Device, u32, &BindImageMemoryInfo) Result
-
-pub fn bind_image_memory2_khr(device C.Device, bind_info_count u32, p_bind_infos &BindImageMemoryInfo) Result {
-	f := VkBindImageMemory2KHR((*vulkan.loader_p).get_sym('vkBindImageMemory2KHR') or {
-		println("Couldn't load symbol for 'vkBindImageMemory2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, bind_info_count, p_bind_infos)
-}
-
-// VK_KHR_portability_subset is a preprocessor guard. Do not pass it to API calls.
-const khr_portability_subset = 1
-pub const khr_portability_subset_spec_version = 1
-pub const khr_portability_subset_extension_name = 'VK_KHR_portability_subset'
-// PhysicalDevicePortabilitySubsetFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub struct PhysicalDevicePortabilitySubsetFeaturesKHR {
-mut:
-	s_type                                     StructureType
-	p_next                                     voidptr
-	constant_alpha_color_blend_factors         Bool32
-	events                                     Bool32
-	image_view_format_reinterpretation         Bool32
-	image_view_format_swizzle                  Bool32
-	image_view2_d_on3_d_image                  Bool32
-	multisample_array_image                    Bool32
-	mutable_comparison_samplers                Bool32
-	point_polygons                             Bool32
-	sampler_mip_lod_bias                       Bool32
-	separate_stencil_mask_ref                  Bool32
-	shader_sample_rate_interpolation_functions Bool32
-	tessellation_isolines                      Bool32
-	tessellation_point_mode                    Bool32
-	triangle_fans                              Bool32
-	vertex_attribute_access_beyond_stride      Bool32
-}
-
-// PhysicalDevicePortabilitySubsetPropertiesKHR extends VkPhysicalDeviceProperties2
-pub struct PhysicalDevicePortabilitySubsetPropertiesKHR {
-mut:
-	s_type                                    StructureType
-	p_next                                    voidptr
-	min_vertex_input_binding_stride_alignment u32
-}
-
-// VK_KHR_maintenance3 is a preprocessor guard. Do not pass it to API calls.
-const khr_maintenance3 = 1
 pub const khr_maintenance_3_spec_version = 1
 pub const khr_maintenance_3_extension_name = 'VK_KHR_maintenance3'
+// VK_KHR_MAINTENANCE3_SPEC_VERSION is a deprecated alias
 pub const khr_maintenance3_spec_version = khr_maintenance_3_spec_version
+// VK_KHR_MAINTENANCE3_EXTENSION_NAME is a deprecated alias
 pub const khr_maintenance3_extension_name = khr_maintenance_3_extension_name
 
 pub type PhysicalDeviceMaintenance3PropertiesKHR = PhysicalDeviceMaintenance3Properties
 
 pub type DescriptorSetLayoutSupportKHR = DescriptorSetLayoutSupport
 
-type VkGetDescriptorSetLayoutSupportKHR = fn (C.Device, &DescriptorSetLayoutCreateInfo, &DescriptorSetLayoutSupport)
-
-pub fn get_descriptor_set_layout_support_khr(device C.Device, p_create_info &DescriptorSetLayoutCreateInfo, p_support &DescriptorSetLayoutSupport) {
-	f := VkGetDescriptorSetLayoutSupportKHR((*vulkan.loader_p).get_sym('vkGetDescriptorSetLayoutSupportKHR') or {
-		println("Couldn't load symbol for 'vkGetDescriptorSetLayoutSupportKHR': ${err}")
-		return
-	})
-	f(device, p_create_info, p_support)
-}
-
-// VK_KHR_draw_indirect_count is a preprocessor guard. Do not pass it to API calls.
-const khr_draw_indirect_count = 1
 pub const khr_draw_indirect_count_spec_version = 1
 pub const khr_draw_indirect_count_extension_name = 'VK_KHR_draw_indirect_count'
 
-type VkCmdDrawIndirectCountKHR = fn (C.CommandBuffer, C.Buffer, DeviceSize, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_indirect_count_khr(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, count_buffer C.Buffer, count_buffer_offset DeviceSize, max_draw_count u32, stride u32) {
-	f := VkCmdDrawIndirectCountKHR((*vulkan.loader_p).get_sym('vkCmdDrawIndirectCountKHR') or {
-		println("Couldn't load symbol for 'vkCmdDrawIndirectCountKHR': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, count_buffer, count_buffer_offset, max_draw_count,
-		stride)
-}
-
-type VkCmdDrawIndexedIndirectCountKHR = fn (C.CommandBuffer, C.Buffer, DeviceSize, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_indexed_indirect_count_khr(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, count_buffer C.Buffer, count_buffer_offset DeviceSize, max_draw_count u32, stride u32) {
-	f := VkCmdDrawIndexedIndirectCountKHR((*vulkan.loader_p).get_sym('vkCmdDrawIndexedIndirectCountKHR') or {
-		println("Couldn't load symbol for 'vkCmdDrawIndexedIndirectCountKHR': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, count_buffer, count_buffer_offset, max_draw_count,
-		stride)
-}
-
-// VK_KHR_shader_subgroup_extended_types is a preprocessor guard. Do not pass it to API calls.
-const khr_shader_subgroup_extended_types = 1
 pub const khr_shader_subgroup_extended_types_spec_version = 1
 pub const khr_shader_subgroup_extended_types_extension_name = 'VK_KHR_shader_subgroup_extended_types'
 
 pub type PhysicalDeviceShaderSubgroupExtendedTypesFeaturesKHR = PhysicalDeviceShaderSubgroupExtendedTypesFeatures
 
-// VK_KHR_8bit_storage is a preprocessor guard. Do not pass it to API calls.
-const khr_8bit_storage = 1
 pub const khr_8bit_storage_spec_version = 1
 pub const khr_8bit_storage_extension_name = 'VK_KHR_8bit_storage'
 
 pub type PhysicalDevice8BitStorageFeaturesKHR = PhysicalDevice8BitStorageFeatures
 
-// VK_KHR_shader_atomic_int64 is a preprocessor guard. Do not pass it to API calls.
-const khr_shader_atomic_int64 = 1
 pub const khr_shader_atomic_int64_spec_version = 1
 pub const khr_shader_atomic_int64_extension_name = 'VK_KHR_shader_atomic_int64'
 
 pub type PhysicalDeviceShaderAtomicInt64FeaturesKHR = PhysicalDeviceShaderAtomicInt64Features
 
-// VK_KHR_shader_clock is a preprocessor guard. Do not pass it to API calls.
-const khr_shader_clock = 1
 pub const khr_shader_clock_spec_version = 1
 pub const khr_shader_clock_extension_name = 'VK_KHR_shader_clock'
-// PhysicalDeviceShaderClockFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderClockFeaturesKHR {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	shader_subgroup_clock Bool32
 	shader_device_clock   Bool32
 }
 
-// VK_KHR_video_decode_h265 is a preprocessor guard. Do not pass it to API calls.
-const khr_video_decode_h265 = 1
-pub const khr_video_decode_h265_spec_version = 7
+#include "vk_video/vulkan_video_codec_h265std_decode.h"
+
+pub const khr_video_decode_h265_spec_version = 8
 pub const khr_video_decode_h265_extension_name = 'VK_KHR_video_decode_h265'
-// VideoDecodeH265ProfileInfoKHR extends VkVideoProfileInfoKHR,VkQueryPoolCreateInfo
+
 pub struct VideoDecodeH265ProfileInfoKHR {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	std_profile_idc C.StdVideoH265ProfileIdc
 }
 
-// VideoDecodeH265CapabilitiesKHR extends VkVideoCapabilitiesKHR
 pub struct VideoDecodeH265CapabilitiesKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	max_level_idc u32
 }
 
-// VideoDecodeH265SessionParametersAddInfoKHR extends VkVideoSessionParametersUpdateInfoKHR
 pub struct VideoDecodeH265SessionParametersAddInfoKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	std_vps_count u32
@@ -10815,9 +10485,8 @@ mut:
 	p_std_pp_ss   &C.StdVideoH265PictureParameterSet
 }
 
-// VideoDecodeH265SessionParametersCreateInfoKHR extends VkVideoSessionParametersCreateInfoKHR
 pub struct VideoDecodeH265SessionParametersCreateInfoKHR {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	max_std_vps_count     u32
@@ -10826,9 +10495,8 @@ mut:
 	p_parameters_add_info &VideoDecodeH265SessionParametersAddInfoKHR
 }
 
-// VideoDecodeH265PictureInfoKHR extends VkVideoDecodeInfoKHR
 pub struct VideoDecodeH265PictureInfoKHR {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	p_std_picture_info      &C.StdVideoDecodeH265PictureInfo
@@ -10836,16 +10504,13 @@ mut:
 	p_slice_segment_offsets &u32
 }
 
-// VideoDecodeH265DpbSlotInfoKHR extends VkVideoReferenceSlotInfoKHR
 pub struct VideoDecodeH265DpbSlotInfoKHR {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	p_std_reference_info &C.StdVideoDecodeH265ReferenceInfo
 }
 
-// VK_KHR_global_priority is a preprocessor guard. Do not pass it to API calls.
-const khr_global_priority = 1
 pub const max_global_priority_size_khr = u32(16)
 pub const khr_global_priority_spec_version = 1
 pub const khr_global_priority_extension_name = 'VK_KHR_global_priority'
@@ -10858,33 +10523,28 @@ pub enum QueueGlobalPriorityKHR {
 	queue_global_priority_max_enum_khr = int(0x7FFFFFFF)
 }
 
-// DeviceQueueGlobalPriorityCreateInfoKHR extends VkDeviceQueueCreateInfo
 pub struct DeviceQueueGlobalPriorityCreateInfoKHR {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	global_priority QueueGlobalPriorityKHR
 }
 
-// PhysicalDeviceGlobalPriorityQueryFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceGlobalPriorityQueryFeaturesKHR {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	global_priority_query Bool32
 }
 
-// QueueFamilyGlobalPriorityPropertiesKHR extends VkQueueFamilyProperties2
 pub struct QueueFamilyGlobalPriorityPropertiesKHR {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	priority_count u32
-	priorities     []QueueGlobalPriorityKHR
+	priorities     [max_global_priority_size_khr]QueueGlobalPriorityKHR
 }
 
-// VK_KHR_driver_properties is a preprocessor guard. Do not pass it to API calls.
-const khr_driver_properties = 1
 pub const khr_driver_properties_spec_version = 1
 pub const khr_driver_properties_extension_name = 'VK_KHR_driver_properties'
 pub const max_driver_name_size_khr = max_driver_name_size
@@ -10896,8 +10556,6 @@ pub type ConformanceVersionKHR = ConformanceVersion
 
 pub type PhysicalDeviceDriverPropertiesKHR = PhysicalDeviceDriverProperties
 
-// VK_KHR_shader_float_controls is a preprocessor guard. Do not pass it to API calls.
-const khr_shader_float_controls = 1
 pub const khr_shader_float_controls_spec_version = 4
 pub const khr_shader_float_controls_extension_name = 'VK_KHR_shader_float_controls'
 
@@ -10905,24 +10563,19 @@ pub type ShaderFloatControlsIndependenceKHR = ShaderFloatControlsIndependence
 
 pub type PhysicalDeviceFloatControlsPropertiesKHR = PhysicalDeviceFloatControlsProperties
 
-// VK_KHR_depth_stencil_resolve is a preprocessor guard. Do not pass it to API calls.
-const khr_depth_stencil_resolve = 1
 pub const khr_depth_stencil_resolve_spec_version = 1
 pub const khr_depth_stencil_resolve_extension_name = 'VK_KHR_depth_stencil_resolve'
 
 pub type ResolveModeFlagBitsKHR = ResolveModeFlagBits
 
+pub type ResolveModeFlagsKHR = u32
 pub type SubpassDescriptionDepthStencilResolveKHR = SubpassDescriptionDepthStencilResolve
 
 pub type PhysicalDeviceDepthStencilResolvePropertiesKHR = PhysicalDeviceDepthStencilResolveProperties
 
-// VK_KHR_swapchain_mutable_format is a preprocessor guard. Do not pass it to API calls.
-const khr_swapchain_mutable_format = 1
 pub const khr_swapchain_mutable_format_spec_version = 1
 pub const khr_swapchain_mutable_format_extension_name = 'VK_KHR_swapchain_mutable_format'
 
-// VK_KHR_timeline_semaphore is a preprocessor guard. Do not pass it to API calls.
-const khr_timeline_semaphore = 1
 pub const khr_timeline_semaphore_spec_version = 2
 pub const khr_timeline_semaphore_extension_name = 'VK_KHR_timeline_semaphore'
 
@@ -10930,6 +10583,7 @@ pub type SemaphoreTypeKHR = SemaphoreType
 
 pub type SemaphoreWaitFlagBitsKHR = SemaphoreWaitFlagBits
 
+pub type SemaphoreWaitFlagsKHR = u32
 pub type PhysicalDeviceTimelineSemaphoreFeaturesKHR = PhysicalDeviceTimelineSemaphoreFeatures
 
 pub type PhysicalDeviceTimelineSemaphorePropertiesKHR = PhysicalDeviceTimelineSemaphoreProperties
@@ -10942,52 +10596,16 @@ pub type SemaphoreWaitInfoKHR = SemaphoreWaitInfo
 
 pub type SemaphoreSignalInfoKHR = SemaphoreSignalInfo
 
-type VkGetSemaphoreCounterValueKHR = fn (C.Device, C.Semaphore, &u64) Result
-
-pub fn get_semaphore_counter_value_khr(device C.Device, semaphore C.Semaphore, p_value &u64) Result {
-	f := VkGetSemaphoreCounterValueKHR((*vulkan.loader_p).get_sym('vkGetSemaphoreCounterValueKHR') or {
-		println("Couldn't load symbol for 'vkGetSemaphoreCounterValueKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, semaphore, p_value)
-}
-
-type VkWaitSemaphoresKHR = fn (C.Device, &SemaphoreWaitInfo, u64) Result
-
-pub fn wait_semaphores_khr(device C.Device, p_wait_info &SemaphoreWaitInfo, timeout u64) Result {
-	f := VkWaitSemaphoresKHR((*vulkan.loader_p).get_sym('vkWaitSemaphoresKHR') or {
-		println("Couldn't load symbol for 'vkWaitSemaphoresKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_wait_info, timeout)
-}
-
-type VkSignalSemaphoreKHR = fn (C.Device, &SemaphoreSignalInfo) Result
-
-pub fn signal_semaphore_khr(device C.Device, p_signal_info &SemaphoreSignalInfo) Result {
-	f := VkSignalSemaphoreKHR((*vulkan.loader_p).get_sym('vkSignalSemaphoreKHR') or {
-		println("Couldn't load symbol for 'vkSignalSemaphoreKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_signal_info)
-}
-
-// VK_KHR_vulkan_memory_model is a preprocessor guard. Do not pass it to API calls.
-const khr_vulkan_memory_model = 1
 pub const khr_vulkan_memory_model_spec_version = 3
 pub const khr_vulkan_memory_model_extension_name = 'VK_KHR_vulkan_memory_model'
 
 pub type PhysicalDeviceVulkanMemoryModelFeaturesKHR = PhysicalDeviceVulkanMemoryModelFeatures
 
-// VK_KHR_shader_terminate_invocation is a preprocessor guard. Do not pass it to API calls.
-const khr_shader_terminate_invocation = 1
 pub const khr_shader_terminate_invocation_spec_version = 1
 pub const khr_shader_terminate_invocation_extension_name = 'VK_KHR_shader_terminate_invocation'
 
 pub type PhysicalDeviceShaderTerminateInvocationFeaturesKHR = PhysicalDeviceShaderTerminateInvocationFeatures
 
-// VK_KHR_fragment_shading_rate is a preprocessor guard. Do not pass it to API calls.
-const khr_fragment_shading_rate = 1
 pub const khr_fragment_shading_rate_spec_version = 2
 pub const khr_fragment_shading_rate_extension_name = 'VK_KHR_fragment_shading_rate'
 
@@ -11000,27 +10618,24 @@ pub enum FragmentShadingRateCombinerOpKHR {
 	fragment_shading_rate_combiner_op_max_enum_khr = int(0x7FFFFFFF)
 }
 
-// FragmentShadingRateAttachmentInfoKHR extends VkSubpassDescription2
 pub struct FragmentShadingRateAttachmentInfoKHR {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	p_fragment_shading_rate_attachment &AttachmentReference2
 	shading_rate_attachment_texel_size Extent2D
 }
 
-// PipelineFragmentShadingRateStateCreateInfoKHR extends VkGraphicsPipelineCreateInfo
 pub struct PipelineFragmentShadingRateStateCreateInfoKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	fragment_size Extent2D
-	combiner_ops  []FragmentShadingRateCombinerOpKHR
+	combiner_ops  [2]FragmentShadingRateCombinerOpKHR
 }
 
-// PhysicalDeviceFragmentShadingRateFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceFragmentShadingRateFeaturesKHR {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	pipeline_fragment_shading_rate   Bool32
@@ -11028,9 +10643,8 @@ mut:
 	attachment_fragment_shading_rate Bool32
 }
 
-// PhysicalDeviceFragmentShadingRatePropertiesKHR extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceFragmentShadingRatePropertiesKHR {
-mut:
+pub mut:
 	s_type                                                       StructureType
 	p_next                                                       voidptr
 	min_fragment_shading_rate_attachment_texel_size              Extent2D
@@ -11053,52 +10667,97 @@ mut:
 }
 
 pub struct PhysicalDeviceFragmentShadingRateKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	sample_counts SampleCountFlags
 	fragment_size Extent2D
 }
 
-type VkGetPhysicalDeviceFragmentShadingRatesKHR = fn (C.PhysicalDevice, &u32, &PhysicalDeviceFragmentShadingRateKHR) Result
-
-pub fn get_physical_device_fragment_shading_rates_khr(physical_device C.PhysicalDevice, p_fragment_shading_rate_count &u32, p_fragment_shading_rates &PhysicalDeviceFragmentShadingRateKHR) Result {
-	f := VkGetPhysicalDeviceFragmentShadingRatesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceFragmentShadingRatesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceFragmentShadingRatesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_fragment_shading_rate_count, p_fragment_shading_rates)
+fn C.vkGetPhysicalDeviceFragmentShadingRatesKHR(C.PhysicalDevice,
+	&u32,
+	&PhysicalDeviceFragmentShadingRateKHR) Result
+pub fn get_physical_device_fragment_shading_rates_khr(physical_device C.PhysicalDevice,
+	p_fragment_shading_rate_count &u32,
+	p_fragment_shading_rates &PhysicalDeviceFragmentShadingRateKHR) Result {
+	return C.vkGetPhysicalDeviceFragmentShadingRatesKHR(physical_device, p_fragment_shading_rate_count,
+		p_fragment_shading_rates)
 }
 
-type VkCmdSetFragmentShadingRateKHR = fn (C.CommandBuffer, &Extent2D, []FragmentShadingRateCombinerOpKHR)
-
-pub fn cmd_set_fragment_shading_rate_khr(command_buffer C.CommandBuffer, p_fragment_size &Extent2D, combiner_ops []FragmentShadingRateCombinerOpKHR) {
-	f := VkCmdSetFragmentShadingRateKHR((*vulkan.loader_p).get_sym('vkCmdSetFragmentShadingRateKHR') or {
-		println("Couldn't load symbol for 'vkCmdSetFragmentShadingRateKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_fragment_size, combiner_ops)
+fn C.vkCmdSetFragmentShadingRateKHR(C.CommandBuffer,
+	&Extent2D,
+	[2]FragmentShadingRateCombinerOpKHR)
+pub fn cmd_set_fragment_shading_rate_khr(command_buffer C.CommandBuffer,
+	p_fragment_size &Extent2D,
+	combiner_ops [2]FragmentShadingRateCombinerOpKHR) {
+	C.vkCmdSetFragmentShadingRateKHR(command_buffer, p_fragment_size, combiner_ops)
 }
 
-// VK_KHR_spirv_1_4 is a preprocessor guard. Do not pass it to API calls.
-const khr_spirv_1_4 = 1
+pub const khr_dynamic_rendering_local_read_spec_version = 1
+pub const khr_dynamic_rendering_local_read_extension_name = 'VK_KHR_dynamic_rendering_local_read'
+
+pub struct PhysicalDeviceDynamicRenderingLocalReadFeaturesKHR {
+pub mut:
+	s_type                       StructureType
+	p_next                       voidptr
+	dynamic_rendering_local_read Bool32
+}
+
+pub struct RenderingAttachmentLocationInfoKHR {
+pub mut:
+	s_type                       StructureType
+	p_next                       voidptr
+	color_attachment_count       u32
+	p_color_attachment_locations &u32
+}
+
+pub struct RenderingInputAttachmentIndexInfoKHR {
+pub mut:
+	s_type                           StructureType
+	p_next                           voidptr
+	color_attachment_count           u32
+	p_color_attachment_input_indices &u32
+	p_depth_input_attachment_index   &u32
+	p_stencil_input_attachment_index &u32
+}
+
+fn C.vkCmdSetRenderingAttachmentLocationsKHR(C.CommandBuffer,
+	&RenderingAttachmentLocationInfoKHR)
+pub fn cmd_set_rendering_attachment_locations_khr(command_buffer C.CommandBuffer,
+	p_location_info &RenderingAttachmentLocationInfoKHR) {
+	C.vkCmdSetRenderingAttachmentLocationsKHR(command_buffer, p_location_info)
+}
+
+fn C.vkCmdSetRenderingInputAttachmentIndicesKHR(C.CommandBuffer,
+	&RenderingInputAttachmentIndexInfoKHR)
+pub fn cmd_set_rendering_input_attachment_indices_khr(command_buffer C.CommandBuffer,
+	p_input_attachment_index_info &RenderingInputAttachmentIndexInfoKHR) {
+	C.vkCmdSetRenderingInputAttachmentIndicesKHR(command_buffer, p_input_attachment_index_info)
+}
+
+pub const khr_shader_quad_control_spec_version = 1
+pub const khr_shader_quad_control_extension_name = 'VK_KHR_shader_quad_control'
+
+pub struct PhysicalDeviceShaderQuadControlFeaturesKHR {
+pub mut:
+	s_type              StructureType
+	p_next              voidptr
+	shader_quad_control Bool32
+}
+
 pub const khr_spirv_1_4_spec_version = 1
 pub const khr_spirv_1_4_extension_name = 'VK_KHR_spirv_1_4'
 
-// VK_KHR_surface_protected_capabilities is a preprocessor guard. Do not pass it to API calls.
-const khr_surface_protected_capabilities = 1
 pub const khr_surface_protected_capabilities_spec_version = 1
 pub const khr_surface_protected_capabilities_extension_name = 'VK_KHR_surface_protected_capabilities'
-// SurfaceProtectedCapabilitiesKHR extends VkSurfaceCapabilities2KHR
+
 pub struct SurfaceProtectedCapabilitiesKHR {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	supports_protected Bool32
 }
 
-// VK_KHR_separate_depth_stencil_layouts is a preprocessor guard. Do not pass it to API calls.
-const khr_separate_depth_stencil_layouts = 1
 pub const khr_separate_depth_stencil_layouts_spec_version = 1
 pub const khr_separate_depth_stencil_layouts_extension_name = 'VK_KHR_separate_depth_stencil_layouts'
 
@@ -11108,37 +10767,32 @@ pub type AttachmentReferenceStencilLayoutKHR = AttachmentReferenceStencilLayout
 
 pub type AttachmentDescriptionStencilLayoutKHR = AttachmentDescriptionStencilLayout
 
-// VK_KHR_present_wait is a preprocessor guard. Do not pass it to API calls.
-const khr_present_wait = 1
 pub const khr_present_wait_spec_version = 1
 pub const khr_present_wait_extension_name = 'VK_KHR_present_wait'
-// PhysicalDevicePresentWaitFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDevicePresentWaitFeaturesKHR {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	present_wait Bool32
 }
 
-type VkWaitForPresentKHR = fn (C.Device, C.SwapchainKHR, u64, u64) Result
-
-pub fn wait_for_present_khr(device C.Device, swapchain C.SwapchainKHR, present_id u64, timeout u64) Result {
-	f := VkWaitForPresentKHR((*vulkan.loader_p).get_sym('vkWaitForPresentKHR') or {
-		println("Couldn't load symbol for 'vkWaitForPresentKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain, present_id, timeout)
+fn C.vkWaitForPresentKHR(C.Device,
+	C.SwapchainKHR,
+	u64,
+	u64) Result
+pub fn wait_for_present_khr(device C.Device,
+	swapchain C.SwapchainKHR,
+	present_id u64,
+	timeout u64) Result {
+	return C.vkWaitForPresentKHR(device, swapchain, present_id, timeout)
 }
 
-// VK_KHR_uniform_buffer_standard_layout is a preprocessor guard. Do not pass it to API calls.
-const khr_uniform_buffer_standard_layout = 1
 pub const khr_uniform_buffer_standard_layout_spec_version = 1
 pub const khr_uniform_buffer_standard_layout_extension_name = 'VK_KHR_uniform_buffer_standard_layout'
 
 pub type PhysicalDeviceUniformBufferStandardLayoutFeaturesKHR = PhysicalDeviceUniformBufferStandardLayoutFeatures
 
-// VK_KHR_buffer_device_address is a preprocessor guard. Do not pass it to API calls.
-const khr_buffer_device_address = 1
 pub const khr_buffer_device_address_spec_version = 1
 pub const khr_buffer_device_address_extension_name = 'VK_KHR_buffer_device_address'
 
@@ -11152,92 +10806,50 @@ pub type MemoryOpaqueCaptureAddressAllocateInfoKHR = MemoryOpaqueCaptureAddressA
 
 pub type DeviceMemoryOpaqueCaptureAddressInfoKHR = DeviceMemoryOpaqueCaptureAddressInfo
 
-type VkGetBufferDeviceAddressKHR = fn (C.Device, &BufferDeviceAddressInfo) DeviceAddress
-
-pub fn get_buffer_device_address_khr(device C.Device, p_info &BufferDeviceAddressInfo) DeviceAddress {
-	f := VkGetBufferDeviceAddressKHR((*vulkan.loader_p).get_sym('vkGetBufferDeviceAddressKHR') or {
-		panic("Couldn't load symbol for 'vkGetBufferDeviceAddressKHR': ${err}")
-	})
-	return f(device, p_info)
-}
-
-type VkGetBufferOpaqueCaptureAddressKHR = fn (C.Device, &BufferDeviceAddressInfo) u64
-
-pub fn get_buffer_opaque_capture_address_khr(device C.Device, p_info &BufferDeviceAddressInfo) u64 {
-	f := VkGetBufferOpaqueCaptureAddressKHR((*vulkan.loader_p).get_sym('vkGetBufferOpaqueCaptureAddressKHR') or {
-		panic("Couldn't load symbol for 'vkGetBufferOpaqueCaptureAddressKHR': ${err}")
-	})
-	return f(device, p_info)
-}
-
-type VkGetDeviceMemoryOpaqueCaptureAddressKHR = fn (C.Device, &DeviceMemoryOpaqueCaptureAddressInfo) u64
-
-pub fn get_device_memory_opaque_capture_address_khr(device C.Device, p_info &DeviceMemoryOpaqueCaptureAddressInfo) u64 {
-	f := VkGetDeviceMemoryOpaqueCaptureAddressKHR((*vulkan.loader_p).get_sym('vkGetDeviceMemoryOpaqueCaptureAddressKHR') or {
-		panic("Couldn't load symbol for 'vkGetDeviceMemoryOpaqueCaptureAddressKHR': ${err}")
-	})
-	return f(device, p_info)
-}
-
-// VK_KHR_deferred_host_operations is a preprocessor guard. Do not pass it to API calls.
-const khr_deferred_host_operations = 1
-
 pub type C.DeferredOperationKHR = voidptr
 
 pub const khr_deferred_host_operations_spec_version = 4
 pub const khr_deferred_host_operations_extension_name = 'VK_KHR_deferred_host_operations'
 
-type VkCreateDeferredOperationKHR = fn (C.Device, &AllocationCallbacks, &C.DeferredOperationKHR) Result
-
-pub fn create_deferred_operation_khr(device C.Device, p_allocator &AllocationCallbacks, p_deferred_operation &C.DeferredOperationKHR) Result {
-	f := VkCreateDeferredOperationKHR((*vulkan.loader_p).get_sym('vkCreateDeferredOperationKHR') or {
-		println("Couldn't load symbol for 'vkCreateDeferredOperationKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_allocator, p_deferred_operation)
+fn C.vkCreateDeferredOperationKHR(C.Device,
+	&AllocationCallbacks,
+	&C.DeferredOperationKHR) Result
+pub fn create_deferred_operation_khr(device C.Device,
+	p_allocator &AllocationCallbacks,
+	p_deferred_operation &C.DeferredOperationKHR) Result {
+	return C.vkCreateDeferredOperationKHR(device, p_allocator, p_deferred_operation)
 }
 
-type VkDestroyDeferredOperationKHR = fn (C.Device, C.DeferredOperationKHR, &AllocationCallbacks)
-
-pub fn destroy_deferred_operation_khr(device C.Device, operation C.DeferredOperationKHR, p_allocator &AllocationCallbacks) {
-	f := VkDestroyDeferredOperationKHR((*vulkan.loader_p).get_sym('vkDestroyDeferredOperationKHR') or {
-		println("Couldn't load symbol for 'vkDestroyDeferredOperationKHR': ${err}")
-		return
-	})
-	f(device, operation, p_allocator)
+fn C.vkDestroyDeferredOperationKHR(C.Device,
+	C.DeferredOperationKHR,
+	&AllocationCallbacks)
+pub fn destroy_deferred_operation_khr(device C.Device,
+	operation C.DeferredOperationKHR,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyDeferredOperationKHR(device, operation, p_allocator)
 }
 
-type VkGetDeferredOperationMaxConcurrencyKHR = fn (C.Device, C.DeferredOperationKHR) u32
-
-pub fn get_deferred_operation_max_concurrency_khr(device C.Device, operation C.DeferredOperationKHR) u32 {
-	f := VkGetDeferredOperationMaxConcurrencyKHR((*vulkan.loader_p).get_sym('vkGetDeferredOperationMaxConcurrencyKHR') or {
-		panic("Couldn't load symbol for 'vkGetDeferredOperationMaxConcurrencyKHR': ${err}")
-	})
-	return f(device, operation)
+fn C.vkGetDeferredOperationMaxConcurrencyKHR(C.Device,
+	C.DeferredOperationKHR) u32
+pub fn get_deferred_operation_max_concurrency_khr(device C.Device,
+	operation C.DeferredOperationKHR) u32 {
+	return C.vkGetDeferredOperationMaxConcurrencyKHR(device, operation)
 }
 
-type VkGetDeferredOperationResultKHR = fn (C.Device, C.DeferredOperationKHR) Result
-
-pub fn get_deferred_operation_result_khr(device C.Device, operation C.DeferredOperationKHR) Result {
-	f := VkGetDeferredOperationResultKHR((*vulkan.loader_p).get_sym('vkGetDeferredOperationResultKHR') or {
-		println("Couldn't load symbol for 'vkGetDeferredOperationResultKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, operation)
+fn C.vkGetDeferredOperationResultKHR(C.Device,
+	C.DeferredOperationKHR) Result
+pub fn get_deferred_operation_result_khr(device C.Device,
+	operation C.DeferredOperationKHR) Result {
+	return C.vkGetDeferredOperationResultKHR(device, operation)
 }
 
-type VkDeferredOperationJoinKHR = fn (C.Device, C.DeferredOperationKHR) Result
-
-pub fn deferred_operation_join_khr(device C.Device, operation C.DeferredOperationKHR) Result {
-	f := VkDeferredOperationJoinKHR((*vulkan.loader_p).get_sym('vkDeferredOperationJoinKHR') or {
-		println("Couldn't load symbol for 'vkDeferredOperationJoinKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, operation)
+fn C.vkDeferredOperationJoinKHR(C.Device,
+	C.DeferredOperationKHR) Result
+pub fn deferred_operation_join_khr(device C.Device,
+	operation C.DeferredOperationKHR) Result {
+	return C.vkDeferredOperationJoinKHR(device, operation)
 }
 
-// VK_KHR_pipeline_executable_properties is a preprocessor guard. Do not pass it to API calls.
-const khr_pipeline_executable_properties = 1
 pub const khr_pipeline_executable_properties_spec_version = 1
 pub const khr_pipeline_executable_properties_extension_name = 'VK_KHR_pipeline_executable_properties'
 
@@ -11249,33 +10861,32 @@ pub enum PipelineExecutableStatisticFormatKHR {
 	pipeline_executable_statistic_format_max_enum_khr = int(0x7FFFFFFF)
 }
 
-// PhysicalDevicePipelineExecutablePropertiesFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDevicePipelineExecutablePropertiesFeaturesKHR {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	pipeline_executable_info Bool32
 }
 
 pub struct PipelineInfoKHR {
-mut:
+pub mut:
 	s_type   StructureType
 	p_next   voidptr
 	pipeline C.Pipeline
 }
 
 pub struct PipelineExecutablePropertiesKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	stages        ShaderStageFlags
-	name          []char
-	description   []char
+	name          [max_description_size]char
+	description   [max_description_size]char
 	subgroup_size u32
 }
 
 pub struct PipelineExecutableInfoKHR {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	pipeline         C.Pipeline
@@ -11283,7 +10894,7 @@ mut:
 }
 
 pub union PipelineExecutableStatisticValueKHR {
-mut:
+pub mut:
 	b32 Bool32
 	i64 i64
 	u64 u64
@@ -11291,65 +10902,74 @@ mut:
 }
 
 pub struct PipelineExecutableStatisticKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
-	name        []char
-	description []char
+	name        [max_description_size]char
+	description [max_description_size]char
 	format      PipelineExecutableStatisticFormatKHR
 	value       PipelineExecutableStatisticValueKHR
 }
 
 pub struct PipelineExecutableInternalRepresentationKHR {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
-	name        []char
-	description []char
+	name        [max_description_size]char
+	description [max_description_size]char
 	is_text     Bool32
 	data_size   usize
 	p_data      voidptr
 }
 
-type VkGetPipelineExecutablePropertiesKHR = fn (C.Device, &PipelineInfoKHR, &u32, &PipelineExecutablePropertiesKHR) Result
-
-pub fn get_pipeline_executable_properties_khr(device C.Device, p_pipeline_info &PipelineInfoKHR, p_executable_count &u32, p_properties &PipelineExecutablePropertiesKHR) Result {
-	f := VkGetPipelineExecutablePropertiesKHR((*vulkan.loader_p).get_sym('vkGetPipelineExecutablePropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPipelineExecutablePropertiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_pipeline_info, p_executable_count, p_properties)
+fn C.vkGetPipelineExecutablePropertiesKHR(C.Device,
+	&PipelineInfoKHR,
+	&u32,
+	&PipelineExecutablePropertiesKHR) Result
+pub fn get_pipeline_executable_properties_khr(device C.Device,
+	p_pipeline_info &PipelineInfoKHR,
+	p_executable_count &u32,
+	p_properties &PipelineExecutablePropertiesKHR) Result {
+	return C.vkGetPipelineExecutablePropertiesKHR(device, p_pipeline_info, p_executable_count,
+		p_properties)
 }
 
-type VkGetPipelineExecutableStatisticsKHR = fn (C.Device, &PipelineExecutableInfoKHR, &u32, &PipelineExecutableStatisticKHR) Result
-
-pub fn get_pipeline_executable_statistics_khr(device C.Device, p_executable_info &PipelineExecutableInfoKHR, p_statistic_count &u32, p_statistics &PipelineExecutableStatisticKHR) Result {
-	f := VkGetPipelineExecutableStatisticsKHR((*vulkan.loader_p).get_sym('vkGetPipelineExecutableStatisticsKHR') or {
-		println("Couldn't load symbol for 'vkGetPipelineExecutableStatisticsKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_executable_info, p_statistic_count, p_statistics)
+fn C.vkGetPipelineExecutableStatisticsKHR(C.Device,
+	&PipelineExecutableInfoKHR,
+	&u32,
+	&PipelineExecutableStatisticKHR) Result
+pub fn get_pipeline_executable_statistics_khr(device C.Device,
+	p_executable_info &PipelineExecutableInfoKHR,
+	p_statistic_count &u32,
+	p_statistics &PipelineExecutableStatisticKHR) Result {
+	return C.vkGetPipelineExecutableStatisticsKHR(device, p_executable_info, p_statistic_count,
+		p_statistics)
 }
 
-type VkGetPipelineExecutableInternalRepresentationsKHR = fn (C.Device, &PipelineExecutableInfoKHR, &u32, &PipelineExecutableInternalRepresentationKHR) Result
-
-pub fn get_pipeline_executable_internal_representations_khr(device C.Device, p_executable_info &PipelineExecutableInfoKHR, p_internal_representation_count &u32, p_internal_representations &PipelineExecutableInternalRepresentationKHR) Result {
-	f := VkGetPipelineExecutableInternalRepresentationsKHR((*vulkan.loader_p).get_sym('vkGetPipelineExecutableInternalRepresentationsKHR') or {
-		println("Couldn't load symbol for 'vkGetPipelineExecutableInternalRepresentationsKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_executable_info, p_internal_representation_count, p_internal_representations)
+fn C.vkGetPipelineExecutableInternalRepresentationsKHR(C.Device,
+	&PipelineExecutableInfoKHR,
+	&u32,
+	&PipelineExecutableInternalRepresentationKHR) Result
+pub fn get_pipeline_executable_internal_representations_khr(device C.Device,
+	p_executable_info &PipelineExecutableInfoKHR,
+	p_internal_representation_count &u32,
+	p_internal_representations &PipelineExecutableInternalRepresentationKHR) Result {
+	return C.vkGetPipelineExecutableInternalRepresentationsKHR(device, p_executable_info,
+		p_internal_representation_count, p_internal_representations)
 }
 
-// VK_KHR_map_memory2 is a preprocessor guard. Do not pass it to API calls.
-const khr_map_memory2 = 1
 pub const khr_map_memory_2_spec_version = 1
 pub const khr_map_memory_2_extension_name = 'VK_KHR_map_memory2'
+
+pub enum MemoryUnmapFlagBitsKHR {
+	memory_unmap_reserve_bit_ext        = int(0x00000001)
+	memory_unmap_flag_bits_max_enum_khr = int(0x7FFFFFFF)
+}
 
 pub type MemoryUnmapFlagsKHR = u32
 
 pub struct MemoryMapInfoKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  MemoryMapFlags
@@ -11359,35 +10979,29 @@ mut:
 }
 
 pub struct MemoryUnmapInfoKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  MemoryUnmapFlagsKHR
 	memory C.DeviceMemory
 }
 
-type VkMapMemory2KHR = fn (C.Device, &MemoryMapInfoKHR, &voidptr) Result
-
-pub fn map_memory2_khr(device C.Device, p_memory_map_info &MemoryMapInfoKHR, pp_data &voidptr) Result {
-	f := VkMapMemory2KHR((*vulkan.loader_p).get_sym('vkMapMemory2KHR') or {
-		println("Couldn't load symbol for 'vkMapMemory2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_memory_map_info, pp_data)
+fn C.vkMapMemory2KHR(C.Device,
+	&MemoryMapInfoKHR,
+	&voidptr) Result
+pub fn map_memory2_khr(device C.Device,
+	p_memory_map_info &MemoryMapInfoKHR,
+	pp_data &voidptr) Result {
+	return C.vkMapMemory2KHR(device, p_memory_map_info, pp_data)
 }
 
-type VkUnmapMemory2KHR = fn (C.Device, &MemoryUnmapInfoKHR) Result
-
-pub fn unmap_memory2_khr(device C.Device, p_memory_unmap_info &MemoryUnmapInfoKHR) Result {
-	f := VkUnmapMemory2KHR((*vulkan.loader_p).get_sym('vkUnmapMemory2KHR') or {
-		println("Couldn't load symbol for 'vkUnmapMemory2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_memory_unmap_info)
+fn C.vkUnmapMemory2KHR(C.Device,
+	&MemoryUnmapInfoKHR) Result
+pub fn unmap_memory2_khr(device C.Device,
+	p_memory_unmap_info &MemoryUnmapInfoKHR) Result {
+	return C.vkUnmapMemory2KHR(device, p_memory_unmap_info)
 }
 
-// VK_KHR_shader_integer_dot_product is a preprocessor guard. Do not pass it to API calls.
-const khr_shader_integer_dot_product = 1
 pub const khr_shader_integer_dot_product_spec_version = 1
 pub const khr_shader_integer_dot_product_extension_name = 'VK_KHR_shader_integer_dot_product'
 
@@ -11395,48 +11009,39 @@ pub type PhysicalDeviceShaderIntegerDotProductFeaturesKHR = PhysicalDeviceShader
 
 pub type PhysicalDeviceShaderIntegerDotProductPropertiesKHR = PhysicalDeviceShaderIntegerDotProductProperties
 
-// VK_KHR_pipeline_library is a preprocessor guard. Do not pass it to API calls.
-const khr_pipeline_library = 1
 pub const khr_pipeline_library_spec_version = 1
 pub const khr_pipeline_library_extension_name = 'VK_KHR_pipeline_library'
-// PipelineLibraryCreateInfoKHR extends VkGraphicsPipelineCreateInfo
+
 pub struct PipelineLibraryCreateInfoKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	library_count u32
 	p_libraries   &C.Pipeline
 }
 
-// VK_KHR_shader_non_semantic_info is a preprocessor guard. Do not pass it to API calls.
-const khr_shader_non_semantic_info = 1
 pub const khr_shader_non_semantic_info_spec_version = 1
 pub const khr_shader_non_semantic_info_extension_name = 'VK_KHR_shader_non_semantic_info'
 
-// VK_KHR_present_id is a preprocessor guard. Do not pass it to API calls.
-const khr_present_id = 1
 pub const khr_present_id_spec_version = 1
 pub const khr_present_id_extension_name = 'VK_KHR_present_id'
-// PresentIdKHR extends VkPresentInfoKHR
+
 pub struct PresentIdKHR {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	swapchain_count u32
 	p_present_ids   &u64
 }
 
-// PhysicalDevicePresentIdFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDevicePresentIdFeaturesKHR {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	present_id Bool32
 }
 
-// VK_KHR_video_encode_queue is a preprocessor guard. Do not pass it to API calls.
-const khr_video_encode_queue = 1
-pub const khr_video_encode_queue_spec_version = 10
+pub const khr_video_encode_queue_spec_version = 12
 pub const khr_video_encode_queue_extension_name = 'VK_KHR_video_encode_queue'
 
 pub enum VideoEncodeTuningModeKHR {
@@ -11446,6 +11051,10 @@ pub enum VideoEncodeTuningModeKHR {
 	video_encode_tuning_mode_ultra_low_latency_khr = int(3)
 	video_encode_tuning_mode_lossless_khr          = int(4)
 	video_encode_tuning_mode_max_enum_khr          = int(0x7FFFFFFF)
+}
+
+pub enum VideoEncodeFlagBitsKHR {
+	video_encode_flag_bits_max_enum_khr = int(0x7FFFFFFF)
 }
 
 pub type VideoEncodeFlagsKHR = u32
@@ -11500,7 +11109,7 @@ pub type VideoEncodeContentFlagsKHR = u32
 pub type VideoEncodeRateControlFlagsKHR = u32
 
 pub struct VideoEncodeInfoKHR {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	flags                              VideoEncodeFlagsKHR
@@ -11514,9 +11123,8 @@ mut:
 	preceding_externally_encoded_bytes u32
 }
 
-// VideoEncodeCapabilitiesKHR extends VkVideoCapabilitiesKHR
 pub struct VideoEncodeCapabilitiesKHR {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	flags                            VideoEncodeCapabilityFlagsKHR
@@ -11528,17 +11136,15 @@ mut:
 	supported_encode_feedback_flags  VideoEncodeFeedbackFlagsKHR
 }
 
-// QueryPoolVideoEncodeFeedbackCreateInfoKHR extends VkQueryPoolCreateInfo
 pub struct QueryPoolVideoEncodeFeedbackCreateInfoKHR {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	encode_feedback_flags VideoEncodeFeedbackFlagsKHR
 }
 
-// VideoEncodeUsageInfoKHR extends VkVideoProfileInfoKHR,VkQueryPoolCreateInfo
 pub struct VideoEncodeUsageInfoKHR {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	video_usage_hints   VideoEncodeUsageFlagsKHR
@@ -11547,7 +11153,7 @@ mut:
 }
 
 pub struct VideoEncodeRateControlLayerInfoKHR {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	average_bitrate        u64
@@ -11556,9 +11162,8 @@ mut:
 	frame_rate_denominator u32
 }
 
-// VideoEncodeRateControlInfoKHR extends VkVideoCodingControlInfoKHR,VkVideoBeginCodingInfoKHR
 pub struct VideoEncodeRateControlInfoKHR {
-mut:
+pub mut:
 	s_type                            StructureType
 	p_next                            voidptr
 	flags                             VideoEncodeRateControlFlagsKHR
@@ -11570,7 +11175,7 @@ mut:
 }
 
 pub struct PhysicalDeviceVideoEncodeQualityLevelInfoKHR {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	p_video_profile &VideoProfileInfoKHR
@@ -11578,76 +11183,77 @@ mut:
 }
 
 pub struct VideoEncodeQualityLevelPropertiesKHR {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	preferred_rate_control_mode        VideoEncodeRateControlModeFlagBitsKHR
 	preferred_rate_control_layer_count u32
 }
 
-// VideoEncodeQualityLevelInfoKHR extends VkVideoCodingControlInfoKHR,VkVideoSessionParametersCreateInfoKHR
 pub struct VideoEncodeQualityLevelInfoKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	quality_level u32
 }
 
 pub struct VideoEncodeSessionParametersGetInfoKHR {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	video_session_parameters C.VideoSessionParametersKHR
 }
 
 pub struct VideoEncodeSessionParametersFeedbackInfoKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	has_overrides Bool32
 }
 
-type VkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR = fn (C.PhysicalDevice, &PhysicalDeviceVideoEncodeQualityLevelInfoKHR, &VideoEncodeQualityLevelPropertiesKHR) Result
-
-pub fn get_physical_device_video_encode_quality_level_properties_khr(physical_device C.PhysicalDevice, p_quality_level_info &PhysicalDeviceVideoEncodeQualityLevelInfoKHR, p_quality_level_properties &VideoEncodeQualityLevelPropertiesKHR) Result {
-	f := VkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_quality_level_info, p_quality_level_properties)
+fn C.vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR(C.PhysicalDevice,
+	&PhysicalDeviceVideoEncodeQualityLevelInfoKHR,
+	&VideoEncodeQualityLevelPropertiesKHR) Result
+pub fn get_physical_device_video_encode_quality_level_properties_khr(physical_device C.PhysicalDevice,
+	p_quality_level_info &PhysicalDeviceVideoEncodeQualityLevelInfoKHR,
+	p_quality_level_properties &VideoEncodeQualityLevelPropertiesKHR) Result {
+	return C.vkGetPhysicalDeviceVideoEncodeQualityLevelPropertiesKHR(physical_device,
+		p_quality_level_info, p_quality_level_properties)
 }
 
-type VkGetEncodedVideoSessionParametersKHR = fn (C.Device, &VideoEncodeSessionParametersGetInfoKHR, &VideoEncodeSessionParametersFeedbackInfoKHR, &usize, voidptr) Result
-
-pub fn get_encoded_video_session_parameters_khr(device C.Device, p_video_session_parameters_info &VideoEncodeSessionParametersGetInfoKHR, p_feedback_info &VideoEncodeSessionParametersFeedbackInfoKHR, p_data_size &usize, p_data voidptr) Result {
-	f := VkGetEncodedVideoSessionParametersKHR((*vulkan.loader_p).get_sym('vkGetEncodedVideoSessionParametersKHR') or {
-		println("Couldn't load symbol for 'vkGetEncodedVideoSessionParametersKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_video_session_parameters_info, p_feedback_info, p_data_size, p_data)
+fn C.vkGetEncodedVideoSessionParametersKHR(C.Device,
+	&VideoEncodeSessionParametersGetInfoKHR,
+	&VideoEncodeSessionParametersFeedbackInfoKHR,
+	&usize,
+	voidptr) Result
+pub fn get_encoded_video_session_parameters_khr(device C.Device,
+	p_video_session_parameters_info &VideoEncodeSessionParametersGetInfoKHR,
+	p_feedback_info &VideoEncodeSessionParametersFeedbackInfoKHR,
+	p_data_size &usize,
+	p_data voidptr) Result {
+	return C.vkGetEncodedVideoSessionParametersKHR(device, p_video_session_parameters_info,
+		p_feedback_info, p_data_size, p_data)
 }
 
-type VkCmdEncodeVideoKHR = fn (C.CommandBuffer, &VideoEncodeInfoKHR)
-
-pub fn cmd_encode_video_khr(command_buffer C.CommandBuffer, p_encode_info &VideoEncodeInfoKHR) {
-	f := VkCmdEncodeVideoKHR((*vulkan.loader_p).get_sym('vkCmdEncodeVideoKHR') or {
-		println("Couldn't load symbol for 'vkCmdEncodeVideoKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_encode_info)
+fn C.vkCmdEncodeVideoKHR(C.CommandBuffer,
+	&VideoEncodeInfoKHR)
+pub fn cmd_encode_video_khr(command_buffer C.CommandBuffer,
+	p_encode_info &VideoEncodeInfoKHR) {
+	C.vkCmdEncodeVideoKHR(command_buffer, p_encode_info)
 }
 
-// VK_KHR_synchronization2 is a preprocessor guard. Do not pass it to API calls.
-const khr_synchronization2 = 1
 pub const khr_synchronization_2_spec_version = 1
 pub const khr_synchronization_2_extension_name = 'VK_KHR_synchronization2'
 
+pub type PipelineStageFlags2KHR = u64
 pub type PipelineStageFlagBits2KHR = u64
 
+pub type AccessFlags2KHR = u64
 pub type AccessFlagBits2KHR = u64
 
 pub type SubmitFlagBitsKHR = SubmitFlagBits
 
+pub type SubmitFlagsKHR = u32
 pub type MemoryBarrier2KHR = MemoryBarrier2
 
 pub type BufferMemoryBarrier2KHR = BufferMemoryBarrier2
@@ -11664,148 +11270,80 @@ pub type CommandBufferSubmitInfoKHR = CommandBufferSubmitInfo
 
 pub type PhysicalDeviceSynchronization2FeaturesKHR = PhysicalDeviceSynchronization2Features
 
-// QueueFamilyCheckpointProperties2NV extends VkQueueFamilyProperties2
 pub struct QueueFamilyCheckpointProperties2NV {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	checkpoint_execution_stage_mask PipelineStageFlags2
 }
 
 pub struct CheckpointData2NV {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	stage               PipelineStageFlags2
 	p_checkpoint_marker voidptr
 }
 
-type VkCmdSetEvent2KHR = fn (C.CommandBuffer, C.Event, &DependencyInfo)
-
-pub fn cmd_set_event2_khr(command_buffer C.CommandBuffer, event C.Event, p_dependency_info &DependencyInfo) {
-	f := VkCmdSetEvent2KHR((*vulkan.loader_p).get_sym('vkCmdSetEvent2KHR') or {
-		println("Couldn't load symbol for 'vkCmdSetEvent2KHR': ${err}")
-		return
-	})
-	f(command_buffer, event, p_dependency_info)
+fn C.vkCmdWriteBufferMarker2AMD(C.CommandBuffer,
+	PipelineStageFlags2,
+	C.Buffer,
+	DeviceSize,
+	u32)
+pub fn cmd_write_buffer_marker2_amd(command_buffer C.CommandBuffer,
+	stage PipelineStageFlags2,
+	dst_buffer C.Buffer,
+	dst_offset DeviceSize,
+	marker u32) {
+	C.vkCmdWriteBufferMarker2AMD(command_buffer, stage, dst_buffer, dst_offset, marker)
 }
 
-type VkCmdResetEvent2KHR = fn (C.CommandBuffer, C.Event, PipelineStageFlags2)
-
-pub fn cmd_reset_event2_khr(command_buffer C.CommandBuffer, event C.Event, stage_mask PipelineStageFlags2) {
-	f := VkCmdResetEvent2KHR((*vulkan.loader_p).get_sym('vkCmdResetEvent2KHR') or {
-		println("Couldn't load symbol for 'vkCmdResetEvent2KHR': ${err}")
-		return
-	})
-	f(command_buffer, event, stage_mask)
+fn C.vkGetQueueCheckpointData2NV(C.Queue,
+	&u32,
+	&CheckpointData2NV)
+pub fn get_queue_checkpoint_data2_nv(queue C.Queue,
+	p_checkpoint_data_count &u32,
+	p_checkpoint_data &CheckpointData2NV) {
+	C.vkGetQueueCheckpointData2NV(queue, p_checkpoint_data_count, p_checkpoint_data)
 }
 
-type VkCmdWaitEvents2KHR = fn (C.CommandBuffer, u32, &C.Event, &DependencyInfo)
-
-pub fn cmd_wait_events2_khr(command_buffer C.CommandBuffer, event_count u32, p_events &C.Event, p_dependency_infos &DependencyInfo) {
-	f := VkCmdWaitEvents2KHR((*vulkan.loader_p).get_sym('vkCmdWaitEvents2KHR') or {
-		println("Couldn't load symbol for 'vkCmdWaitEvents2KHR': ${err}")
-		return
-	})
-	f(command_buffer, event_count, p_events, p_dependency_infos)
-}
-
-type VkCmdPipelineBarrier2KHR = fn (C.CommandBuffer, &DependencyInfo)
-
-pub fn cmd_pipeline_barrier2_khr(command_buffer C.CommandBuffer, p_dependency_info &DependencyInfo) {
-	f := VkCmdPipelineBarrier2KHR((*vulkan.loader_p).get_sym('vkCmdPipelineBarrier2KHR') or {
-		println("Couldn't load symbol for 'vkCmdPipelineBarrier2KHR': ${err}")
-		return
-	})
-	f(command_buffer, p_dependency_info)
-}
-
-type VkCmdWriteTimestamp2KHR = fn (C.CommandBuffer, PipelineStageFlags2, C.QueryPool, u32)
-
-pub fn cmd_write_timestamp2_khr(command_buffer C.CommandBuffer, stage PipelineStageFlags2, query_pool C.QueryPool, query u32) {
-	f := VkCmdWriteTimestamp2KHR((*vulkan.loader_p).get_sym('vkCmdWriteTimestamp2KHR') or {
-		println("Couldn't load symbol for 'vkCmdWriteTimestamp2KHR': ${err}")
-		return
-	})
-	f(command_buffer, stage, query_pool, query)
-}
-
-type VkQueueSubmit2KHR = fn (C.Queue, u32, &SubmitInfo2, C.Fence) Result
-
-pub fn queue_submit2_khr(queue C.Queue, submit_count u32, p_submits &SubmitInfo2, fence C.Fence) Result {
-	f := VkQueueSubmit2KHR((*vulkan.loader_p).get_sym('vkQueueSubmit2KHR') or {
-		println("Couldn't load symbol for 'vkQueueSubmit2KHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(queue, submit_count, p_submits, fence)
-}
-
-type VkCmdWriteBufferMarker2AMD = fn (C.CommandBuffer, PipelineStageFlags2, C.Buffer, DeviceSize, u32)
-
-pub fn cmd_write_buffer_marker2_amd(command_buffer C.CommandBuffer, stage PipelineStageFlags2, dst_buffer C.Buffer, dst_offset DeviceSize, marker u32) {
-	f := VkCmdWriteBufferMarker2AMD((*vulkan.loader_p).get_sym('vkCmdWriteBufferMarker2AMD') or {
-		println("Couldn't load symbol for 'vkCmdWriteBufferMarker2AMD': ${err}")
-		return
-	})
-	f(command_buffer, stage, dst_buffer, dst_offset, marker)
-}
-
-type VkGetQueueCheckpointData2NV = fn (C.Queue, &u32, &CheckpointData2NV)
-
-pub fn get_queue_checkpoint_data2_nv(queue C.Queue, p_checkpoint_data_count &u32, p_checkpoint_data &CheckpointData2NV) {
-	f := VkGetQueueCheckpointData2NV((*vulkan.loader_p).get_sym('vkGetQueueCheckpointData2NV') or {
-		println("Couldn't load symbol for 'vkGetQueueCheckpointData2NV': ${err}")
-		return
-	})
-	f(queue, p_checkpoint_data_count, p_checkpoint_data)
-}
-
-// VK_KHR_fragment_shader_barycentric is a preprocessor guard. Do not pass it to API calls.
-const khr_fragment_shader_barycentric = 1
 pub const khr_fragment_shader_barycentric_spec_version = 1
 pub const khr_fragment_shader_barycentric_extension_name = 'VK_KHR_fragment_shader_barycentric'
-// PhysicalDeviceFragmentShaderBarycentricFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceFragmentShaderBarycentricFeaturesKHR {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	fragment_shader_barycentric Bool32
 }
 
-// PhysicalDeviceFragmentShaderBarycentricPropertiesKHR extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceFragmentShaderBarycentricPropertiesKHR {
-mut:
+pub mut:
 	s_type                                                 StructureType
 	p_next                                                 voidptr
 	tri_strip_vertex_order_independent_of_provoking_vertex Bool32
 }
 
-// VK_KHR_shader_subgroup_uniform_control_flow is a preprocessor guard. Do not pass it to API calls.
-const khr_shader_subgroup_uniform_control_flow = 1
 pub const khr_shader_subgroup_uniform_control_flow_spec_version = 1
 pub const khr_shader_subgroup_uniform_control_flow_extension_name = 'VK_KHR_shader_subgroup_uniform_control_flow'
-// PhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	shader_subgroup_uniform_control_flow Bool32
 }
 
-// VK_KHR_zero_initialize_workgroup_memory is a preprocessor guard. Do not pass it to API calls.
-const khr_zero_initialize_workgroup_memory = 1
 pub const khr_zero_initialize_workgroup_memory_spec_version = 1
 pub const khr_zero_initialize_workgroup_memory_extension_name = 'VK_KHR_zero_initialize_workgroup_memory'
 
 pub type PhysicalDeviceZeroInitializeWorkgroupMemoryFeaturesKHR = PhysicalDeviceZeroInitializeWorkgroupMemoryFeatures
 
-// VK_KHR_workgroup_memory_explicit_layout is a preprocessor guard. Do not pass it to API calls.
-const khr_workgroup_memory_explicit_layout = 1
 pub const khr_workgroup_memory_explicit_layout_spec_version = 1
 pub const khr_workgroup_memory_explicit_layout_extension_name = 'VK_KHR_workgroup_memory_explicit_layout'
-// PhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR {
-mut:
+pub mut:
 	s_type                                               StructureType
 	p_next                                               voidptr
 	workgroup_memory_explicit_layout                     Bool32
@@ -11814,8 +11352,6 @@ mut:
 	workgroup_memory_explicit_layout16_bit_access        Bool32
 }
 
-// VK_KHR_copy_commands2 is a preprocessor guard. Do not pass it to API calls.
-const khr_copy_commands2 = 1
 pub const khr_copy_commands_2_spec_version = 1
 pub const khr_copy_commands_2_extension_name = 'VK_KHR_copy_commands2'
 
@@ -11841,82 +11377,19 @@ pub type BufferImageCopy2KHR = BufferImageCopy2
 
 pub type ImageResolve2KHR = ImageResolve2
 
-type VkCmdCopyBuffer2KHR = fn (C.CommandBuffer, &CopyBufferInfo2)
-
-pub fn cmd_copy_buffer2_khr(command_buffer C.CommandBuffer, p_copy_buffer_info &CopyBufferInfo2) {
-	f := VkCmdCopyBuffer2KHR((*vulkan.loader_p).get_sym('vkCmdCopyBuffer2KHR') or {
-		println("Couldn't load symbol for 'vkCmdCopyBuffer2KHR': ${err}")
-		return
-	})
-	f(command_buffer, p_copy_buffer_info)
-}
-
-type VkCmdCopyImage2KHR = fn (C.CommandBuffer, &CopyImageInfo2)
-
-pub fn cmd_copy_image2_khr(command_buffer C.CommandBuffer, p_copy_image_info &CopyImageInfo2) {
-	f := VkCmdCopyImage2KHR((*vulkan.loader_p).get_sym('vkCmdCopyImage2KHR') or {
-		println("Couldn't load symbol for 'vkCmdCopyImage2KHR': ${err}")
-		return
-	})
-	f(command_buffer, p_copy_image_info)
-}
-
-type VkCmdCopyBufferToImage2KHR = fn (C.CommandBuffer, &CopyBufferToImageInfo2)
-
-pub fn cmd_copy_buffer_to_image2_khr(command_buffer C.CommandBuffer, p_copy_buffer_to_image_info &CopyBufferToImageInfo2) {
-	f := VkCmdCopyBufferToImage2KHR((*vulkan.loader_p).get_sym('vkCmdCopyBufferToImage2KHR') or {
-		println("Couldn't load symbol for 'vkCmdCopyBufferToImage2KHR': ${err}")
-		return
-	})
-	f(command_buffer, p_copy_buffer_to_image_info)
-}
-
-type VkCmdCopyImageToBuffer2KHR = fn (C.CommandBuffer, &CopyImageToBufferInfo2)
-
-pub fn cmd_copy_image_to_buffer2_khr(command_buffer C.CommandBuffer, p_copy_image_to_buffer_info &CopyImageToBufferInfo2) {
-	f := VkCmdCopyImageToBuffer2KHR((*vulkan.loader_p).get_sym('vkCmdCopyImageToBuffer2KHR') or {
-		println("Couldn't load symbol for 'vkCmdCopyImageToBuffer2KHR': ${err}")
-		return
-	})
-	f(command_buffer, p_copy_image_to_buffer_info)
-}
-
-type VkCmdBlitImage2KHR = fn (C.CommandBuffer, &BlitImageInfo2)
-
-pub fn cmd_blit_image2_khr(command_buffer C.CommandBuffer, p_blit_image_info &BlitImageInfo2) {
-	f := VkCmdBlitImage2KHR((*vulkan.loader_p).get_sym('vkCmdBlitImage2KHR') or {
-		println("Couldn't load symbol for 'vkCmdBlitImage2KHR': ${err}")
-		return
-	})
-	f(command_buffer, p_blit_image_info)
-}
-
-type VkCmdResolveImage2KHR = fn (C.CommandBuffer, &ResolveImageInfo2)
-
-pub fn cmd_resolve_image2_khr(command_buffer C.CommandBuffer, p_resolve_image_info &ResolveImageInfo2) {
-	f := VkCmdResolveImage2KHR((*vulkan.loader_p).get_sym('vkCmdResolveImage2KHR') or {
-		println("Couldn't load symbol for 'vkCmdResolveImage2KHR': ${err}")
-		return
-	})
-	f(command_buffer, p_resolve_image_info)
-}
-
-// VK_KHR_format_feature_flags2 is a preprocessor guard. Do not pass it to API calls.
-const khr_format_feature_flags2 = 1
 pub const khr_format_feature_flags_2_spec_version = 2
 pub const khr_format_feature_flags_2_extension_name = 'VK_KHR_format_feature_flags2'
 
+pub type FormatFeatureFlags2KHR = u64
 pub type FormatFeatureFlagBits2KHR = u64
 
 pub type FormatProperties3KHR = FormatProperties3
 
-// VK_KHR_ray_tracing_maintenance1 is a preprocessor guard. Do not pass it to API calls.
-const khr_ray_tracing_maintenance1 = 1
 pub const khr_ray_tracing_maintenance_1_spec_version = 1
 pub const khr_ray_tracing_maintenance_1_extension_name = 'VK_KHR_ray_tracing_maintenance1'
-// PhysicalDeviceRayTracingMaintenance1FeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceRayTracingMaintenance1FeaturesKHR {
-mut:
+pub mut:
 	s_type                                    StructureType
 	p_next                                    voidptr
 	ray_tracing_maintenance1                  Bool32
@@ -11924,7 +11397,7 @@ mut:
 }
 
 pub struct TraceRaysIndirectCommand2KHR {
-mut:
+pub mut:
 	raygen_shader_record_address          DeviceAddress
 	raygen_shader_record_size             DeviceSize
 	miss_shader_binding_table_address     DeviceAddress
@@ -11941,23 +11414,16 @@ mut:
 	depth                                 u32
 }
 
-type VkCmdTraceRaysIndirect2KHR = fn (C.CommandBuffer, DeviceAddress)
-
-pub fn cmd_trace_rays_indirect2_khr(command_buffer C.CommandBuffer, indirect_device_address DeviceAddress) {
-	f := VkCmdTraceRaysIndirect2KHR((*vulkan.loader_p).get_sym('vkCmdTraceRaysIndirect2KHR') or {
-		println("Couldn't load symbol for 'vkCmdTraceRaysIndirect2KHR': ${err}")
-		return
-	})
-	f(command_buffer, indirect_device_address)
+fn C.vkCmdTraceRaysIndirect2KHR(C.CommandBuffer,
+	DeviceAddress)
+pub fn cmd_trace_rays_indirect2_khr(command_buffer C.CommandBuffer,
+	indirect_device_address DeviceAddress) {
+	C.vkCmdTraceRaysIndirect2KHR(command_buffer, indirect_device_address)
 }
 
-// VK_KHR_portability_enumeration is a preprocessor guard. Do not pass it to API calls.
-const khr_portability_enumeration = 1
 pub const khr_portability_enumeration_spec_version = 1
 pub const khr_portability_enumeration_extension_name = 'VK_KHR_portability_enumeration'
 
-// VK_KHR_maintenance4 is a preprocessor guard. Do not pass it to API calls.
-const khr_maintenance4 = 1
 pub const khr_maintenance_4_spec_version = 2
 pub const khr_maintenance_4_extension_name = 'VK_KHR_maintenance4'
 
@@ -11969,38 +11435,27 @@ pub type DeviceBufferMemoryRequirementsKHR = DeviceBufferMemoryRequirements
 
 pub type DeviceImageMemoryRequirementsKHR = DeviceImageMemoryRequirements
 
-type VkGetDeviceBufferMemoryRequirementsKHR = fn (C.Device, &DeviceBufferMemoryRequirements, &MemoryRequirements2)
+pub const khr_shader_subgroup_rotate_spec_version = 2
+pub const khr_shader_subgroup_rotate_extension_name = 'VK_KHR_shader_subgroup_rotate'
 
-pub fn get_device_buffer_memory_requirements_khr(device C.Device, p_info &DeviceBufferMemoryRequirements, p_memory_requirements &MemoryRequirements2) {
-	f := VkGetDeviceBufferMemoryRequirementsKHR((*vulkan.loader_p).get_sym('vkGetDeviceBufferMemoryRequirementsKHR') or {
-		println("Couldn't load symbol for 'vkGetDeviceBufferMemoryRequirementsKHR': ${err}")
-		return
-	})
-	f(device, p_info, p_memory_requirements)
+pub struct PhysicalDeviceShaderSubgroupRotateFeaturesKHR {
+pub mut:
+	s_type                           StructureType
+	p_next                           voidptr
+	shader_subgroup_rotate           Bool32
+	shader_subgroup_rotate_clustered Bool32
 }
 
-type VkGetDeviceImageMemoryRequirementsKHR = fn (C.Device, &DeviceImageMemoryRequirements, &MemoryRequirements2)
+pub const khr_shader_maximal_reconvergence_spec_version = 1
+pub const khr_shader_maximal_reconvergence_extension_name = 'VK_KHR_shader_maximal_reconvergence'
 
-pub fn get_device_image_memory_requirements_khr(device C.Device, p_info &DeviceImageMemoryRequirements, p_memory_requirements &MemoryRequirements2) {
-	f := VkGetDeviceImageMemoryRequirementsKHR((*vulkan.loader_p).get_sym('vkGetDeviceImageMemoryRequirementsKHR') or {
-		println("Couldn't load symbol for 'vkGetDeviceImageMemoryRequirementsKHR': ${err}")
-		return
-	})
-	f(device, p_info, p_memory_requirements)
+pub struct PhysicalDeviceShaderMaximalReconvergenceFeaturesKHR {
+pub mut:
+	s_type                       StructureType
+	p_next                       voidptr
+	shader_maximal_reconvergence Bool32
 }
 
-type VkGetDeviceImageSparseMemoryRequirementsKHR = fn (C.Device, &DeviceImageMemoryRequirements, &u32, &SparseImageMemoryRequirements2)
-
-pub fn get_device_image_sparse_memory_requirements_khr(device C.Device, p_info &DeviceImageMemoryRequirements, p_sparse_memory_requirement_count &u32, p_sparse_memory_requirements &SparseImageMemoryRequirements2) {
-	f := VkGetDeviceImageSparseMemoryRequirementsKHR((*vulkan.loader_p).get_sym('vkGetDeviceImageSparseMemoryRequirementsKHR') or {
-		println("Couldn't load symbol for 'vkGetDeviceImageSparseMemoryRequirementsKHR': ${err}")
-		return
-	})
-	f(device, p_info, p_sparse_memory_requirement_count, p_sparse_memory_requirements)
-}
-
-// VK_KHR_maintenance5 is a preprocessor guard. Do not pass it to API calls.
-const khr_maintenance5 = 1
 pub const khr_maintenance_5_spec_version = 1
 pub const khr_maintenance_5_extension_name = 'VK_KHR_maintenance5'
 
@@ -12012,6 +11467,7 @@ pub type PipelineCreateFlagBits2KHR = u64
 pub const pipeline_create_2_disable_optimization_bit_khr = u64(0x00000001)
 pub const pipeline_create_2_allow_derivatives_bit_khr = u64(0x00000002)
 pub const pipeline_create_2_derivative_bit_khr = u64(0x00000004)
+pub const pipeline_create_2_enable_legacy_dithering_bit_ext = u64(0x400000000)
 pub const pipeline_create_2_view_index_from_device_index_bit_khr = u64(0x00000008)
 pub const pipeline_create_2_dispatch_base_bit_khr = u64(0x00000010)
 pub const pipeline_create_2_defer_compile_bit_nv = u64(0x00000020)
@@ -12063,6 +11519,8 @@ pub const buffer_usage_2_transform_feedback_buffer_bit_ext = u64(0x00000800)
 pub const buffer_usage_2_transform_feedback_counter_buffer_bit_ext = u64(0x00001000)
 pub const buffer_usage_2_video_decode_src_bit_khr = u64(0x00002000)
 pub const buffer_usage_2_video_decode_dst_bit_khr = u64(0x00004000)
+pub const buffer_usage_2_video_encode_dst_bit_khr = u64(0x00008000)
+pub const buffer_usage_2_video_encode_src_bit_khr = u64(0x00010000)
 pub const buffer_usage_2_shader_device_address_bit_khr = u64(0x00020000)
 pub const buffer_usage_2_acceleration_structure_build_input_read_only_bit_khr = u64(0x00080000)
 pub const buffer_usage_2_acceleration_structure_storage_bit_khr = u64(0x00100000)
@@ -12072,17 +11530,15 @@ pub const buffer_usage_2_push_descriptors_descriptor_buffer_bit_ext = u64(0x0400
 pub const buffer_usage_2_micromap_build_input_read_only_bit_ext = u64(0x00800000)
 pub const buffer_usage_2_micromap_storage_bit_ext = u64(0x01000000)
 
-// PhysicalDeviceMaintenance5FeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceMaintenance5FeaturesKHR {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	maintenance5 Bool32
 }
 
-// PhysicalDeviceMaintenance5PropertiesKHR extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceMaintenance5PropertiesKHR {
-mut:
+pub mut:
 	s_type                                                    StructureType
 	p_next                                                    voidptr
 	early_fragment_multisample_coverage_after_sample_counting Bool32
@@ -12094,7 +11550,7 @@ mut:
 }
 
 pub struct RenderingAreaInfoKHR {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	view_mask                  u32
@@ -12105,14 +11561,14 @@ mut:
 }
 
 pub struct ImageSubresource2KHR {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	image_subresource ImageSubresource
 }
 
 pub struct DeviceImageSubresourceInfoKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	p_create_info &ImageCreateInfo
@@ -12120,82 +11576,78 @@ mut:
 }
 
 pub struct SubresourceLayout2KHR {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	subresource_layout SubresourceLayout
 }
 
-// PipelineCreateFlags2CreateInfoKHR extends VkComputePipelineCreateInfo,VkGraphicsPipelineCreateInfo,VkRayTracingPipelineCreateInfoNV,VkRayTracingPipelineCreateInfoKHR
 pub struct PipelineCreateFlags2CreateInfoKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  PipelineCreateFlags2KHR
 }
 
-// BufferUsageFlags2CreateInfoKHR extends VkBufferViewCreateInfo,VkBufferCreateInfo,VkPhysicalDeviceExternalBufferInfo,VkDescriptorBufferBindingInfoEXT
 pub struct BufferUsageFlags2CreateInfoKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	usage  BufferUsageFlags2KHR
 }
 
-type VkCmdBindIndexBuffer2KHR = fn (C.CommandBuffer, C.Buffer, DeviceSize, DeviceSize, IndexType)
-
-pub fn cmd_bind_index_buffer2_khr(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, size DeviceSize, index_type IndexType) {
-	f := VkCmdBindIndexBuffer2KHR((*vulkan.loader_p).get_sym('vkCmdBindIndexBuffer2KHR') or {
-		println("Couldn't load symbol for 'vkCmdBindIndexBuffer2KHR': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, size, index_type)
+fn C.vkCmdBindIndexBuffer2KHR(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	DeviceSize,
+	IndexType)
+pub fn cmd_bind_index_buffer2_khr(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize,
+	size DeviceSize,
+	index_type IndexType) {
+	C.vkCmdBindIndexBuffer2KHR(command_buffer, buffer, offset, size, index_type)
 }
 
-type VkGetRenderingAreaGranularityKHR = fn (C.Device, &RenderingAreaInfoKHR, &Extent2D)
-
-pub fn get_rendering_area_granularity_khr(device C.Device, p_rendering_area_info &RenderingAreaInfoKHR, p_granularity &Extent2D) {
-	f := VkGetRenderingAreaGranularityKHR((*vulkan.loader_p).get_sym('vkGetRenderingAreaGranularityKHR') or {
-		println("Couldn't load symbol for 'vkGetRenderingAreaGranularityKHR': ${err}")
-		return
-	})
-	f(device, p_rendering_area_info, p_granularity)
+fn C.vkGetRenderingAreaGranularityKHR(C.Device,
+	&RenderingAreaInfoKHR,
+	&Extent2D)
+pub fn get_rendering_area_granularity_khr(device C.Device,
+	p_rendering_area_info &RenderingAreaInfoKHR,
+	p_granularity &Extent2D) {
+	C.vkGetRenderingAreaGranularityKHR(device, p_rendering_area_info, p_granularity)
 }
 
-type VkGetDeviceImageSubresourceLayoutKHR = fn (C.Device, &DeviceImageSubresourceInfoKHR, &SubresourceLayout2KHR)
-
-pub fn get_device_image_subresource_layout_khr(device C.Device, p_info &DeviceImageSubresourceInfoKHR, p_layout &SubresourceLayout2KHR) {
-	f := VkGetDeviceImageSubresourceLayoutKHR((*vulkan.loader_p).get_sym('vkGetDeviceImageSubresourceLayoutKHR') or {
-		println("Couldn't load symbol for 'vkGetDeviceImageSubresourceLayoutKHR': ${err}")
-		return
-	})
-	f(device, p_info, p_layout)
+fn C.vkGetDeviceImageSubresourceLayoutKHR(C.Device,
+	&DeviceImageSubresourceInfoKHR,
+	&SubresourceLayout2KHR)
+pub fn get_device_image_subresource_layout_khr(device C.Device,
+	p_info &DeviceImageSubresourceInfoKHR,
+	p_layout &SubresourceLayout2KHR) {
+	C.vkGetDeviceImageSubresourceLayoutKHR(device, p_info, p_layout)
 }
 
-type VkGetImageSubresourceLayout2KHR = fn (C.Device, C.Image, &ImageSubresource2KHR, &SubresourceLayout2KHR)
-
-pub fn get_image_subresource_layout2_khr(device C.Device, image C.Image, p_subresource &ImageSubresource2KHR, p_layout &SubresourceLayout2KHR) {
-	f := VkGetImageSubresourceLayout2KHR((*vulkan.loader_p).get_sym('vkGetImageSubresourceLayout2KHR') or {
-		println("Couldn't load symbol for 'vkGetImageSubresourceLayout2KHR': ${err}")
-		return
-	})
-	f(device, image, p_subresource, p_layout)
+fn C.vkGetImageSubresourceLayout2KHR(C.Device,
+	C.Image,
+	&ImageSubresource2KHR,
+	&SubresourceLayout2KHR)
+pub fn get_image_subresource_layout2_khr(device C.Device,
+	image C.Image,
+	p_subresource &ImageSubresource2KHR,
+	p_layout &SubresourceLayout2KHR) {
+	C.vkGetImageSubresourceLayout2KHR(device, image, p_subresource, p_layout)
 }
 
-// VK_KHR_ray_tracing_position_fetch is a preprocessor guard. Do not pass it to API calls.
-const khr_ray_tracing_position_fetch = 1
 pub const khr_ray_tracing_position_fetch_spec_version = 1
 pub const khr_ray_tracing_position_fetch_extension_name = 'VK_KHR_ray_tracing_position_fetch'
-// PhysicalDeviceRayTracingPositionFetchFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceRayTracingPositionFetchFeaturesKHR {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	ray_tracing_position_fetch Bool32
 }
 
-// VK_KHR_cooperative_matrix is a preprocessor guard. Do not pass it to API calls.
-const khr_cooperative_matrix = 1
 pub const khr_cooperative_matrix_spec_version = 2
 pub const khr_cooperative_matrix_extension_name = 'VK_KHR_cooperative_matrix'
 
@@ -12223,7 +11675,7 @@ pub enum ScopeKHR {
 }
 
 pub struct CooperativeMatrixPropertiesKHR {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	m_size                  u32
@@ -12237,35 +11689,456 @@ mut:
 	scope                   ScopeKHR
 }
 
-// PhysicalDeviceCooperativeMatrixFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceCooperativeMatrixFeaturesKHR {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	cooperative_matrix                      Bool32
 	cooperative_matrix_robust_buffer_access Bool32
 }
 
-// PhysicalDeviceCooperativeMatrixPropertiesKHR extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceCooperativeMatrixPropertiesKHR {
-mut:
+pub mut:
 	s_type                              StructureType
 	p_next                              voidptr
 	cooperative_matrix_supported_stages ShaderStageFlags
 }
 
-type VkGetPhysicalDeviceCooperativeMatrixPropertiesKHR = fn (C.PhysicalDevice, &u32, &CooperativeMatrixPropertiesKHR) Result
-
-pub fn get_physical_device_cooperative_matrix_properties_khr(physical_device C.PhysicalDevice, p_property_count &u32, p_properties &CooperativeMatrixPropertiesKHR) Result {
-	f := VkGetPhysicalDeviceCooperativeMatrixPropertiesKHR((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_property_count, p_properties)
+fn C.vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR(C.PhysicalDevice,
+	&u32,
+	&CooperativeMatrixPropertiesKHR) Result
+pub fn get_physical_device_cooperative_matrix_properties_khr(physical_device C.PhysicalDevice,
+	p_property_count &u32,
+	p_properties &CooperativeMatrixPropertiesKHR) Result {
+	return C.vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR(physical_device, p_property_count,
+		p_properties)
 }
 
-// VK_EXT_debug_report is a preprocessor guard. Do not pass it to API calls.
-const ext_debug_report = 1
+#include "vk_video/vulkan_video_codec_av1std.h"
+#include "vk_video/vulkan_video_codec_av1std_decode.h"
+
+pub const max_video_av1_references_per_frame_khr = u32(7)
+pub const khr_video_decode_av1_spec_version = 1
+pub const khr_video_decode_av1_extension_name = 'VK_KHR_video_decode_av1'
+
+pub struct VideoDecodeAV1ProfileInfoKHR {
+pub mut:
+	s_type             StructureType
+	p_next             voidptr
+	std_profile        u32
+	film_grain_support Bool32
+}
+
+pub struct VideoDecodeAV1CapabilitiesKHR {
+pub mut:
+	s_type    StructureType
+	p_next    voidptr
+	max_level u32
+}
+
+pub struct VideoDecodeAV1SessionParametersCreateInfoKHR {
+pub mut:
+	s_type                StructureType
+	p_next                voidptr
+	p_std_sequence_header &voidptr
+}
+
+pub struct VideoDecodeAV1PictureInfoKHR {
+pub mut:
+	s_type                      StructureType
+	p_next                      voidptr
+	p_std_picture_info          &voidptr
+	reference_name_slot_indices [max_video_av1_references_per_frame_khr]i32
+	frame_header_offset         u32
+	tile_count                  u32
+	p_tile_offsets              &u32
+	p_tile_sizes                &u32
+}
+
+pub struct VideoDecodeAV1DpbSlotInfoKHR {
+pub mut:
+	s_type               StructureType
+	p_next               voidptr
+	p_std_reference_info &voidptr
+}
+
+pub const khr_video_maintenance_1_spec_version = 1
+pub const khr_video_maintenance_1_extension_name = 'VK_KHR_video_maintenance1'
+
+pub struct PhysicalDeviceVideoMaintenance1FeaturesKHR {
+pub mut:
+	s_type             StructureType
+	p_next             voidptr
+	video_maintenance1 Bool32
+}
+
+pub struct VideoInlineQueryInfoKHR {
+pub mut:
+	s_type      StructureType
+	p_next      voidptr
+	query_pool  C.QueryPool
+	first_query u32
+	query_count u32
+}
+
+pub const khr_vertex_attribute_divisor_spec_version = 1
+pub const khr_vertex_attribute_divisor_extension_name = 'VK_KHR_vertex_attribute_divisor'
+
+pub struct PhysicalDeviceVertexAttributeDivisorPropertiesKHR {
+pub mut:
+	s_type                           StructureType
+	p_next                           voidptr
+	max_vertex_attrib_divisor        u32
+	supports_non_zero_first_instance Bool32
+}
+
+pub struct VertexInputBindingDivisorDescriptionKHR {
+pub mut:
+	binding u32
+	divisor u32
+}
+
+pub struct PipelineVertexInputDivisorStateCreateInfoKHR {
+pub mut:
+	s_type                       StructureType
+	p_next                       voidptr
+	vertex_binding_divisor_count u32
+	p_vertex_binding_divisors    &VertexInputBindingDivisorDescriptionKHR
+}
+
+pub struct PhysicalDeviceVertexAttributeDivisorFeaturesKHR {
+pub mut:
+	s_type                                      StructureType
+	p_next                                      voidptr
+	vertex_attribute_instance_rate_divisor      Bool32
+	vertex_attribute_instance_rate_zero_divisor Bool32
+}
+
+pub const khr_load_store_op_none_spec_version = 1
+pub const khr_load_store_op_none_extension_name = 'VK_KHR_load_store_op_none'
+
+pub const khr_shader_float_controls_2_spec_version = 1
+pub const khr_shader_float_controls_2_extension_name = 'VK_KHR_shader_float_controls2'
+
+pub struct PhysicalDeviceShaderFloatControls2FeaturesKHR {
+pub mut:
+	s_type                 StructureType
+	p_next                 voidptr
+	shader_float_controls2 Bool32
+}
+
+pub const khr_index_type_uint8_spec_version = 1
+pub const khr_index_type_uint8_extension_name = 'VK_KHR_index_type_uint8'
+
+pub struct PhysicalDeviceIndexTypeUint8FeaturesKHR {
+pub mut:
+	s_type           StructureType
+	p_next           voidptr
+	index_type_uint8 Bool32
+}
+
+pub const khr_line_rasterization_spec_version = 1
+pub const khr_line_rasterization_extension_name = 'VK_KHR_line_rasterization'
+
+pub enum LineRasterizationModeKHR {
+	line_rasterization_mode_default_khr            = int(0)
+	line_rasterization_mode_rectangular_khr        = int(1)
+	line_rasterization_mode_bresenham_khr          = int(2)
+	line_rasterization_mode_rectangular_smooth_khr = int(3)
+	line_rasterization_mode_max_enum_khr           = int(0x7FFFFFFF)
+}
+
+pub struct PhysicalDeviceLineRasterizationFeaturesKHR {
+pub mut:
+	s_type                     StructureType
+	p_next                     voidptr
+	rectangular_lines          Bool32
+	bresenham_lines            Bool32
+	smooth_lines               Bool32
+	stippled_rectangular_lines Bool32
+	stippled_bresenham_lines   Bool32
+	stippled_smooth_lines      Bool32
+}
+
+pub struct PhysicalDeviceLineRasterizationPropertiesKHR {
+pub mut:
+	s_type                        StructureType
+	p_next                        voidptr
+	line_sub_pixel_precision_bits u32
+}
+
+pub struct PipelineRasterizationLineStateCreateInfoKHR {
+pub mut:
+	s_type                  StructureType
+	p_next                  voidptr
+	line_rasterization_mode LineRasterizationModeKHR
+	stippled_line_enable    Bool32
+	line_stipple_factor     u32
+	line_stipple_pattern    u16
+}
+
+fn C.vkCmdSetLineStippleKHR(C.CommandBuffer,
+	u32,
+	u16)
+pub fn cmd_set_line_stipple_khr(command_buffer C.CommandBuffer,
+	line_stipple_factor u32,
+	line_stipple_pattern u16) {
+	C.vkCmdSetLineStippleKHR(command_buffer, line_stipple_factor, line_stipple_pattern)
+}
+
+pub const khr_calibrated_timestamps_spec_version = 1
+pub const khr_calibrated_timestamps_extension_name = 'VK_KHR_calibrated_timestamps'
+
+pub enum TimeDomainKHR {
+	time_domain_device_khr                    = int(0)
+	time_domain_clock_monotonic_khr           = int(1)
+	time_domain_clock_monotonic_raw_khr       = int(2)
+	time_domain_query_performance_counter_khr = int(3)
+	time_domain_max_enum_khr                  = int(0x7FFFFFFF)
+}
+
+pub struct CalibratedTimestampInfoKHR {
+pub mut:
+	s_type      StructureType
+	p_next      voidptr
+	time_domain TimeDomainKHR
+}
+
+fn C.vkGetPhysicalDeviceCalibrateableTimeDomainsKHR(C.PhysicalDevice,
+	&u32,
+	&TimeDomainKHR) Result
+pub fn get_physical_device_calibrateable_time_domains_khr(physical_device C.PhysicalDevice,
+	p_time_domain_count &u32,
+	p_time_domains &TimeDomainKHR) Result {
+	return C.vkGetPhysicalDeviceCalibrateableTimeDomainsKHR(physical_device, p_time_domain_count,
+		p_time_domains)
+}
+
+fn C.vkGetCalibratedTimestampsKHR(C.Device,
+	u32,
+	&CalibratedTimestampInfoKHR,
+	&u64,
+	&u64) Result
+pub fn get_calibrated_timestamps_khr(device C.Device,
+	timestamp_count u32,
+	p_timestamp_infos &CalibratedTimestampInfoKHR,
+	p_timestamps &u64,
+	p_max_deviation &u64) Result {
+	return C.vkGetCalibratedTimestampsKHR(device, timestamp_count, p_timestamp_infos,
+		p_timestamps, p_max_deviation)
+}
+
+pub const khr_shader_expect_assume_spec_version = 1
+pub const khr_shader_expect_assume_extension_name = 'VK_KHR_shader_expect_assume'
+
+pub struct PhysicalDeviceShaderExpectAssumeFeaturesKHR {
+pub mut:
+	s_type               StructureType
+	p_next               voidptr
+	shader_expect_assume Bool32
+}
+
+pub const khr_maintenance_6_spec_version = 1
+pub const khr_maintenance_6_extension_name = 'VK_KHR_maintenance6'
+
+pub struct PhysicalDeviceMaintenance6FeaturesKHR {
+pub mut:
+	s_type       StructureType
+	p_next       voidptr
+	maintenance6 Bool32
+}
+
+pub struct PhysicalDeviceMaintenance6PropertiesKHR {
+pub mut:
+	s_type                                      StructureType
+	p_next                                      voidptr
+	block_texel_view_compatible_multiple_layers Bool32
+	max_combined_image_sampler_descriptor_count u32
+	fragment_shading_rate_clamp_combiner_inputs Bool32
+}
+
+pub struct BindMemoryStatusKHR {
+pub mut:
+	s_type   StructureType
+	p_next   voidptr
+	p_result &Result
+}
+
+pub struct BindDescriptorSetsInfoKHR {
+pub mut:
+	s_type               StructureType
+	p_next               voidptr
+	stage_flags          ShaderStageFlags
+	layout               C.PipelineLayout
+	first_set            u32
+	descriptor_set_count u32
+	p_descriptor_sets    &C.DescriptorSet
+	dynamic_offset_count u32
+	p_dynamic_offsets    &u32
+}
+
+pub struct PushConstantsInfoKHR {
+pub mut:
+	s_type      StructureType
+	p_next      voidptr
+	layout      C.PipelineLayout
+	stage_flags ShaderStageFlags
+	offset      u32
+	size        u32
+	p_values    voidptr
+}
+
+pub struct PushDescriptorSetInfoKHR {
+pub mut:
+	s_type                 StructureType
+	p_next                 voidptr
+	stage_flags            ShaderStageFlags
+	layout                 C.PipelineLayout
+	set                    u32
+	descriptor_write_count u32
+	p_descriptor_writes    &WriteDescriptorSet
+}
+
+pub struct PushDescriptorSetWithTemplateInfoKHR {
+pub mut:
+	s_type                     StructureType
+	p_next                     voidptr
+	descriptor_update_template C.DescriptorUpdateTemplate
+	layout                     C.PipelineLayout
+	set                        u32
+	p_data                     voidptr
+}
+
+pub struct SetDescriptorBufferOffsetsInfoEXT {
+pub mut:
+	s_type           StructureType
+	p_next           voidptr
+	stage_flags      ShaderStageFlags
+	layout           C.PipelineLayout
+	first_set        u32
+	set_count        u32
+	p_buffer_indices &u32
+	p_offsets        &DeviceSize
+}
+
+pub struct BindDescriptorBufferEmbeddedSamplersInfoEXT {
+pub mut:
+	s_type      StructureType
+	p_next      voidptr
+	stage_flags ShaderStageFlags
+	layout      C.PipelineLayout
+	set         u32
+}
+
+fn C.vkCmdBindDescriptorSets2KHR(C.CommandBuffer,
+	&BindDescriptorSetsInfoKHR)
+pub fn cmd_bind_descriptor_sets2_khr(command_buffer C.CommandBuffer,
+	p_bind_descriptor_sets_info &BindDescriptorSetsInfoKHR) {
+	C.vkCmdBindDescriptorSets2KHR(command_buffer, p_bind_descriptor_sets_info)
+}
+
+fn C.vkCmdPushConstants2KHR(C.CommandBuffer,
+	&PushConstantsInfoKHR)
+pub fn cmd_push_constants2_khr(command_buffer C.CommandBuffer,
+	p_push_constants_info &PushConstantsInfoKHR) {
+	C.vkCmdPushConstants2KHR(command_buffer, p_push_constants_info)
+}
+
+fn C.vkCmdPushDescriptorSet2KHR(C.CommandBuffer,
+	&PushDescriptorSetInfoKHR)
+pub fn cmd_push_descriptor_set2_khr(command_buffer C.CommandBuffer,
+	p_push_descriptor_set_info &PushDescriptorSetInfoKHR) {
+	C.vkCmdPushDescriptorSet2KHR(command_buffer, p_push_descriptor_set_info)
+}
+
+fn C.vkCmdPushDescriptorSetWithTemplate2KHR(C.CommandBuffer,
+	&PushDescriptorSetWithTemplateInfoKHR)
+pub fn cmd_push_descriptor_set_with_template2_khr(command_buffer C.CommandBuffer,
+	p_push_descriptor_set_with_template_info &PushDescriptorSetWithTemplateInfoKHR) {
+	C.vkCmdPushDescriptorSetWithTemplate2KHR(command_buffer, p_push_descriptor_set_with_template_info)
+}
+
+fn C.vkCmdSetDescriptorBufferOffsets2EXT(C.CommandBuffer,
+	&SetDescriptorBufferOffsetsInfoEXT)
+pub fn cmd_set_descriptor_buffer_offsets2_ext(command_buffer C.CommandBuffer,
+	p_set_descriptor_buffer_offsets_info &SetDescriptorBufferOffsetsInfoEXT) {
+	C.vkCmdSetDescriptorBufferOffsets2EXT(command_buffer, p_set_descriptor_buffer_offsets_info)
+}
+
+fn C.vkCmdBindDescriptorBufferEmbeddedSamplers2EXT(C.CommandBuffer,
+	&BindDescriptorBufferEmbeddedSamplersInfoEXT)
+pub fn cmd_bind_descriptor_buffer_embedded_samplers2_ext(command_buffer C.CommandBuffer,
+	p_bind_descriptor_buffer_embedded_samplers_info &BindDescriptorBufferEmbeddedSamplersInfoEXT) {
+	C.vkCmdBindDescriptorBufferEmbeddedSamplers2EXT(command_buffer, p_bind_descriptor_buffer_embedded_samplers_info)
+}
+
+pub const khr_shader_relaxed_extended_instruction_spec_version = 1
+pub const khr_shader_relaxed_extended_instruction_extension_name = 'VK_KHR_shader_relaxed_extended_instruction'
+
+pub struct PhysicalDeviceShaderRelaxedExtendedInstructionFeaturesKHR {
+pub mut:
+	s_type                              StructureType
+	p_next                              voidptr
+	shader_relaxed_extended_instruction Bool32
+}
+
+pub const khr_maintenance_7_spec_version = 1
+pub const khr_maintenance_7_extension_name = 'VK_KHR_maintenance7'
+
+pub enum PhysicalDeviceLayeredApiKHR {
+	physical_device_layered_api_vulkan_khr   = int(0)
+	physical_device_layered_api_d3d12_khr    = int(1)
+	physical_device_layered_api_metal_khr    = int(2)
+	physical_device_layered_api_opengl_khr   = int(3)
+	physical_device_layered_api_opengles_khr = int(4)
+	physical_device_layered_api_max_enum_khr = int(0x7FFFFFFF)
+}
+
+pub struct PhysicalDeviceMaintenance7FeaturesKHR {
+pub mut:
+	s_type       StructureType
+	p_next       voidptr
+	maintenance7 Bool32
+}
+
+pub struct PhysicalDeviceMaintenance7PropertiesKHR {
+pub mut:
+	s_type                                                             StructureType
+	p_next                                                             voidptr
+	robust_fragment_shading_rate_attachment_access                     Bool32
+	separate_depth_stencil_attachment_access                           Bool32
+	max_descriptor_set_total_uniform_buffers_dynamic                   u32
+	max_descriptor_set_total_storage_buffers_dynamic                   u32
+	max_descriptor_set_total_buffers_dynamic                           u32
+	max_descriptor_set_update_after_bind_total_uniform_buffers_dynamic u32
+	max_descriptor_set_update_after_bind_total_storage_buffers_dynamic u32
+	max_descriptor_set_update_after_bind_total_buffers_dynamic         u32
+}
+
+pub struct PhysicalDeviceLayeredApiPropertiesKHR {
+pub mut:
+	s_type      StructureType
+	p_next      voidptr
+	vendor_id   u32
+	device_id   u32
+	layered_api PhysicalDeviceLayeredApiKHR
+	device_name [max_physical_device_name_size]char
+}
+
+pub struct PhysicalDeviceLayeredApiPropertiesListKHR {
+pub mut:
+	s_type            StructureType
+	p_next            voidptr
+	layered_api_count u32
+	p_layered_apis    &PhysicalDeviceLayeredApiPropertiesKHR
+}
+
+pub struct PhysicalDeviceLayeredApiVulkanPropertiesKHR {
+pub mut:
+	s_type     StructureType
+	p_next     voidptr
+	properties PhysicalDeviceProperties2
+}
 
 pub type C.DebugReportCallbackEXT = voidptr
 
@@ -12327,11 +12200,10 @@ pub enum DebugReportFlagBitsEXT {
 }
 
 pub type DebugReportFlagsEXT = u32
-pub type PFN_vkDebugReportCallbackEXT = fn (flags DebugReportFlagsEXT, objectType DebugReportObjectTypeEXT, object u64, location usize, messageCode i32, pLayerPrefix &char, pMessage &char, pUserData voidptr) voidptr
+pub type PFN_vkDebugReportCallbackEXT = fn (flags DebugReportFlagsEXT, objectType DebugReportObjectTypeEXT, object u64, location usize, messageCode i32, pLayerPrefix &char, pMessage &char, pUserData voidptr)
 
-// DebugReportCallbackCreateInfoEXT extends VkInstanceCreateInfo
 pub struct DebugReportCallbackCreateInfoEXT {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	flags        DebugReportFlagsEXT
@@ -12339,53 +12211,55 @@ mut:
 	p_user_data  voidptr
 }
 
-type VkCreateDebugReportCallbackEXT = fn (C.Instance, &DebugReportCallbackCreateInfoEXT, &AllocationCallbacks, &C.DebugReportCallbackEXT) Result
-
-pub fn create_debug_report_callback_ext(instance C.Instance, p_create_info &DebugReportCallbackCreateInfoEXT, p_allocator &AllocationCallbacks, p_callback &C.DebugReportCallbackEXT) Result {
-	f := VkCreateDebugReportCallbackEXT((*vulkan.loader_p).get_sym('vkCreateDebugReportCallbackEXT') or {
-		println("Couldn't load symbol for 'vkCreateDebugReportCallbackEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_callback)
+fn C.vkCreateDebugReportCallbackEXT(C.Instance,
+	&DebugReportCallbackCreateInfoEXT,
+	&AllocationCallbacks,
+	&C.DebugReportCallbackEXT) Result
+pub fn create_debug_report_callback_ext(instance C.Instance,
+	p_create_info &DebugReportCallbackCreateInfoEXT,
+	p_allocator &AllocationCallbacks,
+	p_callback &C.DebugReportCallbackEXT) Result {
+	return C.vkCreateDebugReportCallbackEXT(instance, p_create_info, p_allocator, p_callback)
 }
 
-type VkDestroyDebugReportCallbackEXT = fn (C.Instance, C.DebugReportCallbackEXT, &AllocationCallbacks)
-
-pub fn destroy_debug_report_callback_ext(instance C.Instance, callback C.DebugReportCallbackEXT, p_allocator &AllocationCallbacks) {
-	f := VkDestroyDebugReportCallbackEXT((*vulkan.loader_p).get_sym('vkDestroyDebugReportCallbackEXT') or {
-		println("Couldn't load symbol for 'vkDestroyDebugReportCallbackEXT': ${err}")
-		return
-	})
-	f(instance, callback, p_allocator)
+fn C.vkDestroyDebugReportCallbackEXT(C.Instance,
+	C.DebugReportCallbackEXT,
+	&AllocationCallbacks)
+pub fn destroy_debug_report_callback_ext(instance C.Instance,
+	callback C.DebugReportCallbackEXT,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyDebugReportCallbackEXT(instance, callback, p_allocator)
 }
 
-type VkDebugReportMessageEXT = fn (C.Instance, DebugReportFlagsEXT, DebugReportObjectTypeEXT, u64, usize, i32, &char, &char)
-
-pub fn debug_report_message_ext(instance C.Instance, flags DebugReportFlagsEXT, object_type DebugReportObjectTypeEXT, object u64, location usize, message_code i32, p_layer_prefix &char, p_message &char) {
-	f := VkDebugReportMessageEXT((*vulkan.loader_p).get_sym('vkDebugReportMessageEXT') or {
-		println("Couldn't load symbol for 'vkDebugReportMessageEXT': ${err}")
-		return
-	})
-	f(instance, flags, object_type, object, location, message_code, p_layer_prefix, p_message)
+fn C.vkDebugReportMessageEXT(C.Instance,
+	DebugReportFlagsEXT,
+	DebugReportObjectTypeEXT,
+	u64,
+	usize,
+	i32,
+	&char,
+	&char)
+pub fn debug_report_message_ext(instance C.Instance,
+	flags DebugReportFlagsEXT,
+	object_type DebugReportObjectTypeEXT,
+	object u64,
+	location usize,
+	message_code i32,
+	p_layer_prefix &char,
+	p_message &char) {
+	C.vkDebugReportMessageEXT(instance, flags, object_type, object, location, message_code,
+		p_layer_prefix, p_message)
 }
 
-// VK_NV_glsl_shader is a preprocessor guard. Do not pass it to API calls.
-const nv_glsl_shader = 1
 pub const nv_glsl_shader_spec_version = 1
 pub const nv_glsl_shader_extension_name = 'VK_NV_glsl_shader'
 
-// VK_EXT_depth_range_unrestricted is a preprocessor guard. Do not pass it to API calls.
-const ext_depth_range_unrestricted = 1
 pub const ext_depth_range_unrestricted_spec_version = 1
 pub const ext_depth_range_unrestricted_extension_name = 'VK_EXT_depth_range_unrestricted'
 
-// VK_IMG_filter_cubic is a preprocessor guard. Do not pass it to API calls.
-const img_filter_cubic = 1
 pub const img_filter_cubic_spec_version = 1
 pub const img_filter_cubic_extension_name = 'VK_IMG_filter_cubic'
 
-// VK_AMD_rasterization_order is a preprocessor guard. Do not pass it to API calls.
-const amd_rasterization_order = 1
 pub const amd_rasterization_order_spec_version = 1
 pub const amd_rasterization_order_extension_name = 'VK_AMD_rasterization_order'
 
@@ -12395,31 +12269,24 @@ pub enum RasterizationOrderAMD {
 	rasterization_order_max_enum_amd = int(0x7FFFFFFF)
 }
 
-// PipelineRasterizationStateRasterizationOrderAMD extends VkPipelineRasterizationStateCreateInfo
 pub struct PipelineRasterizationStateRasterizationOrderAMD {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	rasterization_order RasterizationOrderAMD
 }
 
-// VK_AMD_shader_trinary_minmax is a preprocessor guard. Do not pass it to API calls.
-const amd_shader_trinary_minmax = 1
 pub const amd_shader_trinary_minmax_spec_version = 1
 pub const amd_shader_trinary_minmax_extension_name = 'VK_AMD_shader_trinary_minmax'
 
-// VK_AMD_shader_explicit_vertex_parameter is a preprocessor guard. Do not pass it to API calls.
-const amd_shader_explicit_vertex_parameter = 1
 pub const amd_shader_explicit_vertex_parameter_spec_version = 1
 pub const amd_shader_explicit_vertex_parameter_extension_name = 'VK_AMD_shader_explicit_vertex_parameter'
 
-// VK_EXT_debug_marker is a preprocessor guard. Do not pass it to API calls.
-const ext_debug_marker = 1
 pub const ext_debug_marker_spec_version = 4
 pub const ext_debug_marker_extension_name = 'VK_EXT_debug_marker'
 
 pub struct DebugMarkerObjectNameInfoEXT {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	object_type   DebugReportObjectTypeEXT
@@ -12428,7 +12295,7 @@ mut:
 }
 
 pub struct DebugMarkerObjectTagInfoEXT {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	object_type DebugReportObjectTypeEXT
@@ -12439,116 +12306,89 @@ mut:
 }
 
 pub struct DebugMarkerMarkerInfoEXT {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	p_marker_name &char
-	color         []f32
+	color         [4]f32
 }
 
-type VkDebugMarkerSetObjectTagEXT = fn (C.Device, &DebugMarkerObjectTagInfoEXT) Result
-
-pub fn debug_marker_set_object_tag_ext(device C.Device, p_tag_info &DebugMarkerObjectTagInfoEXT) Result {
-	f := VkDebugMarkerSetObjectTagEXT((*vulkan.loader_p).get_sym('vkDebugMarkerSetObjectTagEXT') or {
-		println("Couldn't load symbol for 'vkDebugMarkerSetObjectTagEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_tag_info)
+fn C.vkDebugMarkerSetObjectTagEXT(C.Device,
+	&DebugMarkerObjectTagInfoEXT) Result
+pub fn debug_marker_set_object_tag_ext(device C.Device,
+	p_tag_info &DebugMarkerObjectTagInfoEXT) Result {
+	return C.vkDebugMarkerSetObjectTagEXT(device, p_tag_info)
 }
 
-type VkDebugMarkerSetObjectNameEXT = fn (C.Device, &DebugMarkerObjectNameInfoEXT) Result
-
-pub fn debug_marker_set_object_name_ext(device C.Device, p_name_info &DebugMarkerObjectNameInfoEXT) Result {
-	f := VkDebugMarkerSetObjectNameEXT((*vulkan.loader_p).get_sym('vkDebugMarkerSetObjectNameEXT') or {
-		println("Couldn't load symbol for 'vkDebugMarkerSetObjectNameEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_name_info)
+fn C.vkDebugMarkerSetObjectNameEXT(C.Device,
+	&DebugMarkerObjectNameInfoEXT) Result
+pub fn debug_marker_set_object_name_ext(device C.Device,
+	p_name_info &DebugMarkerObjectNameInfoEXT) Result {
+	return C.vkDebugMarkerSetObjectNameEXT(device, p_name_info)
 }
 
-type VkCmdDebugMarkerBeginEXT = fn (C.CommandBuffer, &DebugMarkerMarkerInfoEXT)
-
-pub fn cmd_debug_marker_begin_ext(command_buffer C.CommandBuffer, p_marker_info &DebugMarkerMarkerInfoEXT) {
-	f := VkCmdDebugMarkerBeginEXT((*vulkan.loader_p).get_sym('vkCmdDebugMarkerBeginEXT') or {
-		println("Couldn't load symbol for 'vkCmdDebugMarkerBeginEXT': ${err}")
-		return
-	})
-	f(command_buffer, p_marker_info)
+fn C.vkCmdDebugMarkerBeginEXT(C.CommandBuffer,
+	&DebugMarkerMarkerInfoEXT)
+pub fn cmd_debug_marker_begin_ext(command_buffer C.CommandBuffer,
+	p_marker_info &DebugMarkerMarkerInfoEXT) {
+	C.vkCmdDebugMarkerBeginEXT(command_buffer, p_marker_info)
 }
 
-type VkCmdDebugMarkerEndEXT = fn (C.CommandBuffer)
-
+fn C.vkCmdDebugMarkerEndEXT(C.CommandBuffer)
 pub fn cmd_debug_marker_end_ext(command_buffer C.CommandBuffer) {
-	f := VkCmdDebugMarkerEndEXT((*vulkan.loader_p).get_sym('vkCmdDebugMarkerEndEXT') or {
-		println("Couldn't load symbol for 'vkCmdDebugMarkerEndEXT': ${err}")
-		return
-	})
-	f(command_buffer)
+	C.vkCmdDebugMarkerEndEXT(command_buffer)
 }
 
-type VkCmdDebugMarkerInsertEXT = fn (C.CommandBuffer, &DebugMarkerMarkerInfoEXT)
-
-pub fn cmd_debug_marker_insert_ext(command_buffer C.CommandBuffer, p_marker_info &DebugMarkerMarkerInfoEXT) {
-	f := VkCmdDebugMarkerInsertEXT((*vulkan.loader_p).get_sym('vkCmdDebugMarkerInsertEXT') or {
-		println("Couldn't load symbol for 'vkCmdDebugMarkerInsertEXT': ${err}")
-		return
-	})
-	f(command_buffer, p_marker_info)
+fn C.vkCmdDebugMarkerInsertEXT(C.CommandBuffer,
+	&DebugMarkerMarkerInfoEXT)
+pub fn cmd_debug_marker_insert_ext(command_buffer C.CommandBuffer,
+	p_marker_info &DebugMarkerMarkerInfoEXT) {
+	C.vkCmdDebugMarkerInsertEXT(command_buffer, p_marker_info)
 }
 
-// VK_AMD_gcn_shader is a preprocessor guard. Do not pass it to API calls.
-const amd_gcn_shader = 1
 pub const amd_gcn_shader_spec_version = 1
 pub const amd_gcn_shader_extension_name = 'VK_AMD_gcn_shader'
 
-// VK_NV_dedicated_allocation is a preprocessor guard. Do not pass it to API calls.
-const nv_dedicated_allocation = 1
 pub const nv_dedicated_allocation_spec_version = 1
 pub const nv_dedicated_allocation_extension_name = 'VK_NV_dedicated_allocation'
-// DedicatedAllocationImageCreateInfoNV extends VkImageCreateInfo
+
 pub struct DedicatedAllocationImageCreateInfoNV {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	dedicated_allocation Bool32
 }
 
-// DedicatedAllocationBufferCreateInfoNV extends VkBufferCreateInfo
 pub struct DedicatedAllocationBufferCreateInfoNV {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	dedicated_allocation Bool32
 }
 
-// DedicatedAllocationMemoryAllocateInfoNV extends VkMemoryAllocateInfo
 pub struct DedicatedAllocationMemoryAllocateInfoNV {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	image  C.Image
 	buffer C.Buffer
 }
 
-// VK_EXT_transform_feedback is a preprocessor guard. Do not pass it to API calls.
-const ext_transform_feedback = 1
 pub const ext_transform_feedback_spec_version = 1
 pub const ext_transform_feedback_extension_name = 'VK_EXT_transform_feedback'
 
 pub type PipelineRasterizationStateStreamCreateFlagsEXT = u32
 
-// PhysicalDeviceTransformFeedbackFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceTransformFeedbackFeaturesEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	transform_feedback Bool32
 	geometry_streams   Bool32
 }
 
-// PhysicalDeviceTransformFeedbackPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceTransformFeedbackPropertiesEXT {
-mut:
+pub mut:
 	s_type                                         StructureType
 	p_next                                         voidptr
 	max_transform_feedback_streams                 u32
@@ -12563,78 +12403,99 @@ mut:
 	transform_feedback_draw                        Bool32
 }
 
-// PipelineRasterizationStateStreamCreateInfoEXT extends VkPipelineRasterizationStateCreateInfo
 pub struct PipelineRasterizationStateStreamCreateInfoEXT {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	flags                PipelineRasterizationStateStreamCreateFlagsEXT
 	rasterization_stream u32
 }
 
-type VkCmdBindTransformFeedbackBuffersEXT = fn (C.CommandBuffer, u32, u32, &C.Buffer, &DeviceSize, &DeviceSize)
-
-pub fn cmd_bind_transform_feedback_buffers_ext(command_buffer C.CommandBuffer, first_binding u32, binding_count u32, p_buffers &C.Buffer, p_offsets &DeviceSize, p_sizes &DeviceSize) {
-	f := VkCmdBindTransformFeedbackBuffersEXT((*vulkan.loader_p).get_sym('vkCmdBindTransformFeedbackBuffersEXT') or {
-		println("Couldn't load symbol for 'vkCmdBindTransformFeedbackBuffersEXT': ${err}")
-		return
-	})
-	f(command_buffer, first_binding, binding_count, p_buffers, p_offsets, p_sizes)
+fn C.vkCmdBindTransformFeedbackBuffersEXT(C.CommandBuffer,
+	u32,
+	u32,
+	&C.Buffer,
+	&DeviceSize,
+	&DeviceSize)
+pub fn cmd_bind_transform_feedback_buffers_ext(command_buffer C.CommandBuffer,
+	first_binding u32,
+	binding_count u32,
+	p_buffers &C.Buffer,
+	p_offsets &DeviceSize,
+	p_sizes &DeviceSize) {
+	C.vkCmdBindTransformFeedbackBuffersEXT(command_buffer, first_binding, binding_count,
+		p_buffers, p_offsets, p_sizes)
 }
 
-type VkCmdBeginTransformFeedbackEXT = fn (C.CommandBuffer, u32, u32, &C.Buffer, &DeviceSize)
-
-pub fn cmd_begin_transform_feedback_ext(command_buffer C.CommandBuffer, first_counter_buffer u32, counter_buffer_count u32, p_counter_buffers &C.Buffer, p_counter_buffer_offsets &DeviceSize) {
-	f := VkCmdBeginTransformFeedbackEXT((*vulkan.loader_p).get_sym('vkCmdBeginTransformFeedbackEXT') or {
-		println("Couldn't load symbol for 'vkCmdBeginTransformFeedbackEXT': ${err}")
-		return
-	})
-	f(command_buffer, first_counter_buffer, counter_buffer_count, p_counter_buffers, p_counter_buffer_offsets)
+fn C.vkCmdBeginTransformFeedbackEXT(C.CommandBuffer,
+	u32,
+	u32,
+	&C.Buffer,
+	&DeviceSize)
+pub fn cmd_begin_transform_feedback_ext(command_buffer C.CommandBuffer,
+	first_counter_buffer u32,
+	counter_buffer_count u32,
+	p_counter_buffers &C.Buffer,
+	p_counter_buffer_offsets &DeviceSize) {
+	C.vkCmdBeginTransformFeedbackEXT(command_buffer, first_counter_buffer, counter_buffer_count,
+		p_counter_buffers, p_counter_buffer_offsets)
 }
 
-type VkCmdEndTransformFeedbackEXT = fn (C.CommandBuffer, u32, u32, &C.Buffer, &DeviceSize)
-
-pub fn cmd_end_transform_feedback_ext(command_buffer C.CommandBuffer, first_counter_buffer u32, counter_buffer_count u32, p_counter_buffers &C.Buffer, p_counter_buffer_offsets &DeviceSize) {
-	f := VkCmdEndTransformFeedbackEXT((*vulkan.loader_p).get_sym('vkCmdEndTransformFeedbackEXT') or {
-		println("Couldn't load symbol for 'vkCmdEndTransformFeedbackEXT': ${err}")
-		return
-	})
-	f(command_buffer, first_counter_buffer, counter_buffer_count, p_counter_buffers, p_counter_buffer_offsets)
+fn C.vkCmdEndTransformFeedbackEXT(C.CommandBuffer,
+	u32,
+	u32,
+	&C.Buffer,
+	&DeviceSize)
+pub fn cmd_end_transform_feedback_ext(command_buffer C.CommandBuffer,
+	first_counter_buffer u32,
+	counter_buffer_count u32,
+	p_counter_buffers &C.Buffer,
+	p_counter_buffer_offsets &DeviceSize) {
+	C.vkCmdEndTransformFeedbackEXT(command_buffer, first_counter_buffer, counter_buffer_count,
+		p_counter_buffers, p_counter_buffer_offsets)
 }
 
-type VkCmdBeginQueryIndexedEXT = fn (C.CommandBuffer, C.QueryPool, u32, QueryControlFlags, u32)
-
-pub fn cmd_begin_query_indexed_ext(command_buffer C.CommandBuffer, query_pool C.QueryPool, query u32, flags QueryControlFlags, index u32) {
-	f := VkCmdBeginQueryIndexedEXT((*vulkan.loader_p).get_sym('vkCmdBeginQueryIndexedEXT') or {
-		println("Couldn't load symbol for 'vkCmdBeginQueryIndexedEXT': ${err}")
-		return
-	})
-	f(command_buffer, query_pool, query, flags, index)
+fn C.vkCmdBeginQueryIndexedEXT(C.CommandBuffer,
+	C.QueryPool,
+	u32,
+	QueryControlFlags,
+	u32)
+pub fn cmd_begin_query_indexed_ext(command_buffer C.CommandBuffer,
+	query_pool C.QueryPool,
+	query u32,
+	flags QueryControlFlags,
+	index u32) {
+	C.vkCmdBeginQueryIndexedEXT(command_buffer, query_pool, query, flags, index)
 }
 
-type VkCmdEndQueryIndexedEXT = fn (C.CommandBuffer, C.QueryPool, u32, u32)
-
-pub fn cmd_end_query_indexed_ext(command_buffer C.CommandBuffer, query_pool C.QueryPool, query u32, index u32) {
-	f := VkCmdEndQueryIndexedEXT((*vulkan.loader_p).get_sym('vkCmdEndQueryIndexedEXT') or {
-		println("Couldn't load symbol for 'vkCmdEndQueryIndexedEXT': ${err}")
-		return
-	})
-	f(command_buffer, query_pool, query, index)
+fn C.vkCmdEndQueryIndexedEXT(C.CommandBuffer,
+	C.QueryPool,
+	u32,
+	u32)
+pub fn cmd_end_query_indexed_ext(command_buffer C.CommandBuffer,
+	query_pool C.QueryPool,
+	query u32,
+	index u32) {
+	C.vkCmdEndQueryIndexedEXT(command_buffer, query_pool, query, index)
 }
 
-type VkCmdDrawIndirectByteCountEXT = fn (C.CommandBuffer, u32, u32, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_indirect_byte_count_ext(command_buffer C.CommandBuffer, instance_count u32, first_instance u32, counter_buffer C.Buffer, counter_buffer_offset DeviceSize, counter_offset u32, vertex_stride u32) {
-	f := VkCmdDrawIndirectByteCountEXT((*vulkan.loader_p).get_sym('vkCmdDrawIndirectByteCountEXT') or {
-		println("Couldn't load symbol for 'vkCmdDrawIndirectByteCountEXT': ${err}")
-		return
-	})
-	f(command_buffer, instance_count, first_instance, counter_buffer, counter_buffer_offset,
-		counter_offset, vertex_stride)
+fn C.vkCmdDrawIndirectByteCountEXT(C.CommandBuffer,
+	u32,
+	u32,
+	C.Buffer,
+	DeviceSize,
+	u32,
+	u32)
+pub fn cmd_draw_indirect_byte_count_ext(command_buffer C.CommandBuffer,
+	instance_count u32,
+	first_instance u32,
+	counter_buffer C.Buffer,
+	counter_buffer_offset DeviceSize,
+	counter_offset u32,
+	vertex_stride u32) {
+	C.vkCmdDrawIndirectByteCountEXT(command_buffer, instance_count, first_instance, counter_buffer,
+		counter_buffer_offset, counter_offset, vertex_stride)
 }
-
-// VK_NVX_binary_import is a preprocessor guard. Do not pass it to API calls.
-const nvx_binary_import = 1
 
 pub type C.CuModuleNVX = voidptr
 pub type C.CuFunctionNVX = voidptr
@@ -12643,7 +12504,7 @@ pub const nvx_binary_import_spec_version = 1
 pub const nvx_binary_import_extension_name = 'VK_NVX_binary_import'
 
 pub struct CuModuleCreateInfoNVX {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	data_size usize
@@ -12651,7 +12512,7 @@ mut:
 }
 
 pub struct CuFunctionCreateInfoNVX {
-mut:
+pub mut:
 	s_type   StructureType
 	p_next   voidptr
 	vkmodule C.CuModuleNVX
@@ -12659,7 +12520,7 @@ mut:
 }
 
 pub struct CuLaunchInfoNVX {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	function         C.CuFunctionNVX
@@ -12676,63 +12537,58 @@ mut:
 	p_extras         voidptr
 }
 
-type VkCreateCuModuleNVX = fn (C.Device, &CuModuleCreateInfoNVX, &AllocationCallbacks, &C.CuModuleNVX) Result
-
-pub fn create_cu_module_nvx(device C.Device, p_create_info &CuModuleCreateInfoNVX, p_allocator &AllocationCallbacks, p_module &C.CuModuleNVX) Result {
-	f := VkCreateCuModuleNVX((*vulkan.loader_p).get_sym('vkCreateCuModuleNVX') or {
-		println("Couldn't load symbol for 'vkCreateCuModuleNVX': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_module)
+fn C.vkCreateCuModuleNVX(C.Device,
+	&CuModuleCreateInfoNVX,
+	&AllocationCallbacks,
+	&C.CuModuleNVX) Result
+pub fn create_cu_module_nvx(device C.Device,
+	p_create_info &CuModuleCreateInfoNVX,
+	p_allocator &AllocationCallbacks,
+	p_module &C.CuModuleNVX) Result {
+	return C.vkCreateCuModuleNVX(device, p_create_info, p_allocator, p_module)
 }
 
-type VkCreateCuFunctionNVX = fn (C.Device, &CuFunctionCreateInfoNVX, &AllocationCallbacks, &C.CuFunctionNVX) Result
-
-pub fn create_cu_function_nvx(device C.Device, p_create_info &CuFunctionCreateInfoNVX, p_allocator &AllocationCallbacks, p_function &C.CuFunctionNVX) Result {
-	f := VkCreateCuFunctionNVX((*vulkan.loader_p).get_sym('vkCreateCuFunctionNVX') or {
-		println("Couldn't load symbol for 'vkCreateCuFunctionNVX': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_function)
+fn C.vkCreateCuFunctionNVX(C.Device,
+	&CuFunctionCreateInfoNVX,
+	&AllocationCallbacks,
+	&C.CuFunctionNVX) Result
+pub fn create_cu_function_nvx(device C.Device,
+	p_create_info &CuFunctionCreateInfoNVX,
+	p_allocator &AllocationCallbacks,
+	p_function &C.CuFunctionNVX) Result {
+	return C.vkCreateCuFunctionNVX(device, p_create_info, p_allocator, p_function)
 }
 
-type VkDestroyCuModuleNVX = fn (C.Device, C.CuModuleNVX, &AllocationCallbacks)
-
-pub fn destroy_cu_module_nvx(device C.Device, vkmodule C.CuModuleNVX, p_allocator &AllocationCallbacks) {
-	f := VkDestroyCuModuleNVX((*vulkan.loader_p).get_sym('vkDestroyCuModuleNVX') or {
-		println("Couldn't load symbol for 'vkDestroyCuModuleNVX': ${err}")
-		return
-	})
-	f(device, vkmodule, p_allocator)
+fn C.vkDestroyCuModuleNVX(C.Device,
+	C.CuModuleNVX,
+	&AllocationCallbacks)
+pub fn destroy_cu_module_nvx(device C.Device,
+	vkmodule C.CuModuleNVX,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyCuModuleNVX(device, vkmodule, p_allocator)
 }
 
-type VkDestroyCuFunctionNVX = fn (C.Device, C.CuFunctionNVX, &AllocationCallbacks)
-
-pub fn destroy_cu_function_nvx(device C.Device, function C.CuFunctionNVX, p_allocator &AllocationCallbacks) {
-	f := VkDestroyCuFunctionNVX((*vulkan.loader_p).get_sym('vkDestroyCuFunctionNVX') or {
-		println("Couldn't load symbol for 'vkDestroyCuFunctionNVX': ${err}")
-		return
-	})
-	f(device, function, p_allocator)
+fn C.vkDestroyCuFunctionNVX(C.Device,
+	C.CuFunctionNVX,
+	&AllocationCallbacks)
+pub fn destroy_cu_function_nvx(device C.Device,
+	function C.CuFunctionNVX,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyCuFunctionNVX(device, function, p_allocator)
 }
 
-type VkCmdCuLaunchKernelNVX = fn (C.CommandBuffer, &CuLaunchInfoNVX)
-
-pub fn cmd_cu_launch_kernel_nvx(command_buffer C.CommandBuffer, p_launch_info &CuLaunchInfoNVX) {
-	f := VkCmdCuLaunchKernelNVX((*vulkan.loader_p).get_sym('vkCmdCuLaunchKernelNVX') or {
-		println("Couldn't load symbol for 'vkCmdCuLaunchKernelNVX': ${err}")
-		return
-	})
-	f(command_buffer, p_launch_info)
+fn C.vkCmdCuLaunchKernelNVX(C.CommandBuffer,
+	&CuLaunchInfoNVX)
+pub fn cmd_cu_launch_kernel_nvx(command_buffer C.CommandBuffer,
+	p_launch_info &CuLaunchInfoNVX) {
+	C.vkCmdCuLaunchKernelNVX(command_buffer, p_launch_info)
 }
 
-// VK_NVX_image_view_handle is a preprocessor guard. Do not pass it to API calls.
-const nvx_image_view_handle = 1
 pub const nvx_image_view_handle_spec_version = 2
 pub const nvx_image_view_handle_extension_name = 'VK_NVX_image_view_handle'
 
 pub struct ImageViewHandleInfoNVX {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	image_view      C.ImageView
@@ -12741,572 +12597,51 @@ mut:
 }
 
 pub struct ImageViewAddressPropertiesNVX {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	device_address DeviceAddress
 	size           DeviceSize
 }
 
-type VkGetImageViewHandleNVX = fn (C.Device, &ImageViewHandleInfoNVX) u32
-
-pub fn get_image_view_handle_nvx(device C.Device, p_info &ImageViewHandleInfoNVX) u32 {
-	f := VkGetImageViewHandleNVX((*vulkan.loader_p).get_sym('vkGetImageViewHandleNVX') or {
-		panic("Couldn't load symbol for 'vkGetImageViewHandleNVX': ${err}")
-	})
-	return f(device, p_info)
+fn C.vkGetImageViewHandleNVX(C.Device,
+	&ImageViewHandleInfoNVX) u32
+pub fn get_image_view_handle_nvx(device C.Device,
+	p_info &ImageViewHandleInfoNVX) u32 {
+	return C.vkGetImageViewHandleNVX(device, p_info)
 }
 
-type VkGetImageViewAddressNVX = fn (C.Device, C.ImageView, &ImageViewAddressPropertiesNVX) Result
-
-pub fn get_image_view_address_nvx(device C.Device, image_view C.ImageView, p_properties &ImageViewAddressPropertiesNVX) Result {
-	f := VkGetImageViewAddressNVX((*vulkan.loader_p).get_sym('vkGetImageViewAddressNVX') or {
-		println("Couldn't load symbol for 'vkGetImageViewAddressNVX': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, image_view, p_properties)
+fn C.vkGetImageViewAddressNVX(C.Device,
+	C.ImageView,
+	&ImageViewAddressPropertiesNVX) Result
+pub fn get_image_view_address_nvx(device C.Device,
+	image_view C.ImageView,
+	p_properties &ImageViewAddressPropertiesNVX) Result {
+	return C.vkGetImageViewAddressNVX(device, image_view, p_properties)
 }
 
-// VK_AMD_draw_indirect_count is a preprocessor guard. Do not pass it to API calls.
-const amd_draw_indirect_count = 1
 pub const amd_draw_indirect_count_spec_version = 2
 pub const amd_draw_indirect_count_extension_name = 'VK_AMD_draw_indirect_count'
 
-type VkCmdDrawIndirectCountAMD = fn (C.CommandBuffer, C.Buffer, DeviceSize, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_indirect_count_amd(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, count_buffer C.Buffer, count_buffer_offset DeviceSize, max_draw_count u32, stride u32) {
-	f := VkCmdDrawIndirectCountAMD((*vulkan.loader_p).get_sym('vkCmdDrawIndirectCountAMD') or {
-		println("Couldn't load symbol for 'vkCmdDrawIndirectCountAMD': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, count_buffer, count_buffer_offset, max_draw_count,
-		stride)
-}
-
-type VkCmdDrawIndexedIndirectCountAMD = fn (C.CommandBuffer, C.Buffer, DeviceSize, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_indexed_indirect_count_amd(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, count_buffer C.Buffer, count_buffer_offset DeviceSize, max_draw_count u32, stride u32) {
-	f := VkCmdDrawIndexedIndirectCountAMD((*vulkan.loader_p).get_sym('vkCmdDrawIndexedIndirectCountAMD') or {
-		println("Couldn't load symbol for 'vkCmdDrawIndexedIndirectCountAMD': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, count_buffer, count_buffer_offset, max_draw_count,
-		stride)
-}
-
-// VK_AMD_negative_viewport_height is a preprocessor guard. Do not pass it to API calls.
-const amd_negative_viewport_height = 1
 pub const amd_negative_viewport_height_spec_version = 1
 pub const amd_negative_viewport_height_extension_name = 'VK_AMD_negative_viewport_height'
 
-// VK_AMD_gpu_shader_half_float is a preprocessor guard. Do not pass it to API calls.
-const amd_gpu_shader_half_float = 1
 pub const amd_gpu_shader_half_float_spec_version = 2
 pub const amd_gpu_shader_half_float_extension_name = 'VK_AMD_gpu_shader_half_float'
 
-// VK_AMD_shader_ballot is a preprocessor guard. Do not pass it to API calls.
-const amd_shader_ballot = 1
 pub const amd_shader_ballot_spec_version = 1
 pub const amd_shader_ballot_extension_name = 'VK_AMD_shader_ballot'
 
-// VK_EXT_video_encode_h264 is a preprocessor guard. Do not pass it to API calls.
-const ext_video_encode_h264 = 1
-pub const ext_video_encode_h264_spec_version = 12
-pub const ext_video_encode_h264_extension_name = 'VK_EXT_video_encode_h264'
-
-pub enum VideoEncodeH264CapabilityFlagBitsEXT {
-	video_encode_h264_capability_hrd_compliance_bit_ext                    = int(0x00000001)
-	video_encode_h264_capability_prediction_weight_table_generated_bit_ext = int(0x00000002)
-	video_encode_h264_capability_row_unaligned_slice_bit_ext               = int(0x00000004)
-	video_encode_h264_capability_different_slice_type_bit_ext              = int(0x00000008)
-	video_encode_h264_capability_b_frame_in_l0_list_bit_ext                = int(0x00000010)
-	video_encode_h264_capability_b_frame_in_l1_list_bit_ext                = int(0x00000020)
-	video_encode_h264_capability_per_picture_type_min_max_qp_bit_ext       = int(0x00000040)
-	video_encode_h264_capability_per_slice_constant_qp_bit_ext             = int(0x00000080)
-	video_encode_h264_capability_generate_prefix_nalu_bit_ext              = int(0x00000100)
-	video_encode_h264_capability_flag_bits_max_enum_ext                    = int(0x7FFFFFFF)
-}
-
-pub type VideoEncodeH264CapabilityFlagsEXT = u32
-
-pub enum VideoEncodeH264StdFlagBitsEXT {
-	video_encode_h264_std_separate_color_plane_flag_set_bit_ext            = int(0x00000001)
-	video_encode_h264_std_qpprime_y_zero_transform_bypass_flag_set_bit_ext = int(0x00000002)
-	video_encode_h264_std_scaling_matrix_present_flag_set_bit_ext          = int(0x00000004)
-	video_encode_h264_std_chroma_qp_index_offset_bit_ext                   = int(0x00000008)
-	video_encode_h264_std_second_chroma_qp_index_offset_bit_ext            = int(0x00000010)
-	video_encode_h264_std_pic_init_qp_minus26_bit_ext                      = int(0x00000020)
-	video_encode_h264_std_weighted_pred_flag_set_bit_ext                   = int(0x00000040)
-	video_encode_h264_std_weighted_bipred_idc_explicit_bit_ext             = int(0x00000080)
-	video_encode_h264_std_weighted_bipred_idc_implicit_bit_ext             = int(0x00000100)
-	video_encode_h264_std_transform_8x8_mode_flag_set_bit_ext              = int(0x00000200)
-	video_encode_h264_std_direct_spatial_mv_pred_flag_unset_bit_ext        = int(0x00000400)
-	video_encode_h264_std_entropy_coding_mode_flag_unset_bit_ext           = int(0x00000800)
-	video_encode_h264_std_entropy_coding_mode_flag_set_bit_ext             = int(0x00001000)
-	video_encode_h264_std_direct_8x8_inference_flag_unset_bit_ext          = int(0x00002000)
-	video_encode_h264_std_constrained_intra_pred_flag_set_bit_ext          = int(0x00004000)
-	video_encode_h264_std_deblocking_filter_disabled_bit_ext               = int(0x00008000)
-	video_encode_h264_std_deblocking_filter_enabled_bit_ext                = int(0x00010000)
-	video_encode_h264_std_deblocking_filter_partial_bit_ext                = int(0x00020000)
-	video_encode_h264_std_slice_qp_delta_bit_ext                           = int(0x00080000)
-	video_encode_h264_std_different_slice_qp_delta_bit_ext                 = int(0x00100000)
-	video_encode_h264_std_flag_bits_max_enum_ext                           = int(0x7FFFFFFF)
-}
-
-pub type VideoEncodeH264StdFlagsEXT = u32
-
-pub enum VideoEncodeH264RateControlFlagBitsEXT {
-	video_encode_h264_rate_control_attempt_hrd_compliance_bit_ext        = int(0x00000001)
-	video_encode_h264_rate_control_regular_gop_bit_ext                   = int(0x00000002)
-	video_encode_h264_rate_control_reference_pattern_flat_bit_ext        = int(0x00000004)
-	video_encode_h264_rate_control_reference_pattern_dyadic_bit_ext      = int(0x00000008)
-	video_encode_h264_rate_control_temporal_layer_pattern_dyadic_bit_ext = int(0x00000010)
-	video_encode_h264_rate_control_flag_bits_max_enum_ext                = int(0x7FFFFFFF)
-}
-
-pub type VideoEncodeH264RateControlFlagsEXT = u32
-
-// VideoEncodeH264CapabilitiesEXT extends VkVideoCapabilitiesKHR
-pub struct VideoEncodeH264CapabilitiesEXT {
-mut:
-	s_type                               StructureType
-	p_next                               voidptr
-	flags                                VideoEncodeH264CapabilityFlagsEXT
-	max_level_idc                        C.StdVideoH264LevelIdc
-	max_slice_count                      u32
-	max_p_picture_l0_reference_count     u32
-	max_b_picture_l0_reference_count     u32
-	max_l1_reference_count               u32
-	max_temporal_layer_count             u32
-	expect_dyadic_temporal_layer_pattern Bool32
-	min_qp                               i32
-	max_qp                               i32
-	prefers_gop_remaining_frames         Bool32
-	requires_gop_remaining_frames        Bool32
-	std_syntax_flags                     VideoEncodeH264StdFlagsEXT
-}
-
-pub struct VideoEncodeH264QpEXT {
-mut:
-	qp_i i32
-	qp_p i32
-	qp_b i32
-}
-
-// VideoEncodeH264QualityLevelPropertiesEXT extends VkVideoEncodeQualityLevelPropertiesKHR
-pub struct VideoEncodeH264QualityLevelPropertiesEXT {
-mut:
-	s_type                                 StructureType
-	p_next                                 voidptr
-	preferred_rate_control_flags           VideoEncodeH264RateControlFlagsEXT
-	preferred_gop_frame_count              u32
-	preferred_idr_period                   u32
-	preferred_consecutive_b_frame_count    u32
-	preferred_temporal_layer_count         u32
-	preferred_constant_qp                  VideoEncodeH264QpEXT
-	preferred_max_l0_reference_count       u32
-	preferred_max_l1_reference_count       u32
-	preferred_std_entropy_coding_mode_flag Bool32
-}
-
-// VideoEncodeH264SessionCreateInfoEXT extends VkVideoSessionCreateInfoKHR
-pub struct VideoEncodeH264SessionCreateInfoEXT {
-mut:
-	s_type            StructureType
-	p_next            voidptr
-	use_max_level_idc Bool32
-	max_level_idc     C.StdVideoH264LevelIdc
-}
-
-// VideoEncodeH264SessionParametersAddInfoEXT extends VkVideoSessionParametersUpdateInfoKHR
-pub struct VideoEncodeH264SessionParametersAddInfoEXT {
-mut:
-	s_type        StructureType
-	p_next        voidptr
-	std_sps_count u32
-	p_std_sp_ss   &C.StdVideoH264SequenceParameterSet
-	std_pps_count u32
-	p_std_pp_ss   &C.StdVideoH264PictureParameterSet
-}
-
-// VideoEncodeH264SessionParametersCreateInfoEXT extends VkVideoSessionParametersCreateInfoKHR
-pub struct VideoEncodeH264SessionParametersCreateInfoEXT {
-mut:
-	s_type                StructureType
-	p_next                voidptr
-	max_std_sps_count     u32
-	max_std_pps_count     u32
-	p_parameters_add_info &VideoEncodeH264SessionParametersAddInfoEXT
-}
-
-// VideoEncodeH264SessionParametersGetInfoEXT extends VkVideoEncodeSessionParametersGetInfoKHR
-pub struct VideoEncodeH264SessionParametersGetInfoEXT {
-mut:
-	s_type        StructureType
-	p_next        voidptr
-	write_std_sps Bool32
-	write_std_pps Bool32
-	std_sps_id    u32
-	std_pps_id    u32
-}
-
-// VideoEncodeH264SessionParametersFeedbackInfoEXT extends VkVideoEncodeSessionParametersFeedbackInfoKHR
-pub struct VideoEncodeH264SessionParametersFeedbackInfoEXT {
-mut:
-	s_type                StructureType
-	p_next                voidptr
-	has_std_sps_overrides Bool32
-	has_std_pps_overrides Bool32
-}
-
-pub struct VideoEncodeH264NaluSliceInfoEXT {
-mut:
-	s_type             StructureType
-	p_next             voidptr
-	constant_qp        i32
-	p_std_slice_header &C.StdVideoEncodeH264SliceHeader
-}
-
-// VideoEncodeH264PictureInfoEXT extends VkVideoEncodeInfoKHR
-pub struct VideoEncodeH264PictureInfoEXT {
-mut:
-	s_type                 StructureType
-	p_next                 voidptr
-	nalu_slice_entry_count u32
-	p_nalu_slice_entries   &VideoEncodeH264NaluSliceInfoEXT
-	p_std_picture_info     &C.StdVideoEncodeH264PictureInfo
-	generate_prefix_nalu   Bool32
-}
-
-// VideoEncodeH264DpbSlotInfoEXT extends VkVideoReferenceSlotInfoKHR
-pub struct VideoEncodeH264DpbSlotInfoEXT {
-mut:
-	s_type               StructureType
-	p_next               voidptr
-	p_std_reference_info &C.StdVideoEncodeH264ReferenceInfo
-}
-
-// VideoEncodeH264ProfileInfoEXT extends VkVideoProfileInfoKHR,VkQueryPoolCreateInfo
-pub struct VideoEncodeH264ProfileInfoEXT {
-mut:
-	s_type          StructureType
-	p_next          voidptr
-	std_profile_idc C.StdVideoH264ProfileIdc
-}
-
-// VideoEncodeH264RateControlInfoEXT extends VkVideoCodingControlInfoKHR,VkVideoBeginCodingInfoKHR
-pub struct VideoEncodeH264RateControlInfoEXT {
-mut:
-	s_type                    StructureType
-	p_next                    voidptr
-	flags                     VideoEncodeH264RateControlFlagsEXT
-	gop_frame_count           u32
-	idr_period                u32
-	consecutive_b_frame_count u32
-	temporal_layer_count      u32
-}
-
-pub struct VideoEncodeH264FrameSizeEXT {
-mut:
-	frame_i_size u32
-	frame_p_size u32
-	frame_b_size u32
-}
-
-// VideoEncodeH264RateControlLayerInfoEXT extends VkVideoEncodeRateControlLayerInfoKHR
-pub struct VideoEncodeH264RateControlLayerInfoEXT {
-mut:
-	s_type             StructureType
-	p_next             voidptr
-	use_min_qp         Bool32
-	min_qp             VideoEncodeH264QpEXT
-	use_max_qp         Bool32
-	max_qp             VideoEncodeH264QpEXT
-	use_max_frame_size Bool32
-	max_frame_size     VideoEncodeH264FrameSizeEXT
-}
-
-// VideoEncodeH264GopRemainingFrameInfoEXT extends VkVideoBeginCodingInfoKHR
-pub struct VideoEncodeH264GopRemainingFrameInfoEXT {
-mut:
-	s_type                   StructureType
-	p_next                   voidptr
-	use_gop_remaining_frames Bool32
-	gop_remaining_i          u32
-	gop_remaining_p          u32
-	gop_remaining_b          u32
-}
-
-// VK_EXT_video_encode_h265 is a preprocessor guard. Do not pass it to API calls.
-const ext_video_encode_h265 = 1
-pub const ext_video_encode_h265_spec_version = 12
-pub const ext_video_encode_h265_extension_name = 'VK_EXT_video_encode_h265'
-
-pub enum VideoEncodeH265CapabilityFlagBitsEXT {
-	video_encode_h265_capability_hrd_compliance_bit_ext                    = int(0x00000001)
-	video_encode_h265_capability_prediction_weight_table_generated_bit_ext = int(0x00000002)
-	video_encode_h265_capability_row_unaligned_slice_segment_bit_ext       = int(0x00000004)
-	video_encode_h265_capability_different_slice_segment_type_bit_ext      = int(0x00000008)
-	video_encode_h265_capability_b_frame_in_l0_list_bit_ext                = int(0x00000010)
-	video_encode_h265_capability_b_frame_in_l1_list_bit_ext                = int(0x00000020)
-	video_encode_h265_capability_per_picture_type_min_max_qp_bit_ext       = int(0x00000040)
-	video_encode_h265_capability_per_slice_segment_constant_qp_bit_ext     = int(0x00000080)
-	video_encode_h265_capability_multiple_tiles_per_slice_segment_bit_ext  = int(0x00000100)
-	video_encode_h265_capability_multiple_slice_segments_per_tile_bit_ext  = int(0x00000200)
-	video_encode_h265_capability_flag_bits_max_enum_ext                    = int(0x7FFFFFFF)
-}
-
-pub type VideoEncodeH265CapabilityFlagsEXT = u32
-
-pub enum VideoEncodeH265StdFlagBitsEXT {
-	video_encode_h265_std_separate_color_plane_flag_set_bit_ext                = int(0x00000001)
-	video_encode_h265_std_sample_adaptive_offset_enabled_flag_set_bit_ext      = int(0x00000002)
-	video_encode_h265_std_scaling_list_data_present_flag_set_bit_ext           = int(0x00000004)
-	video_encode_h265_std_pcm_enabled_flag_set_bit_ext                         = int(0x00000008)
-	video_encode_h265_std_sps_temporal_mvp_enabled_flag_set_bit_ext            = int(0x00000010)
-	video_encode_h265_std_init_qp_minus26_bit_ext                              = int(0x00000020)
-	video_encode_h265_std_weighted_pred_flag_set_bit_ext                       = int(0x00000040)
-	video_encode_h265_std_weighted_bipred_flag_set_bit_ext                     = int(0x00000080)
-	video_encode_h265_std_log2_parallel_merge_level_minus2_bit_ext             = int(0x00000100)
-	video_encode_h265_std_sign_data_hiding_enabled_flag_set_bit_ext            = int(0x00000200)
-	video_encode_h265_std_transform_skip_enabled_flag_set_bit_ext              = int(0x00000400)
-	video_encode_h265_std_transform_skip_enabled_flag_unset_bit_ext            = int(0x00000800)
-	video_encode_h265_std_pps_slice_chroma_qp_offsets_present_flag_set_bit_ext = int(0x00001000)
-	video_encode_h265_std_transquant_bypass_enabled_flag_set_bit_ext           = int(0x00002000)
-	video_encode_h265_std_constrained_intra_pred_flag_set_bit_ext              = int(0x00004000)
-	video_encode_h265_std_entropy_coding_sync_enabled_flag_set_bit_ext         = int(0x00008000)
-	video_encode_h265_std_deblocking_filter_override_enabled_flag_set_bit_ext  = int(0x00010000)
-	video_encode_h265_std_dependent_slice_segments_enabled_flag_set_bit_ext    = int(0x00020000)
-	video_encode_h265_std_dependent_slice_segment_flag_set_bit_ext             = int(0x00040000)
-	video_encode_h265_std_slice_qp_delta_bit_ext                               = int(0x00080000)
-	video_encode_h265_std_different_slice_qp_delta_bit_ext                     = int(0x00100000)
-	video_encode_h265_std_flag_bits_max_enum_ext                               = int(0x7FFFFFFF)
-}
-
-pub type VideoEncodeH265StdFlagsEXT = u32
-
-pub enum VideoEncodeH265CtbSizeFlagBitsEXT {
-	video_encode_h265_ctb_size_16_bit_ext             = int(0x00000001)
-	video_encode_h265_ctb_size_32_bit_ext             = int(0x00000002)
-	video_encode_h265_ctb_size_64_bit_ext             = int(0x00000004)
-	video_encode_h265_ctb_size_flag_bits_max_enum_ext = int(0x7FFFFFFF)
-}
-
-pub type VideoEncodeH265CtbSizeFlagsEXT = u32
-
-pub enum VideoEncodeH265TransformBlockSizeFlagBitsEXT {
-	video_encode_h265_transform_block_size_4_bit_ext              = int(0x00000001)
-	video_encode_h265_transform_block_size_8_bit_ext              = int(0x00000002)
-	video_encode_h265_transform_block_size_16_bit_ext             = int(0x00000004)
-	video_encode_h265_transform_block_size_32_bit_ext             = int(0x00000008)
-	video_encode_h265_transform_block_size_flag_bits_max_enum_ext = int(0x7FFFFFFF)
-}
-
-pub type VideoEncodeH265TransformBlockSizeFlagsEXT = u32
-
-pub enum VideoEncodeH265RateControlFlagBitsEXT {
-	video_encode_h265_rate_control_attempt_hrd_compliance_bit_ext            = int(0x00000001)
-	video_encode_h265_rate_control_regular_gop_bit_ext                       = int(0x00000002)
-	video_encode_h265_rate_control_reference_pattern_flat_bit_ext            = int(0x00000004)
-	video_encode_h265_rate_control_reference_pattern_dyadic_bit_ext          = int(0x00000008)
-	video_encode_h265_rate_control_temporal_sub_layer_pattern_dyadic_bit_ext = int(0x00000010)
-	video_encode_h265_rate_control_flag_bits_max_enum_ext                    = int(0x7FFFFFFF)
-}
-
-pub type VideoEncodeH265RateControlFlagsEXT = u32
-
-// VideoEncodeH265CapabilitiesEXT extends VkVideoCapabilitiesKHR
-pub struct VideoEncodeH265CapabilitiesEXT {
-mut:
-	s_type                                   StructureType
-	p_next                                   voidptr
-	flags                                    VideoEncodeH265CapabilityFlagsEXT
-	max_level_idc                            u32
-	max_slice_segment_count                  u32
-	max_tiles                                Extent2D
-	ctb_sizes                                VideoEncodeH265CtbSizeFlagsEXT
-	transform_block_sizes                    VideoEncodeH265TransformBlockSizeFlagsEXT
-	max_p_picture_l0_reference_count         u32
-	max_b_picture_l0_reference_count         u32
-	max_l1_reference_count                   u32
-	max_sub_layer_count                      u32
-	expect_dyadic_temporal_sub_layer_pattern Bool32
-	min_qp                                   i32
-	max_qp                                   i32
-	prefers_gop_remaining_frames             Bool32
-	requires_gop_remaining_frames            Bool32
-	std_syntax_flags                         VideoEncodeH265StdFlagsEXT
-}
-
-// VideoEncodeH265SessionCreateInfoEXT extends VkVideoSessionCreateInfoKHR
-pub struct VideoEncodeH265SessionCreateInfoEXT {
-mut:
-	s_type            StructureType
-	p_next            voidptr
-	use_max_level_idc Bool32
-	max_level_idc     u32
-}
-
-pub struct VideoEncodeH265QpEXT {
-mut:
-	qp_i i32
-	qp_p i32
-	qp_b i32
-}
-
-// VideoEncodeH265QualityLevelPropertiesEXT extends VkVideoEncodeQualityLevelPropertiesKHR
-pub struct VideoEncodeH265QualityLevelPropertiesEXT {
-mut:
-	s_type                              StructureType
-	p_next                              voidptr
-	preferred_rate_control_flags        VideoEncodeH265RateControlFlagsEXT
-	preferred_gop_frame_count           u32
-	preferred_idr_period                u32
-	preferred_consecutive_b_frame_count u32
-	preferred_sub_layer_count           u32
-	preferred_constant_qp               VideoEncodeH265QpEXT
-	preferred_max_l0_reference_count    u32
-	preferred_max_l1_reference_count    u32
-}
-
-// VideoEncodeH265SessionParametersAddInfoEXT extends VkVideoSessionParametersUpdateInfoKHR
-pub struct VideoEncodeH265SessionParametersAddInfoEXT {
-mut:
-	s_type        StructureType
-	p_next        voidptr
-	std_vps_count u32
-	p_std_vp_ss   &C.StdVideoH265VideoParameterSet
-	std_sps_count u32
-	p_std_sp_ss   &C.StdVideoH265SequenceParameterSet
-	std_pps_count u32
-	p_std_pp_ss   &C.StdVideoH265PictureParameterSet
-}
-
-// VideoEncodeH265SessionParametersCreateInfoEXT extends VkVideoSessionParametersCreateInfoKHR
-pub struct VideoEncodeH265SessionParametersCreateInfoEXT {
-mut:
-	s_type                StructureType
-	p_next                voidptr
-	max_std_vps_count     u32
-	max_std_sps_count     u32
-	max_std_pps_count     u32
-	p_parameters_add_info &VideoEncodeH265SessionParametersAddInfoEXT
-}
-
-// VideoEncodeH265SessionParametersGetInfoEXT extends VkVideoEncodeSessionParametersGetInfoKHR
-pub struct VideoEncodeH265SessionParametersGetInfoEXT {
-mut:
-	s_type        StructureType
-	p_next        voidptr
-	write_std_vps Bool32
-	write_std_sps Bool32
-	write_std_pps Bool32
-	std_vps_id    u32
-	std_sps_id    u32
-	std_pps_id    u32
-}
-
-// VideoEncodeH265SessionParametersFeedbackInfoEXT extends VkVideoEncodeSessionParametersFeedbackInfoKHR
-pub struct VideoEncodeH265SessionParametersFeedbackInfoEXT {
-mut:
-	s_type                StructureType
-	p_next                voidptr
-	has_std_vps_overrides Bool32
-	has_std_sps_overrides Bool32
-	has_std_pps_overrides Bool32
-}
-
-pub struct VideoEncodeH265NaluSliceSegmentInfoEXT {
-mut:
-	s_type                     StructureType
-	p_next                     voidptr
-	constant_qp                i32
-	p_std_slice_segment_header &C.StdVideoEncodeH265SliceSegmentHeader
-}
-
-// VideoEncodeH265PictureInfoEXT extends VkVideoEncodeInfoKHR
-pub struct VideoEncodeH265PictureInfoEXT {
-mut:
-	s_type                         StructureType
-	p_next                         voidptr
-	nalu_slice_segment_entry_count u32
-	p_nalu_slice_segment_entries   &VideoEncodeH265NaluSliceSegmentInfoEXT
-	p_std_picture_info             &C.StdVideoEncodeH265PictureInfo
-}
-
-// VideoEncodeH265DpbSlotInfoEXT extends VkVideoReferenceSlotInfoKHR
-pub struct VideoEncodeH265DpbSlotInfoEXT {
-mut:
-	s_type               StructureType
-	p_next               voidptr
-	p_std_reference_info &C.StdVideoEncodeH265ReferenceInfo
-}
-
-// VideoEncodeH265ProfileInfoEXT extends VkVideoProfileInfoKHR,VkQueryPoolCreateInfo
-pub struct VideoEncodeH265ProfileInfoEXT {
-mut:
-	s_type          StructureType
-	p_next          voidptr
-	std_profile_idc C.StdVideoH265ProfileIdc
-}
-
-// VideoEncodeH265RateControlInfoEXT extends VkVideoCodingControlInfoKHR,VkVideoBeginCodingInfoKHR
-pub struct VideoEncodeH265RateControlInfoEXT {
-mut:
-	s_type                    StructureType
-	p_next                    voidptr
-	flags                     VideoEncodeH265RateControlFlagsEXT
-	gop_frame_count           u32
-	idr_period                u32
-	consecutive_b_frame_count u32
-	sub_layer_count           u32
-}
-
-pub struct VideoEncodeH265FrameSizeEXT {
-mut:
-	frame_i_size u32
-	frame_p_size u32
-	frame_b_size u32
-}
-
-// VideoEncodeH265RateControlLayerInfoEXT extends VkVideoEncodeRateControlLayerInfoKHR
-pub struct VideoEncodeH265RateControlLayerInfoEXT {
-mut:
-	s_type             StructureType
-	p_next             voidptr
-	use_min_qp         Bool32
-	min_qp             VideoEncodeH265QpEXT
-	use_max_qp         Bool32
-	max_qp             VideoEncodeH265QpEXT
-	use_max_frame_size Bool32
-	max_frame_size     VideoEncodeH265FrameSizeEXT
-}
-
-// VideoEncodeH265GopRemainingFrameInfoEXT extends VkVideoBeginCodingInfoKHR
-pub struct VideoEncodeH265GopRemainingFrameInfoEXT {
-mut:
-	s_type                   StructureType
-	p_next                   voidptr
-	use_gop_remaining_frames Bool32
-	gop_remaining_i          u32
-	gop_remaining_p          u32
-	gop_remaining_b          u32
-}
-
-// VK_AMD_texture_gather_bias_lod is a preprocessor guard. Do not pass it to API calls.
-const amd_texture_gather_bias_lod = 1
 pub const amd_texture_gather_bias_lod_spec_version = 1
 pub const amd_texture_gather_bias_lod_extension_name = 'VK_AMD_texture_gather_bias_lod'
-// TextureLODGatherFormatPropertiesAMD extends VkImageFormatProperties2
+
 pub struct TextureLODGatherFormatPropertiesAMD {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	supports_texture_gather_lod_bias_amd Bool32
 }
 
-// VK_AMD_shader_info is a preprocessor guard. Do not pass it to API calls.
-const amd_shader_info = 1
 pub const amd_shader_info_spec_version = 1
 pub const amd_shader_info_extension_name = 'VK_AMD_shader_info'
 
@@ -13318,7 +12653,7 @@ pub enum ShaderInfoTypeAMD {
 }
 
 pub struct ShaderResourceUsageAMD {
-mut:
+pub mut:
 	num_used_vgprs                u32
 	num_used_sgprs                u32
 	lds_size_per_local_work_group u32
@@ -13327,75 +12662,48 @@ mut:
 }
 
 pub struct ShaderStatisticsInfoAMD {
-mut:
+pub mut:
 	shader_stage_mask       ShaderStageFlags
 	resource_usage          ShaderResourceUsageAMD
 	num_physical_vgprs      u32
 	num_physical_sgprs      u32
 	num_available_vgprs     u32
 	num_available_sgprs     u32
-	compute_work_group_size []u32
+	compute_work_group_size [3]u32
 }
 
-type VkGetShaderInfoAMD = fn (C.Device, C.Pipeline, ShaderStageFlagBits, ShaderInfoTypeAMD, &usize, voidptr) Result
-
-pub fn get_shader_info_amd(device C.Device, pipeline C.Pipeline, shader_stage ShaderStageFlagBits, info_type ShaderInfoTypeAMD, p_info_size &usize, p_info voidptr) Result {
-	f := VkGetShaderInfoAMD((*vulkan.loader_p).get_sym('vkGetShaderInfoAMD') or {
-		println("Couldn't load symbol for 'vkGetShaderInfoAMD': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, pipeline, shader_stage, info_type, p_info_size, p_info)
+fn C.vkGetShaderInfoAMD(C.Device,
+	C.Pipeline,
+	ShaderStageFlagBits,
+	ShaderInfoTypeAMD,
+	&usize,
+	voidptr) Result
+pub fn get_shader_info_amd(device C.Device,
+	pipeline C.Pipeline,
+	shader_stage ShaderStageFlagBits,
+	info_type ShaderInfoTypeAMD,
+	p_info_size &usize,
+	p_info voidptr) Result {
+	return C.vkGetShaderInfoAMD(device, pipeline, shader_stage, info_type, p_info_size,
+		p_info)
 }
 
-// VK_AMD_shader_image_load_store_lod is a preprocessor guard. Do not pass it to API calls.
-const amd_shader_image_load_store_lod = 1
 pub const amd_shader_image_load_store_lod_spec_version = 1
 pub const amd_shader_image_load_store_lod_extension_name = 'VK_AMD_shader_image_load_store_lod'
 
-// VK_GGP_stream_descriptor_surface is a preprocessor guard. Do not pass it to API calls.
-const ggp_stream_descriptor_surface = 1
-pub const ggp_stream_descriptor_surface_spec_version = 1
-pub const ggp_stream_descriptor_surface_extension_name = 'VK_GGP_stream_descriptor_surface'
-
-pub type StreamDescriptorSurfaceCreateFlagsGGP = u32
-
-pub struct StreamDescriptorSurfaceCreateInfoGGP {
-mut:
-	s_type            StructureType
-	p_next            voidptr
-	flags             StreamDescriptorSurfaceCreateFlagsGGP
-	stream_descriptor voidptr
-}
-
-type VkCreateStreamDescriptorSurfaceGGP = fn (C.Instance, &StreamDescriptorSurfaceCreateInfoGGP, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_stream_descriptor_surface_ggp(instance C.Instance, p_create_info &StreamDescriptorSurfaceCreateInfoGGP, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateStreamDescriptorSurfaceGGP((*vulkan.loader_p).get_sym('vkCreateStreamDescriptorSurfaceGGP') or {
-		println("Couldn't load symbol for 'vkCreateStreamDescriptorSurfaceGGP': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-// VK_NV_corner_sampled_image is a preprocessor guard. Do not pass it to API calls.
-const nv_corner_sampled_image = 1
 pub const nv_corner_sampled_image_spec_version = 2
 pub const nv_corner_sampled_image_extension_name = 'VK_NV_corner_sampled_image'
-// PhysicalDeviceCornerSampledImageFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceCornerSampledImageFeaturesNV {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	corner_sampled_image Bool32
 }
 
-// VK_IMG_format_pvrtc is a preprocessor guard. Do not pass it to API calls.
-const img_format_pvrtc = 1
 pub const img_format_pvrtc_spec_version = 1
 pub const img_format_pvrtc_extension_name = 'VK_IMG_format_pvrtc'
 
-// VK_NV_external_memory_capabilities is a preprocessor guard. Do not pass it to API calls.
-const nv_external_memory_capabilities = 1
 pub const nv_external_memory_capabilities_spec_version = 1
 pub const nv_external_memory_capabilities_extension_name = 'VK_NV_external_memory_capabilities'
 
@@ -13419,96 +12727,50 @@ pub enum ExternalMemoryFeatureFlagBitsNV {
 pub type ExternalMemoryFeatureFlagsNV = u32
 
 pub struct ExternalImageFormatPropertiesNV {
-mut:
+pub mut:
 	image_format_properties           ImageFormatProperties
 	external_memory_features          ExternalMemoryFeatureFlagsNV
 	export_from_imported_handle_types ExternalMemoryHandleTypeFlagsNV
 	compatible_handle_types           ExternalMemoryHandleTypeFlagsNV
 }
 
-type VkGetPhysicalDeviceExternalImageFormatPropertiesNV = fn (C.PhysicalDevice, Format, ImageType, ImageTiling, ImageUsageFlags, ImageCreateFlags, ExternalMemoryHandleTypeFlagsNV, &ExternalImageFormatPropertiesNV) Result
-
-pub fn get_physical_device_external_image_format_properties_nv(physical_device C.PhysicalDevice, format Format, vktype ImageType, tiling ImageTiling, usage ImageUsageFlags, flags ImageCreateFlags, external_handle_type ExternalMemoryHandleTypeFlagsNV, p_external_image_format_properties &ExternalImageFormatPropertiesNV) Result {
-	f := VkGetPhysicalDeviceExternalImageFormatPropertiesNV((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceExternalImageFormatPropertiesNV') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceExternalImageFormatPropertiesNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, format, vktype, tiling, usage, flags, external_handle_type,
-		p_external_image_format_properties)
+fn C.vkGetPhysicalDeviceExternalImageFormatPropertiesNV(C.PhysicalDevice,
+	Format,
+	ImageType,
+	ImageTiling,
+	ImageUsageFlags,
+	ImageCreateFlags,
+	ExternalMemoryHandleTypeFlagsNV,
+	&ExternalImageFormatPropertiesNV) Result
+pub fn get_physical_device_external_image_format_properties_nv(physical_device C.PhysicalDevice,
+	format Format,
+	vktype ImageType,
+	tiling ImageTiling,
+	usage ImageUsageFlags,
+	flags ImageCreateFlags,
+	external_handle_type ExternalMemoryHandleTypeFlagsNV,
+	p_external_image_format_properties &ExternalImageFormatPropertiesNV) Result {
+	return C.vkGetPhysicalDeviceExternalImageFormatPropertiesNV(physical_device, format,
+		vktype, tiling, usage, flags, external_handle_type, p_external_image_format_properties)
 }
 
-// VK_NV_external_memory is a preprocessor guard. Do not pass it to API calls.
-const nv_external_memory = 1
 pub const nv_external_memory_spec_version = 1
 pub const nv_external_memory_extension_name = 'VK_NV_external_memory'
-// ExternalMemoryImageCreateInfoNV extends VkImageCreateInfo
+
 pub struct ExternalMemoryImageCreateInfoNV {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	handle_types ExternalMemoryHandleTypeFlagsNV
 }
 
-// ExportMemoryAllocateInfoNV extends VkMemoryAllocateInfo
 pub struct ExportMemoryAllocateInfoNV {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	handle_types ExternalMemoryHandleTypeFlagsNV
 }
 
-// VK_NV_external_memory_win32 is a preprocessor guard. Do not pass it to API calls.
-const nv_external_memory_win32 = 1
-pub const nv_external_memory_win32_spec_version = 1
-pub const nv_external_memory_win32_extension_name = 'VK_NV_external_memory_win32'
-// ImportMemoryWin32HandleInfoNV extends VkMemoryAllocateInfo
-pub struct ImportMemoryWin32HandleInfoNV {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	handle_type ExternalMemoryHandleTypeFlagsNV
-	handle      voidptr
-}
-
-// ExportMemoryWin32HandleInfoNV extends VkMemoryAllocateInfo
-pub struct ExportMemoryWin32HandleInfoNV {
-mut:
-	s_type       StructureType
-	p_next       voidptr
-	p_attributes voidptr
-	dw_access    u32
-}
-
-type VkGetMemoryWin32HandleNV = fn (C.Device, C.DeviceMemory, ExternalMemoryHandleTypeFlagsNV, &voidptr) Result
-
-pub fn get_memory_win32_handle_nv(device C.Device, memory C.DeviceMemory, handle_type ExternalMemoryHandleTypeFlagsNV, p_handle &voidptr) Result {
-	f := VkGetMemoryWin32HandleNV((*vulkan.loader_p).get_sym('vkGetMemoryWin32HandleNV') or {
-		println("Couldn't load symbol for 'vkGetMemoryWin32HandleNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, memory, handle_type, p_handle)
-}
-
-// VK_NV_win32_keyed_mutex is a preprocessor guard. Do not pass it to API calls.
-const nv_win32_keyed_mutex = 1
-pub const nv_win32_keyed_mutex_spec_version = 2
-pub const nv_win32_keyed_mutex_extension_name = 'VK_NV_win32_keyed_mutex'
-// Win32KeyedMutexAcquireReleaseInfoNV extends VkSubmitInfo,VkSubmitInfo2
-pub struct Win32KeyedMutexAcquireReleaseInfoNV {
-mut:
-	s_type                         StructureType
-	p_next                         voidptr
-	acquire_count                  u32
-	p_acquire_syncs                &C.DeviceMemory
-	p_acquire_keys                 &u64
-	p_acquire_timeout_milliseconds &u32
-	release_count                  u32
-	p_release_syncs                &C.DeviceMemory
-	p_release_keys                 &u64
-}
-
-// VK_EXT_validation_flags is a preprocessor guard. Do not pass it to API calls.
-const ext_validation_flags = 1
 pub const ext_validation_flags_spec_version = 3
 pub const ext_validation_flags_extension_name = 'VK_EXT_validation_flags'
 
@@ -13518,79 +12780,42 @@ pub enum ValidationCheckEXT {
 	validation_check_max_enum_ext = int(0x7FFFFFFF)
 }
 
-// ValidationFlagsEXT extends VkInstanceCreateInfo
 pub struct ValidationFlagsEXT {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	disabled_validation_check_count u32
 	p_disabled_validation_checks    &ValidationCheckEXT
 }
 
-// VK_NN_vi_surface is a preprocessor guard. Do not pass it to API calls.
-const nn_vi_surface = 1
-pub const nn_vi_surface_spec_version = 1
-pub const nn_vi_surface_extension_name = 'VK_NN_vi_surface'
-
-pub type ViSurfaceCreateFlagsNN = u32
-
-pub struct ViSurfaceCreateInfoNN {
-mut:
-	s_type StructureType
-	p_next voidptr
-	flags  ViSurfaceCreateFlagsNN
-	window voidptr
-}
-
-type VkCreateViSurfaceNN = fn (C.Instance, &ViSurfaceCreateInfoNN, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_vi_surface_nn(instance C.Instance, p_create_info &ViSurfaceCreateInfoNN, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateViSurfaceNN((*vulkan.loader_p).get_sym('vkCreateViSurfaceNN') or {
-		println("Couldn't load symbol for 'vkCreateViSurfaceNN': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-// VK_EXT_shader_subgroup_ballot is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_subgroup_ballot = 1
 pub const ext_shader_subgroup_ballot_spec_version = 1
 pub const ext_shader_subgroup_ballot_extension_name = 'VK_EXT_shader_subgroup_ballot'
 
-// VK_EXT_shader_subgroup_vote is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_subgroup_vote = 1
 pub const ext_shader_subgroup_vote_spec_version = 1
 pub const ext_shader_subgroup_vote_extension_name = 'VK_EXT_shader_subgroup_vote'
 
-// VK_EXT_texture_compression_astc_hdr is a preprocessor guard. Do not pass it to API calls.
-const ext_texture_compression_astc_hdr = 1
 pub const ext_texture_compression_astc_hdr_spec_version = 1
 pub const ext_texture_compression_astc_hdr_extension_name = 'VK_EXT_texture_compression_astc_hdr'
 
 pub type PhysicalDeviceTextureCompressionASTCHDRFeaturesEXT = PhysicalDeviceTextureCompressionASTCHDRFeatures
 
-// VK_EXT_astc_decode_mode is a preprocessor guard. Do not pass it to API calls.
-const ext_astc_decode_mode = 1
 pub const ext_astc_decode_mode_spec_version = 1
 pub const ext_astc_decode_mode_extension_name = 'VK_EXT_astc_decode_mode'
-// ImageViewASTCDecodeModeEXT extends VkImageViewCreateInfo
+
 pub struct ImageViewASTCDecodeModeEXT {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	decode_mode Format
 }
 
-// PhysicalDeviceASTCDecodeFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceASTCDecodeFeaturesEXT {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	decode_mode_shared_exponent Bool32
 }
 
-// VK_EXT_pipeline_robustness is a preprocessor guard. Do not pass it to API calls.
-const ext_pipeline_robustness = 1
 pub const ext_pipeline_robustness_spec_version = 1
 pub const ext_pipeline_robustness_extension_name = 'VK_EXT_pipeline_robustness'
 
@@ -13610,17 +12835,15 @@ pub enum PipelineRobustnessImageBehaviorEXT {
 	pipeline_robustness_image_behavior_max_enum_ext              = int(0x7FFFFFFF)
 }
 
-// PhysicalDevicePipelineRobustnessFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDevicePipelineRobustnessFeaturesEXT {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	pipeline_robustness Bool32
 }
 
-// PhysicalDevicePipelineRobustnessPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDevicePipelineRobustnessPropertiesEXT {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	default_robustness_storage_buffers PipelineRobustnessBufferBehaviorEXT
@@ -13629,9 +12852,8 @@ mut:
 	default_robustness_images          PipelineRobustnessImageBehaviorEXT
 }
 
-// PipelineRobustnessCreateInfoEXT extends VkGraphicsPipelineCreateInfo,VkComputePipelineCreateInfo,VkPipelineShaderStageCreateInfo,VkRayTracingPipelineCreateInfoKHR
 pub struct PipelineRobustnessCreateInfoEXT {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	storage_buffers PipelineRobustnessBufferBehaviorEXT
@@ -13640,8 +12862,6 @@ mut:
 	images          PipelineRobustnessImageBehaviorEXT
 }
 
-// VK_EXT_conditional_rendering is a preprocessor guard. Do not pass it to API calls.
-const ext_conditional_rendering = 1
 pub const ext_conditional_rendering_spec_version = 2
 pub const ext_conditional_rendering_extension_name = 'VK_EXT_conditional_rendering'
 
@@ -13653,7 +12873,7 @@ pub enum ConditionalRenderingFlagBitsEXT {
 pub type ConditionalRenderingFlagsEXT = u32
 
 pub struct ConditionalRenderingBeginInfoEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	buffer C.Buffer
@@ -13661,57 +12881,44 @@ mut:
 	flags  ConditionalRenderingFlagsEXT
 }
 
-// PhysicalDeviceConditionalRenderingFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceConditionalRenderingFeaturesEXT {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	conditional_rendering           Bool32
 	inherited_conditional_rendering Bool32
 }
 
-// CommandBufferInheritanceConditionalRenderingInfoEXT extends VkCommandBufferInheritanceInfo
 pub struct CommandBufferInheritanceConditionalRenderingInfoEXT {
-mut:
+pub mut:
 	s_type                       StructureType
 	p_next                       voidptr
 	conditional_rendering_enable Bool32
 }
 
-type VkCmdBeginConditionalRenderingEXT = fn (C.CommandBuffer, &ConditionalRenderingBeginInfoEXT)
-
-pub fn cmd_begin_conditional_rendering_ext(command_buffer C.CommandBuffer, p_conditional_rendering_begin &ConditionalRenderingBeginInfoEXT) {
-	f := VkCmdBeginConditionalRenderingEXT((*vulkan.loader_p).get_sym('vkCmdBeginConditionalRenderingEXT') or {
-		println("Couldn't load symbol for 'vkCmdBeginConditionalRenderingEXT': ${err}")
-		return
-	})
-	f(command_buffer, p_conditional_rendering_begin)
+fn C.vkCmdBeginConditionalRenderingEXT(C.CommandBuffer,
+	&ConditionalRenderingBeginInfoEXT)
+pub fn cmd_begin_conditional_rendering_ext(command_buffer C.CommandBuffer,
+	p_conditional_rendering_begin &ConditionalRenderingBeginInfoEXT) {
+	C.vkCmdBeginConditionalRenderingEXT(command_buffer, p_conditional_rendering_begin)
 }
 
-type VkCmdEndConditionalRenderingEXT = fn (C.CommandBuffer)
-
+fn C.vkCmdEndConditionalRenderingEXT(C.CommandBuffer)
 pub fn cmd_end_conditional_rendering_ext(command_buffer C.CommandBuffer) {
-	f := VkCmdEndConditionalRenderingEXT((*vulkan.loader_p).get_sym('vkCmdEndConditionalRenderingEXT') or {
-		println("Couldn't load symbol for 'vkCmdEndConditionalRenderingEXT': ${err}")
-		return
-	})
-	f(command_buffer)
+	C.vkCmdEndConditionalRenderingEXT(command_buffer)
 }
 
-// VK_NV_clip_space_w_scaling is a preprocessor guard. Do not pass it to API calls.
-const nv_clip_space_w_scaling = 1
 pub const nv_clip_space_w_scaling_spec_version = 1
 pub const nv_clip_space_w_scaling_extension_name = 'VK_NV_clip_space_w_scaling'
 
 pub struct ViewportWScalingNV {
-mut:
+pub mut:
 	xcoeff f32
 	ycoeff f32
 }
 
-// PipelineViewportWScalingStateCreateInfoNV extends VkPipelineViewportStateCreateInfo
 pub struct PipelineViewportWScalingStateCreateInfoNV {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	viewport_w_scaling_enable Bool32
@@ -13719,58 +12926,27 @@ mut:
 	p_viewport_w_scalings     &ViewportWScalingNV
 }
 
-type VkCmdSetViewportWScalingNV = fn (C.CommandBuffer, u32, u32, &ViewportWScalingNV)
-
-pub fn cmd_set_viewport_w_scaling_nv(command_buffer C.CommandBuffer, first_viewport u32, viewport_count u32, p_viewport_w_scalings &ViewportWScalingNV) {
-	f := VkCmdSetViewportWScalingNV((*vulkan.loader_p).get_sym('vkCmdSetViewportWScalingNV') or {
-		println("Couldn't load symbol for 'vkCmdSetViewportWScalingNV': ${err}")
-		return
-	})
-	f(command_buffer, first_viewport, viewport_count, p_viewport_w_scalings)
+fn C.vkCmdSetViewportWScalingNV(C.CommandBuffer,
+	u32,
+	u32,
+	&ViewportWScalingNV)
+pub fn cmd_set_viewport_w_scaling_nv(command_buffer C.CommandBuffer,
+	first_viewport u32,
+	viewport_count u32,
+	p_viewport_w_scalings &ViewportWScalingNV) {
+	C.vkCmdSetViewportWScalingNV(command_buffer, first_viewport, viewport_count, p_viewport_w_scalings)
 }
 
-// VK_EXT_direct_mode_display is a preprocessor guard. Do not pass it to API calls.
-const ext_direct_mode_display = 1
 pub const ext_direct_mode_display_spec_version = 1
 pub const ext_direct_mode_display_extension_name = 'VK_EXT_direct_mode_display'
 
-type VkReleaseDisplayEXT = fn (C.PhysicalDevice, C.DisplayKHR) Result
-
-pub fn release_display_ext(physical_device C.PhysicalDevice, display C.DisplayKHR) Result {
-	f := VkReleaseDisplayEXT((*vulkan.loader_p).get_sym('vkReleaseDisplayEXT') or {
-		println("Couldn't load symbol for 'vkReleaseDisplayEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, display)
+fn C.vkReleaseDisplayEXT(C.PhysicalDevice,
+	C.DisplayKHR) Result
+pub fn release_display_ext(physical_device C.PhysicalDevice,
+	display C.DisplayKHR) Result {
+	return C.vkReleaseDisplayEXT(physical_device, display)
 }
 
-// VK_EXT_acquire_xlib_display is a preprocessor guard. Do not pass it to API calls.
-const ext_acquire_xlib_display = 1
-pub const ext_acquire_xlib_display_spec_version = 1
-pub const ext_acquire_xlib_display_extension_name = 'VK_EXT_acquire_xlib_display'
-
-type VkAcquireXlibDisplayEXT = fn (C.PhysicalDevice, &C.DisplayKHR, C.DisplayKHR) Result
-
-pub fn acquire_xlib_display_ext(physical_device C.PhysicalDevice, dpy &C.DisplayKHR, display C.DisplayKHR) Result {
-	f := VkAcquireXlibDisplayEXT((*vulkan.loader_p).get_sym('vkAcquireXlibDisplayEXT') or {
-		println("Couldn't load symbol for 'vkAcquireXlibDisplayEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, dpy, display)
-}
-
-type VkGetRandROutputDisplayEXT = fn (C.PhysicalDevice, &C.DisplayKHR, u32, &C.DisplayKHR) Result
-
-pub fn get_rand_r_output_display_ext(physical_device C.PhysicalDevice, dpy &C.DisplayKHR, rr_output u32, p_display &C.DisplayKHR) Result {
-	f := VkGetRandROutputDisplayEXT((*vulkan.loader_p).get_sym('vkGetRandROutputDisplayEXT') or {
-		println("Couldn't load symbol for 'vkGetRandROutputDisplayEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, dpy, rr_output, p_display)
-}
-
-// VK_EXT_display_surface_counter is a preprocessor guard. Do not pass it to API calls.
-const ext_display_surface_counter = 1
 pub const ext_display_surface_counter_spec_version = 1
 pub const ext_display_surface_counter_extension_name = 'VK_EXT_display_surface_counter'
 
@@ -13782,7 +12958,7 @@ pub enum SurfaceCounterFlagBitsEXT {
 pub type SurfaceCounterFlagsEXT = u32
 
 pub struct SurfaceCapabilities2EXT {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	min_image_count            u32
@@ -13798,18 +12974,15 @@ mut:
 	supported_surface_counters SurfaceCounterFlagsEXT
 }
 
-type VkGetPhysicalDeviceSurfaceCapabilities2EXT = fn (C.PhysicalDevice, C.SurfaceKHR, &SurfaceCapabilities2EXT) Result
-
-pub fn get_physical_device_surface_capabilities2_ext(physical_device C.PhysicalDevice, surface C.SurfaceKHR, p_surface_capabilities &SurfaceCapabilities2EXT) Result {
-	f := VkGetPhysicalDeviceSurfaceCapabilities2EXT((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSurfaceCapabilities2EXT') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfaceCapabilities2EXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, surface, p_surface_capabilities)
+fn C.vkGetPhysicalDeviceSurfaceCapabilities2EXT(C.PhysicalDevice,
+	C.SurfaceKHR,
+	&SurfaceCapabilities2EXT) Result
+pub fn get_physical_device_surface_capabilities2_ext(physical_device C.PhysicalDevice,
+	surface C.SurfaceKHR,
+	p_surface_capabilities &SurfaceCapabilities2EXT) Result {
+	return C.vkGetPhysicalDeviceSurfaceCapabilities2EXT(physical_device, surface, p_surface_capabilities)
 }
 
-// VK_EXT_display_control is a preprocessor guard. Do not pass it to API calls.
-const ext_display_control = 1
 pub const ext_display_control_spec_version = 1
 pub const ext_display_control_extension_name = 'VK_EXT_display_control'
 
@@ -13831,86 +13004,88 @@ pub enum DisplayEventTypeEXT {
 }
 
 pub struct DisplayPowerInfoEXT {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	power_state DisplayPowerStateEXT
 }
 
 pub struct DeviceEventInfoEXT {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	device_event DeviceEventTypeEXT
 }
 
 pub struct DisplayEventInfoEXT {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	display_event DisplayEventTypeEXT
 }
 
-// SwapchainCounterCreateInfoEXT extends VkSwapchainCreateInfoKHR
 pub struct SwapchainCounterCreateInfoEXT {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	surface_counters SurfaceCounterFlagsEXT
 }
 
-type VkDisplayPowerControlEXT = fn (C.Device, C.DisplayKHR, &DisplayPowerInfoEXT) Result
-
-pub fn display_power_control_ext(device C.Device, display C.DisplayKHR, p_display_power_info &DisplayPowerInfoEXT) Result {
-	f := VkDisplayPowerControlEXT((*vulkan.loader_p).get_sym('vkDisplayPowerControlEXT') or {
-		println("Couldn't load symbol for 'vkDisplayPowerControlEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, display, p_display_power_info)
+fn C.vkDisplayPowerControlEXT(C.Device,
+	C.DisplayKHR,
+	&DisplayPowerInfoEXT) Result
+pub fn display_power_control_ext(device C.Device,
+	display C.DisplayKHR,
+	p_display_power_info &DisplayPowerInfoEXT) Result {
+	return C.vkDisplayPowerControlEXT(device, display, p_display_power_info)
 }
 
-type VkRegisterDeviceEventEXT = fn (C.Device, &DeviceEventInfoEXT, &AllocationCallbacks, &C.Fence) Result
-
-pub fn register_device_event_ext(device C.Device, p_device_event_info &DeviceEventInfoEXT, p_allocator &AllocationCallbacks, p_fence &C.Fence) Result {
-	f := VkRegisterDeviceEventEXT((*vulkan.loader_p).get_sym('vkRegisterDeviceEventEXT') or {
-		println("Couldn't load symbol for 'vkRegisterDeviceEventEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_device_event_info, p_allocator, p_fence)
+fn C.vkRegisterDeviceEventEXT(C.Device,
+	&DeviceEventInfoEXT,
+	&AllocationCallbacks,
+	&C.Fence) Result
+pub fn register_device_event_ext(device C.Device,
+	p_device_event_info &DeviceEventInfoEXT,
+	p_allocator &AllocationCallbacks,
+	p_fence &C.Fence) Result {
+	return C.vkRegisterDeviceEventEXT(device, p_device_event_info, p_allocator, p_fence)
 }
 
-type VkRegisterDisplayEventEXT = fn (C.Device, C.DisplayKHR, &DisplayEventInfoEXT, &AllocationCallbacks, &C.Fence) Result
-
-pub fn register_display_event_ext(device C.Device, display C.DisplayKHR, p_display_event_info &DisplayEventInfoEXT, p_allocator &AllocationCallbacks, p_fence &C.Fence) Result {
-	f := VkRegisterDisplayEventEXT((*vulkan.loader_p).get_sym('vkRegisterDisplayEventEXT') or {
-		println("Couldn't load symbol for 'vkRegisterDisplayEventEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, display, p_display_event_info, p_allocator, p_fence)
+fn C.vkRegisterDisplayEventEXT(C.Device,
+	C.DisplayKHR,
+	&DisplayEventInfoEXT,
+	&AllocationCallbacks,
+	&C.Fence) Result
+pub fn register_display_event_ext(device C.Device,
+	display C.DisplayKHR,
+	p_display_event_info &DisplayEventInfoEXT,
+	p_allocator &AllocationCallbacks,
+	p_fence &C.Fence) Result {
+	return C.vkRegisterDisplayEventEXT(device, display, p_display_event_info, p_allocator,
+		p_fence)
 }
 
-type VkGetSwapchainCounterEXT = fn (C.Device, C.SwapchainKHR, SurfaceCounterFlagBitsEXT, &u64) Result
-
-pub fn get_swapchain_counter_ext(device C.Device, swapchain C.SwapchainKHR, counter SurfaceCounterFlagBitsEXT, p_counter_value &u64) Result {
-	f := VkGetSwapchainCounterEXT((*vulkan.loader_p).get_sym('vkGetSwapchainCounterEXT') or {
-		println("Couldn't load symbol for 'vkGetSwapchainCounterEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain, counter, p_counter_value)
+fn C.vkGetSwapchainCounterEXT(C.Device,
+	C.SwapchainKHR,
+	SurfaceCounterFlagBitsEXT,
+	&u64) Result
+pub fn get_swapchain_counter_ext(device C.Device,
+	swapchain C.SwapchainKHR,
+	counter SurfaceCounterFlagBitsEXT,
+	p_counter_value &u64) Result {
+	return C.vkGetSwapchainCounterEXT(device, swapchain, counter, p_counter_value)
 }
 
-// VK_GOOGLE_display_timing is a preprocessor guard. Do not pass it to API calls.
-const google_display_timing = 1
 pub const google_display_timing_spec_version = 1
 pub const google_display_timing_extension_name = 'VK_GOOGE_display_timing'
 
 pub struct RefreshCycleDurationGOOGLE {
-mut:
+pub mut:
 	refresh_duration u64
 }
 
 pub struct PastPresentationTimingGOOGLE {
-mut:
+pub mut:
 	present_id            u32
 	desired_present_time  u64
 	actual_present_time   u64
@@ -13919,71 +13094,63 @@ mut:
 }
 
 pub struct PresentTimeGOOGLE {
-mut:
+pub mut:
 	present_id           u32
 	desired_present_time u64
 }
 
-// PresentTimesInfoGOOGLE extends VkPresentInfoKHR
 pub struct PresentTimesInfoGOOGLE {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	swapchain_count u32
 	p_times         &PresentTimeGOOGLE
 }
 
-type VkGetRefreshCycleDurationGOOGLE = fn (C.Device, C.SwapchainKHR, &RefreshCycleDurationGOOGLE) Result
-
-pub fn get_refresh_cycle_duration_google(device C.Device, swapchain C.SwapchainKHR, p_display_timing_properties &RefreshCycleDurationGOOGLE) Result {
-	f := VkGetRefreshCycleDurationGOOGLE((*vulkan.loader_p).get_sym('vkGetRefreshCycleDurationGOOGLE') or {
-		println("Couldn't load symbol for 'vkGetRefreshCycleDurationGOOGLE': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain, p_display_timing_properties)
+fn C.vkGetRefreshCycleDurationGOOGLE(C.Device,
+	C.SwapchainKHR,
+	&RefreshCycleDurationGOOGLE) Result
+pub fn get_refresh_cycle_duration_google(device C.Device,
+	swapchain C.SwapchainKHR,
+	p_display_timing_properties &RefreshCycleDurationGOOGLE) Result {
+	return C.vkGetRefreshCycleDurationGOOGLE(device, swapchain, p_display_timing_properties)
 }
 
-type VkGetPastPresentationTimingGOOGLE = fn (C.Device, C.SwapchainKHR, &u32, &PastPresentationTimingGOOGLE) Result
-
-pub fn get_past_presentation_timing_google(device C.Device, swapchain C.SwapchainKHR, p_presentation_timing_count &u32, p_presentation_timings &PastPresentationTimingGOOGLE) Result {
-	f := VkGetPastPresentationTimingGOOGLE((*vulkan.loader_p).get_sym('vkGetPastPresentationTimingGOOGLE') or {
-		println("Couldn't load symbol for 'vkGetPastPresentationTimingGOOGLE': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain, p_presentation_timing_count, p_presentation_timings)
+fn C.vkGetPastPresentationTimingGOOGLE(C.Device,
+	C.SwapchainKHR,
+	&u32,
+	&PastPresentationTimingGOOGLE) Result
+pub fn get_past_presentation_timing_google(device C.Device,
+	swapchain C.SwapchainKHR,
+	p_presentation_timing_count &u32,
+	p_presentation_timings &PastPresentationTimingGOOGLE) Result {
+	return C.vkGetPastPresentationTimingGOOGLE(device, swapchain, p_presentation_timing_count,
+		p_presentation_timings)
 }
 
-// VK_NV_sample_mask_override_coverage is a preprocessor guard. Do not pass it to API calls.
-const nv_sample_mask_override_coverage = 1
 pub const nv_sample_mask_override_coverage_spec_version = 1
 pub const nv_sample_mask_override_coverage_extension_name = 'VK_NV_sample_mask_override_coverage'
 
-// VK_NV_geometry_shader_passthrough is a preprocessor guard. Do not pass it to API calls.
-const nv_geometry_shader_passthrough = 1
 pub const nv_geometry_shader_passthrough_spec_version = 1
 pub const nv_geometry_shader_passthrough_extension_name = 'VK_NV_geometry_shader_passthrough'
 
-// VK_NV_viewport_array2 is a preprocessor guard. Do not pass it to API calls.
-const nv_viewport_array2 = 1
 pub const nv_viewport_array_2_spec_version = 1
 pub const nv_viewport_array_2_extension_name = 'VK_NV_viewport_array2'
+// VK_NV_VIEWPORT_ARRAY2_SPEC_VERSION is a deprecated alias
 pub const nv_viewport_array2_spec_version = nv_viewport_array_2_spec_version
+// VK_NV_VIEWPORT_ARRAY2_EXTENSION_NAME is a deprecated alias
 pub const nv_viewport_array2_extension_name = nv_viewport_array_2_extension_name
 
-// VK_NVX_multiview_per_view_attributes is a preprocessor guard. Do not pass it to API calls.
-const nvx_multiview_per_view_attributes = 1
 pub const nvx_multiview_per_view_attributes_spec_version = 1
 pub const nvx_multiview_per_view_attributes_extension_name = 'VK_NVX_multiview_per_view_attributes'
-// PhysicalDeviceMultiviewPerViewAttributesPropertiesNVX extends VkPhysicalDeviceProperties2
+
 pub struct PhysicalDeviceMultiviewPerViewAttributesPropertiesNVX {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	per_view_position_all_components Bool32
 }
 
-// VK_NV_viewport_swizzle is a preprocessor guard. Do not pass it to API calls.
-const nv_viewport_swizzle = 1
 pub const nv_viewport_swizzle_spec_version = 1
 pub const nv_viewport_swizzle_extension_name = 'VK_NV_viewport_swizzle'
 
@@ -14002,16 +13169,15 @@ pub enum ViewportCoordinateSwizzleNV {
 pub type PipelineViewportSwizzleStateCreateFlagsNV = u32
 
 pub struct ViewportSwizzleNV {
-mut:
+pub mut:
 	x ViewportCoordinateSwizzleNV
 	y ViewportCoordinateSwizzleNV
 	z ViewportCoordinateSwizzleNV
 	w ViewportCoordinateSwizzleNV
 }
 
-// PipelineViewportSwizzleStateCreateInfoNV extends VkPipelineViewportStateCreateInfo
 pub struct PipelineViewportSwizzleStateCreateInfoNV {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	flags               PipelineViewportSwizzleStateCreateFlagsNV
@@ -14019,8 +13185,6 @@ mut:
 	p_viewport_swizzles &ViewportSwizzleNV
 }
 
-// VK_EXT_discard_rectangles is a preprocessor guard. Do not pass it to API calls.
-const ext_discard_rectangles = 1
 pub const ext_discard_rectangles_spec_version = 2
 pub const ext_discard_rectangles_extension_name = 'VK_EXT_discard_rectangles'
 
@@ -14032,17 +13196,15 @@ pub enum DiscardRectangleModeEXT {
 
 pub type PipelineDiscardRectangleStateCreateFlagsEXT = u32
 
-// PhysicalDeviceDiscardRectanglePropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceDiscardRectanglePropertiesEXT {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	max_discard_rectangles u32
 }
 
-// PipelineDiscardRectangleStateCreateInfoEXT extends VkGraphicsPipelineCreateInfo
 pub struct PipelineDiscardRectangleStateCreateInfoEXT {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	flags                   PipelineDiscardRectangleStateCreateFlagsEXT
@@ -14051,38 +13213,32 @@ mut:
 	p_discard_rectangles    &Rect2D
 }
 
-type VkCmdSetDiscardRectangleEXT = fn (C.CommandBuffer, u32, u32, &Rect2D)
-
-pub fn cmd_set_discard_rectangle_ext(command_buffer C.CommandBuffer, first_discard_rectangle u32, discard_rectangle_count u32, p_discard_rectangles &Rect2D) {
-	f := VkCmdSetDiscardRectangleEXT((*vulkan.loader_p).get_sym('vkCmdSetDiscardRectangleEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDiscardRectangleEXT': ${err}")
-		return
-	})
-	f(command_buffer, first_discard_rectangle, discard_rectangle_count, p_discard_rectangles)
+fn C.vkCmdSetDiscardRectangleEXT(C.CommandBuffer,
+	u32,
+	u32,
+	&Rect2D)
+pub fn cmd_set_discard_rectangle_ext(command_buffer C.CommandBuffer,
+	first_discard_rectangle u32,
+	discard_rectangle_count u32,
+	p_discard_rectangles &Rect2D) {
+	C.vkCmdSetDiscardRectangleEXT(command_buffer, first_discard_rectangle, discard_rectangle_count,
+		p_discard_rectangles)
 }
 
-type VkCmdSetDiscardRectangleEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_discard_rectangle_enable_ext(command_buffer C.CommandBuffer, discard_rectangle_enable Bool32) {
-	f := VkCmdSetDiscardRectangleEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetDiscardRectangleEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDiscardRectangleEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, discard_rectangle_enable)
+fn C.vkCmdSetDiscardRectangleEnableEXT(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_discard_rectangle_enable_ext(command_buffer C.CommandBuffer,
+	discard_rectangle_enable Bool32) {
+	C.vkCmdSetDiscardRectangleEnableEXT(command_buffer, discard_rectangle_enable)
 }
 
-type VkCmdSetDiscardRectangleModeEXT = fn (C.CommandBuffer, DiscardRectangleModeEXT)
-
-pub fn cmd_set_discard_rectangle_mode_ext(command_buffer C.CommandBuffer, discard_rectangle_mode DiscardRectangleModeEXT) {
-	f := VkCmdSetDiscardRectangleModeEXT((*vulkan.loader_p).get_sym('vkCmdSetDiscardRectangleModeEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDiscardRectangleModeEXT': ${err}")
-		return
-	})
-	f(command_buffer, discard_rectangle_mode)
+fn C.vkCmdSetDiscardRectangleModeEXT(C.CommandBuffer,
+	DiscardRectangleModeEXT)
+pub fn cmd_set_discard_rectangle_mode_ext(command_buffer C.CommandBuffer,
+	discard_rectangle_mode DiscardRectangleModeEXT) {
+	C.vkCmdSetDiscardRectangleModeEXT(command_buffer, discard_rectangle_mode)
 }
 
-// VK_EXT_conservative_rasterization is a preprocessor guard. Do not pass it to API calls.
-const ext_conservative_rasterization = 1
 pub const ext_conservative_rasterization_spec_version = 1
 pub const ext_conservative_rasterization_extension_name = 'VK_EXT_conservative_rasterization'
 
@@ -14095,9 +13251,8 @@ pub enum ConservativeRasterizationModeEXT {
 
 pub type PipelineRasterizationConservativeStateCreateFlagsEXT = u32
 
-// PhysicalDeviceConservativeRasterizationPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceConservativeRasterizationPropertiesEXT {
-mut:
+pub mut:
 	s_type                                          StructureType
 	p_next                                          voidptr
 	primitive_overestimation_size                   f32
@@ -14111,9 +13266,8 @@ mut:
 	conservative_rasterization_post_depth_coverage  Bool32
 }
 
-// PipelineRasterizationConservativeStateCreateInfoEXT extends VkPipelineRasterizationStateCreateInfo
 pub struct PipelineRasterizationConservativeStateCreateInfoEXT {
-mut:
+pub mut:
 	s_type                              StructureType
 	p_next                              voidptr
 	flags                               PipelineRasterizationConservativeStateCreateFlagsEXT
@@ -14121,48 +13275,40 @@ mut:
 	extra_primitive_overestimation_size f32
 }
 
-// VK_EXT_depth_clip_enable is a preprocessor guard. Do not pass it to API calls.
-const ext_depth_clip_enable = 1
 pub const ext_depth_clip_enable_spec_version = 1
 pub const ext_depth_clip_enable_extension_name = 'VK_EXT_depth_clip_enable'
 
 pub type PipelineRasterizationDepthClipStateCreateFlagsEXT = u32
 
-// PhysicalDeviceDepthClipEnableFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceDepthClipEnableFeaturesEXT {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	depth_clip_enable Bool32
 }
 
-// PipelineRasterizationDepthClipStateCreateInfoEXT extends VkPipelineRasterizationStateCreateInfo
 pub struct PipelineRasterizationDepthClipStateCreateInfoEXT {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	flags             PipelineRasterizationDepthClipStateCreateFlagsEXT
 	depth_clip_enable Bool32
 }
 
-// VK_EXT_swapchain_colorspace is a preprocessor guard. Do not pass it to API calls.
-const ext_swapchain_colorspace = 1
-pub const ext_swapchain_color_space_spec_version = 4
+pub const ext_swapchain_color_space_spec_version = 5
 pub const ext_swapchain_color_space_extension_name = 'VK_EXT_swapchain_colorspace'
 
-// VK_EXT_hdr_metadata is a preprocessor guard. Do not pass it to API calls.
-const ext_hdr_metadata = 1
-pub const ext_hdr_metadata_spec_version = 2
+pub const ext_hdr_metadata_spec_version = 3
 pub const ext_hdr_metadata_extension_name = 'VK_EXT_hdr_metadata'
 
 pub struct XYColorEXT {
-mut:
+pub mut:
 	x f32
 	y f32
 }
 
 pub struct HdrMetadataEXT {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	display_primary_red           XYColorEXT
@@ -14175,91 +13321,33 @@ mut:
 	max_frame_average_light_level f32
 }
 
-type VkSetHdrMetadataEXT = fn (C.Device, u32, &C.SwapchainKHR, &HdrMetadataEXT)
-
-pub fn set_hdr_metadata_ext(device C.Device, swapchain_count u32, p_swapchains &C.SwapchainKHR, p_metadata &HdrMetadataEXT) {
-	f := VkSetHdrMetadataEXT((*vulkan.loader_p).get_sym('vkSetHdrMetadataEXT') or {
-		println("Couldn't load symbol for 'vkSetHdrMetadataEXT': ${err}")
-		return
-	})
-	f(device, swapchain_count, p_swapchains, p_metadata)
+fn C.vkSetHdrMetadataEXT(C.Device,
+	u32,
+	&C.SwapchainKHR,
+	&HdrMetadataEXT)
+pub fn set_hdr_metadata_ext(device C.Device,
+	swapchain_count u32,
+	p_swapchains &C.SwapchainKHR,
+	p_metadata &HdrMetadataEXT) {
+	C.vkSetHdrMetadataEXT(device, swapchain_count, p_swapchains, p_metadata)
 }
 
-// VK_IMG_relaxed_line_rasterization is a preprocessor guard. Do not pass it to API calls.
-const img_relaxed_line_rasterization = 1
 pub const img_relaxed_line_rasterization_spec_version = 1
 pub const img_relaxed_line_rasterization_extension_name = 'VK_IMG_relaxed_line_rasterization'
-// PhysicalDeviceRelaxedLineRasterizationFeaturesIMG extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceRelaxedLineRasterizationFeaturesIMG {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	relaxed_line_rasterization Bool32
 }
 
-// VK_MVK_ios_surface is a preprocessor guard. Do not pass it to API calls.
-const mvk_ios_surface = 1
-pub const mvk_ios_surface_spec_version = 3
-pub const mvk_ios_surface_extension_name = 'VK_MVK_ios_surface'
-
-pub type IOSSurfaceCreateFlagsMVK = u32
-
-pub struct IOSSurfaceCreateInfoMVK {
-mut:
-	s_type StructureType
-	p_next voidptr
-	flags  IOSSurfaceCreateFlagsMVK
-	p_view voidptr
-}
-
-type VkCreateIOSSurfaceMVK = fn (C.Instance, &IOSSurfaceCreateInfoMVK, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_ios_surface_mvk(instance C.Instance, p_create_info &IOSSurfaceCreateInfoMVK, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateIOSSurfaceMVK((*vulkan.loader_p).get_sym('vkCreateIOSSurfaceMVK') or {
-		println("Couldn't load symbol for 'vkCreateIOSSurfaceMVK': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-// VK_MVK_macos_surface is a preprocessor guard. Do not pass it to API calls.
-const mvk_macos_surface = 1
-pub const mvk_macos_surface_spec_version = 3
-pub const mvk_macos_surface_extension_name = 'VK_MVK_macos_surface'
-
-pub type MacOSSurfaceCreateFlagsMVK = u32
-
-pub struct MacOSSurfaceCreateInfoMVK {
-mut:
-	s_type StructureType
-	p_next voidptr
-	flags  MacOSSurfaceCreateFlagsMVK
-	p_view voidptr
-}
-
-type VkCreateMacOSSurfaceMVK = fn (C.Instance, &MacOSSurfaceCreateInfoMVK, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_mac_os_surface_mvk(instance C.Instance, p_create_info &MacOSSurfaceCreateInfoMVK, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateMacOSSurfaceMVK((*vulkan.loader_p).get_sym('vkCreateMacOSSurfaceMVK') or {
-		println("Couldn't load symbol for 'vkCreateMacOSSurfaceMVK': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-// VK_EXT_external_memory_dma_buf is a preprocessor guard. Do not pass it to API calls.
-const ext_external_memory_dma_buf = 1
 pub const ext_external_memory_dma_buf_spec_version = 1
 pub const ext_external_memory_dma_buf_extension_name = 'VK_EXT_external_memory_dma_buf'
 
-// VK_EXT_queue_family_foreign is a preprocessor guard. Do not pass it to API calls.
-const ext_queue_family_foreign = 1
 pub const ext_queue_family_foreign_spec_version = 1
 pub const ext_queue_family_foreign_extension_name = 'VK_EXT_queue_family_foreign'
 pub const queue_family_foreign_ext = ~u32(2)
-
-// VK_EXT_debug_utils is a preprocessor guard. Do not pass it to API calls.
-const ext_debug_utils = 1
 
 pub type C.DebugUtilsMessengerEXT = voidptr
 
@@ -14289,16 +13377,15 @@ pub type DebugUtilsMessageSeverityFlagsEXT = u32
 pub type DebugUtilsMessengerCreateFlagsEXT = u32
 
 pub struct DebugUtilsLabelEXT {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	p_label_name &char
-	color        []f32
+	color        [4]f32
 }
 
-// DebugUtilsObjectNameInfoEXT extends VkPipelineShaderStageCreateInfo
 pub struct DebugUtilsObjectNameInfoEXT {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	object_type   ObjectType
@@ -14307,7 +13394,7 @@ mut:
 }
 
 pub struct DebugUtilsMessengerCallbackDataEXT {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	flags               DebugUtilsMessengerCallbackDataFlagsEXT
@@ -14322,11 +13409,10 @@ mut:
 	p_objects           &DebugUtilsObjectNameInfoEXT
 }
 
-pub type PFN_vkDebugUtilsMessengerCallbackEXT = fn (messageSeverity DebugUtilsMessageSeverityFlagBitsEXT, messageTypes DebugUtilsMessageTypeFlagsEXT, pCallbackData &DebugUtilsMessengerCallbackDataEXT, pUserData voidptr) voidptr
+pub type PFN_vkDebugUtilsMessengerCallbackEXT = fn (messageSeverity DebugUtilsMessageSeverityFlagBitsEXT, messageTypes DebugUtilsMessageTypeFlagsEXT, pCallbackData &DebugUtilsMessengerCallbackDataEXT, pUserData voidptr)
 
-// DebugUtilsMessengerCreateInfoEXT extends VkInstanceCreateInfo
 pub struct DebugUtilsMessengerCreateInfoEXT {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	flags             DebugUtilsMessengerCreateFlagsEXT
@@ -14337,7 +13423,7 @@ mut:
 }
 
 pub struct DebugUtilsObjectTagInfoEXT {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	object_type   ObjectType
@@ -14347,211 +13433,89 @@ mut:
 	p_tag         voidptr
 }
 
-type VkSetDebugUtilsObjectNameEXT = fn (C.Device, &DebugUtilsObjectNameInfoEXT) Result
-
-pub fn set_debug_utils_object_name_ext(device C.Device, p_name_info &DebugUtilsObjectNameInfoEXT) Result {
-	f := VkSetDebugUtilsObjectNameEXT((*vulkan.loader_p).get_sym('vkSetDebugUtilsObjectNameEXT') or {
-		println("Couldn't load symbol for 'vkSetDebugUtilsObjectNameEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_name_info)
+fn C.vkSetDebugUtilsObjectNameEXT(C.Device,
+	&DebugUtilsObjectNameInfoEXT) Result
+pub fn set_debug_utils_object_name_ext(device C.Device,
+	p_name_info &DebugUtilsObjectNameInfoEXT) Result {
+	return C.vkSetDebugUtilsObjectNameEXT(device, p_name_info)
 }
 
-type VkSetDebugUtilsObjectTagEXT = fn (C.Device, &DebugUtilsObjectTagInfoEXT) Result
-
-pub fn set_debug_utils_object_tag_ext(device C.Device, p_tag_info &DebugUtilsObjectTagInfoEXT) Result {
-	f := VkSetDebugUtilsObjectTagEXT((*vulkan.loader_p).get_sym('vkSetDebugUtilsObjectTagEXT') or {
-		println("Couldn't load symbol for 'vkSetDebugUtilsObjectTagEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_tag_info)
+fn C.vkSetDebugUtilsObjectTagEXT(C.Device,
+	&DebugUtilsObjectTagInfoEXT) Result
+pub fn set_debug_utils_object_tag_ext(device C.Device,
+	p_tag_info &DebugUtilsObjectTagInfoEXT) Result {
+	return C.vkSetDebugUtilsObjectTagEXT(device, p_tag_info)
 }
 
-type VkQueueBeginDebugUtilsLabelEXT = fn (C.Queue, &DebugUtilsLabelEXT)
-
-pub fn queue_begin_debug_utils_label_ext(queue C.Queue, p_label_info &DebugUtilsLabelEXT) {
-	f := VkQueueBeginDebugUtilsLabelEXT((*vulkan.loader_p).get_sym('vkQueueBeginDebugUtilsLabelEXT') or {
-		println("Couldn't load symbol for 'vkQueueBeginDebugUtilsLabelEXT': ${err}")
-		return
-	})
-	f(queue, p_label_info)
+fn C.vkQueueBeginDebugUtilsLabelEXT(C.Queue,
+	&DebugUtilsLabelEXT)
+pub fn queue_begin_debug_utils_label_ext(queue C.Queue,
+	p_label_info &DebugUtilsLabelEXT) {
+	C.vkQueueBeginDebugUtilsLabelEXT(queue, p_label_info)
 }
 
-type VkQueueEndDebugUtilsLabelEXT = fn (C.Queue)
-
+fn C.vkQueueEndDebugUtilsLabelEXT(C.Queue)
 pub fn queue_end_debug_utils_label_ext(queue C.Queue) {
-	f := VkQueueEndDebugUtilsLabelEXT((*vulkan.loader_p).get_sym('vkQueueEndDebugUtilsLabelEXT') or {
-		println("Couldn't load symbol for 'vkQueueEndDebugUtilsLabelEXT': ${err}")
-		return
-	})
-	f(queue)
+	C.vkQueueEndDebugUtilsLabelEXT(queue)
 }
 
-type VkQueueInsertDebugUtilsLabelEXT = fn (C.Queue, &DebugUtilsLabelEXT)
-
-pub fn queue_insert_debug_utils_label_ext(queue C.Queue, p_label_info &DebugUtilsLabelEXT) {
-	f := VkQueueInsertDebugUtilsLabelEXT((*vulkan.loader_p).get_sym('vkQueueInsertDebugUtilsLabelEXT') or {
-		println("Couldn't load symbol for 'vkQueueInsertDebugUtilsLabelEXT': ${err}")
-		return
-	})
-	f(queue, p_label_info)
+fn C.vkQueueInsertDebugUtilsLabelEXT(C.Queue,
+	&DebugUtilsLabelEXT)
+pub fn queue_insert_debug_utils_label_ext(queue C.Queue,
+	p_label_info &DebugUtilsLabelEXT) {
+	C.vkQueueInsertDebugUtilsLabelEXT(queue, p_label_info)
 }
 
-type VkCmdBeginDebugUtilsLabelEXT = fn (C.CommandBuffer, &DebugUtilsLabelEXT)
-
-pub fn cmd_begin_debug_utils_label_ext(command_buffer C.CommandBuffer, p_label_info &DebugUtilsLabelEXT) {
-	f := VkCmdBeginDebugUtilsLabelEXT((*vulkan.loader_p).get_sym('vkCmdBeginDebugUtilsLabelEXT') or {
-		println("Couldn't load symbol for 'vkCmdBeginDebugUtilsLabelEXT': ${err}")
-		return
-	})
-	f(command_buffer, p_label_info)
+fn C.vkCmdBeginDebugUtilsLabelEXT(C.CommandBuffer,
+	&DebugUtilsLabelEXT)
+pub fn cmd_begin_debug_utils_label_ext(command_buffer C.CommandBuffer,
+	p_label_info &DebugUtilsLabelEXT) {
+	C.vkCmdBeginDebugUtilsLabelEXT(command_buffer, p_label_info)
 }
 
-type VkCmdEndDebugUtilsLabelEXT = fn (C.CommandBuffer)
-
+fn C.vkCmdEndDebugUtilsLabelEXT(C.CommandBuffer)
 pub fn cmd_end_debug_utils_label_ext(command_buffer C.CommandBuffer) {
-	f := VkCmdEndDebugUtilsLabelEXT((*vulkan.loader_p).get_sym('vkCmdEndDebugUtilsLabelEXT') or {
-		println("Couldn't load symbol for 'vkCmdEndDebugUtilsLabelEXT': ${err}")
-		return
-	})
-	f(command_buffer)
+	C.vkCmdEndDebugUtilsLabelEXT(command_buffer)
 }
 
-type VkCmdInsertDebugUtilsLabelEXT = fn (C.CommandBuffer, &DebugUtilsLabelEXT)
-
-pub fn cmd_insert_debug_utils_label_ext(command_buffer C.CommandBuffer, p_label_info &DebugUtilsLabelEXT) {
-	f := VkCmdInsertDebugUtilsLabelEXT((*vulkan.loader_p).get_sym('vkCmdInsertDebugUtilsLabelEXT') or {
-		println("Couldn't load symbol for 'vkCmdInsertDebugUtilsLabelEXT': ${err}")
-		return
-	})
-	f(command_buffer, p_label_info)
+fn C.vkCmdInsertDebugUtilsLabelEXT(C.CommandBuffer,
+	&DebugUtilsLabelEXT)
+pub fn cmd_insert_debug_utils_label_ext(command_buffer C.CommandBuffer,
+	p_label_info &DebugUtilsLabelEXT) {
+	C.vkCmdInsertDebugUtilsLabelEXT(command_buffer, p_label_info)
 }
 
-type VkCreateDebugUtilsMessengerEXT = fn (C.Instance, &DebugUtilsMessengerCreateInfoEXT, &AllocationCallbacks, &C.DebugUtilsMessengerEXT) Result
-
-pub fn create_debug_utils_messenger_ext(instance C.Instance, p_create_info &DebugUtilsMessengerCreateInfoEXT, p_allocator &AllocationCallbacks, p_messenger &C.DebugUtilsMessengerEXT) Result {
-	f := VkCreateDebugUtilsMessengerEXT((*vulkan.loader_p).get_sym('vkCreateDebugUtilsMessengerEXT') or {
-		println("Couldn't load symbol for 'vkCreateDebugUtilsMessengerEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_messenger)
+fn C.vkCreateDebugUtilsMessengerEXT(C.Instance,
+	&DebugUtilsMessengerCreateInfoEXT,
+	&AllocationCallbacks,
+	&C.DebugUtilsMessengerEXT) Result
+pub fn create_debug_utils_messenger_ext(instance C.Instance,
+	p_create_info &DebugUtilsMessengerCreateInfoEXT,
+	p_allocator &AllocationCallbacks,
+	p_messenger &C.DebugUtilsMessengerEXT) Result {
+	return C.vkCreateDebugUtilsMessengerEXT(instance, p_create_info, p_allocator, p_messenger)
 }
 
-type VkDestroyDebugUtilsMessengerEXT = fn (C.Instance, C.DebugUtilsMessengerEXT, &AllocationCallbacks)
-
-pub fn destroy_debug_utils_messenger_ext(instance C.Instance, messenger C.DebugUtilsMessengerEXT, p_allocator &AllocationCallbacks) {
-	f := VkDestroyDebugUtilsMessengerEXT((*vulkan.loader_p).get_sym('vkDestroyDebugUtilsMessengerEXT') or {
-		println("Couldn't load symbol for 'vkDestroyDebugUtilsMessengerEXT': ${err}")
-		return
-	})
-	f(instance, messenger, p_allocator)
+fn C.vkDestroyDebugUtilsMessengerEXT(C.Instance,
+	C.DebugUtilsMessengerEXT,
+	&AllocationCallbacks)
+pub fn destroy_debug_utils_messenger_ext(instance C.Instance,
+	messenger C.DebugUtilsMessengerEXT,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyDebugUtilsMessengerEXT(instance, messenger, p_allocator)
 }
 
-type VkSubmitDebugUtilsMessageEXT = fn (C.Instance, DebugUtilsMessageSeverityFlagBitsEXT, DebugUtilsMessageTypeFlagsEXT, &DebugUtilsMessengerCallbackDataEXT)
-
-pub fn submit_debug_utils_message_ext(instance C.Instance, message_severity DebugUtilsMessageSeverityFlagBitsEXT, message_types DebugUtilsMessageTypeFlagsEXT, p_callback_data &DebugUtilsMessengerCallbackDataEXT) {
-	f := VkSubmitDebugUtilsMessageEXT((*vulkan.loader_p).get_sym('vkSubmitDebugUtilsMessageEXT') or {
-		println("Couldn't load symbol for 'vkSubmitDebugUtilsMessageEXT': ${err}")
-		return
-	})
-	f(instance, message_severity, message_types, p_callback_data)
+fn C.vkSubmitDebugUtilsMessageEXT(C.Instance,
+	DebugUtilsMessageSeverityFlagBitsEXT,
+	DebugUtilsMessageTypeFlagsEXT,
+	&DebugUtilsMessengerCallbackDataEXT)
+pub fn submit_debug_utils_message_ext(instance C.Instance,
+	message_severity DebugUtilsMessageSeverityFlagBitsEXT,
+	message_types DebugUtilsMessageTypeFlagsEXT,
+	p_callback_data &DebugUtilsMessengerCallbackDataEXT) {
+	C.vkSubmitDebugUtilsMessageEXT(instance, message_severity, message_types, p_callback_data)
 }
 
-// VK_ANDROID_external_memory_android_hardware_buffer is a preprocessor guard. Do not pass it to API calls.
-const android_external_memory_android_hardware_buffer = 1
-pub const android_external_memory_android_hardware_buffer_spec_version = 5
-pub const android_external_memory_android_hardware_buffer_extension_name = 'VK_ANDROID_external_memory_android_hardware_buffer'
-// AndroidHardwareBufferUsageANDROID extends VkImageFormatProperties2
-pub struct AndroidHardwareBufferUsageANDROID {
-mut:
-	s_type                        StructureType
-	p_next                        voidptr
-	android_hardware_buffer_usage u64
-}
-
-pub struct AndroidHardwareBufferPropertiesANDROID {
-mut:
-	s_type           StructureType
-	p_next           voidptr
-	allocation_size  DeviceSize
-	memory_type_bits u32
-}
-
-// AndroidHardwareBufferFormatPropertiesANDROID extends VkAndroidHardwareBufferPropertiesANDROID
-pub struct AndroidHardwareBufferFormatPropertiesANDROID {
-mut:
-	s_type                              StructureType
-	p_next                              voidptr
-	format                              Format
-	external_format                     u64
-	format_features                     FormatFeatureFlags
-	sampler_ycbcr_conversion_components ComponentMapping
-	suggested_ycbcr_model               SamplerYcbcrModelConversion
-	suggested_ycbcr_range               SamplerYcbcrRange
-	suggested_x_chroma_offset           ChromaLocation
-	suggested_y_chroma_offset           ChromaLocation
-}
-
-// ImportAndroidHardwareBufferInfoANDROID extends VkMemoryAllocateInfo
-pub struct ImportAndroidHardwareBufferInfoANDROID {
-mut:
-	s_type StructureType
-	p_next voidptr
-	buffer voidptr
-}
-
-pub struct MemoryGetAndroidHardwareBufferInfoANDROID {
-mut:
-	s_type StructureType
-	p_next voidptr
-	memory C.DeviceMemory
-}
-
-// ExternalFormatANDROID extends VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo,VkAttachmentDescription2,VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo
-pub struct ExternalFormatANDROID {
-mut:
-	s_type          StructureType
-	p_next          voidptr
-	external_format u64
-}
-
-// AndroidHardwareBufferFormatProperties2ANDROID extends VkAndroidHardwareBufferPropertiesANDROID
-pub struct AndroidHardwareBufferFormatProperties2ANDROID {
-mut:
-	s_type                              StructureType
-	p_next                              voidptr
-	format                              Format
-	external_format                     u64
-	format_features                     FormatFeatureFlags2
-	sampler_ycbcr_conversion_components ComponentMapping
-	suggested_ycbcr_model               SamplerYcbcrModelConversion
-	suggested_ycbcr_range               SamplerYcbcrRange
-	suggested_x_chroma_offset           ChromaLocation
-	suggested_y_chroma_offset           ChromaLocation
-}
-
-type VkGetAndroidHardwareBufferPropertiesANDROID = fn (C.Device, voidptr, &AndroidHardwareBufferPropertiesANDROID) Result
-
-pub fn get_android_hardware_buffer_properties_android(device C.Device, buffer voidptr, p_properties &AndroidHardwareBufferPropertiesANDROID) Result {
-	f := VkGetAndroidHardwareBufferPropertiesANDROID((*vulkan.loader_p).get_sym('vkGetAndroidHardwareBufferPropertiesANDROID') or {
-		println("Couldn't load symbol for 'vkGetAndroidHardwareBufferPropertiesANDROID': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, buffer, p_properties)
-}
-
-type VkGetMemoryAndroidHardwareBufferANDROID = fn (C.Device, &MemoryGetAndroidHardwareBufferInfoANDROID, voidptr) Result
-
-pub fn get_memory_android_hardware_buffer_android(device C.Device, p_info &MemoryGetAndroidHardwareBufferInfoANDROID, p_buffer voidptr) Result {
-	f := VkGetMemoryAndroidHardwareBufferANDROID((*vulkan.loader_p).get_sym('vkGetMemoryAndroidHardwareBufferANDROID') or {
-		println("Couldn't load symbol for 'vkGetMemoryAndroidHardwareBufferANDROID': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_info, p_buffer)
-}
-
-// VK_EXT_sampler_filter_minmax is a preprocessor guard. Do not pass it to API calls.
-const ext_sampler_filter_minmax = 1
 pub const ext_sampler_filter_minmax_spec_version = 2
 pub const ext_sampler_filter_minmax_extension_name = 'VK_EXT_sampler_filter_minmax'
 
@@ -14561,168 +13525,15 @@ pub type SamplerReductionModeCreateInfoEXT = SamplerReductionModeCreateInfo
 
 pub type PhysicalDeviceSamplerFilterMinmaxPropertiesEXT = PhysicalDeviceSamplerFilterMinmaxProperties
 
-// VK_AMD_gpu_shader_int16 is a preprocessor guard. Do not pass it to API calls.
-const amd_gpu_shader_int16 = 1
 pub const amd_gpu_shader_int16_spec_version = 2
 pub const amd_gpu_shader_int16_extension_name = 'VK_AMD_gpu_shader_int16'
 
-// VK_AMDX_shader_enqueue is a preprocessor guard. Do not pass it to API calls.
-const amdx_shader_enqueue = 1
-pub const amdx_shader_enqueue_spec_version = 1
-pub const amdx_shader_enqueue_extension_name = 'VK_AMDX_shader_enqueue'
-pub const shader_index_unused_amdx = ~u32(0)
-// PhysicalDeviceShaderEnqueueFeaturesAMDX extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub struct PhysicalDeviceShaderEnqueueFeaturesAMDX {
-mut:
-	s_type         StructureType
-	p_next         voidptr
-	shader_enqueue Bool32
-}
-
-// PhysicalDeviceShaderEnqueuePropertiesAMDX extends VkPhysicalDeviceProperties2
-pub struct PhysicalDeviceShaderEnqueuePropertiesAMDX {
-mut:
-	s_type                                     StructureType
-	p_next                                     voidptr
-	max_execution_graph_depth                  u32
-	max_execution_graph_shader_output_nodes    u32
-	max_execution_graph_shader_payload_size    u32
-	max_execution_graph_shader_payload_count   u32
-	execution_graph_dispatch_address_alignment u32
-}
-
-pub struct ExecutionGraphPipelineScratchSizeAMDX {
-mut:
-	s_type StructureType
-	p_next voidptr
-	size   DeviceSize
-}
-
-pub struct ExecutionGraphPipelineCreateInfoAMDX {
-mut:
-	s_type               StructureType
-	p_next               voidptr
-	flags                PipelineCreateFlags
-	stage_count          u32
-	p_stages             &PipelineShaderStageCreateInfo
-	p_library_info       &PipelineLibraryCreateInfoKHR
-	layout               C.PipelineLayout
-	base_pipeline_handle C.Pipeline
-	base_pipeline_index  i32
-}
-
-pub union DeviceOrHostAddressConstAMDX {
-mut:
-	device_address DeviceAddress
-	host_address   voidptr
-}
-
-pub struct DispatchGraphInfoAMDX {
-mut:
-	node_index     u32
-	payload_count  u32
-	payloads       DeviceOrHostAddressConstAMDX
-	payload_stride u64
-}
-
-pub struct DispatchGraphCountInfoAMDX {
-mut:
-	count  u32
-	infos  DeviceOrHostAddressConstAMDX
-	stride u64
-}
-
-// PipelineShaderStageNodeCreateInfoAMDX extends VkPipelineShaderStageCreateInfo
-pub struct PipelineShaderStageNodeCreateInfoAMDX {
-mut:
-	s_type StructureType
-	p_next voidptr
-	p_name &char
-	index  u32
-}
-
-type VkCreateExecutionGraphPipelinesAMDX = fn (C.Device, C.PipelineCache, u32, &ExecutionGraphPipelineCreateInfoAMDX, &AllocationCallbacks, &C.Pipeline) Result
-
-pub fn create_execution_graph_pipelines_amdx(device C.Device, pipeline_cache C.PipelineCache, create_info_count u32, p_create_infos &ExecutionGraphPipelineCreateInfoAMDX, p_allocator &AllocationCallbacks, p_pipelines &C.Pipeline) Result {
-	f := VkCreateExecutionGraphPipelinesAMDX((*vulkan.loader_p).get_sym('vkCreateExecutionGraphPipelinesAMDX') or {
-		println("Couldn't load symbol for 'vkCreateExecutionGraphPipelinesAMDX': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, pipeline_cache, create_info_count, p_create_infos, p_allocator, p_pipelines)
-}
-
-type VkGetExecutionGraphPipelineScratchSizeAMDX = fn (C.Device, C.Pipeline, &ExecutionGraphPipelineScratchSizeAMDX) Result
-
-pub fn get_execution_graph_pipeline_scratch_size_amdx(device C.Device, execution_graph C.Pipeline, p_size_info &ExecutionGraphPipelineScratchSizeAMDX) Result {
-	f := VkGetExecutionGraphPipelineScratchSizeAMDX((*vulkan.loader_p).get_sym('vkGetExecutionGraphPipelineScratchSizeAMDX') or {
-		println("Couldn't load symbol for 'vkGetExecutionGraphPipelineScratchSizeAMDX': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, execution_graph, p_size_info)
-}
-
-type VkGetExecutionGraphPipelineNodeIndexAMDX = fn (C.Device, C.Pipeline, &PipelineShaderStageNodeCreateInfoAMDX, &u32) Result
-
-pub fn get_execution_graph_pipeline_node_index_amdx(device C.Device, execution_graph C.Pipeline, p_node_info &PipelineShaderStageNodeCreateInfoAMDX, p_node_index &u32) Result {
-	f := VkGetExecutionGraphPipelineNodeIndexAMDX((*vulkan.loader_p).get_sym('vkGetExecutionGraphPipelineNodeIndexAMDX') or {
-		println("Couldn't load symbol for 'vkGetExecutionGraphPipelineNodeIndexAMDX': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, execution_graph, p_node_info, p_node_index)
-}
-
-type VkCmdInitializeGraphScratchMemoryAMDX = fn (C.CommandBuffer, DeviceAddress)
-
-pub fn cmd_initialize_graph_scratch_memory_amdx(command_buffer C.CommandBuffer, scratch DeviceAddress) {
-	f := VkCmdInitializeGraphScratchMemoryAMDX((*vulkan.loader_p).get_sym('vkCmdInitializeGraphScratchMemoryAMDX') or {
-		println("Couldn't load symbol for 'vkCmdInitializeGraphScratchMemoryAMDX': ${err}")
-		return
-	})
-	f(command_buffer, scratch)
-}
-
-type VkCmdDispatchGraphAMDX = fn (C.CommandBuffer, DeviceAddress, &DispatchGraphCountInfoAMDX)
-
-pub fn cmd_dispatch_graph_amdx(command_buffer C.CommandBuffer, scratch DeviceAddress, p_count_info &DispatchGraphCountInfoAMDX) {
-	f := VkCmdDispatchGraphAMDX((*vulkan.loader_p).get_sym('vkCmdDispatchGraphAMDX') or {
-		println("Couldn't load symbol for 'vkCmdDispatchGraphAMDX': ${err}")
-		return
-	})
-	f(command_buffer, scratch, p_count_info)
-}
-
-type VkCmdDispatchGraphIndirectAMDX = fn (C.CommandBuffer, DeviceAddress, &DispatchGraphCountInfoAMDX)
-
-pub fn cmd_dispatch_graph_indirect_amdx(command_buffer C.CommandBuffer, scratch DeviceAddress, p_count_info &DispatchGraphCountInfoAMDX) {
-	f := VkCmdDispatchGraphIndirectAMDX((*vulkan.loader_p).get_sym('vkCmdDispatchGraphIndirectAMDX') or {
-		println("Couldn't load symbol for 'vkCmdDispatchGraphIndirectAMDX': ${err}")
-		return
-	})
-	f(command_buffer, scratch, p_count_info)
-}
-
-type VkCmdDispatchGraphIndirectCountAMDX = fn (C.CommandBuffer, DeviceAddress, DeviceAddress)
-
-pub fn cmd_dispatch_graph_indirect_count_amdx(command_buffer C.CommandBuffer, scratch DeviceAddress, count_info DeviceAddress) {
-	f := VkCmdDispatchGraphIndirectCountAMDX((*vulkan.loader_p).get_sym('vkCmdDispatchGraphIndirectCountAMDX') or {
-		println("Couldn't load symbol for 'vkCmdDispatchGraphIndirectCountAMDX': ${err}")
-		return
-	})
-	f(command_buffer, scratch, count_info)
-}
-
-// VK_AMD_mixed_attachment_samples is a preprocessor guard. Do not pass it to API calls.
-const amd_mixed_attachment_samples = 1
 pub const amd_mixed_attachment_samples_spec_version = 1
 pub const amd_mixed_attachment_samples_extension_name = 'VK_AMD_mixed_attachment_samples'
 
-// VK_AMD_shader_fragment_mask is a preprocessor guard. Do not pass it to API calls.
-const amd_shader_fragment_mask = 1
 pub const amd_shader_fragment_mask_spec_version = 1
 pub const amd_shader_fragment_mask_extension_name = 'VK_AMD_shader_fragment_mask'
 
-// VK_EXT_inline_uniform_block is a preprocessor guard. Do not pass it to API calls.
-const ext_inline_uniform_block = 1
 pub const ext_inline_uniform_block_spec_version = 1
 pub const ext_inline_uniform_block_extension_name = 'VK_EXT_inline_uniform_block'
 
@@ -14734,25 +13545,20 @@ pub type WriteDescriptorSetInlineUniformBlockEXT = WriteDescriptorSetInlineUnifo
 
 pub type DescriptorPoolInlineUniformBlockCreateInfoEXT = DescriptorPoolInlineUniformBlockCreateInfo
 
-// VK_EXT_shader_stencil_export is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_stencil_export = 1
 pub const ext_shader_stencil_export_spec_version = 1
 pub const ext_shader_stencil_export_extension_name = 'VK_EXT_shader_stencil_export'
 
-// VK_EXT_sample_locations is a preprocessor guard. Do not pass it to API calls.
-const ext_sample_locations = 1
 pub const ext_sample_locations_spec_version = 1
 pub const ext_sample_locations_extension_name = 'VK_EXT_sample_locations'
 
 pub struct SampleLocationEXT {
-mut:
+pub mut:
 	x f32
 	y f32
 }
 
-// SampleLocationsInfoEXT extends VkImageMemoryBarrier,VkImageMemoryBarrier2
 pub struct SampleLocationsInfoEXT {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	sample_locations_per_pixel SampleCountFlagBits
@@ -14762,20 +13568,19 @@ mut:
 }
 
 pub struct AttachmentSampleLocationsEXT {
-mut:
+pub mut:
 	attachment_index      u32
 	sample_locations_info SampleLocationsInfoEXT
 }
 
 pub struct SubpassSampleLocationsEXT {
-mut:
+pub mut:
 	subpass_index         u32
 	sample_locations_info SampleLocationsInfoEXT
 }
 
-// RenderPassSampleLocationsBeginInfoEXT extends VkRenderPassBeginInfo
 pub struct RenderPassSampleLocationsBeginInfoEXT {
-mut:
+pub mut:
 	s_type                                    StructureType
 	p_next                                    voidptr
 	attachment_initial_sample_locations_count u32
@@ -14784,56 +13589,48 @@ mut:
 	p_post_subpass_sample_locations           &SubpassSampleLocationsEXT
 }
 
-// PipelineSampleLocationsStateCreateInfoEXT extends VkPipelineMultisampleStateCreateInfo
 pub struct PipelineSampleLocationsStateCreateInfoEXT {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	sample_locations_enable Bool32
 	sample_locations_info   SampleLocationsInfoEXT
 }
 
-// PhysicalDeviceSampleLocationsPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceSampleLocationsPropertiesEXT {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	sample_location_sample_counts    SampleCountFlags
 	max_sample_location_grid_size    Extent2D
-	sample_location_coordinate_range []f32
+	sample_location_coordinate_range [2]f32
 	sample_location_sub_pixel_bits   u32
 	variable_sample_locations        Bool32
 }
 
 pub struct MultisamplePropertiesEXT {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	max_sample_location_grid_size Extent2D
 }
 
-type VkCmdSetSampleLocationsEXT = fn (C.CommandBuffer, &SampleLocationsInfoEXT)
-
-pub fn cmd_set_sample_locations_ext(command_buffer C.CommandBuffer, p_sample_locations_info &SampleLocationsInfoEXT) {
-	f := VkCmdSetSampleLocationsEXT((*vulkan.loader_p).get_sym('vkCmdSetSampleLocationsEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetSampleLocationsEXT': ${err}")
-		return
-	})
-	f(command_buffer, p_sample_locations_info)
+fn C.vkCmdSetSampleLocationsEXT(C.CommandBuffer,
+	&SampleLocationsInfoEXT)
+pub fn cmd_set_sample_locations_ext(command_buffer C.CommandBuffer,
+	p_sample_locations_info &SampleLocationsInfoEXT) {
+	C.vkCmdSetSampleLocationsEXT(command_buffer, p_sample_locations_info)
 }
 
-type VkGetPhysicalDeviceMultisamplePropertiesEXT = fn (C.PhysicalDevice, SampleCountFlagBits, &MultisamplePropertiesEXT)
-
-pub fn get_physical_device_multisample_properties_ext(physical_device C.PhysicalDevice, samples SampleCountFlagBits, p_multisample_properties &MultisamplePropertiesEXT) {
-	f := VkGetPhysicalDeviceMultisamplePropertiesEXT((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceMultisamplePropertiesEXT') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceMultisamplePropertiesEXT': ${err}")
-		return
-	})
-	f(physical_device, samples, p_multisample_properties)
+fn C.vkGetPhysicalDeviceMultisamplePropertiesEXT(C.PhysicalDevice,
+	SampleCountFlagBits,
+	&MultisamplePropertiesEXT)
+pub fn get_physical_device_multisample_properties_ext(physical_device C.PhysicalDevice,
+	samples SampleCountFlagBits,
+	p_multisample_properties &MultisamplePropertiesEXT) {
+	C.vkGetPhysicalDeviceMultisamplePropertiesEXT(physical_device, samples, p_multisample_properties)
 }
 
-// VK_EXT_blend_operation_advanced is a preprocessor guard. Do not pass it to API calls.
-const ext_blend_operation_advanced = 1
 pub const ext_blend_operation_advanced_spec_version = 2
 pub const ext_blend_operation_advanced_extension_name = 'VK_EXT_blend_operation_advanced'
 
@@ -14844,17 +13641,15 @@ pub enum BlendOverlapEXT {
 	blend_overlap_max_enum_ext     = int(0x7FFFFFFF)
 }
 
-// PhysicalDeviceBlendOperationAdvancedFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceBlendOperationAdvancedFeaturesEXT {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	advanced_blend_coherent_operations Bool32
 }
 
-// PhysicalDeviceBlendOperationAdvancedPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceBlendOperationAdvancedPropertiesEXT {
-mut:
+pub mut:
 	s_type                                     StructureType
 	p_next                                     voidptr
 	advanced_blend_max_color_attachments       u32
@@ -14865,9 +13660,8 @@ mut:
 	advanced_blend_all_operations              Bool32
 }
 
-// PipelineColorBlendAdvancedStateCreateInfoEXT extends VkPipelineColorBlendStateCreateInfo
 pub struct PipelineColorBlendAdvancedStateCreateInfoEXT {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	src_premultiplied Bool32
@@ -14875,16 +13669,13 @@ mut:
 	blend_overlap     BlendOverlapEXT
 }
 
-// VK_NV_fragment_coverage_to_color is a preprocessor guard. Do not pass it to API calls.
-const nv_fragment_coverage_to_color = 1
 pub const nv_fragment_coverage_to_color_spec_version = 1
 pub const nv_fragment_coverage_to_color_extension_name = 'VK_NV_fragment_coverage_to_color'
 
 pub type PipelineCoverageToColorStateCreateFlagsNV = u32
 
-// PipelineCoverageToColorStateCreateInfoNV extends VkPipelineMultisampleStateCreateInfo
 pub struct PipelineCoverageToColorStateCreateInfoNV {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	flags                      PipelineCoverageToColorStateCreateFlagsNV
@@ -14892,8 +13683,6 @@ mut:
 	coverage_to_color_location u32
 }
 
-// VK_NV_framebuffer_mixed_samples is a preprocessor guard. Do not pass it to API calls.
-const nv_framebuffer_mixed_samples = 1
 pub const nv_framebuffer_mixed_samples_spec_version = 1
 pub const nv_framebuffer_mixed_samples_extension_name = 'VK_NV_framebuffer_mixed_samples'
 
@@ -14907,9 +13696,8 @@ pub enum CoverageModulationModeNV {
 
 pub type PipelineCoverageModulationStateCreateFlagsNV = u32
 
-// PipelineCoverageModulationStateCreateInfoNV extends VkPipelineMultisampleStateCreateInfo
 pub struct PipelineCoverageModulationStateCreateInfoNV {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	flags                            PipelineCoverageModulationStateCreateFlagsNV
@@ -14919,61 +13707,50 @@ mut:
 	p_coverage_modulation_table      &f32
 }
 
-// VK_NV_fill_rectangle is a preprocessor guard. Do not pass it to API calls.
-const nv_fill_rectangle = 1
 pub const nv_fill_rectangle_spec_version = 1
 pub const nv_fill_rectangle_extension_name = 'VK_NV_fill_rectangle'
 
-// VK_NV_shader_sm_builtins is a preprocessor guard. Do not pass it to API calls.
-const nv_shader_sm_builtins = 1
 pub const nv_shader_sm_builtins_spec_version = 1
 pub const nv_shader_sm_builtins_extension_name = 'VK_NV_shader_sm_builtins'
-// PhysicalDeviceShaderSMBuiltinsPropertiesNV extends VkPhysicalDeviceProperties2
+
 pub struct PhysicalDeviceShaderSMBuiltinsPropertiesNV {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	shader_sm_count     u32
 	shader_warps_per_sm u32
 }
 
-// PhysicalDeviceShaderSMBuiltinsFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceShaderSMBuiltinsFeaturesNV {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	shader_sm_builtins Bool32
 }
 
-// VK_EXT_post_depth_coverage is a preprocessor guard. Do not pass it to API calls.
-const ext_post_depth_coverage = 1
 pub const ext_post_depth_coverage_spec_version = 1
 pub const ext_post_depth_coverage_extension_name = 'VK_EXT_post_depth_coverage'
 
-// VK_EXT_image_drm_format_modifier is a preprocessor guard. Do not pass it to API calls.
-const ext_image_drm_format_modifier = 1
 pub const ext_image_drm_format_modifier_spec_version = 2
 pub const ext_image_drm_format_modifier_extension_name = 'VK_EXT_image_drm_format_modifier'
 
 pub struct DrmFormatModifierPropertiesEXT {
-mut:
+pub mut:
 	drm_format_modifier                 u64
 	drm_format_modifier_plane_count     u32
 	drm_format_modifier_tiling_features FormatFeatureFlags
 }
 
-// DrmFormatModifierPropertiesListEXT extends VkFormatProperties2
 pub struct DrmFormatModifierPropertiesListEXT {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	drm_format_modifier_count        u32
 	p_drm_format_modifier_properties &DrmFormatModifierPropertiesEXT
 }
 
-// PhysicalDeviceImageDrmFormatModifierInfoEXT extends VkPhysicalDeviceImageFormatInfo2
 pub struct PhysicalDeviceImageDrmFormatModifierInfoEXT {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	drm_format_modifier      u64
@@ -14982,18 +13759,16 @@ mut:
 	p_queue_family_indices   &u32
 }
 
-// ImageDrmFormatModifierListCreateInfoEXT extends VkImageCreateInfo
 pub struct ImageDrmFormatModifierListCreateInfoEXT {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	drm_format_modifier_count u32
 	p_drm_format_modifiers    &u64
 }
 
-// ImageDrmFormatModifierExplicitCreateInfoEXT extends VkImageCreateInfo
 pub struct ImageDrmFormatModifierExplicitCreateInfoEXT {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	drm_format_modifier             u64
@@ -15002,40 +13777,35 @@ mut:
 }
 
 pub struct ImageDrmFormatModifierPropertiesEXT {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	drm_format_modifier u64
 }
 
 pub struct DrmFormatModifierProperties2EXT {
-mut:
+pub mut:
 	drm_format_modifier                 u64
 	drm_format_modifier_plane_count     u32
 	drm_format_modifier_tiling_features FormatFeatureFlags2
 }
 
-// DrmFormatModifierPropertiesList2EXT extends VkFormatProperties2
 pub struct DrmFormatModifierPropertiesList2EXT {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	drm_format_modifier_count        u32
 	p_drm_format_modifier_properties &DrmFormatModifierProperties2EXT
 }
 
-type VkGetImageDrmFormatModifierPropertiesEXT = fn (C.Device, C.Image, &ImageDrmFormatModifierPropertiesEXT) Result
-
-pub fn get_image_drm_format_modifier_properties_ext(device C.Device, image C.Image, p_properties &ImageDrmFormatModifierPropertiesEXT) Result {
-	f := VkGetImageDrmFormatModifierPropertiesEXT((*vulkan.loader_p).get_sym('vkGetImageDrmFormatModifierPropertiesEXT') or {
-		println("Couldn't load symbol for 'vkGetImageDrmFormatModifierPropertiesEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, image, p_properties)
+fn C.vkGetImageDrmFormatModifierPropertiesEXT(C.Device,
+	C.Image,
+	&ImageDrmFormatModifierPropertiesEXT) Result
+pub fn get_image_drm_format_modifier_properties_ext(device C.Device,
+	image C.Image,
+	p_properties &ImageDrmFormatModifierPropertiesEXT) Result {
+	return C.vkGetImageDrmFormatModifierPropertiesEXT(device, image, p_properties)
 }
-
-// VK_EXT_validation_cache is a preprocessor guard. Do not pass it to API calls.
-const ext_validation_cache = 1
 
 pub type C.ValidationCacheEXT = voidptr
 
@@ -15050,7 +13820,7 @@ pub enum ValidationCacheHeaderVersionEXT {
 pub type ValidationCacheCreateFlagsEXT = u32
 
 pub struct ValidationCacheCreateInfoEXT {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	flags             ValidationCacheCreateFlagsEXT
@@ -15058,61 +13828,61 @@ mut:
 	p_initial_data    voidptr
 }
 
-// ShaderModuleValidationCacheCreateInfoEXT extends VkShaderModuleCreateInfo,VkPipelineShaderStageCreateInfo
 pub struct ShaderModuleValidationCacheCreateInfoEXT {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	validation_cache C.ValidationCacheEXT
 }
 
-type VkCreateValidationCacheEXT = fn (C.Device, &ValidationCacheCreateInfoEXT, &AllocationCallbacks, &C.ValidationCacheEXT) Result
-
-pub fn create_validation_cache_ext(device C.Device, p_create_info &ValidationCacheCreateInfoEXT, p_allocator &AllocationCallbacks, p_validation_cache &C.ValidationCacheEXT) Result {
-	f := VkCreateValidationCacheEXT((*vulkan.loader_p).get_sym('vkCreateValidationCacheEXT') or {
-		println("Couldn't load symbol for 'vkCreateValidationCacheEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_validation_cache)
+fn C.vkCreateValidationCacheEXT(C.Device,
+	&ValidationCacheCreateInfoEXT,
+	&AllocationCallbacks,
+	&C.ValidationCacheEXT) Result
+pub fn create_validation_cache_ext(device C.Device,
+	p_create_info &ValidationCacheCreateInfoEXT,
+	p_allocator &AllocationCallbacks,
+	p_validation_cache &C.ValidationCacheEXT) Result {
+	return C.vkCreateValidationCacheEXT(device, p_create_info, p_allocator, p_validation_cache)
 }
 
-type VkDestroyValidationCacheEXT = fn (C.Device, C.ValidationCacheEXT, &AllocationCallbacks)
-
-pub fn destroy_validation_cache_ext(device C.Device, validation_cache C.ValidationCacheEXT, p_allocator &AllocationCallbacks) {
-	f := VkDestroyValidationCacheEXT((*vulkan.loader_p).get_sym('vkDestroyValidationCacheEXT') or {
-		println("Couldn't load symbol for 'vkDestroyValidationCacheEXT': ${err}")
-		return
-	})
-	f(device, validation_cache, p_allocator)
+fn C.vkDestroyValidationCacheEXT(C.Device,
+	C.ValidationCacheEXT,
+	&AllocationCallbacks)
+pub fn destroy_validation_cache_ext(device C.Device,
+	validation_cache C.ValidationCacheEXT,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyValidationCacheEXT(device, validation_cache, p_allocator)
 }
 
-type VkMergeValidationCachesEXT = fn (C.Device, C.ValidationCacheEXT, u32, &C.ValidationCacheEXT) Result
-
-pub fn merge_validation_caches_ext(device C.Device, dst_cache C.ValidationCacheEXT, src_cache_count u32, p_src_caches &C.ValidationCacheEXT) Result {
-	f := VkMergeValidationCachesEXT((*vulkan.loader_p).get_sym('vkMergeValidationCachesEXT') or {
-		println("Couldn't load symbol for 'vkMergeValidationCachesEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, dst_cache, src_cache_count, p_src_caches)
+fn C.vkMergeValidationCachesEXT(C.Device,
+	C.ValidationCacheEXT,
+	u32,
+	&C.ValidationCacheEXT) Result
+pub fn merge_validation_caches_ext(device C.Device,
+	dst_cache C.ValidationCacheEXT,
+	src_cache_count u32,
+	p_src_caches &C.ValidationCacheEXT) Result {
+	return C.vkMergeValidationCachesEXT(device, dst_cache, src_cache_count, p_src_caches)
 }
 
-type VkGetValidationCacheDataEXT = fn (C.Device, C.ValidationCacheEXT, &usize, voidptr) Result
-
-pub fn get_validation_cache_data_ext(device C.Device, validation_cache C.ValidationCacheEXT, p_data_size &usize, p_data voidptr) Result {
-	f := VkGetValidationCacheDataEXT((*vulkan.loader_p).get_sym('vkGetValidationCacheDataEXT') or {
-		println("Couldn't load symbol for 'vkGetValidationCacheDataEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, validation_cache, p_data_size, p_data)
+fn C.vkGetValidationCacheDataEXT(C.Device,
+	C.ValidationCacheEXT,
+	&usize,
+	voidptr) Result
+pub fn get_validation_cache_data_ext(device C.Device,
+	validation_cache C.ValidationCacheEXT,
+	p_data_size &usize,
+	p_data voidptr) Result {
+	return C.vkGetValidationCacheDataEXT(device, validation_cache, p_data_size, p_data)
 }
 
-// VK_EXT_descriptor_indexing is a preprocessor guard. Do not pass it to API calls.
-const ext_descriptor_indexing = 1
 pub const ext_descriptor_indexing_spec_version = 2
 pub const ext_descriptor_indexing_extension_name = 'VK_EXT_descriptor_indexing'
 
 pub type DescriptorBindingFlagBitsEXT = DescriptorBindingFlagBits
 
+pub type DescriptorBindingFlagsEXT = u32
 pub type DescriptorSetLayoutBindingFlagsCreateInfoEXT = DescriptorSetLayoutBindingFlagsCreateInfo
 
 pub type PhysicalDeviceDescriptorIndexingFeaturesEXT = PhysicalDeviceDescriptorIndexingFeatures
@@ -15123,13 +13893,9 @@ pub type DescriptorSetVariableDescriptorCountAllocateInfoEXT = DescriptorSetVari
 
 pub type DescriptorSetVariableDescriptorCountLayoutSupportEXT = DescriptorSetVariableDescriptorCountLayoutSupport
 
-// VK_EXT_shader_viewport_index_layer is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_viewport_index_layer = 1
 pub const ext_shader_viewport_index_layer_spec_version = 1
 pub const ext_shader_viewport_index_layer_extension_name = 'VK_EXT_shader_viewport_index_layer'
 
-// VK_NV_shading_rate_image is a preprocessor guard. Do not pass it to API calls.
-const nv_shading_rate_image = 1
 pub const nv_shading_rate_image_spec_version = 3
 pub const nv_shading_rate_image_extension_name = 'VK_NV_shading_rate_image'
 
@@ -15158,14 +13924,13 @@ pub enum CoarseSampleOrderTypeNV {
 }
 
 pub struct ShadingRatePaletteNV {
-mut:
+pub mut:
 	shading_rate_palette_entry_count u32
 	p_shading_rate_palette_entries   &ShadingRatePaletteEntryNV
 }
 
-// PipelineViewportShadingRateImageStateCreateInfoNV extends VkPipelineViewportStateCreateInfo
 pub struct PipelineViewportShadingRateImageStateCreateInfoNV {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	shading_rate_image_enable Bool32
@@ -15173,18 +13938,16 @@ mut:
 	p_shading_rate_palettes   &ShadingRatePaletteNV
 }
 
-// PhysicalDeviceShadingRateImageFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceShadingRateImageFeaturesNV {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	shading_rate_image               Bool32
 	shading_rate_coarse_sample_order Bool32
 }
 
-// PhysicalDeviceShadingRateImagePropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceShadingRateImagePropertiesNV {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	shading_rate_texel_size         Extent2D
@@ -15193,23 +13956,22 @@ mut:
 }
 
 pub struct CoarseSampleLocationNV {
-mut:
+pub mut:
 	pixel_x u32
 	pixel_y u32
 	sample  u32
 }
 
 pub struct CoarseSampleOrderCustomNV {
-mut:
+pub mut:
 	shading_rate          ShadingRatePaletteEntryNV
 	sample_count          u32
 	sample_location_count u32
 	p_sample_locations    &CoarseSampleLocationNV
 }
 
-// PipelineViewportCoarseSampleOrderStateCreateInfoNV extends VkPipelineViewportStateCreateInfo
 pub struct PipelineViewportCoarseSampleOrderStateCreateInfoNV {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	sample_order_type         CoarseSampleOrderTypeNV
@@ -15217,38 +13979,38 @@ mut:
 	p_custom_sample_orders    &CoarseSampleOrderCustomNV
 }
 
-type VkCmdBindShadingRateImageNV = fn (C.CommandBuffer, C.ImageView, ImageLayout)
-
-pub fn cmd_bind_shading_rate_image_nv(command_buffer C.CommandBuffer, image_view C.ImageView, image_layout ImageLayout) {
-	f := VkCmdBindShadingRateImageNV((*vulkan.loader_p).get_sym('vkCmdBindShadingRateImageNV') or {
-		println("Couldn't load symbol for 'vkCmdBindShadingRateImageNV': ${err}")
-		return
-	})
-	f(command_buffer, image_view, image_layout)
+fn C.vkCmdBindShadingRateImageNV(C.CommandBuffer,
+	C.ImageView,
+	ImageLayout)
+pub fn cmd_bind_shading_rate_image_nv(command_buffer C.CommandBuffer,
+	image_view C.ImageView,
+	image_layout ImageLayout) {
+	C.vkCmdBindShadingRateImageNV(command_buffer, image_view, image_layout)
 }
 
-type VkCmdSetViewportShadingRatePaletteNV = fn (C.CommandBuffer, u32, u32, &ShadingRatePaletteNV)
-
-pub fn cmd_set_viewport_shading_rate_palette_nv(command_buffer C.CommandBuffer, first_viewport u32, viewport_count u32, p_shading_rate_palettes &ShadingRatePaletteNV) {
-	f := VkCmdSetViewportShadingRatePaletteNV((*vulkan.loader_p).get_sym('vkCmdSetViewportShadingRatePaletteNV') or {
-		println("Couldn't load symbol for 'vkCmdSetViewportShadingRatePaletteNV': ${err}")
-		return
-	})
-	f(command_buffer, first_viewport, viewport_count, p_shading_rate_palettes)
+fn C.vkCmdSetViewportShadingRatePaletteNV(C.CommandBuffer,
+	u32,
+	u32,
+	&ShadingRatePaletteNV)
+pub fn cmd_set_viewport_shading_rate_palette_nv(command_buffer C.CommandBuffer,
+	first_viewport u32,
+	viewport_count u32,
+	p_shading_rate_palettes &ShadingRatePaletteNV) {
+	C.vkCmdSetViewportShadingRatePaletteNV(command_buffer, first_viewport, viewport_count,
+		p_shading_rate_palettes)
 }
 
-type VkCmdSetCoarseSampleOrderNV = fn (C.CommandBuffer, CoarseSampleOrderTypeNV, u32, &CoarseSampleOrderCustomNV)
-
-pub fn cmd_set_coarse_sample_order_nv(command_buffer C.CommandBuffer, sample_order_type CoarseSampleOrderTypeNV, custom_sample_order_count u32, p_custom_sample_orders &CoarseSampleOrderCustomNV) {
-	f := VkCmdSetCoarseSampleOrderNV((*vulkan.loader_p).get_sym('vkCmdSetCoarseSampleOrderNV') or {
-		println("Couldn't load symbol for 'vkCmdSetCoarseSampleOrderNV': ${err}")
-		return
-	})
-	f(command_buffer, sample_order_type, custom_sample_order_count, p_custom_sample_orders)
+fn C.vkCmdSetCoarseSampleOrderNV(C.CommandBuffer,
+	CoarseSampleOrderTypeNV,
+	u32,
+	&CoarseSampleOrderCustomNV)
+pub fn cmd_set_coarse_sample_order_nv(command_buffer C.CommandBuffer,
+	sample_order_type CoarseSampleOrderTypeNV,
+	custom_sample_order_count u32,
+	p_custom_sample_orders &CoarseSampleOrderCustomNV) {
+	C.vkCmdSetCoarseSampleOrderNV(command_buffer, sample_order_type, custom_sample_order_count,
+		p_custom_sample_orders)
 }
-
-// VK_NV_ray_tracing is a preprocessor guard. Do not pass it to API calls.
-const nv_ray_tracing = 1
 
 pub type C.AccelerationStructureNV = voidptr
 
@@ -15308,6 +14070,7 @@ pub enum GeometryFlagBitsKHR {
 }
 
 pub type GeometryFlagsKHR = u32
+pub type GeometryFlagsNV = u32
 pub type GeometryFlagBitsNV = GeometryFlagBitsKHR
 
 pub enum GeometryInstanceFlagBitsKHR {
@@ -15321,6 +14084,7 @@ pub enum GeometryInstanceFlagBitsKHR {
 }
 
 pub type GeometryInstanceFlagsKHR = u32
+pub type GeometryInstanceFlagsNV = u32
 pub type GeometryInstanceFlagBitsNV = GeometryInstanceFlagBitsKHR
 
 pub enum BuildAccelerationStructureFlagBitsKHR {
@@ -15338,10 +14102,11 @@ pub enum BuildAccelerationStructureFlagBitsKHR {
 }
 
 pub type BuildAccelerationStructureFlagsKHR = u32
+pub type BuildAccelerationStructureFlagsNV = u32
 pub type BuildAccelerationStructureFlagBitsNV = BuildAccelerationStructureFlagBitsKHR
 
 pub struct RayTracingShaderGroupCreateInfoNV {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	vktype              RayTracingShaderGroupTypeKHR
@@ -15352,7 +14117,7 @@ mut:
 }
 
 pub struct RayTracingPipelineCreateInfoNV {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	flags                PipelineCreateFlags
@@ -15367,7 +14132,7 @@ mut:
 }
 
 pub struct GeometryTrianglesNV {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	vertex_data      C.Buffer
@@ -15384,7 +14149,7 @@ mut:
 }
 
 pub struct GeometryAABBNV {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	aabb_data  C.Buffer
@@ -15394,13 +14159,13 @@ mut:
 }
 
 pub struct GeometryDataNV {
-mut:
+pub mut:
 	triangles GeometryTrianglesNV
 	aabbs     GeometryAABBNV
 }
 
 pub struct GeometryNV {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	geometry_type GeometryTypeKHR
@@ -15409,18 +14174,18 @@ mut:
 }
 
 pub struct AccelerationStructureInfoNV {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	vktype         AccelerationStructureTypeNV
-	flags          Flags
+	flags          u32
 	instance_count u32
 	geometry_count u32
 	p_geometries   &GeometryNV
 }
 
 pub struct AccelerationStructureCreateInfoNV {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	compacted_size DeviceSize
@@ -15428,7 +14193,7 @@ mut:
 }
 
 pub struct BindAccelerationStructureMemoryInfoNV {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	acceleration_structure C.AccelerationStructureNV
@@ -15438,9 +14203,8 @@ mut:
 	p_device_indices       &u32
 }
 
-// WriteDescriptorSetAccelerationStructureNV extends VkWriteDescriptorSet
 pub struct WriteDescriptorSetAccelerationStructureNV {
-mut:
+pub mut:
 	s_type                       StructureType
 	p_next                       voidptr
 	acceleration_structure_count u32
@@ -15448,16 +14212,15 @@ mut:
 }
 
 pub struct AccelerationStructureMemoryRequirementsInfoNV {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	vktype                 AccelerationStructureMemoryRequirementsTypeNV
 	acceleration_structure C.AccelerationStructureNV
 }
 
-// PhysicalDeviceRayTracingPropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceRayTracingPropertiesNV {
-mut:
+pub mut:
 	s_type                                     StructureType
 	p_next                                     voidptr
 	shader_group_handle_size                   u32
@@ -15471,14 +14234,14 @@ mut:
 }
 
 pub struct TransformMatrixKHR {
-mut:
-	matrix [4][]f32
+pub mut:
+	matrix [4][3]f32
 }
 
 pub type TransformMatrixNV = TransformMatrixKHR
 
 pub struct AabbPositionsKHR {
-mut:
+pub mut:
 	min_x f32
 	min_y f32
 	min_z f32
@@ -15490,7 +14253,7 @@ mut:
 pub type AabbPositionsNV = AabbPositionsKHR
 
 pub struct AccelerationStructureInstanceKHR {
-mut:
+pub mut:
 	transform                                   TransformMatrixKHR
 	instance_custom_index                       u32
 	mask                                        u32
@@ -15501,190 +14264,221 @@ mut:
 
 pub type AccelerationStructureInstanceNV = AccelerationStructureInstanceKHR
 
-type VkCreateAccelerationStructureNV = fn (C.Device, &AccelerationStructureCreateInfoNV, &AllocationCallbacks, &C.AccelerationStructureNV) Result
-
-pub fn create_acceleration_structure_nv(device C.Device, p_create_info &AccelerationStructureCreateInfoNV, p_allocator &AllocationCallbacks, p_acceleration_structure &C.AccelerationStructureNV) Result {
-	f := VkCreateAccelerationStructureNV((*vulkan.loader_p).get_sym('vkCreateAccelerationStructureNV') or {
-		println("Couldn't load symbol for 'vkCreateAccelerationStructureNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_acceleration_structure)
+fn C.vkCreateAccelerationStructureNV(C.Device,
+	&AccelerationStructureCreateInfoNV,
+	&AllocationCallbacks,
+	&C.AccelerationStructureNV) Result
+pub fn create_acceleration_structure_nv(device C.Device,
+	p_create_info &AccelerationStructureCreateInfoNV,
+	p_allocator &AllocationCallbacks,
+	p_acceleration_structure &C.AccelerationStructureNV) Result {
+	return C.vkCreateAccelerationStructureNV(device, p_create_info, p_allocator, p_acceleration_structure)
 }
 
-type VkDestroyAccelerationStructureNV = fn (C.Device, C.AccelerationStructureNV, &AllocationCallbacks)
-
-pub fn destroy_acceleration_structure_nv(device C.Device, acceleration_structure C.AccelerationStructureNV, p_allocator &AllocationCallbacks) {
-	f := VkDestroyAccelerationStructureNV((*vulkan.loader_p).get_sym('vkDestroyAccelerationStructureNV') or {
-		println("Couldn't load symbol for 'vkDestroyAccelerationStructureNV': ${err}")
-		return
-	})
-	f(device, acceleration_structure, p_allocator)
+fn C.vkDestroyAccelerationStructureNV(C.Device,
+	C.AccelerationStructureNV,
+	&AllocationCallbacks)
+pub fn destroy_acceleration_structure_nv(device C.Device,
+	acceleration_structure C.AccelerationStructureNV,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyAccelerationStructureNV(device, acceleration_structure, p_allocator)
 }
 
-type VkGetAccelerationStructureMemoryRequirementsNV = fn (C.Device, &AccelerationStructureMemoryRequirementsInfoNV, &MemoryRequirements2KHR)
-
-pub fn get_acceleration_structure_memory_requirements_nv(device C.Device, p_info &AccelerationStructureMemoryRequirementsInfoNV, p_memory_requirements &MemoryRequirements2KHR) {
-	f := VkGetAccelerationStructureMemoryRequirementsNV((*vulkan.loader_p).get_sym('vkGetAccelerationStructureMemoryRequirementsNV') or {
-		println("Couldn't load symbol for 'vkGetAccelerationStructureMemoryRequirementsNV': ${err}")
-		return
-	})
-	f(device, p_info, p_memory_requirements)
+fn C.vkGetAccelerationStructureMemoryRequirementsNV(C.Device,
+	&AccelerationStructureMemoryRequirementsInfoNV,
+	&MemoryRequirements2KHR)
+pub fn get_acceleration_structure_memory_requirements_nv(device C.Device,
+	p_info &AccelerationStructureMemoryRequirementsInfoNV,
+	p_memory_requirements &MemoryRequirements2KHR) {
+	C.vkGetAccelerationStructureMemoryRequirementsNV(device, p_info, p_memory_requirements)
 }
 
-type VkBindAccelerationStructureMemoryNV = fn (C.Device, u32, &BindAccelerationStructureMemoryInfoNV) Result
-
-pub fn bind_acceleration_structure_memory_nv(device C.Device, bind_info_count u32, p_bind_infos &BindAccelerationStructureMemoryInfoNV) Result {
-	f := VkBindAccelerationStructureMemoryNV((*vulkan.loader_p).get_sym('vkBindAccelerationStructureMemoryNV') or {
-		println("Couldn't load symbol for 'vkBindAccelerationStructureMemoryNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, bind_info_count, p_bind_infos)
+fn C.vkBindAccelerationStructureMemoryNV(C.Device,
+	u32,
+	&BindAccelerationStructureMemoryInfoNV) Result
+pub fn bind_acceleration_structure_memory_nv(device C.Device,
+	bind_info_count u32,
+	p_bind_infos &BindAccelerationStructureMemoryInfoNV) Result {
+	return C.vkBindAccelerationStructureMemoryNV(device, bind_info_count, p_bind_infos)
 }
 
-type VkCmdBuildAccelerationStructureNV = fn (C.CommandBuffer, &AccelerationStructureInfoNV, C.Buffer, DeviceSize, Bool32, C.AccelerationStructureNV, C.AccelerationStructureNV, C.Buffer, DeviceSize)
-
-pub fn cmd_build_acceleration_structure_nv(command_buffer C.CommandBuffer, p_info &AccelerationStructureInfoNV, instance_data C.Buffer, instance_offset DeviceSize, update Bool32, dst C.AccelerationStructureNV, src C.AccelerationStructureNV, scratch C.Buffer, scratch_offset DeviceSize) {
-	f := VkCmdBuildAccelerationStructureNV((*vulkan.loader_p).get_sym('vkCmdBuildAccelerationStructureNV') or {
-		println("Couldn't load symbol for 'vkCmdBuildAccelerationStructureNV': ${err}")
-		return
-	})
-	f(command_buffer, p_info, instance_data, instance_offset, update, dst, src, scratch,
-		scratch_offset)
+fn C.vkCmdBuildAccelerationStructureNV(C.CommandBuffer,
+	&AccelerationStructureInfoNV,
+	C.Buffer,
+	DeviceSize,
+	Bool32,
+	C.AccelerationStructureNV,
+	C.AccelerationStructureNV,
+	C.Buffer,
+	DeviceSize)
+pub fn cmd_build_acceleration_structure_nv(command_buffer C.CommandBuffer,
+	p_info &AccelerationStructureInfoNV,
+	instance_data C.Buffer,
+	instance_offset DeviceSize,
+	update Bool32,
+	dst C.AccelerationStructureNV,
+	src C.AccelerationStructureNV,
+	scratch C.Buffer,
+	scratch_offset DeviceSize) {
+	C.vkCmdBuildAccelerationStructureNV(command_buffer, p_info, instance_data, instance_offset,
+		update, dst, src, scratch, scratch_offset)
 }
 
-type VkCmdCopyAccelerationStructureNV = fn (C.CommandBuffer, C.AccelerationStructureNV, C.AccelerationStructureNV, CopyAccelerationStructureModeKHR)
-
-pub fn cmd_copy_acceleration_structure_nv(command_buffer C.CommandBuffer, dst C.AccelerationStructureNV, src C.AccelerationStructureNV, mode CopyAccelerationStructureModeKHR) {
-	f := VkCmdCopyAccelerationStructureNV((*vulkan.loader_p).get_sym('vkCmdCopyAccelerationStructureNV') or {
-		println("Couldn't load symbol for 'vkCmdCopyAccelerationStructureNV': ${err}")
-		return
-	})
-	f(command_buffer, dst, src, mode)
+fn C.vkCmdCopyAccelerationStructureNV(C.CommandBuffer,
+	C.AccelerationStructureNV,
+	C.AccelerationStructureNV,
+	CopyAccelerationStructureModeKHR)
+pub fn cmd_copy_acceleration_structure_nv(command_buffer C.CommandBuffer,
+	dst C.AccelerationStructureNV,
+	src C.AccelerationStructureNV,
+	mode CopyAccelerationStructureModeKHR) {
+	C.vkCmdCopyAccelerationStructureNV(command_buffer, dst, src, mode)
 }
 
-type VkCmdTraceRaysNV = fn (C.CommandBuffer, C.Buffer, DeviceSize, C.Buffer, DeviceSize, DeviceSize, C.Buffer, DeviceSize, DeviceSize, C.Buffer, DeviceSize, DeviceSize, u32, u32, u32)
-
-pub fn cmd_trace_rays_nv(command_buffer C.CommandBuffer, raygen_shader_binding_table_buffer C.Buffer, raygen_shader_binding_offset DeviceSize, miss_shader_binding_table_buffer C.Buffer, miss_shader_binding_offset DeviceSize, miss_shader_binding_stride DeviceSize, hit_shader_binding_table_buffer C.Buffer, hit_shader_binding_offset DeviceSize, hit_shader_binding_stride DeviceSize, callable_shader_binding_table_buffer C.Buffer, callable_shader_binding_offset DeviceSize, callable_shader_binding_stride DeviceSize, width u32, height u32, depth u32) {
-	f := VkCmdTraceRaysNV((*vulkan.loader_p).get_sym('vkCmdTraceRaysNV') or {
-		println("Couldn't load symbol for 'vkCmdTraceRaysNV': ${err}")
-		return
-	})
-	f(command_buffer, raygen_shader_binding_table_buffer, raygen_shader_binding_offset,
+fn C.vkCmdTraceRaysNV(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	C.Buffer,
+	DeviceSize,
+	DeviceSize,
+	C.Buffer,
+	DeviceSize,
+	DeviceSize,
+	C.Buffer,
+	DeviceSize,
+	DeviceSize,
+	u32,
+	u32,
+	u32)
+pub fn cmd_trace_rays_nv(command_buffer C.CommandBuffer,
+	raygen_shader_binding_table_buffer C.Buffer,
+	raygen_shader_binding_offset DeviceSize,
+	miss_shader_binding_table_buffer C.Buffer,
+	miss_shader_binding_offset DeviceSize,
+	miss_shader_binding_stride DeviceSize,
+	hit_shader_binding_table_buffer C.Buffer,
+	hit_shader_binding_offset DeviceSize,
+	hit_shader_binding_stride DeviceSize,
+	callable_shader_binding_table_buffer C.Buffer,
+	callable_shader_binding_offset DeviceSize,
+	callable_shader_binding_stride DeviceSize,
+	width u32,
+	height u32,
+	depth u32) {
+	C.vkCmdTraceRaysNV(command_buffer, raygen_shader_binding_table_buffer, raygen_shader_binding_offset,
 		miss_shader_binding_table_buffer, miss_shader_binding_offset, miss_shader_binding_stride,
 		hit_shader_binding_table_buffer, hit_shader_binding_offset, hit_shader_binding_stride,
 		callable_shader_binding_table_buffer, callable_shader_binding_offset, callable_shader_binding_stride,
 		width, height, depth)
 }
 
-type VkCreateRayTracingPipelinesNV = fn (C.Device, C.PipelineCache, u32, &RayTracingPipelineCreateInfoNV, &AllocationCallbacks, &C.Pipeline) Result
-
-pub fn create_ray_tracing_pipelines_nv(device C.Device, pipeline_cache C.PipelineCache, create_info_count u32, p_create_infos &RayTracingPipelineCreateInfoNV, p_allocator &AllocationCallbacks, p_pipelines &C.Pipeline) Result {
-	f := VkCreateRayTracingPipelinesNV((*vulkan.loader_p).get_sym('vkCreateRayTracingPipelinesNV') or {
-		println("Couldn't load symbol for 'vkCreateRayTracingPipelinesNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, pipeline_cache, create_info_count, p_create_infos, p_allocator, p_pipelines)
+fn C.vkCreateRayTracingPipelinesNV(C.Device,
+	C.PipelineCache,
+	u32,
+	&RayTracingPipelineCreateInfoNV,
+	&AllocationCallbacks,
+	&C.Pipeline) Result
+pub fn create_ray_tracing_pipelines_nv(device C.Device,
+	pipeline_cache C.PipelineCache,
+	create_info_count u32,
+	p_create_infos &RayTracingPipelineCreateInfoNV,
+	p_allocator &AllocationCallbacks,
+	p_pipelines &C.Pipeline) Result {
+	return C.vkCreateRayTracingPipelinesNV(device, pipeline_cache, create_info_count,
+		p_create_infos, p_allocator, p_pipelines)
 }
 
-type VkGetRayTracingShaderGroupHandlesKHR = fn (C.Device, C.Pipeline, u32, u32, usize, voidptr) Result
-
-pub fn get_ray_tracing_shader_group_handles_khr(device C.Device, pipeline C.Pipeline, first_group u32, group_count u32, data_size usize, p_data voidptr) Result {
-	f := VkGetRayTracingShaderGroupHandlesKHR((*vulkan.loader_p).get_sym('vkGetRayTracingShaderGroupHandlesKHR') or {
-		println("Couldn't load symbol for 'vkGetRayTracingShaderGroupHandlesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, pipeline, first_group, group_count, data_size, p_data)
+fn C.vkGetRayTracingShaderGroupHandlesKHR(C.Device,
+	C.Pipeline,
+	u32,
+	u32,
+	usize,
+	voidptr) Result
+pub fn get_ray_tracing_shader_group_handles_khr(device C.Device,
+	pipeline C.Pipeline,
+	first_group u32,
+	group_count u32,
+	data_size usize,
+	p_data voidptr) Result {
+	return C.vkGetRayTracingShaderGroupHandlesKHR(device, pipeline, first_group, group_count,
+		data_size, p_data)
 }
 
-type VkGetRayTracingShaderGroupHandlesNV = fn (C.Device, C.Pipeline, u32, u32, usize, voidptr) Result
-
-pub fn get_ray_tracing_shader_group_handles_nv(device C.Device, pipeline C.Pipeline, first_group u32, group_count u32, data_size usize, p_data voidptr) Result {
-	f := VkGetRayTracingShaderGroupHandlesNV((*vulkan.loader_p).get_sym('vkGetRayTracingShaderGroupHandlesNV') or {
-		println("Couldn't load symbol for 'vkGetRayTracingShaderGroupHandlesNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, pipeline, first_group, group_count, data_size, p_data)
+fn C.vkGetAccelerationStructureHandleNV(C.Device,
+	C.AccelerationStructureNV,
+	usize,
+	voidptr) Result
+pub fn get_acceleration_structure_handle_nv(device C.Device,
+	acceleration_structure C.AccelerationStructureNV,
+	data_size usize,
+	p_data voidptr) Result {
+	return C.vkGetAccelerationStructureHandleNV(device, acceleration_structure, data_size,
+		p_data)
 }
 
-type VkGetAccelerationStructureHandleNV = fn (C.Device, C.AccelerationStructureNV, usize, voidptr) Result
-
-pub fn get_acceleration_structure_handle_nv(device C.Device, acceleration_structure C.AccelerationStructureNV, data_size usize, p_data voidptr) Result {
-	f := VkGetAccelerationStructureHandleNV((*vulkan.loader_p).get_sym('vkGetAccelerationStructureHandleNV') or {
-		println("Couldn't load symbol for 'vkGetAccelerationStructureHandleNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, acceleration_structure, data_size, p_data)
+fn C.vkCmdWriteAccelerationStructuresPropertiesNV(C.CommandBuffer,
+	u32,
+	&C.AccelerationStructureNV,
+	QueryType,
+	C.QueryPool,
+	u32)
+pub fn cmd_write_acceleration_structures_properties_nv(command_buffer C.CommandBuffer,
+	acceleration_structure_count u32,
+	p_acceleration_structures &C.AccelerationStructureNV,
+	query_type QueryType,
+	query_pool C.QueryPool,
+	first_query u32) {
+	C.vkCmdWriteAccelerationStructuresPropertiesNV(command_buffer, acceleration_structure_count,
+		p_acceleration_structures, query_type, query_pool, first_query)
 }
 
-type VkCmdWriteAccelerationStructuresPropertiesNV = fn (C.CommandBuffer, u32, &C.AccelerationStructureNV, QueryType, C.QueryPool, u32)
-
-pub fn cmd_write_acceleration_structures_properties_nv(command_buffer C.CommandBuffer, acceleration_structure_count u32, p_acceleration_structures &C.AccelerationStructureNV, query_type QueryType, query_pool C.QueryPool, first_query u32) {
-	f := VkCmdWriteAccelerationStructuresPropertiesNV((*vulkan.loader_p).get_sym('vkCmdWriteAccelerationStructuresPropertiesNV') or {
-		println("Couldn't load symbol for 'vkCmdWriteAccelerationStructuresPropertiesNV': ${err}")
-		return
-	})
-	f(command_buffer, acceleration_structure_count, p_acceleration_structures, query_type,
-		query_pool, first_query)
+fn C.vkCompileDeferredNV(C.Device,
+	C.Pipeline,
+	u32) Result
+pub fn compile_deferred_nv(device C.Device,
+	pipeline C.Pipeline,
+	shader u32) Result {
+	return C.vkCompileDeferredNV(device, pipeline, shader)
 }
 
-type VkCompileDeferredNV = fn (C.Device, C.Pipeline, u32) Result
-
-pub fn compile_deferred_nv(device C.Device, pipeline C.Pipeline, shader u32) Result {
-	f := VkCompileDeferredNV((*vulkan.loader_p).get_sym('vkCompileDeferredNV') or {
-		println("Couldn't load symbol for 'vkCompileDeferredNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, pipeline, shader)
-}
-
-// VK_NV_representative_fragment_test is a preprocessor guard. Do not pass it to API calls.
-const nv_representative_fragment_test = 1
 pub const nv_representative_fragment_test_spec_version = 2
 pub const nv_representative_fragment_test_extension_name = 'VK_NV_representative_fragment_test'
-// PhysicalDeviceRepresentativeFragmentTestFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceRepresentativeFragmentTestFeaturesNV {
-mut:
+pub mut:
 	s_type                       StructureType
 	p_next                       voidptr
 	representative_fragment_test Bool32
 }
 
-// PipelineRepresentativeFragmentTestStateCreateInfoNV extends VkGraphicsPipelineCreateInfo
 pub struct PipelineRepresentativeFragmentTestStateCreateInfoNV {
-mut:
+pub mut:
 	s_type                              StructureType
 	p_next                              voidptr
 	representative_fragment_test_enable Bool32
 }
 
-// VK_EXT_filter_cubic is a preprocessor guard. Do not pass it to API calls.
-const ext_filter_cubic = 1
 pub const ext_filter_cubic_spec_version = 3
 pub const ext_filter_cubic_extension_name = 'VK_EXT_filter_cubic'
-// PhysicalDeviceImageViewImageFormatInfoEXT extends VkPhysicalDeviceImageFormatInfo2
+
 pub struct PhysicalDeviceImageViewImageFormatInfoEXT {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	image_view_type ImageViewType
 }
 
-// FilterCubicImageViewImageFormatPropertiesEXT extends VkImageFormatProperties2
 pub struct FilterCubicImageViewImageFormatPropertiesEXT {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	filter_cubic        Bool32
 	filter_cubic_minmax Bool32
 }
 
-// VK_QCOM_render_pass_shader_resolve is a preprocessor guard. Do not pass it to API calls.
-const qcom_render_pass_shader_resolve = 1
 pub const qcom_render_pass_shader_resolve_spec_version = 4
 pub const qcom_render_pass_shader_resolve_extension_name = 'VK_QCOM_render_pass_shader_resolve'
 
-// VK_EXT_global_priority is a preprocessor guard. Do not pass it to API calls.
-const ext_global_priority = 1
 pub const ext_global_priority_spec_version = 2
 pub const ext_global_priority_extension_name = 'VK_EXT_global_priority'
 
@@ -15692,13 +14486,11 @@ pub type QueueGlobalPriorityEXT = QueueGlobalPriorityKHR
 
 pub type DeviceQueueGlobalPriorityCreateInfoEXT = DeviceQueueGlobalPriorityCreateInfoKHR
 
-// VK_EXT_external_memory_host is a preprocessor guard. Do not pass it to API calls.
-const ext_external_memory_host = 1
 pub const ext_external_memory_host_spec_version = 1
 pub const ext_external_memory_host_extension_name = 'VK_EXT_external_memory_host'
-// ImportMemoryHostPointerInfoEXT extends VkMemoryAllocateInfo
+
 pub struct ImportMemoryHostPointerInfoEXT {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	handle_type    ExternalMemoryHandleTypeFlagBits
@@ -15706,47 +14498,48 @@ mut:
 }
 
 pub struct MemoryHostPointerPropertiesEXT {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	memory_type_bits u32
 }
 
-// PhysicalDeviceExternalMemoryHostPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceExternalMemoryHostPropertiesEXT {
-mut:
+pub mut:
 	s_type                              StructureType
 	p_next                              voidptr
 	min_imported_host_pointer_alignment DeviceSize
 }
 
-type VkGetMemoryHostPointerPropertiesEXT = fn (C.Device, ExternalMemoryHandleTypeFlagBits, voidptr, &MemoryHostPointerPropertiesEXT) Result
-
-pub fn get_memory_host_pointer_properties_ext(device C.Device, handle_type ExternalMemoryHandleTypeFlagBits, p_host_pointer voidptr, p_memory_host_pointer_properties &MemoryHostPointerPropertiesEXT) Result {
-	f := VkGetMemoryHostPointerPropertiesEXT((*vulkan.loader_p).get_sym('vkGetMemoryHostPointerPropertiesEXT') or {
-		println("Couldn't load symbol for 'vkGetMemoryHostPointerPropertiesEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, handle_type, p_host_pointer, p_memory_host_pointer_properties)
+fn C.vkGetMemoryHostPointerPropertiesEXT(C.Device,
+	ExternalMemoryHandleTypeFlagBits,
+	voidptr,
+	&MemoryHostPointerPropertiesEXT) Result
+pub fn get_memory_host_pointer_properties_ext(device C.Device,
+	handle_type ExternalMemoryHandleTypeFlagBits,
+	p_host_pointer voidptr,
+	p_memory_host_pointer_properties &MemoryHostPointerPropertiesEXT) Result {
+	return C.vkGetMemoryHostPointerPropertiesEXT(device, handle_type, p_host_pointer,
+		p_memory_host_pointer_properties)
 }
 
-// VK_AMD_buffer_marker is a preprocessor guard. Do not pass it to API calls.
-const amd_buffer_marker = 1
 pub const amd_buffer_marker_spec_version = 1
 pub const amd_buffer_marker_extension_name = 'VK_AMD_buffer_marker'
 
-type VkCmdWriteBufferMarkerAMD = fn (C.CommandBuffer, PipelineStageFlagBits, C.Buffer, DeviceSize, u32)
-
-pub fn cmd_write_buffer_marker_amd(command_buffer C.CommandBuffer, pipeline_stage PipelineStageFlagBits, dst_buffer C.Buffer, dst_offset DeviceSize, marker u32) {
-	f := VkCmdWriteBufferMarkerAMD((*vulkan.loader_p).get_sym('vkCmdWriteBufferMarkerAMD') or {
-		println("Couldn't load symbol for 'vkCmdWriteBufferMarkerAMD': ${err}")
-		return
-	})
-	f(command_buffer, pipeline_stage, dst_buffer, dst_offset, marker)
+fn C.vkCmdWriteBufferMarkerAMD(C.CommandBuffer,
+	PipelineStageFlagBits,
+	C.Buffer,
+	DeviceSize,
+	u32)
+pub fn cmd_write_buffer_marker_amd(command_buffer C.CommandBuffer,
+	pipeline_stage PipelineStageFlagBits,
+	dst_buffer C.Buffer,
+	dst_offset DeviceSize,
+	marker u32) {
+	C.vkCmdWriteBufferMarkerAMD(command_buffer, pipeline_stage, dst_buffer, dst_offset,
+		marker)
 }
 
-// VK_AMD_pipeline_compiler_control is a preprocessor guard. Do not pass it to API calls.
-const amd_pipeline_compiler_control = 1
 pub const amd_pipeline_compiler_control_spec_version = 1
 pub const amd_pipeline_compiler_control_extension_name = 'VK_AMD_pipeline_compiler_control'
 
@@ -15756,61 +14549,25 @@ pub enum PipelineCompilerControlFlagBitsAMD {
 
 pub type PipelineCompilerControlFlagsAMD = u32
 
-// PipelineCompilerControlCreateInfoAMD extends VkGraphicsPipelineCreateInfo,VkComputePipelineCreateInfo,VkExecutionGraphPipelineCreateInfoAMDX
 pub struct PipelineCompilerControlCreateInfoAMD {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	compiler_control_flags PipelineCompilerControlFlagsAMD
 }
 
-// VK_EXT_calibrated_timestamps is a preprocessor guard. Do not pass it to API calls.
-const ext_calibrated_timestamps = 1
 pub const ext_calibrated_timestamps_spec_version = 2
 pub const ext_calibrated_timestamps_extension_name = 'VK_EXT_calibrated_timestamps'
 
-pub enum TimeDomainEXT {
-	time_domain_device_ext                    = int(0)
-	time_domain_clock_monotonic_ext           = int(1)
-	time_domain_clock_monotonic_raw_ext       = int(2)
-	time_domain_query_performance_counter_ext = int(3)
-	time_domain_max_enum_ext                  = int(0x7FFFFFFF)
-}
+pub type TimeDomainEXT = TimeDomainKHR
 
-pub struct CalibratedTimestampInfoEXT {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	time_domain TimeDomainEXT
-}
+pub type CalibratedTimestampInfoEXT = CalibratedTimestampInfoKHR
 
-type VkGetPhysicalDeviceCalibrateableTimeDomainsEXT = fn (C.PhysicalDevice, &u32, &TimeDomainEXT) Result
-
-pub fn get_physical_device_calibrateable_time_domains_ext(physical_device C.PhysicalDevice, p_time_domain_count &u32, p_time_domains &TimeDomainEXT) Result {
-	f := VkGetPhysicalDeviceCalibrateableTimeDomainsEXT((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceCalibrateableTimeDomainsEXT') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceCalibrateableTimeDomainsEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_time_domain_count, p_time_domains)
-}
-
-type VkGetCalibratedTimestampsEXT = fn (C.Device, u32, &CalibratedTimestampInfoEXT, &u64, &u64) Result
-
-pub fn get_calibrated_timestamps_ext(device C.Device, timestamp_count u32, p_timestamp_infos &CalibratedTimestampInfoEXT, p_timestamps &u64, p_max_deviation &u64) Result {
-	f := VkGetCalibratedTimestampsEXT((*vulkan.loader_p).get_sym('vkGetCalibratedTimestampsEXT') or {
-		println("Couldn't load symbol for 'vkGetCalibratedTimestampsEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, timestamp_count, p_timestamp_infos, p_timestamps, p_max_deviation)
-}
-
-// VK_AMD_shader_core_properties is a preprocessor guard. Do not pass it to API calls.
-const amd_shader_core_properties = 1
 pub const amd_shader_core_properties_spec_version = 2
 pub const amd_shader_core_properties_extension_name = 'VK_AMD_shader_core_properties'
-// PhysicalDeviceShaderCorePropertiesAMD extends VkPhysicalDeviceProperties2
+
 pub struct PhysicalDeviceShaderCorePropertiesAMD {
-mut:
+pub mut:
 	s_type                         StructureType
 	p_next                         voidptr
 	shader_engine_count            u32
@@ -15829,8 +14586,6 @@ mut:
 	vgpr_allocation_granularity    u32
 }
 
-// VK_AMD_memory_overallocation_behavior is a preprocessor guard. Do not pass it to API calls.
-const amd_memory_overallocation_behavior = 1
 pub const amd_memory_overallocation_behavior_spec_version = 1
 pub const amd_memory_overallocation_behavior_extension_name = 'VK_AMD_memory_overallocation_behavior'
 
@@ -15841,116 +14596,75 @@ pub enum MemoryOverallocationBehaviorAMD {
 	memory_overallocation_behavior_max_enum_amd   = int(0x7FFFFFFF)
 }
 
-// DeviceMemoryOverallocationCreateInfoAMD extends VkDeviceCreateInfo
 pub struct DeviceMemoryOverallocationCreateInfoAMD {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	overallocation_behavior MemoryOverallocationBehaviorAMD
 }
 
-// VK_EXT_vertex_attribute_divisor is a preprocessor guard. Do not pass it to API calls.
-const ext_vertex_attribute_divisor = 1
 pub const ext_vertex_attribute_divisor_spec_version = 3
 pub const ext_vertex_attribute_divisor_extension_name = 'VK_EXT_vertex_attribute_divisor'
-// PhysicalDeviceVertexAttributeDivisorPropertiesEXT extends VkPhysicalDeviceProperties2
+
 pub struct PhysicalDeviceVertexAttributeDivisorPropertiesEXT {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	max_vertex_attrib_divisor u32
 }
 
-pub struct VertexInputBindingDivisorDescriptionEXT {
-mut:
-	binding u32
-	divisor u32
-}
+pub type VertexInputBindingDivisorDescriptionEXT = VertexInputBindingDivisorDescriptionKHR
 
-// PipelineVertexInputDivisorStateCreateInfoEXT extends VkPipelineVertexInputStateCreateInfo
-pub struct PipelineVertexInputDivisorStateCreateInfoEXT {
-mut:
-	s_type                       StructureType
-	p_next                       voidptr
-	vertex_binding_divisor_count u32
-	p_vertex_binding_divisors    &VertexInputBindingDivisorDescriptionEXT
-}
+pub type PipelineVertexInputDivisorStateCreateInfoEXT = PipelineVertexInputDivisorStateCreateInfoKHR
 
-// PhysicalDeviceVertexAttributeDivisorFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub struct PhysicalDeviceVertexAttributeDivisorFeaturesEXT {
-mut:
-	s_type                                      StructureType
-	p_next                                      voidptr
-	vertex_attribute_instance_rate_divisor      Bool32
-	vertex_attribute_instance_rate_zero_divisor Bool32
-}
+pub type PhysicalDeviceVertexAttributeDivisorFeaturesEXT = PhysicalDeviceVertexAttributeDivisorFeaturesKHR
 
-// VK_GGP_frame_token is a preprocessor guard. Do not pass it to API calls.
-const ggp_frame_token = 1
-pub const ggp_frame_token_spec_version = 1
-pub const ggp_frame_token_extension_name = 'VK_GGP_frame_token'
-// PresentFrameTokenGGP extends VkPresentInfoKHR
-pub struct PresentFrameTokenGGP {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	frame_token u64
-}
-
-// VK_EXT_pipeline_creation_feedback is a preprocessor guard. Do not pass it to API calls.
-const ext_pipeline_creation_feedback = 1
 pub const ext_pipeline_creation_feedback_spec_version = 1
 pub const ext_pipeline_creation_feedback_extension_name = 'VK_EXT_pipeline_creation_feedback'
 
 pub type PipelineCreationFeedbackFlagBitsEXT = PipelineCreationFeedbackFlagBits
 
+pub type PipelineCreationFeedbackFlagsEXT = u32
 pub type PipelineCreationFeedbackCreateInfoEXT = PipelineCreationFeedbackCreateInfo
 
 pub type PipelineCreationFeedbackEXT = PipelineCreationFeedback
 
-// VK_NV_shader_subgroup_partitioned is a preprocessor guard. Do not pass it to API calls.
-const nv_shader_subgroup_partitioned = 1
 pub const nv_shader_subgroup_partitioned_spec_version = 1
 pub const nv_shader_subgroup_partitioned_extension_name = 'VK_NV_shader_subgroup_partitioned'
 
-// VK_NV_compute_shader_derivatives is a preprocessor guard. Do not pass it to API calls.
-const nv_compute_shader_derivatives = 1
 pub const nv_compute_shader_derivatives_spec_version = 1
 pub const nv_compute_shader_derivatives_extension_name = 'VK_NV_compute_shader_derivatives'
-// PhysicalDeviceComputeShaderDerivativesFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceComputeShaderDerivativesFeaturesNV {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	compute_derivative_group_quads  Bool32
 	compute_derivative_group_linear Bool32
 }
 
-// VK_NV_mesh_shader is a preprocessor guard. Do not pass it to API calls.
-const nv_mesh_shader = 1
 pub const nv_mesh_shader_spec_version = 1
 pub const nv_mesh_shader_extension_name = 'VK_NV_mesh_shader'
-// PhysicalDeviceMeshShaderFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceMeshShaderFeaturesNV {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	task_shader Bool32
 	mesh_shader Bool32
 }
 
-// PhysicalDeviceMeshShaderPropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceMeshShaderPropertiesNV {
-mut:
+pub mut:
 	s_type                                StructureType
 	p_next                                voidptr
 	max_draw_mesh_tasks_count             u32
 	max_task_work_group_invocations       u32
-	max_task_work_group_size              []u32
+	max_task_work_group_size              [3]u32
 	max_task_total_memory_size            u32
 	max_task_output_count                 u32
 	max_mesh_work_group_invocations       u32
-	max_mesh_work_group_size              []u32
+	max_mesh_work_group_size              [3]u32
 	max_mesh_total_memory_size            u32
 	max_mesh_output_vertices              u32
 	max_mesh_output_primitives            u32
@@ -15960,156 +14674,151 @@ mut:
 }
 
 pub struct DrawMeshTasksIndirectCommandNV {
-mut:
+pub mut:
 	task_count u32
 	first_task u32
 }
 
-type VkCmdDrawMeshTasksNV = fn (C.CommandBuffer, u32, u32)
-
-pub fn cmd_draw_mesh_tasks_nv(command_buffer C.CommandBuffer, task_count u32, first_task u32) {
-	f := VkCmdDrawMeshTasksNV((*vulkan.loader_p).get_sym('vkCmdDrawMeshTasksNV') or {
-		println("Couldn't load symbol for 'vkCmdDrawMeshTasksNV': ${err}")
-		return
-	})
-	f(command_buffer, task_count, first_task)
+fn C.vkCmdDrawMeshTasksNV(C.CommandBuffer,
+	u32,
+	u32)
+pub fn cmd_draw_mesh_tasks_nv(command_buffer C.CommandBuffer,
+	task_count u32,
+	first_task u32) {
+	C.vkCmdDrawMeshTasksNV(command_buffer, task_count, first_task)
 }
 
-type VkCmdDrawMeshTasksIndirectNV = fn (C.CommandBuffer, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_mesh_tasks_indirect_nv(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, draw_count u32, stride u32) {
-	f := VkCmdDrawMeshTasksIndirectNV((*vulkan.loader_p).get_sym('vkCmdDrawMeshTasksIndirectNV') or {
-		println("Couldn't load symbol for 'vkCmdDrawMeshTasksIndirectNV': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, draw_count, stride)
+fn C.vkCmdDrawMeshTasksIndirectNV(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	u32,
+	u32)
+pub fn cmd_draw_mesh_tasks_indirect_nv(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize,
+	draw_count u32,
+	stride u32) {
+	C.vkCmdDrawMeshTasksIndirectNV(command_buffer, buffer, offset, draw_count, stride)
 }
 
-type VkCmdDrawMeshTasksIndirectCountNV = fn (C.CommandBuffer, C.Buffer, DeviceSize, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_mesh_tasks_indirect_count_nv(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, count_buffer C.Buffer, count_buffer_offset DeviceSize, max_draw_count u32, stride u32) {
-	f := VkCmdDrawMeshTasksIndirectCountNV((*vulkan.loader_p).get_sym('vkCmdDrawMeshTasksIndirectCountNV') or {
-		println("Couldn't load symbol for 'vkCmdDrawMeshTasksIndirectCountNV': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, count_buffer, count_buffer_offset, max_draw_count,
-		stride)
+fn C.vkCmdDrawMeshTasksIndirectCountNV(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	C.Buffer,
+	DeviceSize,
+	u32,
+	u32)
+pub fn cmd_draw_mesh_tasks_indirect_count_nv(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize,
+	count_buffer C.Buffer,
+	count_buffer_offset DeviceSize,
+	max_draw_count u32,
+	stride u32) {
+	C.vkCmdDrawMeshTasksIndirectCountNV(command_buffer, buffer, offset, count_buffer,
+		count_buffer_offset, max_draw_count, stride)
 }
 
-// VK_NV_fragment_shader_barycentric is a preprocessor guard. Do not pass it to API calls.
-const nv_fragment_shader_barycentric = 1
 pub const nv_fragment_shader_barycentric_spec_version = 1
 pub const nv_fragment_shader_barycentric_extension_name = 'VK_NV_fragment_shader_barycentric'
 
 pub type PhysicalDeviceFragmentShaderBarycentricFeaturesNV = PhysicalDeviceFragmentShaderBarycentricFeaturesKHR
 
-// VK_NV_shader_image_footprint is a preprocessor guard. Do not pass it to API calls.
-const nv_shader_image_footprint = 1
 pub const nv_shader_image_footprint_spec_version = 2
 pub const nv_shader_image_footprint_extension_name = 'VK_NV_shader_image_footprint'
-// PhysicalDeviceShaderImageFootprintFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderImageFootprintFeaturesNV {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	image_footprint Bool32
 }
 
-// VK_NV_scissor_exclusive is a preprocessor guard. Do not pass it to API calls.
-const nv_scissor_exclusive = 1
 pub const nv_scissor_exclusive_spec_version = 2
 pub const nv_scissor_exclusive_extension_name = 'VK_NV_scissor_exclusive'
-// PipelineViewportExclusiveScissorStateCreateInfoNV extends VkPipelineViewportStateCreateInfo
+
 pub struct PipelineViewportExclusiveScissorStateCreateInfoNV {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	exclusive_scissor_count u32
 	p_exclusive_scissors    &Rect2D
 }
 
-// PhysicalDeviceExclusiveScissorFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceExclusiveScissorFeaturesNV {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	exclusive_scissor Bool32
 }
 
-type VkCmdSetExclusiveScissorEnableNV = fn (C.CommandBuffer, u32, u32, &Bool32)
-
-pub fn cmd_set_exclusive_scissor_enable_nv(command_buffer C.CommandBuffer, first_exclusive_scissor u32, exclusive_scissor_count u32, p_exclusive_scissor_enables &Bool32) {
-	f := VkCmdSetExclusiveScissorEnableNV((*vulkan.loader_p).get_sym('vkCmdSetExclusiveScissorEnableNV') or {
-		println("Couldn't load symbol for 'vkCmdSetExclusiveScissorEnableNV': ${err}")
-		return
-	})
-	f(command_buffer, first_exclusive_scissor, exclusive_scissor_count, p_exclusive_scissor_enables)
+fn C.vkCmdSetExclusiveScissorEnableNV(C.CommandBuffer,
+	u32,
+	u32,
+	&Bool32)
+pub fn cmd_set_exclusive_scissor_enable_nv(command_buffer C.CommandBuffer,
+	first_exclusive_scissor u32,
+	exclusive_scissor_count u32,
+	p_exclusive_scissor_enables &Bool32) {
+	C.vkCmdSetExclusiveScissorEnableNV(command_buffer, first_exclusive_scissor, exclusive_scissor_count,
+		p_exclusive_scissor_enables)
 }
 
-type VkCmdSetExclusiveScissorNV = fn (C.CommandBuffer, u32, u32, &Rect2D)
-
-pub fn cmd_set_exclusive_scissor_nv(command_buffer C.CommandBuffer, first_exclusive_scissor u32, exclusive_scissor_count u32, p_exclusive_scissors &Rect2D) {
-	f := VkCmdSetExclusiveScissorNV((*vulkan.loader_p).get_sym('vkCmdSetExclusiveScissorNV') or {
-		println("Couldn't load symbol for 'vkCmdSetExclusiveScissorNV': ${err}")
-		return
-	})
-	f(command_buffer, first_exclusive_scissor, exclusive_scissor_count, p_exclusive_scissors)
+fn C.vkCmdSetExclusiveScissorNV(C.CommandBuffer,
+	u32,
+	u32,
+	&Rect2D)
+pub fn cmd_set_exclusive_scissor_nv(command_buffer C.CommandBuffer,
+	first_exclusive_scissor u32,
+	exclusive_scissor_count u32,
+	p_exclusive_scissors &Rect2D) {
+	C.vkCmdSetExclusiveScissorNV(command_buffer, first_exclusive_scissor, exclusive_scissor_count,
+		p_exclusive_scissors)
 }
 
-// VK_NV_device_diagnostic_checkpoints is a preprocessor guard. Do not pass it to API calls.
-const nv_device_diagnostic_checkpoints = 1
 pub const nv_device_diagnostic_checkpoints_spec_version = 2
 pub const nv_device_diagnostic_checkpoints_extension_name = 'VK_NV_device_diagnostic_checkpoints'
-// QueueFamilyCheckpointPropertiesNV extends VkQueueFamilyProperties2
+
 pub struct QueueFamilyCheckpointPropertiesNV {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	checkpoint_execution_stage_mask PipelineStageFlags
 }
 
 pub struct CheckpointDataNV {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	stage               PipelineStageFlagBits
 	p_checkpoint_marker voidptr
 }
 
-type VkCmdSetCheckpointNV = fn (C.CommandBuffer, voidptr)
-
-pub fn cmd_set_checkpoint_nv(command_buffer C.CommandBuffer, p_checkpoint_marker voidptr) {
-	f := VkCmdSetCheckpointNV((*vulkan.loader_p).get_sym('vkCmdSetCheckpointNV') or {
-		println("Couldn't load symbol for 'vkCmdSetCheckpointNV': ${err}")
-		return
-	})
-	f(command_buffer, p_checkpoint_marker)
+fn C.vkCmdSetCheckpointNV(C.CommandBuffer,
+	voidptr)
+pub fn cmd_set_checkpoint_nv(command_buffer C.CommandBuffer,
+	p_checkpoint_marker voidptr) {
+	C.vkCmdSetCheckpointNV(command_buffer, p_checkpoint_marker)
 }
 
-type VkGetQueueCheckpointDataNV = fn (C.Queue, &u32, &CheckpointDataNV)
-
-pub fn get_queue_checkpoint_data_nv(queue C.Queue, p_checkpoint_data_count &u32, p_checkpoint_data &CheckpointDataNV) {
-	f := VkGetQueueCheckpointDataNV((*vulkan.loader_p).get_sym('vkGetQueueCheckpointDataNV') or {
-		println("Couldn't load symbol for 'vkGetQueueCheckpointDataNV': ${err}")
-		return
-	})
-	f(queue, p_checkpoint_data_count, p_checkpoint_data)
+fn C.vkGetQueueCheckpointDataNV(C.Queue,
+	&u32,
+	&CheckpointDataNV)
+pub fn get_queue_checkpoint_data_nv(queue C.Queue,
+	p_checkpoint_data_count &u32,
+	p_checkpoint_data &CheckpointDataNV) {
+	C.vkGetQueueCheckpointDataNV(queue, p_checkpoint_data_count, p_checkpoint_data)
 }
 
-// VK_INTEL_shader_integer_functions2 is a preprocessor guard. Do not pass it to API calls.
-const intel_shader_integer_functions2 = 1
 pub const intel_shader_integer_functions_2_spec_version = 1
 pub const intel_shader_integer_functions_2_extension_name = 'VK_INTE_shader_integer_functions2'
-// PhysicalDeviceShaderIntegerFunctions2FeaturesINTEL extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderIntegerFunctions2FeaturesINTEL {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	shader_integer_functions2 Bool32
 }
-
-// VK_INTEL_performance_query is a preprocessor guard. Do not pass it to API calls.
-const intel_performance_query = 1
 
 pub type C.PerformanceConfigurationINTEL = voidptr
 
@@ -16148,7 +14857,7 @@ pub enum PerformanceValueTypeINTEL {
 }
 
 pub union PerformanceValueDataINTEL {
-mut:
+pub mut:
 	value32      u32
 	value64      u64
 	value_float  f32
@@ -16157,21 +14866,20 @@ mut:
 }
 
 pub struct PerformanceValueINTEL {
-mut:
+pub mut:
 	vktype PerformanceValueTypeINTEL
 	data   PerformanceValueDataINTEL
 }
 
 pub struct InitializePerformanceApiInfoINTEL {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	p_user_data voidptr
 }
 
-// QueryPoolPerformanceQueryCreateInfoINTEL extends VkQueryPoolCreateInfo
 pub struct QueryPoolPerformanceQueryCreateInfoINTEL {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	performance_counters_sampling QueryPoolSamplingModeINTEL
@@ -16180,21 +14888,21 @@ mut:
 pub type QueryPoolCreateInfoINTEL = QueryPoolPerformanceQueryCreateInfoINTEL
 
 pub struct PerformanceMarkerInfoINTEL {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	marker u64
 }
 
 pub struct PerformanceStreamMarkerInfoINTEL {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	marker u32
 }
 
 pub struct PerformanceOverrideInfoINTEL {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	vktype    PerformanceOverrideTypeINTEL
@@ -16203,109 +14911,82 @@ mut:
 }
 
 pub struct PerformanceConfigurationAcquireInfoINTEL {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	vktype PerformanceConfigurationTypeINTEL
 }
 
-type VkInitializePerformanceApiINTEL = fn (C.Device, &InitializePerformanceApiInfoINTEL) Result
-
-pub fn initialize_performance_api_intel(device C.Device, p_initialize_info &InitializePerformanceApiInfoINTEL) Result {
-	f := VkInitializePerformanceApiINTEL((*vulkan.loader_p).get_sym('vkInitializePerformanceApiINTEL') or {
-		println("Couldn't load symbol for 'vkInitializePerformanceApiINTEL': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_initialize_info)
+fn C.vkInitializePerformanceApiINTEL(C.Device,
+	&InitializePerformanceApiInfoINTEL) Result
+pub fn initialize_performance_api_intel(device C.Device,
+	p_initialize_info &InitializePerformanceApiInfoINTEL) Result {
+	return C.vkInitializePerformanceApiINTEL(device, p_initialize_info)
 }
 
-type VkUninitializePerformanceApiINTEL = fn (C.Device)
-
+fn C.vkUninitializePerformanceApiINTEL(C.Device)
 pub fn uninitialize_performance_api_intel(device C.Device) {
-	f := VkUninitializePerformanceApiINTEL((*vulkan.loader_p).get_sym('vkUninitializePerformanceApiINTEL') or {
-		println("Couldn't load symbol for 'vkUninitializePerformanceApiINTEL': ${err}")
-		return
-	})
-	f(device)
+	C.vkUninitializePerformanceApiINTEL(device)
 }
 
-type VkCmdSetPerformanceMarkerINTEL = fn (C.CommandBuffer, &PerformanceMarkerInfoINTEL) Result
-
-pub fn cmd_set_performance_marker_intel(command_buffer C.CommandBuffer, p_marker_info &PerformanceMarkerInfoINTEL) Result {
-	f := VkCmdSetPerformanceMarkerINTEL((*vulkan.loader_p).get_sym('vkCmdSetPerformanceMarkerINTEL') or {
-		println("Couldn't load symbol for 'vkCmdSetPerformanceMarkerINTEL': ${err}")
-		return Result.error_unknown
-	})
-	return f(command_buffer, p_marker_info)
+fn C.vkCmdSetPerformanceMarkerINTEL(C.CommandBuffer,
+	&PerformanceMarkerInfoINTEL) Result
+pub fn cmd_set_performance_marker_intel(command_buffer C.CommandBuffer,
+	p_marker_info &PerformanceMarkerInfoINTEL) Result {
+	return C.vkCmdSetPerformanceMarkerINTEL(command_buffer, p_marker_info)
 }
 
-type VkCmdSetPerformanceStreamMarkerINTEL = fn (C.CommandBuffer, &PerformanceStreamMarkerInfoINTEL) Result
-
-pub fn cmd_set_performance_stream_marker_intel(command_buffer C.CommandBuffer, p_marker_info &PerformanceStreamMarkerInfoINTEL) Result {
-	f := VkCmdSetPerformanceStreamMarkerINTEL((*vulkan.loader_p).get_sym('vkCmdSetPerformanceStreamMarkerINTEL') or {
-		println("Couldn't load symbol for 'vkCmdSetPerformanceStreamMarkerINTEL': ${err}")
-		return Result.error_unknown
-	})
-	return f(command_buffer, p_marker_info)
+fn C.vkCmdSetPerformanceStreamMarkerINTEL(C.CommandBuffer,
+	&PerformanceStreamMarkerInfoINTEL) Result
+pub fn cmd_set_performance_stream_marker_intel(command_buffer C.CommandBuffer,
+	p_marker_info &PerformanceStreamMarkerInfoINTEL) Result {
+	return C.vkCmdSetPerformanceStreamMarkerINTEL(command_buffer, p_marker_info)
 }
 
-type VkCmdSetPerformanceOverrideINTEL = fn (C.CommandBuffer, &PerformanceOverrideInfoINTEL) Result
-
-pub fn cmd_set_performance_override_intel(command_buffer C.CommandBuffer, p_override_info &PerformanceOverrideInfoINTEL) Result {
-	f := VkCmdSetPerformanceOverrideINTEL((*vulkan.loader_p).get_sym('vkCmdSetPerformanceOverrideINTEL') or {
-		println("Couldn't load symbol for 'vkCmdSetPerformanceOverrideINTEL': ${err}")
-		return Result.error_unknown
-	})
-	return f(command_buffer, p_override_info)
+fn C.vkCmdSetPerformanceOverrideINTEL(C.CommandBuffer,
+	&PerformanceOverrideInfoINTEL) Result
+pub fn cmd_set_performance_override_intel(command_buffer C.CommandBuffer,
+	p_override_info &PerformanceOverrideInfoINTEL) Result {
+	return C.vkCmdSetPerformanceOverrideINTEL(command_buffer, p_override_info)
 }
 
-type VkAcquirePerformanceConfigurationINTEL = fn (C.Device, &PerformanceConfigurationAcquireInfoINTEL, &C.PerformanceConfigurationINTEL) Result
-
-pub fn acquire_performance_configuration_intel(device C.Device, p_acquire_info &PerformanceConfigurationAcquireInfoINTEL, p_configuration &C.PerformanceConfigurationINTEL) Result {
-	f := VkAcquirePerformanceConfigurationINTEL((*vulkan.loader_p).get_sym('vkAcquirePerformanceConfigurationINTEL') or {
-		println("Couldn't load symbol for 'vkAcquirePerformanceConfigurationINTEL': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_acquire_info, p_configuration)
+fn C.vkAcquirePerformanceConfigurationINTEL(C.Device,
+	&PerformanceConfigurationAcquireInfoINTEL,
+	&C.PerformanceConfigurationINTEL) Result
+pub fn acquire_performance_configuration_intel(device C.Device,
+	p_acquire_info &PerformanceConfigurationAcquireInfoINTEL,
+	p_configuration &C.PerformanceConfigurationINTEL) Result {
+	return C.vkAcquirePerformanceConfigurationINTEL(device, p_acquire_info, p_configuration)
 }
 
-type VkReleasePerformanceConfigurationINTEL = fn (C.Device, C.PerformanceConfigurationINTEL) Result
-
-pub fn release_performance_configuration_intel(device C.Device, configuration C.PerformanceConfigurationINTEL) Result {
-	f := VkReleasePerformanceConfigurationINTEL((*vulkan.loader_p).get_sym('vkReleasePerformanceConfigurationINTEL') or {
-		println("Couldn't load symbol for 'vkReleasePerformanceConfigurationINTEL': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, configuration)
+fn C.vkReleasePerformanceConfigurationINTEL(C.Device,
+	C.PerformanceConfigurationINTEL) Result
+pub fn release_performance_configuration_intel(device C.Device,
+	configuration C.PerformanceConfigurationINTEL) Result {
+	return C.vkReleasePerformanceConfigurationINTEL(device, configuration)
 }
 
-type VkQueueSetPerformanceConfigurationINTEL = fn (C.Queue, C.PerformanceConfigurationINTEL) Result
-
-pub fn queue_set_performance_configuration_intel(queue C.Queue, configuration C.PerformanceConfigurationINTEL) Result {
-	f := VkQueueSetPerformanceConfigurationINTEL((*vulkan.loader_p).get_sym('vkQueueSetPerformanceConfigurationINTEL') or {
-		println("Couldn't load symbol for 'vkQueueSetPerformanceConfigurationINTEL': ${err}")
-		return Result.error_unknown
-	})
-	return f(queue, configuration)
+fn C.vkQueueSetPerformanceConfigurationINTEL(C.Queue,
+	C.PerformanceConfigurationINTEL) Result
+pub fn queue_set_performance_configuration_intel(queue C.Queue,
+	configuration C.PerformanceConfigurationINTEL) Result {
+	return C.vkQueueSetPerformanceConfigurationINTEL(queue, configuration)
 }
 
-type VkGetPerformanceParameterINTEL = fn (C.Device, PerformanceParameterTypeINTEL, &PerformanceValueINTEL) Result
-
-pub fn get_performance_parameter_intel(device C.Device, parameter PerformanceParameterTypeINTEL, p_value &PerformanceValueINTEL) Result {
-	f := VkGetPerformanceParameterINTEL((*vulkan.loader_p).get_sym('vkGetPerformanceParameterINTEL') or {
-		println("Couldn't load symbol for 'vkGetPerformanceParameterINTEL': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, parameter, p_value)
+fn C.vkGetPerformanceParameterINTEL(C.Device,
+	PerformanceParameterTypeINTEL,
+	&PerformanceValueINTEL) Result
+pub fn get_performance_parameter_intel(device C.Device,
+	parameter PerformanceParameterTypeINTEL,
+	p_value &PerformanceValueINTEL) Result {
+	return C.vkGetPerformanceParameterINTEL(device, parameter, p_value)
 }
 
-// VK_EXT_pci_bus_info is a preprocessor guard. Do not pass it to API calls.
-const ext_pci_bus_info = 1
 pub const ext_pci_bus_info_spec_version = 2
 pub const ext_pci_bus_info_extension_name = 'VK_EXT_pci_bus_info'
-// PhysicalDevicePCIBusInfoPropertiesEXT extends VkPhysicalDeviceProperties2
+
 pub struct PhysicalDevicePCIBusInfoPropertiesEXT {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	pci_domain   u32
@@ -16314,93 +14995,37 @@ mut:
 	pci_function u32
 }
 
-// VK_AMD_display_native_hdr is a preprocessor guard. Do not pass it to API calls.
-const amd_display_native_hdr = 1
 pub const amd_display_native_hdr_spec_version = 1
 pub const amd_display_native_hdr_extension_name = 'VK_AMD_display_native_hdr'
-// DisplayNativeHdrSurfaceCapabilitiesAMD extends VkSurfaceCapabilities2KHR
+
 pub struct DisplayNativeHdrSurfaceCapabilitiesAMD {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	local_dimming_support Bool32
 }
 
-// SwapchainDisplayNativeHdrCreateInfoAMD extends VkSwapchainCreateInfoKHR
 pub struct SwapchainDisplayNativeHdrCreateInfoAMD {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	local_dimming_enable Bool32
 }
 
-type VkSetLocalDimmingAMD = fn (C.Device, C.SwapchainKHR, Bool32)
-
-pub fn set_local_dimming_amd(device C.Device, swap_chain C.SwapchainKHR, local_dimming_enable Bool32) {
-	f := VkSetLocalDimmingAMD((*vulkan.loader_p).get_sym('vkSetLocalDimmingAMD') or {
-		println("Couldn't load symbol for 'vkSetLocalDimmingAMD': ${err}")
-		return
-	})
-	f(device, swap_chain, local_dimming_enable)
+fn C.vkSetLocalDimmingAMD(C.Device,
+	C.SwapchainKHR,
+	Bool32)
+pub fn set_local_dimming_amd(device C.Device,
+	swap_chain C.SwapchainKHR,
+	local_dimming_enable Bool32) {
+	C.vkSetLocalDimmingAMD(device, swap_chain, local_dimming_enable)
 }
 
-// VK_FUCHSIA_imagepipe_surface is a preprocessor guard. Do not pass it to API calls.
-const fuchsia_imagepipe_surface = 1
-pub const fuchsia_imagepipe_surface_spec_version = 1
-pub const fuchsia_imagepipe_surface_extension_name = 'VK_CHSIA_imagepipe_surface'
-
-pub type ImagePipeSurfaceCreateFlagsFUCHSIA = u32
-
-pub struct ImagePipeSurfaceCreateInfoFUCHSIA {
-mut:
-	s_type            StructureType
-	p_next            voidptr
-	flags             ImagePipeSurfaceCreateFlagsFUCHSIA
-	image_pipe_handle voidptr
-}
-
-type VkCreateImagePipeSurfaceFUCHSIA = fn (C.Instance, &ImagePipeSurfaceCreateInfoFUCHSIA, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_image_pipe_surface_fuchsia(instance C.Instance, p_create_info &ImagePipeSurfaceCreateInfoFUCHSIA, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateImagePipeSurfaceFUCHSIA((*vulkan.loader_p).get_sym('vkCreateImagePipeSurfaceFUCHSIA') or {
-		println("Couldn't load symbol for 'vkCreateImagePipeSurfaceFUCHSIA': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-// VK_EXT_metal_surface is a preprocessor guard. Do not pass it to API calls.
-const ext_metal_surface = 1
-pub const ext_metal_surface_spec_version = 1
-pub const ext_metal_surface_extension_name = 'VK_EXT_metal_surface'
-
-pub type MetalSurfaceCreateFlagsEXT = u32
-
-pub struct MetalSurfaceCreateInfoEXT {
-mut:
-	s_type  StructureType
-	p_next  voidptr
-	flags   MetalSurfaceCreateFlagsEXT
-	p_layer voidptr
-}
-
-type VkCreateMetalSurfaceEXT = fn (C.Instance, &MetalSurfaceCreateInfoEXT, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_metal_surface_ext(instance C.Instance, p_create_info &MetalSurfaceCreateInfoEXT, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateMetalSurfaceEXT((*vulkan.loader_p).get_sym('vkCreateMetalSurfaceEXT') or {
-		println("Couldn't load symbol for 'vkCreateMetalSurfaceEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-// VK_EXT_fragment_density_map is a preprocessor guard. Do not pass it to API calls.
-const ext_fragment_density_map = 1
 pub const ext_fragment_density_map_spec_version = 2
 pub const ext_fragment_density_map_extension_name = 'VK_EXT_fragment_density_map'
-// PhysicalDeviceFragmentDensityMapFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceFragmentDensityMapFeaturesEXT {
-mut:
+pub mut:
 	s_type                                     StructureType
 	p_next                                     voidptr
 	fragment_density_map                       Bool32
@@ -16408,9 +15033,8 @@ mut:
 	fragment_density_map_non_subsampled_images Bool32
 }
 
-// PhysicalDeviceFragmentDensityMapPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceFragmentDensityMapPropertiesEXT {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	min_fragment_density_texel_size Extent2D
@@ -16418,35 +15042,28 @@ mut:
 	fragment_density_invocations    Bool32
 }
 
-// RenderPassFragmentDensityMapCreateInfoEXT extends VkRenderPassCreateInfo,VkRenderPassCreateInfo2
 pub struct RenderPassFragmentDensityMapCreateInfoEXT {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	fragment_density_map_attachment AttachmentReference
 }
 
-// VK_EXT_scalar_block_layout is a preprocessor guard. Do not pass it to API calls.
-const ext_scalar_block_layout = 1
 pub const ext_scalar_block_layout_spec_version = 1
 pub const ext_scalar_block_layout_extension_name = 'VK_EXT_scalar_block_layout'
 
 pub type PhysicalDeviceScalarBlockLayoutFeaturesEXT = PhysicalDeviceScalarBlockLayoutFeatures
 
-// VK_GOOGLE_hlsl_functionality1 is a preprocessor guard. Do not pass it to API calls.
-const google_hlsl_functionality1 = 1
 pub const google_hlsl_functionality_1_spec_version = 1
 pub const google_hlsl_functionality_1_extension_name = 'VK_GOOGE_hlsl_functionality1'
+// VK_GOOGLE_HLSL_FUNCTIONALITY1_SPEC_VERSION is a deprecated alias
 pub const google_hlsl_functionality1_spec_version = google_hlsl_functionality_1_spec_version
+// VK_GOOGLE_HLSL_FUNCTIONALITY1_EXTENSION_NAME is a deprecated alias
 pub const google_hlsl_functionality1_extension_name = google_hlsl_functionality_1_extension_name
 
-// VK_GOOGLE_decorate_string is a preprocessor guard. Do not pass it to API calls.
-const google_decorate_string = 1
 pub const google_decorate_string_spec_version = 1
 pub const google_decorate_string_extension_name = 'VK_GOOGE_decorate_string'
 
-// VK_EXT_subgroup_size_control is a preprocessor guard. Do not pass it to API calls.
-const ext_subgroup_size_control = 1
 pub const ext_subgroup_size_control_spec_version = 2
 pub const ext_subgroup_size_control_extension_name = 'VK_EXT_subgroup_size_control'
 
@@ -16456,8 +15073,6 @@ pub type PhysicalDeviceSubgroupSizeControlPropertiesEXT = PhysicalDeviceSubgroup
 
 pub type PipelineShaderStageRequiredSubgroupSizeCreateInfoEXT = PipelineShaderStageRequiredSubgroupSizeCreateInfo
 
-// VK_AMD_shader_core_properties2 is a preprocessor guard. Do not pass it to API calls.
-const amd_shader_core_properties2 = 1
 pub const amd_shader_core_properties_2_spec_version = 1
 pub const amd_shader_core_properties_2_extension_name = 'VK_AMD_shader_core_properties2'
 
@@ -16467,92 +15082,78 @@ pub enum ShaderCorePropertiesFlagBitsAMD {
 
 pub type ShaderCorePropertiesFlagsAMD = u32
 
-// PhysicalDeviceShaderCoreProperties2AMD extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceShaderCoreProperties2AMD {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	shader_core_features      ShaderCorePropertiesFlagsAMD
 	active_compute_unit_count u32
 }
 
-// VK_AMD_device_coherent_memory is a preprocessor guard. Do not pass it to API calls.
-const amd_device_coherent_memory = 1
 pub const amd_device_coherent_memory_spec_version = 1
 pub const amd_device_coherent_memory_extension_name = 'VK_AMD_device_coherent_memory'
-// PhysicalDeviceCoherentMemoryFeaturesAMD extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceCoherentMemoryFeaturesAMD {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	device_coherent_memory Bool32
 }
 
-// VK_EXT_shader_image_atomic_int64 is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_image_atomic_int64 = 1
 pub const ext_shader_image_atomic_int64_spec_version = 1
 pub const ext_shader_image_atomic_int64_extension_name = 'VK_EXT_shader_image_atomic_int64'
-// PhysicalDeviceShaderImageAtomicInt64FeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderImageAtomicInt64FeaturesEXT {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	shader_image_int64_atomics Bool32
 	sparse_image_int64_atomics Bool32
 }
 
-// VK_EXT_memory_budget is a preprocessor guard. Do not pass it to API calls.
-const ext_memory_budget = 1
 pub const ext_memory_budget_spec_version = 1
 pub const ext_memory_budget_extension_name = 'VK_EXT_memory_budget'
-// PhysicalDeviceMemoryBudgetPropertiesEXT extends VkPhysicalDeviceMemoryProperties2
+
 pub struct PhysicalDeviceMemoryBudgetPropertiesEXT {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
-	heap_budget []DeviceSize
-	heap_usage  []DeviceSize
+	heap_budget [max_memory_heaps]DeviceSize
+	heap_usage  [max_memory_heaps]DeviceSize
 }
 
-// VK_EXT_memory_priority is a preprocessor guard. Do not pass it to API calls.
-const ext_memory_priority = 1
 pub const ext_memory_priority_spec_version = 1
 pub const ext_memory_priority_extension_name = 'VK_EXT_memory_priority'
-// PhysicalDeviceMemoryPriorityFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceMemoryPriorityFeaturesEXT {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	memory_priority Bool32
 }
 
-// MemoryPriorityAllocateInfoEXT extends VkMemoryAllocateInfo
 pub struct MemoryPriorityAllocateInfoEXT {
-mut:
+pub mut:
 	s_type   StructureType
 	p_next   voidptr
 	priority f32
 }
 
-// VK_NV_dedicated_allocation_image_aliasing is a preprocessor guard. Do not pass it to API calls.
-const nv_dedicated_allocation_image_aliasing = 1
 pub const nv_dedicated_allocation_image_aliasing_spec_version = 1
 pub const nv_dedicated_allocation_image_aliasing_extension_name = 'VK_NV_dedicated_allocation_image_aliasing'
-// PhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV {
-mut:
+pub mut:
 	s_type                              StructureType
 	p_next                              voidptr
 	dedicated_allocation_image_aliasing Bool32
 }
 
-// VK_EXT_buffer_device_address is a preprocessor guard. Do not pass it to API calls.
-const ext_buffer_device_address = 1
 pub const ext_buffer_device_address_spec_version = 2
 pub const ext_buffer_device_address_extension_name = 'VK_EXT_buffer_device_address'
-// PhysicalDeviceBufferDeviceAddressFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceBufferDeviceAddressFeaturesEXT {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	buffer_device_address                Bool32
@@ -16564,51 +15165,26 @@ pub type PhysicalDeviceBufferAddressFeaturesEXT = PhysicalDeviceBufferDeviceAddr
 
 pub type BufferDeviceAddressInfoEXT = BufferDeviceAddressInfo
 
-// BufferDeviceAddressCreateInfoEXT extends VkBufferCreateInfo
 pub struct BufferDeviceAddressCreateInfoEXT {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	device_address DeviceAddress
 }
 
-type VkGetBufferDeviceAddressEXT = fn (C.Device, &BufferDeviceAddressInfo) DeviceAddress
-
-pub fn get_buffer_device_address_ext(device C.Device, p_info &BufferDeviceAddressInfo) DeviceAddress {
-	f := VkGetBufferDeviceAddressEXT((*vulkan.loader_p).get_sym('vkGetBufferDeviceAddressEXT') or {
-		panic("Couldn't load symbol for 'vkGetBufferDeviceAddressEXT': ${err}")
-	})
-	return f(device, p_info)
-}
-
-// VK_EXT_tooling_info is a preprocessor guard. Do not pass it to API calls.
-const ext_tooling_info = 1
 pub const ext_tooling_info_spec_version = 1
 pub const ext_tooling_info_extension_name = 'VK_EXT_tooling_info'
 
 pub type ToolPurposeFlagBitsEXT = ToolPurposeFlagBits
 
+pub type ToolPurposeFlagsEXT = u32
 pub type PhysicalDeviceToolPropertiesEXT = PhysicalDeviceToolProperties
 
-type VkGetPhysicalDeviceToolPropertiesEXT = fn (C.PhysicalDevice, &u32, &PhysicalDeviceToolProperties) Result
-
-pub fn get_physical_device_tool_properties_ext(physical_device C.PhysicalDevice, p_tool_count &u32, p_tool_properties &PhysicalDeviceToolProperties) Result {
-	f := VkGetPhysicalDeviceToolPropertiesEXT((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceToolPropertiesEXT') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceToolPropertiesEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_tool_count, p_tool_properties)
-}
-
-// VK_EXT_separate_stencil_usage is a preprocessor guard. Do not pass it to API calls.
-const ext_separate_stencil_usage = 1
 pub const ext_separate_stencil_usage_spec_version = 1
 pub const ext_separate_stencil_usage_extension_name = 'VK_EXT_separate_stencil_usage'
 
 pub type ImageStencilUsageCreateInfoEXT = ImageStencilUsageCreateInfo
 
-// VK_EXT_validation_features is a preprocessor guard. Do not pass it to API calls.
-const ext_validation_features = 1
 pub const ext_validation_features_spec_version = 6
 pub const ext_validation_features_extension_name = 'VK_EXT_validation_features'
 
@@ -16633,9 +15209,8 @@ pub enum ValidationFeatureDisableEXT {
 	validation_feature_disable_max_enum_ext                = int(0x7FFFFFFF)
 }
 
-// ValidationFeaturesEXT extends VkInstanceCreateInfo
 pub struct ValidationFeaturesEXT {
-mut:
+pub mut:
 	s_type                            StructureType
 	p_next                            voidptr
 	enabled_validation_feature_count  u32
@@ -16644,8 +15219,6 @@ mut:
 	p_disabled_validation_features    &ValidationFeatureDisableEXT
 }
 
-// VK_NV_cooperative_matrix is a preprocessor guard. Do not pass it to API calls.
-const nv_cooperative_matrix = 1
 pub const nv_cooperative_matrix_spec_version = 1
 pub const nv_cooperative_matrix_extension_name = 'VK_NV_cooperative_matrix'
 
@@ -16654,7 +15227,7 @@ pub type ComponentTypeNV = ComponentTypeKHR
 pub type ScopeNV = ScopeKHR
 
 pub struct CooperativeMatrixPropertiesNV {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	m_size u32
@@ -16667,35 +15240,31 @@ mut:
 	scope  ScopeNV
 }
 
-// PhysicalDeviceCooperativeMatrixFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceCooperativeMatrixFeaturesNV {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	cooperative_matrix                      Bool32
 	cooperative_matrix_robust_buffer_access Bool32
 }
 
-// PhysicalDeviceCooperativeMatrixPropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceCooperativeMatrixPropertiesNV {
-mut:
+pub mut:
 	s_type                              StructureType
 	p_next                              voidptr
 	cooperative_matrix_supported_stages ShaderStageFlags
 }
 
-type VkGetPhysicalDeviceCooperativeMatrixPropertiesNV = fn (C.PhysicalDevice, &u32, &CooperativeMatrixPropertiesNV) Result
-
-pub fn get_physical_device_cooperative_matrix_properties_nv(physical_device C.PhysicalDevice, p_property_count &u32, p_properties &CooperativeMatrixPropertiesNV) Result {
-	f := VkGetPhysicalDeviceCooperativeMatrixPropertiesNV((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceCooperativeMatrixPropertiesNV') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceCooperativeMatrixPropertiesNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_property_count, p_properties)
+fn C.vkGetPhysicalDeviceCooperativeMatrixPropertiesNV(C.PhysicalDevice,
+	&u32,
+	&CooperativeMatrixPropertiesNV) Result
+pub fn get_physical_device_cooperative_matrix_properties_nv(physical_device C.PhysicalDevice,
+	p_property_count &u32,
+	p_properties &CooperativeMatrixPropertiesNV) Result {
+	return C.vkGetPhysicalDeviceCooperativeMatrixPropertiesNV(physical_device, p_property_count,
+		p_properties)
 }
 
-// VK_NV_coverage_reduction_mode is a preprocessor guard. Do not pass it to API calls.
-const nv_coverage_reduction_mode = 1
 pub const nv_coverage_reduction_mode_spec_version = 1
 pub const nv_coverage_reduction_mode_extension_name = 'VK_NV_coverage_reduction_mode'
 
@@ -16707,17 +15276,15 @@ pub enum CoverageReductionModeNV {
 
 pub type PipelineCoverageReductionStateCreateFlagsNV = u32
 
-// PhysicalDeviceCoverageReductionModeFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceCoverageReductionModeFeaturesNV {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	coverage_reduction_mode Bool32
 }
 
-// PipelineCoverageReductionStateCreateInfoNV extends VkPipelineMultisampleStateCreateInfo
 pub struct PipelineCoverageReductionStateCreateInfoNV {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	flags                   PipelineCoverageReductionStateCreateFlagsNV
@@ -16725,7 +15292,7 @@ mut:
 }
 
 pub struct FramebufferMixedSamplesCombinationNV {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	coverage_reduction_mode CoverageReductionModeNV
@@ -16734,23 +15301,21 @@ mut:
 	color_samples           SampleCountFlags
 }
 
-type VkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV = fn (C.PhysicalDevice, &u32, &FramebufferMixedSamplesCombinationNV) Result
-
-pub fn get_physical_device_supported_framebuffer_mixed_samples_combinations_nv(physical_device C.PhysicalDevice, p_combination_count &u32, p_combinations &FramebufferMixedSamplesCombinationNV) Result {
-	f := VkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_combination_count, p_combinations)
+fn C.vkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV(C.PhysicalDevice,
+	&u32,
+	&FramebufferMixedSamplesCombinationNV) Result
+pub fn get_physical_device_supported_framebuffer_mixed_samples_combinations_nv(physical_device C.PhysicalDevice,
+	p_combination_count &u32,
+	p_combinations &FramebufferMixedSamplesCombinationNV) Result {
+	return C.vkGetPhysicalDeviceSupportedFramebufferMixedSamplesCombinationsNV(physical_device,
+		p_combination_count, p_combinations)
 }
 
-// VK_EXT_fragment_shader_interlock is a preprocessor guard. Do not pass it to API calls.
-const ext_fragment_shader_interlock = 1
 pub const ext_fragment_shader_interlock_spec_version = 1
 pub const ext_fragment_shader_interlock_extension_name = 'VK_EXT_fragment_shader_interlock'
-// PhysicalDeviceFragmentShaderInterlockFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceFragmentShaderInterlockFeaturesEXT {
-mut:
+pub mut:
 	s_type                                 StructureType
 	p_next                                 voidptr
 	fragment_shader_sample_interlock       Bool32
@@ -16758,20 +15323,16 @@ mut:
 	fragment_shader_shading_rate_interlock Bool32
 }
 
-// VK_EXT_ycbcr_image_arrays is a preprocessor guard. Do not pass it to API calls.
-const ext_ycbcr_image_arrays = 1
 pub const ext_ycbcr_image_arrays_spec_version = 1
 pub const ext_ycbcr_image_arrays_extension_name = 'VK_EXT_ycbcr_image_arrays'
-// PhysicalDeviceYcbcrImageArraysFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceYcbcrImageArraysFeaturesEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	ycbcr_image_arrays Bool32
 }
 
-// VK_EXT_provoking_vertex is a preprocessor guard. Do not pass it to API calls.
-const ext_provoking_vertex = 1
 pub const ext_provoking_vertex_spec_version = 1
 pub const ext_provoking_vertex_extension_name = 'VK_EXT_provoking_vertex'
 
@@ -16781,195 +15342,68 @@ pub enum ProvokingVertexModeEXT {
 	provoking_vertex_mode_max_enum_ext     = int(0x7FFFFFFF)
 }
 
-// PhysicalDeviceProvokingVertexFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceProvokingVertexFeaturesEXT {
-mut:
+pub mut:
 	s_type                                        StructureType
 	p_next                                        voidptr
 	provoking_vertex_last                         Bool32
 	transform_feedback_preserves_provoking_vertex Bool32
 }
 
-// PhysicalDeviceProvokingVertexPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceProvokingVertexPropertiesEXT {
-mut:
+pub mut:
 	s_type                                                     StructureType
 	p_next                                                     voidptr
 	provoking_vertex_mode_per_pipeline                         Bool32
 	transform_feedback_preserves_triangle_fan_provoking_vertex Bool32
 }
 
-// PipelineRasterizationProvokingVertexStateCreateInfoEXT extends VkPipelineRasterizationStateCreateInfo
 pub struct PipelineRasterizationProvokingVertexStateCreateInfoEXT {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	provoking_vertex_mode ProvokingVertexModeEXT
 }
 
-// VK_EXT_full_screen_exclusive is a preprocessor guard. Do not pass it to API calls.
-const ext_full_screen_exclusive = 1
-pub const ext_full_screen_exclusive_spec_version = 4
-pub const ext_full_screen_exclusive_extension_name = 'VK_EXT_full_screen_exclusive'
-
-pub enum FullScreenExclusiveEXT {
-	full_screen_exclusive_default_ext                = int(0)
-	full_screen_exclusive_allowed_ext                = int(1)
-	full_screen_exclusive_disallowed_ext             = int(2)
-	full_screen_exclusive_application_controlled_ext = int(3)
-	full_screen_exclusive_max_enum_ext               = int(0x7FFFFFFF)
-}
-
-// SurfaceFullScreenExclusiveInfoEXT extends VkPhysicalDeviceSurfaceInfo2KHR,VkSwapchainCreateInfoKHR
-pub struct SurfaceFullScreenExclusiveInfoEXT {
-mut:
-	s_type                StructureType
-	p_next                voidptr
-	full_screen_exclusive FullScreenExclusiveEXT
-}
-
-// SurfaceCapabilitiesFullScreenExclusiveEXT extends VkSurfaceCapabilities2KHR
-pub struct SurfaceCapabilitiesFullScreenExclusiveEXT {
-mut:
-	s_type                          StructureType
-	p_next                          voidptr
-	full_screen_exclusive_supported Bool32
-}
-
-// SurfaceFullScreenExclusiveWin32InfoEXT extends VkPhysicalDeviceSurfaceInfo2KHR,VkSwapchainCreateInfoKHR
-pub struct SurfaceFullScreenExclusiveWin32InfoEXT {
-mut:
-	s_type   StructureType
-	p_next   voidptr
-	hmonitor voidptr
-}
-
-type VkGetPhysicalDeviceSurfacePresentModes2EXT = fn (C.PhysicalDevice, &PhysicalDeviceSurfaceInfo2KHR, &u32, &PresentModeKHR) Result
-
-pub fn get_physical_device_surface_present_modes2_ext(physical_device C.PhysicalDevice, p_surface_info &PhysicalDeviceSurfaceInfo2KHR, p_present_mode_count &u32, p_present_modes &PresentModeKHR) Result {
-	f := VkGetPhysicalDeviceSurfacePresentModes2EXT((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceSurfacePresentModes2EXT') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceSurfacePresentModes2EXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_surface_info, p_present_mode_count, p_present_modes)
-}
-
-type VkAcquireFullScreenExclusiveModeEXT = fn (C.Device, C.SwapchainKHR) Result
-
-pub fn acquire_full_screen_exclusive_mode_ext(device C.Device, swapchain C.SwapchainKHR) Result {
-	f := VkAcquireFullScreenExclusiveModeEXT((*vulkan.loader_p).get_sym('vkAcquireFullScreenExclusiveModeEXT') or {
-		println("Couldn't load symbol for 'vkAcquireFullScreenExclusiveModeEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain)
-}
-
-type VkReleaseFullScreenExclusiveModeEXT = fn (C.Device, C.SwapchainKHR) Result
-
-pub fn release_full_screen_exclusive_mode_ext(device C.Device, swapchain C.SwapchainKHR) Result {
-	f := VkReleaseFullScreenExclusiveModeEXT((*vulkan.loader_p).get_sym('vkReleaseFullScreenExclusiveModeEXT') or {
-		println("Couldn't load symbol for 'vkReleaseFullScreenExclusiveModeEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain)
-}
-
-type VkGetDeviceGroupSurfacePresentModes2EXT = fn (C.Device, &PhysicalDeviceSurfaceInfo2KHR, &DeviceGroupPresentModeFlagsKHR) Result
-
-pub fn get_device_group_surface_present_modes2_ext(device C.Device, p_surface_info &PhysicalDeviceSurfaceInfo2KHR, p_modes &DeviceGroupPresentModeFlagsKHR) Result {
-	f := VkGetDeviceGroupSurfacePresentModes2EXT((*vulkan.loader_p).get_sym('vkGetDeviceGroupSurfacePresentModes2EXT') or {
-		println("Couldn't load symbol for 'vkGetDeviceGroupSurfacePresentModes2EXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_surface_info, p_modes)
-}
-
-// VK_EXT_headless_surface is a preprocessor guard. Do not pass it to API calls.
-const ext_headless_surface = 1
 pub const ext_headless_surface_spec_version = 1
 pub const ext_headless_surface_extension_name = 'VK_EXT_headless_surface'
 
 pub type HeadlessSurfaceCreateFlagsEXT = u32
 
 pub struct HeadlessSurfaceCreateInfoEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  HeadlessSurfaceCreateFlagsEXT
 }
 
-type VkCreateHeadlessSurfaceEXT = fn (C.Instance, &HeadlessSurfaceCreateInfoEXT, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_headless_surface_ext(instance C.Instance, p_create_info &HeadlessSurfaceCreateInfoEXT, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateHeadlessSurfaceEXT((*vulkan.loader_p).get_sym('vkCreateHeadlessSurfaceEXT') or {
-		println("Couldn't load symbol for 'vkCreateHeadlessSurfaceEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
+fn C.vkCreateHeadlessSurfaceEXT(C.Instance,
+	&HeadlessSurfaceCreateInfoEXT,
+	&AllocationCallbacks,
+	&C.SurfaceKHR) Result
+pub fn create_headless_surface_ext(instance C.Instance,
+	p_create_info &HeadlessSurfaceCreateInfoEXT,
+	p_allocator &AllocationCallbacks,
+	p_surface &C.SurfaceKHR) Result {
+	return C.vkCreateHeadlessSurfaceEXT(instance, p_create_info, p_allocator, p_surface)
 }
 
-// VK_EXT_line_rasterization is a preprocessor guard. Do not pass it to API calls.
-const ext_line_rasterization = 1
 pub const ext_line_rasterization_spec_version = 1
 pub const ext_line_rasterization_extension_name = 'VK_EXT_line_rasterization'
 
-pub enum LineRasterizationModeEXT {
-	line_rasterization_mode_default_ext            = int(0)
-	line_rasterization_mode_rectangular_ext        = int(1)
-	line_rasterization_mode_bresenham_ext          = int(2)
-	line_rasterization_mode_rectangular_smooth_ext = int(3)
-	line_rasterization_mode_max_enum_ext           = int(0x7FFFFFFF)
-}
+pub type LineRasterizationModeEXT = LineRasterizationModeKHR
 
-// PhysicalDeviceLineRasterizationFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub struct PhysicalDeviceLineRasterizationFeaturesEXT {
-mut:
-	s_type                     StructureType
-	p_next                     voidptr
-	rectangular_lines          Bool32
-	bresenham_lines            Bool32
-	smooth_lines               Bool32
-	stippled_rectangular_lines Bool32
-	stippled_bresenham_lines   Bool32
-	stippled_smooth_lines      Bool32
-}
+pub type PhysicalDeviceLineRasterizationFeaturesEXT = PhysicalDeviceLineRasterizationFeaturesKHR
 
-// PhysicalDeviceLineRasterizationPropertiesEXT extends VkPhysicalDeviceProperties2
-pub struct PhysicalDeviceLineRasterizationPropertiesEXT {
-mut:
-	s_type                        StructureType
-	p_next                        voidptr
-	line_sub_pixel_precision_bits u32
-}
+pub type PhysicalDeviceLineRasterizationPropertiesEXT = PhysicalDeviceLineRasterizationPropertiesKHR
 
-// PipelineRasterizationLineStateCreateInfoEXT extends VkPipelineRasterizationStateCreateInfo
-pub struct PipelineRasterizationLineStateCreateInfoEXT {
-mut:
-	s_type                  StructureType
-	p_next                  voidptr
-	line_rasterization_mode LineRasterizationModeEXT
-	stippled_line_enable    Bool32
-	line_stipple_factor     u32
-	line_stipple_pattern    u16
-}
+pub type PipelineRasterizationLineStateCreateInfoEXT = PipelineRasterizationLineStateCreateInfoKHR
 
-type VkCmdSetLineStippleEXT = fn (C.CommandBuffer, u32, u16)
-
-pub fn cmd_set_line_stipple_ext(command_buffer C.CommandBuffer, line_stipple_factor u32, line_stipple_pattern u16) {
-	f := VkCmdSetLineStippleEXT((*vulkan.loader_p).get_sym('vkCmdSetLineStippleEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetLineStippleEXT': ${err}")
-		return
-	})
-	f(command_buffer, line_stipple_factor, line_stipple_pattern)
-}
-
-// VK_EXT_shader_atomic_float is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_atomic_float = 1
 pub const ext_shader_atomic_float_spec_version = 1
 pub const ext_shader_atomic_float_extension_name = 'VK_EXT_shader_atomic_float'
-// PhysicalDeviceShaderAtomicFloatFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderAtomicFloatFeaturesEXT {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	shader_buffer_float32_atomics    Bool32
@@ -16986,169 +15420,26 @@ mut:
 	sparse_image_float32_atomic_add  Bool32
 }
 
-// VK_EXT_host_query_reset is a preprocessor guard. Do not pass it to API calls.
-const ext_host_query_reset = 1
 pub const ext_host_query_reset_spec_version = 1
 pub const ext_host_query_reset_extension_name = 'VK_EXT_host_query_reset'
 
 pub type PhysicalDeviceHostQueryResetFeaturesEXT = PhysicalDeviceHostQueryResetFeatures
 
-type VkResetQueryPoolEXT = fn (C.Device, C.QueryPool, u32, u32)
-
-pub fn reset_query_pool_ext(device C.Device, query_pool C.QueryPool, first_query u32, query_count u32) {
-	f := VkResetQueryPoolEXT((*vulkan.loader_p).get_sym('vkResetQueryPoolEXT') or {
-		println("Couldn't load symbol for 'vkResetQueryPoolEXT': ${err}")
-		return
-	})
-	f(device, query_pool, first_query, query_count)
-}
-
-// VK_EXT_index_type_uint8 is a preprocessor guard. Do not pass it to API calls.
-const ext_index_type_uint8 = 1
 pub const ext_index_type_uint8_spec_version = 1
 pub const ext_index_type_uint8_extension_name = 'VK_EXT_index_type_uint8'
-// PhysicalDeviceIndexTypeUint8FeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub struct PhysicalDeviceIndexTypeUint8FeaturesEXT {
-mut:
-	s_type           StructureType
-	p_next           voidptr
-	index_type_uint8 Bool32
-}
 
-// VK_EXT_extended_dynamic_state is a preprocessor guard. Do not pass it to API calls.
-const ext_extended_dynamic_state = 1
+pub type PhysicalDeviceIndexTypeUint8FeaturesEXT = PhysicalDeviceIndexTypeUint8FeaturesKHR
+
 pub const ext_extended_dynamic_state_spec_version = 1
 pub const ext_extended_dynamic_state_extension_name = 'VK_EXT_extended_dynamic_state'
-// PhysicalDeviceExtendedDynamicStateFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceExtendedDynamicStateFeaturesEXT {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	extended_dynamic_state Bool32
 }
 
-type VkCmdSetCullModeEXT = fn (C.CommandBuffer, CullModeFlags)
-
-pub fn cmd_set_cull_mode_ext(command_buffer C.CommandBuffer, cull_mode CullModeFlags) {
-	f := VkCmdSetCullModeEXT((*vulkan.loader_p).get_sym('vkCmdSetCullModeEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetCullModeEXT': ${err}")
-		return
-	})
-	f(command_buffer, cull_mode)
-}
-
-type VkCmdSetFrontFaceEXT = fn (C.CommandBuffer, FrontFace)
-
-pub fn cmd_set_front_face_ext(command_buffer C.CommandBuffer, front_face FrontFace) {
-	f := VkCmdSetFrontFaceEXT((*vulkan.loader_p).get_sym('vkCmdSetFrontFaceEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetFrontFaceEXT': ${err}")
-		return
-	})
-	f(command_buffer, front_face)
-}
-
-type VkCmdSetPrimitiveTopologyEXT = fn (C.CommandBuffer, PrimitiveTopology)
-
-pub fn cmd_set_primitive_topology_ext(command_buffer C.CommandBuffer, primitive_topology PrimitiveTopology) {
-	f := VkCmdSetPrimitiveTopologyEXT((*vulkan.loader_p).get_sym('vkCmdSetPrimitiveTopologyEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetPrimitiveTopologyEXT': ${err}")
-		return
-	})
-	f(command_buffer, primitive_topology)
-}
-
-type VkCmdSetViewportWithCountEXT = fn (C.CommandBuffer, u32, &Viewport)
-
-pub fn cmd_set_viewport_with_count_ext(command_buffer C.CommandBuffer, viewport_count u32, p_viewports &Viewport) {
-	f := VkCmdSetViewportWithCountEXT((*vulkan.loader_p).get_sym('vkCmdSetViewportWithCountEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetViewportWithCountEXT': ${err}")
-		return
-	})
-	f(command_buffer, viewport_count, p_viewports)
-}
-
-type VkCmdSetScissorWithCountEXT = fn (C.CommandBuffer, u32, &Rect2D)
-
-pub fn cmd_set_scissor_with_count_ext(command_buffer C.CommandBuffer, scissor_count u32, p_scissors &Rect2D) {
-	f := VkCmdSetScissorWithCountEXT((*vulkan.loader_p).get_sym('vkCmdSetScissorWithCountEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetScissorWithCountEXT': ${err}")
-		return
-	})
-	f(command_buffer, scissor_count, p_scissors)
-}
-
-type VkCmdBindVertexBuffers2EXT = fn (C.CommandBuffer, u32, u32, &C.Buffer, &DeviceSize, &DeviceSize, &DeviceSize)
-
-pub fn cmd_bind_vertex_buffers2_ext(command_buffer C.CommandBuffer, first_binding u32, binding_count u32, p_buffers &C.Buffer, p_offsets &DeviceSize, p_sizes &DeviceSize, p_strides &DeviceSize) {
-	f := VkCmdBindVertexBuffers2EXT((*vulkan.loader_p).get_sym('vkCmdBindVertexBuffers2EXT') or {
-		println("Couldn't load symbol for 'vkCmdBindVertexBuffers2EXT': ${err}")
-		return
-	})
-	f(command_buffer, first_binding, binding_count, p_buffers, p_offsets, p_sizes, p_strides)
-}
-
-type VkCmdSetDepthTestEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_test_enable_ext(command_buffer C.CommandBuffer, depth_test_enable Bool32) {
-	f := VkCmdSetDepthTestEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetDepthTestEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthTestEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, depth_test_enable)
-}
-
-type VkCmdSetDepthWriteEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_write_enable_ext(command_buffer C.CommandBuffer, depth_write_enable Bool32) {
-	f := VkCmdSetDepthWriteEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetDepthWriteEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthWriteEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, depth_write_enable)
-}
-
-type VkCmdSetDepthCompareOpEXT = fn (C.CommandBuffer, CompareOp)
-
-pub fn cmd_set_depth_compare_op_ext(command_buffer C.CommandBuffer, depth_compare_op CompareOp) {
-	f := VkCmdSetDepthCompareOpEXT((*vulkan.loader_p).get_sym('vkCmdSetDepthCompareOpEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthCompareOpEXT': ${err}")
-		return
-	})
-	f(command_buffer, depth_compare_op)
-}
-
-type VkCmdSetDepthBoundsTestEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_bounds_test_enable_ext(command_buffer C.CommandBuffer, depth_bounds_test_enable Bool32) {
-	f := VkCmdSetDepthBoundsTestEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetDepthBoundsTestEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthBoundsTestEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, depth_bounds_test_enable)
-}
-
-type VkCmdSetStencilTestEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_stencil_test_enable_ext(command_buffer C.CommandBuffer, stencil_test_enable Bool32) {
-	f := VkCmdSetStencilTestEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetStencilTestEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetStencilTestEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, stencil_test_enable)
-}
-
-type VkCmdSetStencilOpEXT = fn (C.CommandBuffer, StencilFaceFlags, StencilOp, StencilOp, StencilOp, CompareOp)
-
-pub fn cmd_set_stencil_op_ext(command_buffer C.CommandBuffer, face_mask StencilFaceFlags, fail_op StencilOp, pass_op StencilOp, depth_fail_op StencilOp, compare_op CompareOp) {
-	f := VkCmdSetStencilOpEXT((*vulkan.loader_p).get_sym('vkCmdSetStencilOpEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetStencilOpEXT': ${err}")
-		return
-	})
-	f(command_buffer, face_mask, fail_op, pass_op, depth_fail_op, compare_op)
-}
-
-// VK_EXT_host_image_copy is a preprocessor guard. Do not pass it to API calls.
-const ext_host_image_copy = 1
 pub const ext_host_image_copy_spec_version = 1
 pub const ext_host_image_copy_extension_name = 'VK_EXT_host_image_copy'
 
@@ -17159,29 +15450,27 @@ pub enum HostImageCopyFlagBitsEXT {
 
 pub type HostImageCopyFlagsEXT = u32
 
-// PhysicalDeviceHostImageCopyFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceHostImageCopyFeaturesEXT {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	host_image_copy Bool32
 }
 
-// PhysicalDeviceHostImageCopyPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceHostImageCopyPropertiesEXT {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	copy_src_layout_count              u32
 	p_copy_src_layouts                 &ImageLayout
 	copy_dst_layout_count              u32
 	p_copy_dst_layouts                 &ImageLayout
-	optimal_tiling_layout_uuid         []u8
+	optimal_tiling_layout_uuid         [uuid_size]u8
 	identical_memory_type_requirements Bool32
 }
 
 pub struct MemoryToImageCopyEXT {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	p_host_pointer      voidptr
@@ -17193,7 +15482,7 @@ mut:
 }
 
 pub struct ImageToMemoryCopyEXT {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	p_host_pointer      voidptr
@@ -17205,7 +15494,7 @@ mut:
 }
 
 pub struct CopyMemoryToImageInfoEXT {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	flags            HostImageCopyFlagsEXT
@@ -17216,7 +15505,7 @@ mut:
 }
 
 pub struct CopyImageToMemoryInfoEXT {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	flags            HostImageCopyFlagsEXT
@@ -17227,7 +15516,7 @@ mut:
 }
 
 pub struct CopyImageToImageInfoEXT {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	flags            HostImageCopyFlagsEXT
@@ -17240,7 +15529,7 @@ mut:
 }
 
 pub struct HostImageLayoutTransitionInfoEXT {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	image             C.Image
@@ -17249,17 +15538,15 @@ mut:
 	subresource_range ImageSubresourceRange
 }
 
-// SubresourceHostMemcpySizeEXT extends VkSubresourceLayout2KHR
 pub struct SubresourceHostMemcpySizeEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	size   DeviceSize
 }
 
-// HostImageCopyDevicePerformanceQueryEXT extends VkImageFormatProperties2
 pub struct HostImageCopyDevicePerformanceQueryEXT {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	optimal_device_access   Bool32
@@ -17270,63 +15557,67 @@ pub type SubresourceLayout2EXT = SubresourceLayout2KHR
 
 pub type ImageSubresource2EXT = ImageSubresource2KHR
 
-type VkCopyMemoryToImageEXT = fn (C.Device, &CopyMemoryToImageInfoEXT) Result
-
-pub fn copy_memory_to_image_ext(device C.Device, p_copy_memory_to_image_info &CopyMemoryToImageInfoEXT) Result {
-	f := VkCopyMemoryToImageEXT((*vulkan.loader_p).get_sym('vkCopyMemoryToImageEXT') or {
-		println("Couldn't load symbol for 'vkCopyMemoryToImageEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_copy_memory_to_image_info)
+fn C.vkCopyMemoryToImageEXT(C.Device,
+	&CopyMemoryToImageInfoEXT) Result
+pub fn copy_memory_to_image_ext(device C.Device,
+	p_copy_memory_to_image_info &CopyMemoryToImageInfoEXT) Result {
+	return C.vkCopyMemoryToImageEXT(device, p_copy_memory_to_image_info)
 }
 
-type VkCopyImageToMemoryEXT = fn (C.Device, &CopyImageToMemoryInfoEXT) Result
-
-pub fn copy_image_to_memory_ext(device C.Device, p_copy_image_to_memory_info &CopyImageToMemoryInfoEXT) Result {
-	f := VkCopyImageToMemoryEXT((*vulkan.loader_p).get_sym('vkCopyImageToMemoryEXT') or {
-		println("Couldn't load symbol for 'vkCopyImageToMemoryEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_copy_image_to_memory_info)
+fn C.vkCopyImageToMemoryEXT(C.Device,
+	&CopyImageToMemoryInfoEXT) Result
+pub fn copy_image_to_memory_ext(device C.Device,
+	p_copy_image_to_memory_info &CopyImageToMemoryInfoEXT) Result {
+	return C.vkCopyImageToMemoryEXT(device, p_copy_image_to_memory_info)
 }
 
-type VkCopyImageToImageEXT = fn (C.Device, &CopyImageToImageInfoEXT) Result
-
-pub fn copy_image_to_image_ext(device C.Device, p_copy_image_to_image_info &CopyImageToImageInfoEXT) Result {
-	f := VkCopyImageToImageEXT((*vulkan.loader_p).get_sym('vkCopyImageToImageEXT') or {
-		println("Couldn't load symbol for 'vkCopyImageToImageEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_copy_image_to_image_info)
+fn C.vkCopyImageToImageEXT(C.Device,
+	&CopyImageToImageInfoEXT) Result
+pub fn copy_image_to_image_ext(device C.Device,
+	p_copy_image_to_image_info &CopyImageToImageInfoEXT) Result {
+	return C.vkCopyImageToImageEXT(device, p_copy_image_to_image_info)
 }
 
-type VkTransitionImageLayoutEXT = fn (C.Device, u32, &HostImageLayoutTransitionInfoEXT) Result
-
-pub fn transition_image_layout_ext(device C.Device, transition_count u32, p_transitions &HostImageLayoutTransitionInfoEXT) Result {
-	f := VkTransitionImageLayoutEXT((*vulkan.loader_p).get_sym('vkTransitionImageLayoutEXT') or {
-		println("Couldn't load symbol for 'vkTransitionImageLayoutEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, transition_count, p_transitions)
+fn C.vkTransitionImageLayoutEXT(C.Device,
+	u32,
+	&HostImageLayoutTransitionInfoEXT) Result
+pub fn transition_image_layout_ext(device C.Device,
+	transition_count u32,
+	p_transitions &HostImageLayoutTransitionInfoEXT) Result {
+	return C.vkTransitionImageLayoutEXT(device, transition_count, p_transitions)
 }
 
-type VkGetImageSubresourceLayout2EXT = fn (C.Device, C.Image, &ImageSubresource2KHR, &SubresourceLayout2KHR)
+pub const ext_map_memory_placed_spec_version = 1
+pub const ext_map_memory_placed_extension_name = 'VK_EXT_map_memory_placed'
 
-pub fn get_image_subresource_layout2_ext(device C.Device, image C.Image, p_subresource &ImageSubresource2KHR, p_layout &SubresourceLayout2KHR) {
-	f := VkGetImageSubresourceLayout2EXT((*vulkan.loader_p).get_sym('vkGetImageSubresourceLayout2EXT') or {
-		println("Couldn't load symbol for 'vkGetImageSubresourceLayout2EXT': ${err}")
-		return
-	})
-	f(device, image, p_subresource, p_layout)
+pub struct PhysicalDeviceMapMemoryPlacedFeaturesEXT {
+pub mut:
+	s_type                  StructureType
+	p_next                  voidptr
+	memory_map_placed       Bool32
+	memory_map_range_placed Bool32
+	memory_unmap_reserve    Bool32
 }
 
-// VK_EXT_shader_atomic_float2 is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_atomic_float2 = 1
+pub struct PhysicalDeviceMapMemoryPlacedPropertiesEXT {
+pub mut:
+	s_type                          StructureType
+	p_next                          voidptr
+	min_placed_memory_map_alignment DeviceSize
+}
+
+pub struct MemoryMapPlacedInfoEXT {
+pub mut:
+	s_type           StructureType
+	p_next           voidptr
+	p_placed_address voidptr
+}
+
 pub const ext_shader_atomic_float_2_spec_version = 1
 pub const ext_shader_atomic_float_2_extension_name = 'VK_EXT_shader_atomic_float2'
-// PhysicalDeviceShaderAtomicFloat2FeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderAtomicFloat2FeaturesEXT {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	shader_buffer_float16_atomics        Bool32
@@ -17343,8 +15634,6 @@ mut:
 	sparse_image_float32_atomic_min_max  Bool32
 }
 
-// VK_EXT_surface_maintenance1 is a preprocessor guard. Do not pass it to API calls.
-const ext_surface_maintenance1 = 1
 pub const ext_surface_maintenance_1_spec_version = 1
 pub const ext_surface_maintenance_1_extension_name = 'VK_EXT_surface_maintenance1'
 
@@ -17366,17 +15655,15 @@ pub enum PresentGravityFlagBitsEXT {
 
 pub type PresentGravityFlagsEXT = u32
 
-// SurfacePresentModeEXT extends VkPhysicalDeviceSurfaceInfo2KHR
 pub struct SurfacePresentModeEXT {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	present_mode PresentModeKHR
 }
 
-// SurfacePresentScalingCapabilitiesEXT extends VkSurfaceCapabilities2KHR
 pub struct SurfacePresentScalingCapabilitiesEXT {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	supported_present_scaling   PresentScalingFlagsEXT
@@ -17386,57 +15673,50 @@ mut:
 	max_scaled_image_extent     Extent2D
 }
 
-// SurfacePresentModeCompatibilityEXT extends VkSurfaceCapabilities2KHR
 pub struct SurfacePresentModeCompatibilityEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	present_mode_count u32
 	p_present_modes    &PresentModeKHR
 }
 
-// VK_EXT_swapchain_maintenance1 is a preprocessor guard. Do not pass it to API calls.
-const ext_swapchain_maintenance1 = 1
 pub const ext_swapchain_maintenance_1_spec_version = 1
 pub const ext_swapchain_maintenance_1_extension_name = 'VK_EXT_swapchain_maintenance1'
-// PhysicalDeviceSwapchainMaintenance1FeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceSwapchainMaintenance1FeaturesEXT {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	swapchain_maintenance1 Bool32
 }
 
-// SwapchainPresentFenceInfoEXT extends VkPresentInfoKHR
 pub struct SwapchainPresentFenceInfoEXT {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	swapchain_count u32
 	p_fences        &C.Fence
 }
 
-// SwapchainPresentModesCreateInfoEXT extends VkSwapchainCreateInfoKHR
 pub struct SwapchainPresentModesCreateInfoEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	present_mode_count u32
 	p_present_modes    &PresentModeKHR
 }
 
-// SwapchainPresentModeInfoEXT extends VkPresentInfoKHR
 pub struct SwapchainPresentModeInfoEXT {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	swapchain_count u32
 	p_present_modes &PresentModeKHR
 }
 
-// SwapchainPresentScalingCreateInfoEXT extends VkSwapchainCreateInfoKHR
 pub struct SwapchainPresentScalingCreateInfoEXT {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	scaling_behavior  PresentScalingFlagsEXT
@@ -17445,7 +15725,7 @@ mut:
 }
 
 pub struct ReleaseSwapchainImagesInfoEXT {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	swapchain         C.SwapchainKHR
@@ -17453,25 +15733,17 @@ mut:
 	p_image_indices   &u32
 }
 
-type VkReleaseSwapchainImagesEXT = fn (C.Device, &ReleaseSwapchainImagesInfoEXT) Result
-
-pub fn release_swapchain_images_ext(device C.Device, p_release_info &ReleaseSwapchainImagesInfoEXT) Result {
-	f := VkReleaseSwapchainImagesEXT((*vulkan.loader_p).get_sym('vkReleaseSwapchainImagesEXT') or {
-		println("Couldn't load symbol for 'vkReleaseSwapchainImagesEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_release_info)
+fn C.vkReleaseSwapchainImagesEXT(C.Device,
+	&ReleaseSwapchainImagesInfoEXT) Result
+pub fn release_swapchain_images_ext(device C.Device,
+	p_release_info &ReleaseSwapchainImagesInfoEXT) Result {
+	return C.vkReleaseSwapchainImagesEXT(device, p_release_info)
 }
 
-// VK_EXT_shader_demote_to_helper_invocation is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_demote_to_helper_invocation = 1
 pub const ext_shader_demote_to_helper_invocation_spec_version = 1
 pub const ext_shader_demote_to_helper_invocation_extension_name = 'VK_EXT_shader_demote_to_helper_invocation'
 
 pub type PhysicalDeviceShaderDemoteToHelperInvocationFeaturesEXT = PhysicalDeviceShaderDemoteToHelperInvocationFeatures
-
-// VK_NV_device_generated_commands is a preprocessor guard. Do not pass it to API calls.
-const nv_device_generated_commands = 1
 
 pub type C.IndirectCommandsLayoutNV = voidptr
 
@@ -17509,9 +15781,8 @@ pub enum IndirectCommandsLayoutUsageFlagBitsNV {
 
 pub type IndirectCommandsLayoutUsageFlagsNV = u32
 
-// PhysicalDeviceDeviceGeneratedCommandsPropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceDeviceGeneratedCommandsPropertiesNV {
-mut:
+pub mut:
 	s_type                                        StructureType
 	p_next                                        voidptr
 	max_graphics_shader_group_count               u32
@@ -17525,16 +15796,15 @@ mut:
 	min_indirect_commands_buffer_offset_alignment u32
 }
 
-// PhysicalDeviceDeviceGeneratedCommandsFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceDeviceGeneratedCommandsFeaturesNV {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	device_generated_commands Bool32
 }
 
 pub struct GraphicsShaderGroupCreateInfoNV {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	stage_count          u32
@@ -17543,9 +15813,8 @@ mut:
 	p_tessellation_state &PipelineTessellationStateCreateInfo
 }
 
-// GraphicsPipelineShaderGroupsCreateInfoNV extends VkGraphicsPipelineCreateInfo
 pub struct GraphicsPipelineShaderGroupsCreateInfoNV {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	group_count    u32
@@ -17555,37 +15824,37 @@ mut:
 }
 
 pub struct BindShaderGroupIndirectCommandNV {
-mut:
+pub mut:
 	group_index u32
 }
 
 pub struct BindIndexBufferIndirectCommandNV {
-mut:
+pub mut:
 	buffer_address DeviceAddress
 	size           u32
 	index_type     IndexType
 }
 
 pub struct BindVertexBufferIndirectCommandNV {
-mut:
+pub mut:
 	buffer_address DeviceAddress
 	size           u32
 	stride         u32
 }
 
 pub struct SetStateFlagsIndirectCommandNV {
-mut:
+pub mut:
 	data u32
 }
 
 pub struct IndirectCommandsStreamNV {
-mut:
+pub mut:
 	buffer C.Buffer
 	offset DeviceSize
 }
 
 pub struct IndirectCommandsLayoutTokenNV {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	token_type                      IndirectCommandsTokenTypeNV
@@ -17604,7 +15873,7 @@ mut:
 }
 
 pub struct IndirectCommandsLayoutCreateInfoNV {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	flags               IndirectCommandsLayoutUsageFlagsNV
@@ -17616,7 +15885,7 @@ mut:
 }
 
 pub struct GeneratedCommandsInfoNV {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	pipeline_bind_point      PipelineBindPoint
@@ -17635,7 +15904,7 @@ mut:
 }
 
 pub struct GeneratedCommandsMemoryRequirementsInfoNV {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	pipeline_bind_point      PipelineBindPoint
@@ -17644,81 +15913,74 @@ mut:
 	max_sequences_count      u32
 }
 
-type VkGetGeneratedCommandsMemoryRequirementsNV = fn (C.Device, &GeneratedCommandsMemoryRequirementsInfoNV, &MemoryRequirements2)
-
-pub fn get_generated_commands_memory_requirements_nv(device C.Device, p_info &GeneratedCommandsMemoryRequirementsInfoNV, p_memory_requirements &MemoryRequirements2) {
-	f := VkGetGeneratedCommandsMemoryRequirementsNV((*vulkan.loader_p).get_sym('vkGetGeneratedCommandsMemoryRequirementsNV') or {
-		println("Couldn't load symbol for 'vkGetGeneratedCommandsMemoryRequirementsNV': ${err}")
-		return
-	})
-	f(device, p_info, p_memory_requirements)
+fn C.vkGetGeneratedCommandsMemoryRequirementsNV(C.Device,
+	&GeneratedCommandsMemoryRequirementsInfoNV,
+	&MemoryRequirements2)
+pub fn get_generated_commands_memory_requirements_nv(device C.Device,
+	p_info &GeneratedCommandsMemoryRequirementsInfoNV,
+	p_memory_requirements &MemoryRequirements2) {
+	C.vkGetGeneratedCommandsMemoryRequirementsNV(device, p_info, p_memory_requirements)
 }
 
-type VkCmdPreprocessGeneratedCommandsNV = fn (C.CommandBuffer, &GeneratedCommandsInfoNV)
-
-pub fn cmd_preprocess_generated_commands_nv(command_buffer C.CommandBuffer, p_generated_commands_info &GeneratedCommandsInfoNV) {
-	f := VkCmdPreprocessGeneratedCommandsNV((*vulkan.loader_p).get_sym('vkCmdPreprocessGeneratedCommandsNV') or {
-		println("Couldn't load symbol for 'vkCmdPreprocessGeneratedCommandsNV': ${err}")
-		return
-	})
-	f(command_buffer, p_generated_commands_info)
+fn C.vkCmdPreprocessGeneratedCommandsNV(C.CommandBuffer,
+	&GeneratedCommandsInfoNV)
+pub fn cmd_preprocess_generated_commands_nv(command_buffer C.CommandBuffer,
+	p_generated_commands_info &GeneratedCommandsInfoNV) {
+	C.vkCmdPreprocessGeneratedCommandsNV(command_buffer, p_generated_commands_info)
 }
 
-type VkCmdExecuteGeneratedCommandsNV = fn (C.CommandBuffer, Bool32, &GeneratedCommandsInfoNV)
-
-pub fn cmd_execute_generated_commands_nv(command_buffer C.CommandBuffer, is_preprocessed Bool32, p_generated_commands_info &GeneratedCommandsInfoNV) {
-	f := VkCmdExecuteGeneratedCommandsNV((*vulkan.loader_p).get_sym('vkCmdExecuteGeneratedCommandsNV') or {
-		println("Couldn't load symbol for 'vkCmdExecuteGeneratedCommandsNV': ${err}")
-		return
-	})
-	f(command_buffer, is_preprocessed, p_generated_commands_info)
+fn C.vkCmdExecuteGeneratedCommandsNV(C.CommandBuffer,
+	Bool32,
+	&GeneratedCommandsInfoNV)
+pub fn cmd_execute_generated_commands_nv(command_buffer C.CommandBuffer,
+	is_preprocessed Bool32,
+	p_generated_commands_info &GeneratedCommandsInfoNV) {
+	C.vkCmdExecuteGeneratedCommandsNV(command_buffer, is_preprocessed, p_generated_commands_info)
 }
 
-type VkCmdBindPipelineShaderGroupNV = fn (C.CommandBuffer, PipelineBindPoint, C.Pipeline, u32)
-
-pub fn cmd_bind_pipeline_shader_group_nv(command_buffer C.CommandBuffer, pipeline_bind_point PipelineBindPoint, pipeline C.Pipeline, group_index u32) {
-	f := VkCmdBindPipelineShaderGroupNV((*vulkan.loader_p).get_sym('vkCmdBindPipelineShaderGroupNV') or {
-		println("Couldn't load symbol for 'vkCmdBindPipelineShaderGroupNV': ${err}")
-		return
-	})
-	f(command_buffer, pipeline_bind_point, pipeline, group_index)
+fn C.vkCmdBindPipelineShaderGroupNV(C.CommandBuffer,
+	PipelineBindPoint,
+	C.Pipeline,
+	u32)
+pub fn cmd_bind_pipeline_shader_group_nv(command_buffer C.CommandBuffer,
+	pipeline_bind_point PipelineBindPoint,
+	pipeline C.Pipeline,
+	group_index u32) {
+	C.vkCmdBindPipelineShaderGroupNV(command_buffer, pipeline_bind_point, pipeline, group_index)
 }
 
-type VkCreateIndirectCommandsLayoutNV = fn (C.Device, &IndirectCommandsLayoutCreateInfoNV, &AllocationCallbacks, &C.IndirectCommandsLayoutNV) Result
-
-pub fn create_indirect_commands_layout_nv(device C.Device, p_create_info &IndirectCommandsLayoutCreateInfoNV, p_allocator &AllocationCallbacks, p_indirect_commands_layout &C.IndirectCommandsLayoutNV) Result {
-	f := VkCreateIndirectCommandsLayoutNV((*vulkan.loader_p).get_sym('vkCreateIndirectCommandsLayoutNV') or {
-		println("Couldn't load symbol for 'vkCreateIndirectCommandsLayoutNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_indirect_commands_layout)
+fn C.vkCreateIndirectCommandsLayoutNV(C.Device,
+	&IndirectCommandsLayoutCreateInfoNV,
+	&AllocationCallbacks,
+	&C.IndirectCommandsLayoutNV) Result
+pub fn create_indirect_commands_layout_nv(device C.Device,
+	p_create_info &IndirectCommandsLayoutCreateInfoNV,
+	p_allocator &AllocationCallbacks,
+	p_indirect_commands_layout &C.IndirectCommandsLayoutNV) Result {
+	return C.vkCreateIndirectCommandsLayoutNV(device, p_create_info, p_allocator, p_indirect_commands_layout)
 }
 
-type VkDestroyIndirectCommandsLayoutNV = fn (C.Device, C.IndirectCommandsLayoutNV, &AllocationCallbacks)
-
-pub fn destroy_indirect_commands_layout_nv(device C.Device, indirect_commands_layout C.IndirectCommandsLayoutNV, p_allocator &AllocationCallbacks) {
-	f := VkDestroyIndirectCommandsLayoutNV((*vulkan.loader_p).get_sym('vkDestroyIndirectCommandsLayoutNV') or {
-		println("Couldn't load symbol for 'vkDestroyIndirectCommandsLayoutNV': ${err}")
-		return
-	})
-	f(device, indirect_commands_layout, p_allocator)
+fn C.vkDestroyIndirectCommandsLayoutNV(C.Device,
+	C.IndirectCommandsLayoutNV,
+	&AllocationCallbacks)
+pub fn destroy_indirect_commands_layout_nv(device C.Device,
+	indirect_commands_layout C.IndirectCommandsLayoutNV,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyIndirectCommandsLayoutNV(device, indirect_commands_layout, p_allocator)
 }
 
-// VK_NV_inherited_viewport_scissor is a preprocessor guard. Do not pass it to API calls.
-const nv_inherited_viewport_scissor = 1
 pub const nv_inherited_viewport_scissor_spec_version = 1
 pub const nv_inherited_viewport_scissor_extension_name = 'VK_NV_inherited_viewport_scissor'
-// PhysicalDeviceInheritedViewportScissorFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceInheritedViewportScissorFeaturesNV {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	inherited_viewport_scissor2_d Bool32
 }
 
-// CommandBufferInheritanceViewportScissorInfoNV extends VkCommandBufferInheritanceInfo
 pub struct CommandBufferInheritanceViewportScissorInfoNV {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	viewport_scissor2_d  Bool32
@@ -17726,13 +15988,11 @@ mut:
 	p_viewport_depths    &Viewport
 }
 
-// VK_EXT_texel_buffer_alignment is a preprocessor guard. Do not pass it to API calls.
-const ext_texel_buffer_alignment = 1
 pub const ext_texel_buffer_alignment_spec_version = 1
 pub const ext_texel_buffer_alignment_extension_name = 'VK_EXT_texel_buffer_alignment'
-// PhysicalDeviceTexelBufferAlignmentFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceTexelBufferAlignmentFeaturesEXT {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	texel_buffer_alignment Bool32
@@ -17740,29 +16000,24 @@ mut:
 
 pub type PhysicalDeviceTexelBufferAlignmentPropertiesEXT = PhysicalDeviceTexelBufferAlignmentProperties
 
-// VK_QCOM_render_pass_transform is a preprocessor guard. Do not pass it to API calls.
-const qcom_render_pass_transform = 1
-pub const qcom_render_pass_transform_spec_version = 3
+pub const qcom_render_pass_transform_spec_version = 4
 pub const qcom_render_pass_transform_extension_name = 'VK_QCOM_render_pass_transform'
-// RenderPassTransformBeginInfoQCOM extends VkRenderPassBeginInfo
+
 pub struct RenderPassTransformBeginInfoQCOM {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	transform SurfaceTransformFlagBitsKHR
 }
 
-// CommandBufferInheritanceRenderPassTransformInfoQCOM extends VkCommandBufferInheritanceInfo
 pub struct CommandBufferInheritanceRenderPassTransformInfoQCOM {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	transform   SurfaceTransformFlagBitsKHR
 	render_area Rect2D
 }
 
-// VK_EXT_depth_bias_control is a preprocessor guard. Do not pass it to API calls.
-const ext_depth_bias_control = 1
 pub const ext_depth_bias_control_spec_version = 1
 pub const ext_depth_bias_control_extension_name = 'VK_EXT_depth_bias_control'
 
@@ -17773,9 +16028,8 @@ pub enum DepthBiasRepresentationEXT {
 	depth_bias_representation_max_enum_ext                              = int(0x7FFFFFFF)
 }
 
-// PhysicalDeviceDepthBiasControlFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceDepthBiasControlFeaturesEXT {
-mut:
+pub mut:
 	s_type                                               StructureType
 	p_next                                               voidptr
 	depth_bias_control                                   Bool32
@@ -17785,7 +16039,7 @@ mut:
 }
 
 pub struct DepthBiasInfoEXT {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	depth_bias_constant_factor f32
@@ -17793,27 +16047,21 @@ mut:
 	depth_bias_slope_factor    f32
 }
 
-// DepthBiasRepresentationInfoEXT extends VkDepthBiasInfoEXT,VkPipelineRasterizationStateCreateInfo
 pub struct DepthBiasRepresentationInfoEXT {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	depth_bias_representation DepthBiasRepresentationEXT
 	depth_bias_exact          Bool32
 }
 
-type VkCmdSetDepthBias2EXT = fn (C.CommandBuffer, &DepthBiasInfoEXT)
-
-pub fn cmd_set_depth_bias2_ext(command_buffer C.CommandBuffer, p_depth_bias_info &DepthBiasInfoEXT) {
-	f := VkCmdSetDepthBias2EXT((*vulkan.loader_p).get_sym('vkCmdSetDepthBias2EXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthBias2EXT': ${err}")
-		return
-	})
-	f(command_buffer, p_depth_bias_info)
+fn C.vkCmdSetDepthBias2EXT(C.CommandBuffer,
+	&DepthBiasInfoEXT)
+pub fn cmd_set_depth_bias2_ext(command_buffer C.CommandBuffer,
+	p_depth_bias_info &DepthBiasInfoEXT) {
+	C.vkCmdSetDepthBias2EXT(command_buffer, p_depth_bias_info)
 }
 
-// VK_EXT_device_memory_report is a preprocessor guard. Do not pass it to API calls.
-const ext_device_memory_report = 1
 pub const ext_device_memory_report_spec_version = 2
 pub const ext_device_memory_report_extension_name = 'VK_EXT_device_memory_report'
 
@@ -17828,16 +16076,15 @@ pub enum DeviceMemoryReportEventTypeEXT {
 
 pub type DeviceMemoryReportFlagsEXT = u32
 
-// PhysicalDeviceDeviceMemoryReportFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceDeviceMemoryReportFeaturesEXT {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	device_memory_report Bool32
 }
 
 pub struct DeviceMemoryReportCallbackDataEXT {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	flags            DeviceMemoryReportFlagsEXT
@@ -17849,11 +16096,10 @@ mut:
 	heap_index       u32
 }
 
-pub type PFN_vkDeviceMemoryReportCallbackEXT = fn (pCallbackData &DeviceMemoryReportCallbackDataEXT, pUserData voidptr) voidptr
+pub type PFN_vkDeviceMemoryReportCallbackEXT = fn (pCallbackData &DeviceMemoryReportCallbackDataEXT, pUserData voidptr)
 
-// DeviceDeviceMemoryReportCreateInfoEXT extends VkDeviceCreateInfo
 pub struct DeviceDeviceMemoryReportCreateInfoEXT {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	flags             DeviceMemoryReportFlagsEXT
@@ -17861,38 +16107,34 @@ mut:
 	p_user_data       voidptr
 }
 
-// VK_EXT_acquire_drm_display is a preprocessor guard. Do not pass it to API calls.
-const ext_acquire_drm_display = 1
 pub const ext_acquire_drm_display_spec_version = 1
 pub const ext_acquire_drm_display_extension_name = 'VK_EXT_acquire_drm_display'
 
-type VkAcquireDrmDisplayEXT = fn (C.PhysicalDevice, i32, C.DisplayKHR) Result
-
-pub fn acquire_drm_display_ext(physical_device C.PhysicalDevice, drm_fd i32, display C.DisplayKHR) Result {
-	f := VkAcquireDrmDisplayEXT((*vulkan.loader_p).get_sym('vkAcquireDrmDisplayEXT') or {
-		println("Couldn't load symbol for 'vkAcquireDrmDisplayEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, drm_fd, display)
+fn C.vkAcquireDrmDisplayEXT(C.PhysicalDevice,
+	i32,
+	C.DisplayKHR) Result
+pub fn acquire_drm_display_ext(physical_device C.PhysicalDevice,
+	drm_fd i32,
+	display C.DisplayKHR) Result {
+	return C.vkAcquireDrmDisplayEXT(physical_device, drm_fd, display)
 }
 
-type VkGetDrmDisplayEXT = fn (C.PhysicalDevice, i32, u32, &C.DisplayKHR) Result
-
-pub fn get_drm_display_ext(physical_device C.PhysicalDevice, drm_fd i32, connector_id u32, display &C.DisplayKHR) Result {
-	f := VkGetDrmDisplayEXT((*vulkan.loader_p).get_sym('vkGetDrmDisplayEXT') or {
-		println("Couldn't load symbol for 'vkGetDrmDisplayEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, drm_fd, connector_id, display)
+fn C.vkGetDrmDisplayEXT(C.PhysicalDevice,
+	i32,
+	u32,
+	&C.DisplayKHR) Result
+pub fn get_drm_display_ext(physical_device C.PhysicalDevice,
+	drm_fd i32,
+	connector_id u32,
+	display &C.DisplayKHR) Result {
+	return C.vkGetDrmDisplayEXT(physical_device, drm_fd, connector_id, display)
 }
 
-// VK_EXT_robustness2 is a preprocessor guard. Do not pass it to API calls.
-const ext_robustness2 = 1
 pub const ext_robustness_2_spec_version = 1
 pub const ext_robustness_2_extension_name = 'VK_EXT_robustness2'
-// PhysicalDeviceRobustness2FeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceRobustness2FeaturesEXT {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	robust_buffer_access2 Bool32
@@ -17900,138 +16142,84 @@ mut:
 	null_descriptor       Bool32
 }
 
-// PhysicalDeviceRobustness2PropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceRobustness2PropertiesEXT {
-mut:
+pub mut:
 	s_type                                      StructureType
 	p_next                                      voidptr
 	robust_storage_buffer_access_size_alignment DeviceSize
 	robust_uniform_buffer_access_size_alignment DeviceSize
 }
 
-// VK_EXT_custom_border_color is a preprocessor guard. Do not pass it to API calls.
-const ext_custom_border_color = 1
 pub const ext_custom_border_color_spec_version = 12
 pub const ext_custom_border_color_extension_name = 'VK_EXT_custom_border_color'
-// SamplerCustomBorderColorCreateInfoEXT extends VkSamplerCreateInfo
+
 pub struct SamplerCustomBorderColorCreateInfoEXT {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	custom_border_color ClearColorValue
 	format              Format
 }
 
-// PhysicalDeviceCustomBorderColorPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceCustomBorderColorPropertiesEXT {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	max_custom_border_color_samplers u32
 }
 
-// PhysicalDeviceCustomBorderColorFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceCustomBorderColorFeaturesEXT {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	custom_border_colors               Bool32
 	custom_border_color_without_format Bool32
 }
 
-// VK_GOOGLE_user_type is a preprocessor guard. Do not pass it to API calls.
-const google_user_type = 1
 pub const google_user_type_spec_version = 1
 pub const google_user_type_extension_name = 'VK_GOOGE_user_type'
 
-// VK_NV_present_barrier is a preprocessor guard. Do not pass it to API calls.
-const nv_present_barrier = 1
 pub const nv_present_barrier_spec_version = 1
 pub const nv_present_barrier_extension_name = 'VK_NV_present_barrier'
-// PhysicalDevicePresentBarrierFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDevicePresentBarrierFeaturesNV {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	present_barrier Bool32
 }
 
-// SurfaceCapabilitiesPresentBarrierNV extends VkSurfaceCapabilities2KHR
 pub struct SurfaceCapabilitiesPresentBarrierNV {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	present_barrier_supported Bool32
 }
 
-// SwapchainPresentBarrierCreateInfoNV extends VkSwapchainCreateInfoKHR
 pub struct SwapchainPresentBarrierCreateInfoNV {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	present_barrier_enable Bool32
 }
 
-// VK_EXT_private_data is a preprocessor guard. Do not pass it to API calls.
-const ext_private_data = 1
+pub type PrivateDataSlotEXT = voidptr
+
 pub const ext_private_data_spec_version = 1
 pub const ext_private_data_extension_name = 'VK_EXT_private_data'
 
+pub type PrivateDataSlotCreateFlagsEXT = u32
 pub type PhysicalDevicePrivateDataFeaturesEXT = PhysicalDevicePrivateDataFeatures
 
 pub type DevicePrivateDataCreateInfoEXT = DevicePrivateDataCreateInfo
 
 pub type PrivateDataSlotCreateInfoEXT = PrivateDataSlotCreateInfo
 
-type VkCreatePrivateDataSlotEXT = fn (C.Device, &PrivateDataSlotCreateInfo, &AllocationCallbacks, &C.PrivateDataSlot) Result
-
-pub fn create_private_data_slot_ext(device C.Device, p_create_info &PrivateDataSlotCreateInfo, p_allocator &AllocationCallbacks, p_private_data_slot &C.PrivateDataSlot) Result {
-	f := VkCreatePrivateDataSlotEXT((*vulkan.loader_p).get_sym('vkCreatePrivateDataSlotEXT') or {
-		println("Couldn't load symbol for 'vkCreatePrivateDataSlotEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_private_data_slot)
-}
-
-type VkDestroyPrivateDataSlotEXT = fn (C.Device, C.PrivateDataSlot, &AllocationCallbacks)
-
-pub fn destroy_private_data_slot_ext(device C.Device, private_data_slot C.PrivateDataSlot, p_allocator &AllocationCallbacks) {
-	f := VkDestroyPrivateDataSlotEXT((*vulkan.loader_p).get_sym('vkDestroyPrivateDataSlotEXT') or {
-		println("Couldn't load symbol for 'vkDestroyPrivateDataSlotEXT': ${err}")
-		return
-	})
-	f(device, private_data_slot, p_allocator)
-}
-
-type VkSetPrivateDataEXT = fn (C.Device, ObjectType, u64, C.PrivateDataSlot, u64) Result
-
-pub fn set_private_data_ext(device C.Device, object_type ObjectType, object_handle u64, private_data_slot C.PrivateDataSlot, data u64) Result {
-	f := VkSetPrivateDataEXT((*vulkan.loader_p).get_sym('vkSetPrivateDataEXT') or {
-		println("Couldn't load symbol for 'vkSetPrivateDataEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, object_type, object_handle, private_data_slot, data)
-}
-
-type VkGetPrivateDataEXT = fn (C.Device, ObjectType, u64, C.PrivateDataSlot, &u64)
-
-pub fn get_private_data_ext(device C.Device, object_type ObjectType, object_handle u64, private_data_slot C.PrivateDataSlot, p_data &u64) {
-	f := VkGetPrivateDataEXT((*vulkan.loader_p).get_sym('vkGetPrivateDataEXT') or {
-		println("Couldn't load symbol for 'vkGetPrivateDataEXT': ${err}")
-		return
-	})
-	f(device, object_type, object_handle, private_data_slot, p_data)
-}
-
-// VK_EXT_pipeline_creation_cache_control is a preprocessor guard. Do not pass it to API calls.
-const ext_pipeline_creation_cache_control = 1
 pub const ext_pipeline_creation_cache_control_spec_version = 3
 pub const ext_pipeline_creation_cache_control_extension_name = 'VK_EXT_pipeline_creation_cache_control'
 
 pub type PhysicalDevicePipelineCreationCacheControlFeaturesEXT = PhysicalDevicePipelineCreationCacheControlFeatures
 
-// VK_NV_device_diagnostics_config is a preprocessor guard. Do not pass it to API calls.
-const nv_device_diagnostics_config = 1
 pub const nv_device_diagnostics_config_spec_version = 2
 pub const nv_device_diagnostics_config_extension_name = 'VK_NV_device_diagnostics_config'
 
@@ -18045,29 +16233,22 @@ pub enum DeviceDiagnosticsConfigFlagBitsNV {
 
 pub type DeviceDiagnosticsConfigFlagsNV = u32
 
-// PhysicalDeviceDiagnosticsConfigFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceDiagnosticsConfigFeaturesNV {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	diagnostics_config Bool32
 }
 
-// DeviceDiagnosticsConfigCreateInfoNV extends VkDeviceCreateInfo
 pub struct DeviceDiagnosticsConfigCreateInfoNV {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  DeviceDiagnosticsConfigFlagsNV
 }
 
-// VK_QCOM_render_pass_store_ops is a preprocessor guard. Do not pass it to API calls.
-const qcom_render_pass_store_ops = 1
 pub const qcom_render_pass_store_ops_spec_version = 2
 pub const qcom_render_pass_store_ops_extension_name = 'VK_QCOM_render_pass_store_ops'
-
-// VK_NV_cuda_kernel_launch is a preprocessor guard. Do not pass it to API calls.
-const nv_cuda_kernel_launch = 1
 
 pub type C.CudaModuleNV = voidptr
 pub type C.CudaFunctionNV = voidptr
@@ -18076,7 +16257,7 @@ pub const nv_cuda_kernel_launch_spec_version = 2
 pub const nv_cuda_kernel_launch_extension_name = 'VK_NV_cuda_kernel_launch'
 
 pub struct CudaModuleCreateInfoNV {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	data_size usize
@@ -18084,7 +16265,7 @@ mut:
 }
 
 pub struct CudaFunctionCreateInfoNV {
-mut:
+pub mut:
 	s_type   StructureType
 	p_next   voidptr
 	vkmodule C.CudaModuleNV
@@ -18092,7 +16273,7 @@ mut:
 }
 
 pub struct CudaLaunchInfoNV {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	function         C.CudaFunctionNV
@@ -18109,236 +16290,96 @@ mut:
 	p_extras         voidptr
 }
 
-// PhysicalDeviceCudaKernelLaunchFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceCudaKernelLaunchFeaturesNV {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	cuda_kernel_launch_features Bool32
 }
 
-// PhysicalDeviceCudaKernelLaunchPropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceCudaKernelLaunchPropertiesNV {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	compute_capability_minor u32
 	compute_capability_major u32
 }
 
-type VkCreateCudaModuleNV = fn (C.Device, &CudaModuleCreateInfoNV, &AllocationCallbacks, &C.CudaModuleNV) Result
-
-pub fn create_cuda_module_nv(device C.Device, p_create_info &CudaModuleCreateInfoNV, p_allocator &AllocationCallbacks, p_module &C.CudaModuleNV) Result {
-	f := VkCreateCudaModuleNV((*vulkan.loader_p).get_sym('vkCreateCudaModuleNV') or {
-		println("Couldn't load symbol for 'vkCreateCudaModuleNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_module)
+fn C.vkCreateCudaModuleNV(C.Device,
+	&CudaModuleCreateInfoNV,
+	&AllocationCallbacks,
+	&C.CudaModuleNV) Result
+pub fn create_cuda_module_nv(device C.Device,
+	p_create_info &CudaModuleCreateInfoNV,
+	p_allocator &AllocationCallbacks,
+	p_module &C.CudaModuleNV) Result {
+	return C.vkCreateCudaModuleNV(device, p_create_info, p_allocator, p_module)
 }
 
-type VkGetCudaModuleCacheNV = fn (C.Device, C.CudaModuleNV, &usize, voidptr) Result
-
-pub fn get_cuda_module_cache_nv(device C.Device, vkmodule C.CudaModuleNV, p_cache_size &usize, p_cache_data voidptr) Result {
-	f := VkGetCudaModuleCacheNV((*vulkan.loader_p).get_sym('vkGetCudaModuleCacheNV') or {
-		println("Couldn't load symbol for 'vkGetCudaModuleCacheNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, vkmodule, p_cache_size, p_cache_data)
+fn C.vkGetCudaModuleCacheNV(C.Device,
+	C.CudaModuleNV,
+	&usize,
+	voidptr) Result
+pub fn get_cuda_module_cache_nv(device C.Device,
+	vkmodule C.CudaModuleNV,
+	p_cache_size &usize,
+	p_cache_data voidptr) Result {
+	return C.vkGetCudaModuleCacheNV(device, vkmodule, p_cache_size, p_cache_data)
 }
 
-type VkCreateCudaFunctionNV = fn (C.Device, &CudaFunctionCreateInfoNV, &AllocationCallbacks, &C.CudaFunctionNV) Result
-
-pub fn create_cuda_function_nv(device C.Device, p_create_info &CudaFunctionCreateInfoNV, p_allocator &AllocationCallbacks, p_function &C.CudaFunctionNV) Result {
-	f := VkCreateCudaFunctionNV((*vulkan.loader_p).get_sym('vkCreateCudaFunctionNV') or {
-		println("Couldn't load symbol for 'vkCreateCudaFunctionNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_function)
+fn C.vkCreateCudaFunctionNV(C.Device,
+	&CudaFunctionCreateInfoNV,
+	&AllocationCallbacks,
+	&C.CudaFunctionNV) Result
+pub fn create_cuda_function_nv(device C.Device,
+	p_create_info &CudaFunctionCreateInfoNV,
+	p_allocator &AllocationCallbacks,
+	p_function &C.CudaFunctionNV) Result {
+	return C.vkCreateCudaFunctionNV(device, p_create_info, p_allocator, p_function)
 }
 
-type VkDestroyCudaModuleNV = fn (C.Device, C.CudaModuleNV, &AllocationCallbacks)
-
-pub fn destroy_cuda_module_nv(device C.Device, vkmodule C.CudaModuleNV, p_allocator &AllocationCallbacks) {
-	f := VkDestroyCudaModuleNV((*vulkan.loader_p).get_sym('vkDestroyCudaModuleNV') or {
-		println("Couldn't load symbol for 'vkDestroyCudaModuleNV': ${err}")
-		return
-	})
-	f(device, vkmodule, p_allocator)
+fn C.vkDestroyCudaModuleNV(C.Device,
+	C.CudaModuleNV,
+	&AllocationCallbacks)
+pub fn destroy_cuda_module_nv(device C.Device,
+	vkmodule C.CudaModuleNV,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyCudaModuleNV(device, vkmodule, p_allocator)
 }
 
-type VkDestroyCudaFunctionNV = fn (C.Device, C.CudaFunctionNV, &AllocationCallbacks)
-
-pub fn destroy_cuda_function_nv(device C.Device, function C.CudaFunctionNV, p_allocator &AllocationCallbacks) {
-	f := VkDestroyCudaFunctionNV((*vulkan.loader_p).get_sym('vkDestroyCudaFunctionNV') or {
-		println("Couldn't load symbol for 'vkDestroyCudaFunctionNV': ${err}")
-		return
-	})
-	f(device, function, p_allocator)
+fn C.vkDestroyCudaFunctionNV(C.Device,
+	C.CudaFunctionNV,
+	&AllocationCallbacks)
+pub fn destroy_cuda_function_nv(device C.Device,
+	function C.CudaFunctionNV,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyCudaFunctionNV(device, function, p_allocator)
 }
 
-type VkCmdCudaLaunchKernelNV = fn (C.CommandBuffer, &CudaLaunchInfoNV)
-
-pub fn cmd_cuda_launch_kernel_nv(command_buffer C.CommandBuffer, p_launch_info &CudaLaunchInfoNV) {
-	f := VkCmdCudaLaunchKernelNV((*vulkan.loader_p).get_sym('vkCmdCudaLaunchKernelNV') or {
-		println("Couldn't load symbol for 'vkCmdCudaLaunchKernelNV': ${err}")
-		return
-	})
-	f(command_buffer, p_launch_info)
+fn C.vkCmdCudaLaunchKernelNV(C.CommandBuffer,
+	&CudaLaunchInfoNV)
+pub fn cmd_cuda_launch_kernel_nv(command_buffer C.CommandBuffer,
+	p_launch_info &CudaLaunchInfoNV) {
+	C.vkCmdCudaLaunchKernelNV(command_buffer, p_launch_info)
 }
 
-// VK_NV_low_latency is a preprocessor guard. Do not pass it to API calls.
-const nv_low_latency = 1
 pub const nv_low_latency_spec_version = 1
 pub const nv_low_latency_extension_name = 'VK_NV_low_latency'
-// QueryLowLatencySupportNV extends VkSemaphoreCreateInfo
+
 pub struct QueryLowLatencySupportNV {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	p_queried_low_latency_data voidptr
 }
 
-// VK_EXT_metal_objects is a preprocessor guard. Do not pass it to API calls.
-const ext_metal_objects = 1
-pub const ext_metal_objects_spec_version = 1
-pub const ext_metal_objects_extension_name = 'VK_EXT_metal_objects'
-
-pub enum ExportMetalObjectTypeFlagBitsEXT {
-	export_metal_object_type_metal_device_bit_ext        = int(0x00000001)
-	export_metal_object_type_metal_command_queue_bit_ext = int(0x00000002)
-	export_metal_object_type_metal_buffer_bit_ext        = int(0x00000004)
-	export_metal_object_type_metal_texture_bit_ext       = int(0x00000008)
-	export_metal_object_type_metal_iosurface_bit_ext     = int(0x00000010)
-	export_metal_object_type_metal_shared_event_bit_ext  = int(0x00000020)
-	export_metal_object_type_flag_bits_max_enum_ext      = int(0x7FFFFFFF)
-}
-
-pub type ExportMetalObjectTypeFlagsEXT = u32
-
-// ExportMetalObjectCreateInfoEXT extends VkInstanceCreateInfo,VkMemoryAllocateInfo,VkImageCreateInfo,VkImageViewCreateInfo,VkBufferViewCreateInfo,VkSemaphoreCreateInfo,VkEventCreateInfo
-pub struct ExportMetalObjectCreateInfoEXT {
-mut:
-	s_type             StructureType
-	p_next             voidptr
-	export_object_type ExportMetalObjectTypeFlagBitsEXT
-}
-
-pub struct ExportMetalObjectsInfoEXT {
-mut:
-	s_type StructureType
-	p_next voidptr
-}
-
-// ExportMetalDeviceInfoEXT extends VkExportMetalObjectsInfoEXT
-pub struct ExportMetalDeviceInfoEXT {
-mut:
-	s_type     StructureType
-	p_next     voidptr
-	mtl_device voidptr
-}
-
-// ExportMetalCommandQueueInfoEXT extends VkExportMetalObjectsInfoEXT
-pub struct ExportMetalCommandQueueInfoEXT {
-mut:
-	s_type            StructureType
-	p_next            voidptr
-	queue             C.Queue
-	mtl_command_queue voidptr
-}
-
-// ExportMetalBufferInfoEXT extends VkExportMetalObjectsInfoEXT
-pub struct ExportMetalBufferInfoEXT {
-mut:
-	s_type     StructureType
-	p_next     voidptr
-	memory     C.DeviceMemory
-	mtl_buffer voidptr
-}
-
-// ImportMetalBufferInfoEXT extends VkMemoryAllocateInfo
-pub struct ImportMetalBufferInfoEXT {
-mut:
-	s_type     StructureType
-	p_next     voidptr
-	mtl_buffer voidptr
-}
-
-// ExportMetalTextureInfoEXT extends VkExportMetalObjectsInfoEXT
-pub struct ExportMetalTextureInfoEXT {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	image       C.Image
-	image_view  C.ImageView
-	buffer_view C.BufferView
-	plane       ImageAspectFlagBits
-	mtl_texture voidptr
-}
-
-// ImportMetalTextureInfoEXT extends VkImageCreateInfo
-pub struct ImportMetalTextureInfoEXT {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	plane       ImageAspectFlagBits
-	mtl_texture voidptr
-}
-
-// ExportMetalIOSurfaceInfoEXT extends VkExportMetalObjectsInfoEXT
-pub struct ExportMetalIOSurfaceInfoEXT {
-mut:
-	s_type     StructureType
-	p_next     voidptr
-	image      C.Image
-	io_surface voidptr
-}
-
-// ImportMetalIOSurfaceInfoEXT extends VkImageCreateInfo
-pub struct ImportMetalIOSurfaceInfoEXT {
-mut:
-	s_type     StructureType
-	p_next     voidptr
-	io_surface voidptr
-}
-
-// ExportMetalSharedEventInfoEXT extends VkExportMetalObjectsInfoEXT
-pub struct ExportMetalSharedEventInfoEXT {
-mut:
-	s_type           StructureType
-	p_next           voidptr
-	semaphore        C.Semaphore
-	event            C.Event
-	mtl_shared_event voidptr
-}
-
-// ImportMetalSharedEventInfoEXT extends VkSemaphoreCreateInfo,VkEventCreateInfo
-pub struct ImportMetalSharedEventInfoEXT {
-mut:
-	s_type           StructureType
-	p_next           voidptr
-	mtl_shared_event voidptr
-}
-
-type VkExportMetalObjectsEXT = fn (C.Device, &ExportMetalObjectsInfoEXT)
-
-pub fn export_metal_objects_ext(device C.Device, p_metal_objects_info &ExportMetalObjectsInfoEXT) {
-	f := VkExportMetalObjectsEXT((*vulkan.loader_p).get_sym('vkExportMetalObjectsEXT') or {
-		println("Couldn't load symbol for 'vkExportMetalObjectsEXT': ${err}")
-		return
-	})
-	f(device, p_metal_objects_info)
-}
-
-// VK_EXT_descriptor_buffer is a preprocessor guard. Do not pass it to API calls.
-const ext_descriptor_buffer = 1
-
 pub type C.AccelerationStructureKHR = voidptr
 
 pub const ext_descriptor_buffer_spec_version = 1
 pub const ext_descriptor_buffer_extension_name = 'VK_EXT_descriptor_buffer'
-// PhysicalDeviceDescriptorBufferPropertiesEXT extends VkPhysicalDeviceProperties2
+
 pub struct PhysicalDeviceDescriptorBufferPropertiesEXT {
-mut:
+pub mut:
 	s_type                                                     StructureType
 	p_next                                                     voidptr
 	combined_image_sampler_descriptor_single_array             Bool32
@@ -18376,17 +16417,15 @@ mut:
 	descriptor_buffer_address_space_size                       DeviceSize
 }
 
-// PhysicalDeviceDescriptorBufferDensityMapPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceDescriptorBufferDensityMapPropertiesEXT {
-mut:
+pub mut:
 	s_type                                             StructureType
 	p_next                                             voidptr
 	combined_image_sampler_density_map_descriptor_size usize
 }
 
-// PhysicalDeviceDescriptorBufferFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceDescriptorBufferFeaturesEXT {
-mut:
+pub mut:
 	s_type                                 StructureType
 	p_next                                 voidptr
 	descriptor_buffer                      Bool32
@@ -18396,7 +16435,7 @@ mut:
 }
 
 pub struct DescriptorAddressInfoEXT {
-mut:
+pub mut:
 	s_type  StructureType
 	p_next  voidptr
 	address DeviceAddress
@@ -18405,23 +16444,22 @@ mut:
 }
 
 pub struct DescriptorBufferBindingInfoEXT {
-mut:
+pub mut:
 	s_type  StructureType
 	p_next  voidptr
 	address DeviceAddress
 	usage   BufferUsageFlags
 }
 
-// DescriptorBufferBindingPushDescriptorBufferHandleEXT extends VkDescriptorBufferBindingInfoEXT
 pub struct DescriptorBufferBindingPushDescriptorBufferHandleEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	buffer C.Buffer
 }
 
 pub union DescriptorDataEXT {
-mut:
+pub mut:
 	p_sampler                &C.Sampler
 	p_combined_image_sampler &DescriptorImageInfo
 	p_input_attachment_image &DescriptorImageInfo
@@ -18435,7 +16473,7 @@ mut:
 }
 
 pub struct DescriptorGetInfoEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	vktype DescriptorType
@@ -18443,162 +16481,164 @@ mut:
 }
 
 pub struct BufferCaptureDescriptorDataInfoEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	buffer C.Buffer
 }
 
 pub struct ImageCaptureDescriptorDataInfoEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	image  C.Image
 }
 
 pub struct ImageViewCaptureDescriptorDataInfoEXT {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	image_view C.ImageView
 }
 
 pub struct SamplerCaptureDescriptorDataInfoEXT {
-mut:
+pub mut:
 	s_type  StructureType
 	p_next  voidptr
 	sampler C.Sampler
 }
 
-// OpaqueCaptureDescriptorDataCreateInfoEXT extends VkBufferCreateInfo,VkImageCreateInfo,VkImageViewCreateInfo,VkSamplerCreateInfo,VkAccelerationStructureCreateInfoKHR,VkAccelerationStructureCreateInfoNV
 pub struct OpaqueCaptureDescriptorDataCreateInfoEXT {
-mut:
+pub mut:
 	s_type                         StructureType
 	p_next                         voidptr
 	opaque_capture_descriptor_data voidptr
 }
 
 pub struct AccelerationStructureCaptureDescriptorDataInfoEXT {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	acceleration_structure    C.AccelerationStructureKHR
 	acceleration_structure_nv C.AccelerationStructureNV
 }
 
-type VkGetDescriptorSetLayoutSizeEXT = fn (C.Device, C.DescriptorSetLayout, &DeviceSize)
-
-pub fn get_descriptor_set_layout_size_ext(device C.Device, layout C.DescriptorSetLayout, p_layout_size_in_bytes &DeviceSize) {
-	f := VkGetDescriptorSetLayoutSizeEXT((*vulkan.loader_p).get_sym('vkGetDescriptorSetLayoutSizeEXT') or {
-		println("Couldn't load symbol for 'vkGetDescriptorSetLayoutSizeEXT': ${err}")
-		return
-	})
-	f(device, layout, p_layout_size_in_bytes)
+fn C.vkGetDescriptorSetLayoutSizeEXT(C.Device,
+	C.DescriptorSetLayout,
+	&DeviceSize)
+pub fn get_descriptor_set_layout_size_ext(device C.Device,
+	layout C.DescriptorSetLayout,
+	p_layout_size_in_bytes &DeviceSize) {
+	C.vkGetDescriptorSetLayoutSizeEXT(device, layout, p_layout_size_in_bytes)
 }
 
-type VkGetDescriptorSetLayoutBindingOffsetEXT = fn (C.Device, C.DescriptorSetLayout, u32, &DeviceSize)
-
-pub fn get_descriptor_set_layout_binding_offset_ext(device C.Device, layout C.DescriptorSetLayout, binding u32, p_offset &DeviceSize) {
-	f := VkGetDescriptorSetLayoutBindingOffsetEXT((*vulkan.loader_p).get_sym('vkGetDescriptorSetLayoutBindingOffsetEXT') or {
-		println("Couldn't load symbol for 'vkGetDescriptorSetLayoutBindingOffsetEXT': ${err}")
-		return
-	})
-	f(device, layout, binding, p_offset)
+fn C.vkGetDescriptorSetLayoutBindingOffsetEXT(C.Device,
+	C.DescriptorSetLayout,
+	u32,
+	&DeviceSize)
+pub fn get_descriptor_set_layout_binding_offset_ext(device C.Device,
+	layout C.DescriptorSetLayout,
+	binding u32,
+	p_offset &DeviceSize) {
+	C.vkGetDescriptorSetLayoutBindingOffsetEXT(device, layout, binding, p_offset)
 }
 
-type VkGetDescriptorEXT = fn (C.Device, &DescriptorGetInfoEXT, usize, voidptr)
-
-pub fn get_descriptor_ext(device C.Device, p_descriptor_info &DescriptorGetInfoEXT, data_size usize, p_descriptor voidptr) {
-	f := VkGetDescriptorEXT((*vulkan.loader_p).get_sym('vkGetDescriptorEXT') or {
-		println("Couldn't load symbol for 'vkGetDescriptorEXT': ${err}")
-		return
-	})
-	f(device, p_descriptor_info, data_size, p_descriptor)
+fn C.vkGetDescriptorEXT(C.Device,
+	&DescriptorGetInfoEXT,
+	usize,
+	voidptr)
+pub fn get_descriptor_ext(device C.Device,
+	p_descriptor_info &DescriptorGetInfoEXT,
+	data_size usize,
+	p_descriptor voidptr) {
+	C.vkGetDescriptorEXT(device, p_descriptor_info, data_size, p_descriptor)
 }
 
-type VkCmdBindDescriptorBuffersEXT = fn (C.CommandBuffer, u32, &DescriptorBufferBindingInfoEXT)
-
-pub fn cmd_bind_descriptor_buffers_ext(command_buffer C.CommandBuffer, buffer_count u32, p_binding_infos &DescriptorBufferBindingInfoEXT) {
-	f := VkCmdBindDescriptorBuffersEXT((*vulkan.loader_p).get_sym('vkCmdBindDescriptorBuffersEXT') or {
-		println("Couldn't load symbol for 'vkCmdBindDescriptorBuffersEXT': ${err}")
-		return
-	})
-	f(command_buffer, buffer_count, p_binding_infos)
+fn C.vkCmdBindDescriptorBuffersEXT(C.CommandBuffer,
+	u32,
+	&DescriptorBufferBindingInfoEXT)
+pub fn cmd_bind_descriptor_buffers_ext(command_buffer C.CommandBuffer,
+	buffer_count u32,
+	p_binding_infos &DescriptorBufferBindingInfoEXT) {
+	C.vkCmdBindDescriptorBuffersEXT(command_buffer, buffer_count, p_binding_infos)
 }
 
-type VkCmdSetDescriptorBufferOffsetsEXT = fn (C.CommandBuffer, PipelineBindPoint, C.PipelineLayout, u32, u32, &u32, &DeviceSize)
-
-pub fn cmd_set_descriptor_buffer_offsets_ext(command_buffer C.CommandBuffer, pipeline_bind_point PipelineBindPoint, layout C.PipelineLayout, first_set u32, set_count u32, p_buffer_indices &u32, p_offsets &DeviceSize) {
-	f := VkCmdSetDescriptorBufferOffsetsEXT((*vulkan.loader_p).get_sym('vkCmdSetDescriptorBufferOffsetsEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDescriptorBufferOffsetsEXT': ${err}")
-		return
-	})
-	f(command_buffer, pipeline_bind_point, layout, first_set, set_count, p_buffer_indices,
-		p_offsets)
+fn C.vkCmdSetDescriptorBufferOffsetsEXT(C.CommandBuffer,
+	PipelineBindPoint,
+	C.PipelineLayout,
+	u32,
+	u32,
+	&u32,
+	&DeviceSize)
+pub fn cmd_set_descriptor_buffer_offsets_ext(command_buffer C.CommandBuffer,
+	pipeline_bind_point PipelineBindPoint,
+	layout C.PipelineLayout,
+	first_set u32,
+	set_count u32,
+	p_buffer_indices &u32,
+	p_offsets &DeviceSize) {
+	C.vkCmdSetDescriptorBufferOffsetsEXT(command_buffer, pipeline_bind_point, layout,
+		first_set, set_count, p_buffer_indices, p_offsets)
 }
 
-type VkCmdBindDescriptorBufferEmbeddedSamplersEXT = fn (C.CommandBuffer, PipelineBindPoint, C.PipelineLayout, u32)
-
-pub fn cmd_bind_descriptor_buffer_embedded_samplers_ext(command_buffer C.CommandBuffer, pipeline_bind_point PipelineBindPoint, layout C.PipelineLayout, set u32) {
-	f := VkCmdBindDescriptorBufferEmbeddedSamplersEXT((*vulkan.loader_p).get_sym('vkCmdBindDescriptorBufferEmbeddedSamplersEXT') or {
-		println("Couldn't load symbol for 'vkCmdBindDescriptorBufferEmbeddedSamplersEXT': ${err}")
-		return
-	})
-	f(command_buffer, pipeline_bind_point, layout, set)
+fn C.vkCmdBindDescriptorBufferEmbeddedSamplersEXT(C.CommandBuffer,
+	PipelineBindPoint,
+	C.PipelineLayout,
+	u32)
+pub fn cmd_bind_descriptor_buffer_embedded_samplers_ext(command_buffer C.CommandBuffer,
+	pipeline_bind_point PipelineBindPoint,
+	layout C.PipelineLayout,
+	set u32) {
+	C.vkCmdBindDescriptorBufferEmbeddedSamplersEXT(command_buffer, pipeline_bind_point,
+		layout, set)
 }
 
-type VkGetBufferOpaqueCaptureDescriptorDataEXT = fn (C.Device, &BufferCaptureDescriptorDataInfoEXT, voidptr) Result
-
-pub fn get_buffer_opaque_capture_descriptor_data_ext(device C.Device, p_info &BufferCaptureDescriptorDataInfoEXT, p_data voidptr) Result {
-	f := VkGetBufferOpaqueCaptureDescriptorDataEXT((*vulkan.loader_p).get_sym('vkGetBufferOpaqueCaptureDescriptorDataEXT') or {
-		println("Couldn't load symbol for 'vkGetBufferOpaqueCaptureDescriptorDataEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_info, p_data)
+fn C.vkGetBufferOpaqueCaptureDescriptorDataEXT(C.Device,
+	&BufferCaptureDescriptorDataInfoEXT,
+	voidptr) Result
+pub fn get_buffer_opaque_capture_descriptor_data_ext(device C.Device,
+	p_info &BufferCaptureDescriptorDataInfoEXT,
+	p_data voidptr) Result {
+	return C.vkGetBufferOpaqueCaptureDescriptorDataEXT(device, p_info, p_data)
 }
 
-type VkGetImageOpaqueCaptureDescriptorDataEXT = fn (C.Device, &ImageCaptureDescriptorDataInfoEXT, voidptr) Result
-
-pub fn get_image_opaque_capture_descriptor_data_ext(device C.Device, p_info &ImageCaptureDescriptorDataInfoEXT, p_data voidptr) Result {
-	f := VkGetImageOpaqueCaptureDescriptorDataEXT((*vulkan.loader_p).get_sym('vkGetImageOpaqueCaptureDescriptorDataEXT') or {
-		println("Couldn't load symbol for 'vkGetImageOpaqueCaptureDescriptorDataEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_info, p_data)
+fn C.vkGetImageOpaqueCaptureDescriptorDataEXT(C.Device,
+	&ImageCaptureDescriptorDataInfoEXT,
+	voidptr) Result
+pub fn get_image_opaque_capture_descriptor_data_ext(device C.Device,
+	p_info &ImageCaptureDescriptorDataInfoEXT,
+	p_data voidptr) Result {
+	return C.vkGetImageOpaqueCaptureDescriptorDataEXT(device, p_info, p_data)
 }
 
-type VkGetImageViewOpaqueCaptureDescriptorDataEXT = fn (C.Device, &ImageViewCaptureDescriptorDataInfoEXT, voidptr) Result
-
-pub fn get_image_view_opaque_capture_descriptor_data_ext(device C.Device, p_info &ImageViewCaptureDescriptorDataInfoEXT, p_data voidptr) Result {
-	f := VkGetImageViewOpaqueCaptureDescriptorDataEXT((*vulkan.loader_p).get_sym('vkGetImageViewOpaqueCaptureDescriptorDataEXT') or {
-		println("Couldn't load symbol for 'vkGetImageViewOpaqueCaptureDescriptorDataEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_info, p_data)
+fn C.vkGetImageViewOpaqueCaptureDescriptorDataEXT(C.Device,
+	&ImageViewCaptureDescriptorDataInfoEXT,
+	voidptr) Result
+pub fn get_image_view_opaque_capture_descriptor_data_ext(device C.Device,
+	p_info &ImageViewCaptureDescriptorDataInfoEXT,
+	p_data voidptr) Result {
+	return C.vkGetImageViewOpaqueCaptureDescriptorDataEXT(device, p_info, p_data)
 }
 
-type VkGetSamplerOpaqueCaptureDescriptorDataEXT = fn (C.Device, &SamplerCaptureDescriptorDataInfoEXT, voidptr) Result
-
-pub fn get_sampler_opaque_capture_descriptor_data_ext(device C.Device, p_info &SamplerCaptureDescriptorDataInfoEXT, p_data voidptr) Result {
-	f := VkGetSamplerOpaqueCaptureDescriptorDataEXT((*vulkan.loader_p).get_sym('vkGetSamplerOpaqueCaptureDescriptorDataEXT') or {
-		println("Couldn't load symbol for 'vkGetSamplerOpaqueCaptureDescriptorDataEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_info, p_data)
+fn C.vkGetSamplerOpaqueCaptureDescriptorDataEXT(C.Device,
+	&SamplerCaptureDescriptorDataInfoEXT,
+	voidptr) Result
+pub fn get_sampler_opaque_capture_descriptor_data_ext(device C.Device,
+	p_info &SamplerCaptureDescriptorDataInfoEXT,
+	p_data voidptr) Result {
+	return C.vkGetSamplerOpaqueCaptureDescriptorDataEXT(device, p_info, p_data)
 }
 
-type VkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT = fn (C.Device, &AccelerationStructureCaptureDescriptorDataInfoEXT, voidptr) Result
-
-pub fn get_acceleration_structure_opaque_capture_descriptor_data_ext(device C.Device, p_info &AccelerationStructureCaptureDescriptorDataInfoEXT, p_data voidptr) Result {
-	f := VkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT((*vulkan.loader_p).get_sym('vkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT') or {
-		println("Couldn't load symbol for 'vkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_info, p_data)
+fn C.vkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT(C.Device,
+	&AccelerationStructureCaptureDescriptorDataInfoEXT,
+	voidptr) Result
+pub fn get_acceleration_structure_opaque_capture_descriptor_data_ext(device C.Device,
+	p_info &AccelerationStructureCaptureDescriptorDataInfoEXT,
+	p_data voidptr) Result {
+	return C.vkGetAccelerationStructureOpaqueCaptureDescriptorDataEXT(device, p_info,
+		p_data)
 }
 
-// VK_EXT_graphics_pipeline_library is a preprocessor guard. Do not pass it to API calls.
-const ext_graphics_pipeline_library = 1
 pub const ext_graphics_pipeline_library_spec_version = 1
 pub const ext_graphics_pipeline_library_extension_name = 'VK_EXT_graphics_pipeline_library'
 
@@ -18612,45 +16652,38 @@ pub enum GraphicsPipelineLibraryFlagBitsEXT {
 
 pub type GraphicsPipelineLibraryFlagsEXT = u32
 
-// PhysicalDeviceGraphicsPipelineLibraryFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceGraphicsPipelineLibraryFeaturesEXT {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	graphics_pipeline_library Bool32
 }
 
-// PhysicalDeviceGraphicsPipelineLibraryPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceGraphicsPipelineLibraryPropertiesEXT {
-mut:
+pub mut:
 	s_type                                                         StructureType
 	p_next                                                         voidptr
 	graphics_pipeline_library_fast_linking                         Bool32
 	graphics_pipeline_library_independent_interpolation_decoration Bool32
 }
 
-// GraphicsPipelineLibraryCreateInfoEXT extends VkGraphicsPipelineCreateInfo
 pub struct GraphicsPipelineLibraryCreateInfoEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	flags  GraphicsPipelineLibraryFlagsEXT
 }
 
-// VK_AMD_shader_early_and_late_fragment_tests is a preprocessor guard. Do not pass it to API calls.
-const amd_shader_early_and_late_fragment_tests = 1
 pub const amd_shader_early_and_late_fragment_tests_spec_version = 1
 pub const amd_shader_early_and_late_fragment_tests_extension_name = 'VK_AMD_shader_early_and_late_fragment_tests'
-// PhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	shader_early_and_late_fragment_tests Bool32
 }
 
-// VK_NV_fragment_shading_rate_enums is a preprocessor guard. Do not pass it to API calls.
-const nv_fragment_shading_rate_enums = 1
 pub const nv_fragment_shading_rate_enums_spec_version = 1
 pub const nv_fragment_shading_rate_enums_extension_name = 'VK_NV_fragment_shading_rate_enums'
 
@@ -18676,9 +16709,8 @@ pub enum FragmentShadingRateNV {
 	fragment_shading_rate_max_enum_nv                    = int(0x7FFFFFFF)
 }
 
-// PhysicalDeviceFragmentShadingRateEnumsFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceFragmentShadingRateEnumsFeaturesNV {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	fragment_shading_rate_enums          Bool32
@@ -18686,36 +16718,31 @@ mut:
 	no_invocation_fragment_shading_rates Bool32
 }
 
-// PhysicalDeviceFragmentShadingRateEnumsPropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceFragmentShadingRateEnumsPropertiesNV {
-mut:
+pub mut:
 	s_type                                     StructureType
 	p_next                                     voidptr
 	max_fragment_shading_rate_invocation_count SampleCountFlagBits
 }
 
-// PipelineFragmentShadingRateEnumStateCreateInfoNV extends VkGraphicsPipelineCreateInfo
 pub struct PipelineFragmentShadingRateEnumStateCreateInfoNV {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	shading_rate_type FragmentShadingRateTypeNV
 	shading_rate      FragmentShadingRateNV
-	combiner_ops      []FragmentShadingRateCombinerOpKHR
+	combiner_ops      [2]FragmentShadingRateCombinerOpKHR
 }
 
-type VkCmdSetFragmentShadingRateEnumNV = fn (C.CommandBuffer, FragmentShadingRateNV, []FragmentShadingRateCombinerOpKHR)
-
-pub fn cmd_set_fragment_shading_rate_enum_nv(command_buffer C.CommandBuffer, shading_rate FragmentShadingRateNV, combiner_ops []FragmentShadingRateCombinerOpKHR) {
-	f := VkCmdSetFragmentShadingRateEnumNV((*vulkan.loader_p).get_sym('vkCmdSetFragmentShadingRateEnumNV') or {
-		println("Couldn't load symbol for 'vkCmdSetFragmentShadingRateEnumNV': ${err}")
-		return
-	})
-	f(command_buffer, shading_rate, combiner_ops)
+fn C.vkCmdSetFragmentShadingRateEnumNV(C.CommandBuffer,
+	FragmentShadingRateNV,
+	[2]FragmentShadingRateCombinerOpKHR)
+pub fn cmd_set_fragment_shading_rate_enum_nv(command_buffer C.CommandBuffer,
+	shading_rate FragmentShadingRateNV,
+	combiner_ops [2]FragmentShadingRateCombinerOpKHR) {
+	C.vkCmdSetFragmentShadingRateEnumNV(command_buffer, shading_rate, combiner_ops)
 }
 
-// VK_NV_ray_tracing_motion_blur is a preprocessor guard. Do not pass it to API calls.
-const nv_ray_tracing_motion_blur = 1
 pub const nv_ray_tracing_motion_blur_spec_version = 1
 pub const nv_ray_tracing_motion_blur_extension_name = 'VK_NV_ray_tracing_motion_blur'
 
@@ -18730,22 +16757,20 @@ pub type AccelerationStructureMotionInfoFlagsNV = u32
 pub type AccelerationStructureMotionInstanceFlagsNV = u32
 
 pub union DeviceOrHostAddressConstKHR {
-mut:
+pub mut:
 	device_address DeviceAddress
 	host_address   voidptr
 }
 
-// AccelerationStructureGeometryMotionTrianglesDataNV extends VkAccelerationStructureGeometryTrianglesDataKHR
 pub struct AccelerationStructureGeometryMotionTrianglesDataNV {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	vertex_data DeviceOrHostAddressConstKHR
 }
 
-// AccelerationStructureMotionInfoNV extends VkAccelerationStructureCreateInfoKHR
 pub struct AccelerationStructureMotionInfoNV {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	max_instances u32
@@ -18753,7 +16778,7 @@ mut:
 }
 
 pub struct AccelerationStructureMatrixMotionInstanceNV {
-mut:
+pub mut:
 	transform_t0                                TransformMatrixKHR
 	transform_t1                                TransformMatrixKHR
 	instance_custom_index                       u32
@@ -18764,7 +16789,7 @@ mut:
 }
 
 pub struct SRTDataNV {
-mut:
+pub mut:
 	sx  f32
 	a   f32
 	b   f32
@@ -18784,7 +16809,7 @@ mut:
 }
 
 pub struct AccelerationStructureSRTMotionInstanceNV {
-mut:
+pub mut:
 	transform_t0                                SRTDataNV
 	transform_t1                                SRTDataNV
 	instance_custom_index                       u32
@@ -18795,55 +16820,49 @@ mut:
 }
 
 pub union AccelerationStructureMotionInstanceDataNV {
-mut:
+pub mut:
 	static_instance        AccelerationStructureInstanceKHR
 	matrix_motion_instance AccelerationStructureMatrixMotionInstanceNV
 	srt_motion_instance    AccelerationStructureSRTMotionInstanceNV
 }
 
 pub struct AccelerationStructureMotionInstanceNV {
-mut:
+pub mut:
 	vktype AccelerationStructureMotionInstanceTypeNV
 	flags  AccelerationStructureMotionInstanceFlagsNV
 	data   AccelerationStructureMotionInstanceDataNV
 }
 
-// PhysicalDeviceRayTracingMotionBlurFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceRayTracingMotionBlurFeaturesNV {
-mut:
+pub mut:
 	s_type                                               StructureType
 	p_next                                               voidptr
 	ray_tracing_motion_blur                              Bool32
 	ray_tracing_motion_blur_pipeline_trace_rays_indirect Bool32
 }
 
-// VK_EXT_ycbcr_2plane_444_formats is a preprocessor guard. Do not pass it to API calls.
-const ext_ycbcr_2plane_444_formats = 1
 pub const ext_ycbcr_2plane_444_formats_spec_version = 1
 pub const ext_ycbcr_2plane_444_formats_extension_name = 'VK_EXT_ycbcr_2plane_444_formats'
-// PhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	ycbcr2plane444_formats Bool32
 }
 
-// VK_EXT_fragment_density_map2 is a preprocessor guard. Do not pass it to API calls.
-const ext_fragment_density_map2 = 1
 pub const ext_fragment_density_map_2_spec_version = 1
 pub const ext_fragment_density_map_2_extension_name = 'VK_EXT_fragment_density_map2'
-// PhysicalDeviceFragmentDensityMap2FeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceFragmentDensityMap2FeaturesEXT {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	fragment_density_map_deferred Bool32
 }
 
-// PhysicalDeviceFragmentDensityMap2PropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceFragmentDensityMap2PropertiesEXT {
-mut:
+pub mut:
 	s_type                                        StructureType
 	p_next                                        voidptr
 	subsampled_loads                              Bool32
@@ -18852,27 +16871,21 @@ mut:
 	max_descriptor_set_subsampled_samplers        u32
 }
 
-// VK_QCOM_rotated_copy_commands is a preprocessor guard. Do not pass it to API calls.
-const qcom_rotated_copy_commands = 1
-pub const qcom_rotated_copy_commands_spec_version = 1
+pub const qcom_rotated_copy_commands_spec_version = 2
 pub const qcom_rotated_copy_commands_extension_name = 'VK_QCOM_rotated_copy_commands'
-// CopyCommandTransformInfoQCOM extends VkBufferImageCopy2,VkImageBlit2
+
 pub struct CopyCommandTransformInfoQCOM {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	transform SurfaceTransformFlagBitsKHR
 }
 
-// VK_EXT_image_robustness is a preprocessor guard. Do not pass it to API calls.
-const ext_image_robustness = 1
 pub const ext_image_robustness_spec_version = 1
 pub const ext_image_robustness_extension_name = 'VK_EXT_image_robustness'
 
 pub type PhysicalDeviceImageRobustnessFeaturesEXT = PhysicalDeviceImageRobustnessFeatures
 
-// VK_EXT_image_compression_control is a preprocessor guard. Do not pass it to API calls.
-const ext_image_compression_control = 1
 pub const ext_image_compression_control_spec_version = 1
 pub const ext_image_compression_control_extension_name = 'VK_EXT_image_compression_control'
 
@@ -18917,17 +16930,15 @@ pub enum ImageCompressionFixedRateFlagBitsEXT {
 
 pub type ImageCompressionFixedRateFlagsEXT = u32
 
-// PhysicalDeviceImageCompressionControlFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceImageCompressionControlFeaturesEXT {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	image_compression_control Bool32
 }
 
-// ImageCompressionControlEXT extends VkImageCreateInfo,VkSwapchainCreateInfoKHR,VkPhysicalDeviceImageFormatInfo2
 pub struct ImageCompressionControlEXT {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	flags                           ImageCompressionFlagsEXT
@@ -18935,42 +16946,35 @@ mut:
 	p_fixed_rate_flags              &ImageCompressionFixedRateFlagsEXT
 }
 
-// ImageCompressionPropertiesEXT extends VkImageFormatProperties2,VkSurfaceFormat2KHR,VkSubresourceLayout2KHR
 pub struct ImageCompressionPropertiesEXT {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	image_compression_flags            ImageCompressionFlagsEXT
 	image_compression_fixed_rate_flags ImageCompressionFixedRateFlagsEXT
 }
 
-// VK_EXT_attachment_feedback_loop_layout is a preprocessor guard. Do not pass it to API calls.
-const ext_attachment_feedback_loop_layout = 1
 pub const ext_attachment_feedback_loop_layout_spec_version = 2
 pub const ext_attachment_feedback_loop_layout_extension_name = 'VK_EXT_attachment_feedback_loop_layout'
-// PhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	attachment_feedback_loop_layout Bool32
 }
 
-// VK_EXT_4444_formats is a preprocessor guard. Do not pass it to API calls.
-const ext_4444_formats = 1
 pub const ext_4444_formats_spec_version = 1
 pub const ext_4444_formats_extension_name = 'VK_EXT_4444_formats'
-// PhysicalDevice4444FormatsFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDevice4444FormatsFeaturesEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	format_a4_r4_g4_b4 Bool32
 	format_a4_b4_g4_r4 Bool32
 }
 
-// VK_EXT_device_fault is a preprocessor guard. Do not pass it to API calls.
-const ext_device_fault = 1
 pub const ext_device_fault_spec_version = 2
 pub const ext_device_fault_extension_name = 'VK_EXT_device_fault'
 
@@ -18990,9 +16994,8 @@ pub enum DeviceFaultVendorBinaryHeaderVersionEXT {
 	device_fault_vendor_binary_header_version_max_enum_ext = int(0x7FFFFFFF)
 }
 
-// PhysicalDeviceFaultFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceFaultFeaturesEXT {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	device_fault               Bool32
@@ -19000,7 +17003,7 @@ mut:
 }
 
 pub struct DeviceFaultCountsEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	address_info_count u32
@@ -19009,37 +17012,37 @@ mut:
 }
 
 pub struct DeviceFaultAddressInfoEXT {
-mut:
+pub mut:
 	address_type      DeviceFaultAddressTypeEXT
 	reported_address  DeviceAddress
 	address_precision DeviceSize
 }
 
 pub struct DeviceFaultVendorInfoEXT {
-mut:
-	description       []char
+pub mut:
+	description       [max_description_size]char
 	vendor_fault_code u64
 	vendor_fault_data u64
 }
 
 pub struct DeviceFaultInfoEXT {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
-	description          []char
+	description          [max_description_size]char
 	p_address_infos      &DeviceFaultAddressInfoEXT
 	p_vendor_infos       &DeviceFaultVendorInfoEXT
 	p_vendor_binary_data voidptr
 }
 
 pub struct DeviceFaultVendorBinaryHeaderVersionOneEXT {
-mut:
+pub mut:
 	header_size             u32
 	header_version          DeviceFaultVendorBinaryHeaderVersionEXT
 	vendor_id               u32
 	device_id               u32
 	driver_version          u32
-	pipeline_cache_uuid     []u8
+	pipeline_cache_uuid     [uuid_size]u8
 	application_name_offset u32
 	application_version     u32
 	engine_name_offset      u32
@@ -19047,23 +17050,20 @@ mut:
 	api_version             u32
 }
 
-type VkGetDeviceFaultInfoEXT = fn (C.Device, &DeviceFaultCountsEXT, &DeviceFaultInfoEXT) Result
-
-pub fn get_device_fault_info_ext(device C.Device, p_fault_counts &DeviceFaultCountsEXT, p_fault_info &DeviceFaultInfoEXT) Result {
-	f := VkGetDeviceFaultInfoEXT((*vulkan.loader_p).get_sym('vkGetDeviceFaultInfoEXT') or {
-		println("Couldn't load symbol for 'vkGetDeviceFaultInfoEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_fault_counts, p_fault_info)
+fn C.vkGetDeviceFaultInfoEXT(C.Device,
+	&DeviceFaultCountsEXT,
+	&DeviceFaultInfoEXT) Result
+pub fn get_device_fault_info_ext(device C.Device,
+	p_fault_counts &DeviceFaultCountsEXT,
+	p_fault_info &DeviceFaultInfoEXT) Result {
+	return C.vkGetDeviceFaultInfoEXT(device, p_fault_counts, p_fault_info)
 }
 
-// VK_ARM_rasterization_order_attachment_access is a preprocessor guard. Do not pass it to API calls.
-const arm_rasterization_order_attachment_access = 1
 pub const arm_rasterization_order_attachment_access_spec_version = 1
 pub const arm_rasterization_order_attachment_access_extension_name = 'VK_ARM_rasterization_order_attachment_access'
-// PhysicalDeviceRasterizationOrderAttachmentAccessFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceRasterizationOrderAttachmentAccessFeaturesEXT {
-mut:
+pub mut:
 	s_type                                        StructureType
 	p_next                                        voidptr
 	rasterization_order_color_attachment_access   Bool32
@@ -19073,85 +17073,21 @@ mut:
 
 pub type PhysicalDeviceRasterizationOrderAttachmentAccessFeaturesARM = PhysicalDeviceRasterizationOrderAttachmentAccessFeaturesEXT
 
-// VK_EXT_rgba10x6_formats is a preprocessor guard. Do not pass it to API calls.
-const ext_rgba10x6_formats = 1
 pub const ext_rgba10x6_formats_spec_version = 1
 pub const ext_rgba10x6_formats_extension_name = 'VK_EXT_rgba10x6_formats'
-// PhysicalDeviceRGBA10X6FormatsFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceRGBA10X6FormatsFeaturesEXT {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	format_rgba10x6_without_y_cb_cr_sampler Bool32
 }
 
-// VK_NV_acquire_winrt_display is a preprocessor guard. Do not pass it to API calls.
-const nv_acquire_winrt_display = 1
-pub const nv_acquire_winrt_display_spec_version = 1
-pub const nv_acquire_winrt_display_extension_name = 'VK_NV_acquire_winrt_display'
-
-type VkAcquireWinrtDisplayNV = fn (C.PhysicalDevice, C.DisplayKHR) Result
-
-pub fn acquire_winrt_display_nv(physical_device C.PhysicalDevice, display C.DisplayKHR) Result {
-	f := VkAcquireWinrtDisplayNV((*vulkan.loader_p).get_sym('vkAcquireWinrtDisplayNV') or {
-		println("Couldn't load symbol for 'vkAcquireWinrtDisplayNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, display)
-}
-
-type VkGetWinrtDisplayNV = fn (C.PhysicalDevice, u32, &C.DisplayKHR) Result
-
-pub fn get_winrt_display_nv(physical_device C.PhysicalDevice, device_relative_id u32, p_display &C.DisplayKHR) Result {
-	f := VkGetWinrtDisplayNV((*vulkan.loader_p).get_sym('vkGetWinrtDisplayNV') or {
-		println("Couldn't load symbol for 'vkGetWinrtDisplayNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, device_relative_id, p_display)
-}
-
-// VK_EXT_directfb_surface is a preprocessor guard. Do not pass it to API calls.
-const ext_directfb_surface = 1
-pub const ext_directfb_surface_spec_version = 1
-pub const ext_directfb_surface_extension_name = 'VK_EXT_directfb_surface'
-
-pub type DirectFBSurfaceCreateFlagsEXT = u32
-
-pub struct DirectFBSurfaceCreateInfoEXT {
-mut:
-	s_type  StructureType
-	p_next  voidptr
-	flags   DirectFBSurfaceCreateFlagsEXT
-	dfb     voidptr
-	surface voidptr
-}
-
-type VkCreateDirectFBSurfaceEXT = fn (C.Instance, &DirectFBSurfaceCreateInfoEXT, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_direct_fb_surface_ext(instance C.Instance, p_create_info &DirectFBSurfaceCreateInfoEXT, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateDirectFBSurfaceEXT((*vulkan.loader_p).get_sym('vkCreateDirectFBSurfaceEXT') or {
-		println("Couldn't load symbol for 'vkCreateDirectFBSurfaceEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-type VkGetPhysicalDeviceDirectFBPresentationSupportEXT = fn (C.PhysicalDevice, u32, voidptr) Bool32
-
-pub fn get_physical_device_direct_fb_presentation_support_ext(physical_device C.PhysicalDevice, queue_family_index u32, dfb voidptr) Bool32 {
-	f := VkGetPhysicalDeviceDirectFBPresentationSupportEXT((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceDirectFBPresentationSupportEXT') or {
-		panic("Couldn't load symbol for 'vkGetPhysicalDeviceDirectFBPresentationSupportEXT': ${err}")
-	})
-	return f(physical_device, queue_family_index, dfb)
-}
-
-// VK_VALVE_mutable_descriptor_type is a preprocessor guard. Do not pass it to API calls.
-const valve_mutable_descriptor_type = 1
 pub const valve_mutable_descriptor_type_spec_version = 1
 pub const valve_mutable_descriptor_type_extension_name = 'VK_VAVE_mutable_descriptor_type'
-// PhysicalDeviceMutableDescriptorTypeFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceMutableDescriptorTypeFeaturesEXT {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	mutable_descriptor_type Bool32
@@ -19160,16 +17096,15 @@ mut:
 pub type PhysicalDeviceMutableDescriptorTypeFeaturesVALVE = PhysicalDeviceMutableDescriptorTypeFeaturesEXT
 
 pub struct MutableDescriptorTypeListEXT {
-mut:
+pub mut:
 	descriptor_type_count u32
 	p_descriptor_types    &DescriptorType
 }
 
 pub type MutableDescriptorTypeListVALVE = MutableDescriptorTypeListEXT
 
-// MutableDescriptorTypeCreateInfoEXT extends VkDescriptorSetLayoutCreateInfo,VkDescriptorPoolCreateInfo
 pub struct MutableDescriptorTypeCreateInfoEXT {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	mutable_descriptor_type_list_count u32
@@ -19178,20 +17113,18 @@ mut:
 
 pub type MutableDescriptorTypeCreateInfoVALVE = MutableDescriptorTypeCreateInfoEXT
 
-// VK_EXT_vertex_input_dynamic_state is a preprocessor guard. Do not pass it to API calls.
-const ext_vertex_input_dynamic_state = 1
 pub const ext_vertex_input_dynamic_state_spec_version = 2
 pub const ext_vertex_input_dynamic_state_extension_name = 'VK_EXT_vertex_input_dynamic_state'
-// PhysicalDeviceVertexInputDynamicStateFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceVertexInputDynamicStateFeaturesEXT {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	vertex_input_dynamic_state Bool32
 }
 
 pub struct VertexInputBindingDescription2EXT {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	binding    u32
@@ -19201,7 +17134,7 @@ mut:
 }
 
 pub struct VertexInputAttributeDescription2EXT {
-mut:
+pub mut:
 	s_type   StructureType
 	p_next   voidptr
 	location u32
@@ -19210,24 +17143,25 @@ mut:
 	offset   u32
 }
 
-type VkCmdSetVertexInputEXT = fn (C.CommandBuffer, u32, &VertexInputBindingDescription2EXT, u32, &VertexInputAttributeDescription2EXT)
-
-pub fn cmd_set_vertex_input_ext(command_buffer C.CommandBuffer, vertex_binding_description_count u32, p_vertex_binding_descriptions &VertexInputBindingDescription2EXT, vertex_attribute_description_count u32, p_vertex_attribute_descriptions &VertexInputAttributeDescription2EXT) {
-	f := VkCmdSetVertexInputEXT((*vulkan.loader_p).get_sym('vkCmdSetVertexInputEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetVertexInputEXT': ${err}")
-		return
-	})
-	f(command_buffer, vertex_binding_description_count, p_vertex_binding_descriptions,
+fn C.vkCmdSetVertexInputEXT(C.CommandBuffer,
+	u32,
+	&VertexInputBindingDescription2EXT,
+	u32,
+	&VertexInputAttributeDescription2EXT)
+pub fn cmd_set_vertex_input_ext(command_buffer C.CommandBuffer,
+	vertex_binding_description_count u32,
+	p_vertex_binding_descriptions &VertexInputBindingDescription2EXT,
+	vertex_attribute_description_count u32,
+	p_vertex_attribute_descriptions &VertexInputAttributeDescription2EXT) {
+	C.vkCmdSetVertexInputEXT(command_buffer, vertex_binding_description_count, p_vertex_binding_descriptions,
 		vertex_attribute_description_count, p_vertex_attribute_descriptions)
 }
 
-// VK_EXT_physical_device_drm is a preprocessor guard. Do not pass it to API calls.
-const ext_physical_device_drm = 1
 pub const ext_physical_device_drm_spec_version = 1
 pub const ext_physical_device_drm_extension_name = 'VK_EXT_physical_device_drm'
-// PhysicalDeviceDrmPropertiesEXT extends VkPhysicalDeviceProperties2
+
 pub struct PhysicalDeviceDrmPropertiesEXT {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	has_primary   Bool32
@@ -19238,8 +17172,6 @@ mut:
 	render_minor  i64
 }
 
-// VK_EXT_device_address_binding_report is a preprocessor guard. Do not pass it to API calls.
-const ext_device_address_binding_report = 1
 pub const ext_device_address_binding_report_spec_version = 1
 pub const ext_device_address_binding_report_extension_name = 'VK_EXT_device_address_binding_report'
 
@@ -19256,17 +17188,15 @@ pub enum DeviceAddressBindingFlagBitsEXT {
 
 pub type DeviceAddressBindingFlagsEXT = u32
 
-// PhysicalDeviceAddressBindingReportFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceAddressBindingReportFeaturesEXT {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	report_address_binding Bool32
 }
 
-// DeviceAddressBindingCallbackDataEXT extends VkDebugUtilsMessengerCallbackDataEXT
 pub struct DeviceAddressBindingCallbackDataEXT {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	flags        DeviceAddressBindingFlagsEXT
@@ -19275,374 +17205,91 @@ mut:
 	binding_type DeviceAddressBindingTypeEXT
 }
 
-// VK_EXT_depth_clip_control is a preprocessor guard. Do not pass it to API calls.
-const ext_depth_clip_control = 1
 pub const ext_depth_clip_control_spec_version = 1
 pub const ext_depth_clip_control_extension_name = 'VK_EXT_depth_clip_control'
-// PhysicalDeviceDepthClipControlFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceDepthClipControlFeaturesEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	depth_clip_control Bool32
 }
 
-// PipelineViewportDepthClipControlCreateInfoEXT extends VkPipelineViewportStateCreateInfo
 pub struct PipelineViewportDepthClipControlCreateInfoEXT {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	negative_one_to_one Bool32
 }
 
-// VK_EXT_primitive_topology_list_restart is a preprocessor guard. Do not pass it to API calls.
-const ext_primitive_topology_list_restart = 1
 pub const ext_primitive_topology_list_restart_spec_version = 1
 pub const ext_primitive_topology_list_restart_extension_name = 'VK_EXT_primitive_topology_list_restart'
-// PhysicalDevicePrimitiveTopologyListRestartFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDevicePrimitiveTopologyListRestartFeaturesEXT {
-mut:
+pub mut:
 	s_type                                StructureType
 	p_next                                voidptr
 	primitive_topology_list_restart       Bool32
 	primitive_topology_patch_list_restart Bool32
 }
 
-// VK_FUCHSIA_external_memory is a preprocessor guard. Do not pass it to API calls.
-const fuchsia_external_memory = 1
-pub const fuchsia_external_memory_spec_version = 1
-pub const fuchsia_external_memory_extension_name = 'VK_CHSIA_external_memory'
-// ImportMemoryZirconHandleInfoFUCHSIA extends VkMemoryAllocateInfo
-pub struct ImportMemoryZirconHandleInfoFUCHSIA {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	handle_type ExternalMemoryHandleTypeFlagBits
-	handle      voidptr
-}
-
-pub struct MemoryZirconHandlePropertiesFUCHSIA {
-mut:
-	s_type           StructureType
-	p_next           voidptr
-	memory_type_bits u32
-}
-
-pub struct MemoryGetZirconHandleInfoFUCHSIA {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	memory      C.DeviceMemory
-	handle_type ExternalMemoryHandleTypeFlagBits
-}
-
-type VkGetMemoryZirconHandleFUCHSIA = fn (C.Device, &MemoryGetZirconHandleInfoFUCHSIA, &voidptr) Result
-
-pub fn get_memory_zircon_handle_fuchsia(device C.Device, p_get_zircon_handle_info &MemoryGetZirconHandleInfoFUCHSIA, p_zircon_handle &voidptr) Result {
-	f := VkGetMemoryZirconHandleFUCHSIA((*vulkan.loader_p).get_sym('vkGetMemoryZirconHandleFUCHSIA') or {
-		println("Couldn't load symbol for 'vkGetMemoryZirconHandleFUCHSIA': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_get_zircon_handle_info, p_zircon_handle)
-}
-
-type VkGetMemoryZirconHandlePropertiesFUCHSIA = fn (C.Device, ExternalMemoryHandleTypeFlagBits, voidptr, &MemoryZirconHandlePropertiesFUCHSIA) Result
-
-pub fn get_memory_zircon_handle_properties_fuchsia(device C.Device, handle_type ExternalMemoryHandleTypeFlagBits, zircon_handle voidptr, p_memory_zircon_handle_properties &MemoryZirconHandlePropertiesFUCHSIA) Result {
-	f := VkGetMemoryZirconHandlePropertiesFUCHSIA((*vulkan.loader_p).get_sym('vkGetMemoryZirconHandlePropertiesFUCHSIA') or {
-		println("Couldn't load symbol for 'vkGetMemoryZirconHandlePropertiesFUCHSIA': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, handle_type, zircon_handle, p_memory_zircon_handle_properties)
-}
-
-// VK_FUCHSIA_external_semaphore is a preprocessor guard. Do not pass it to API calls.
-const fuchsia_external_semaphore = 1
-pub const fuchsia_external_semaphore_spec_version = 1
-pub const fuchsia_external_semaphore_extension_name = 'VK_CHSIA_external_semaphore'
-
-pub struct ImportSemaphoreZirconHandleInfoFUCHSIA {
-mut:
-	s_type        StructureType
-	p_next        voidptr
-	semaphore     C.Semaphore
-	flags         SemaphoreImportFlags
-	handle_type   ExternalSemaphoreHandleTypeFlagBits
-	zircon_handle voidptr
-}
-
-pub struct SemaphoreGetZirconHandleInfoFUCHSIA {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	semaphore   C.Semaphore
-	handle_type ExternalSemaphoreHandleTypeFlagBits
-}
-
-type VkImportSemaphoreZirconHandleFUCHSIA = fn (C.Device, &ImportSemaphoreZirconHandleInfoFUCHSIA) Result
-
-pub fn import_semaphore_zircon_handle_fuchsia(device C.Device, p_import_semaphore_zircon_handle_info &ImportSemaphoreZirconHandleInfoFUCHSIA) Result {
-	f := VkImportSemaphoreZirconHandleFUCHSIA((*vulkan.loader_p).get_sym('vkImportSemaphoreZirconHandleFUCHSIA') or {
-		println("Couldn't load symbol for 'vkImportSemaphoreZirconHandleFUCHSIA': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_import_semaphore_zircon_handle_info)
-}
-
-type VkGetSemaphoreZirconHandleFUCHSIA = fn (C.Device, &SemaphoreGetZirconHandleInfoFUCHSIA, &voidptr) Result
-
-pub fn get_semaphore_zircon_handle_fuchsia(device C.Device, p_get_zircon_handle_info &SemaphoreGetZirconHandleInfoFUCHSIA, p_zircon_handle &voidptr) Result {
-	f := VkGetSemaphoreZirconHandleFUCHSIA((*vulkan.loader_p).get_sym('vkGetSemaphoreZirconHandleFUCHSIA') or {
-		println("Couldn't load symbol for 'vkGetSemaphoreZirconHandleFUCHSIA': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_get_zircon_handle_info, p_zircon_handle)
-}
-
-// VK_FUCHSIA_buffer_collection is a preprocessor guard. Do not pass it to API calls.
-const fuchsia_buffer_collection = 1
-
-pub type C.BufferCollectionFUCHSIA = voidptr
-
-pub const fuchsia_buffer_collection_spec_version = 2
-pub const fuchsia_buffer_collection_extension_name = 'VK_CHSIA_buffer_collection'
-
-pub type ImageFormatConstraintsFlagsFUCHSIA = u32
-
-pub enum ImageConstraintsInfoFlagBitsFUCHSIA {
-	image_constraints_info_cpu_read_rarely_fuchsia    = int(0x00000001)
-	image_constraints_info_cpu_read_often_fuchsia     = int(0x00000002)
-	image_constraints_info_cpu_write_rarely_fuchsia   = int(0x00000004)
-	image_constraints_info_cpu_write_often_fuchsia    = int(0x00000008)
-	image_constraints_info_protected_optional_fuchsia = int(0x00000010)
-	image_constraints_info_flag_bits_max_enum_fuchsia = int(0x7FFFFFFF)
-}
-
-pub type ImageConstraintsInfoFlagsFUCHSIA = u32
-
-pub struct BufferCollectionCreateInfoFUCHSIA {
-mut:
-	s_type           StructureType
-	p_next           voidptr
-	collection_token voidptr
-}
-
-// ImportMemoryBufferCollectionFUCHSIA extends VkMemoryAllocateInfo
-pub struct ImportMemoryBufferCollectionFUCHSIA {
-mut:
-	s_type     StructureType
-	p_next     voidptr
-	collection C.BufferCollectionFUCHSIA
-	index      u32
-}
-
-// BufferCollectionImageCreateInfoFUCHSIA extends VkImageCreateInfo
-pub struct BufferCollectionImageCreateInfoFUCHSIA {
-mut:
-	s_type     StructureType
-	p_next     voidptr
-	collection C.BufferCollectionFUCHSIA
-	index      u32
-}
-
-pub struct BufferCollectionConstraintsInfoFUCHSIA {
-mut:
-	s_type                               StructureType
-	p_next                               voidptr
-	min_buffer_count                     u32
-	max_buffer_count                     u32
-	min_buffer_count_for_camping         u32
-	min_buffer_count_for_dedicated_slack u32
-	min_buffer_count_for_shared_slack    u32
-}
-
-pub struct BufferConstraintsInfoFUCHSIA {
-mut:
-	s_type                        StructureType
-	p_next                        voidptr
-	create_info                   BufferCreateInfo
-	required_format_features      FormatFeatureFlags
-	buffer_collection_constraints BufferCollectionConstraintsInfoFUCHSIA
-}
-
-// BufferCollectionBufferCreateInfoFUCHSIA extends VkBufferCreateInfo
-pub struct BufferCollectionBufferCreateInfoFUCHSIA {
-mut:
-	s_type     StructureType
-	p_next     voidptr
-	collection C.BufferCollectionFUCHSIA
-	index      u32
-}
-
-pub struct SysmemColorSpaceFUCHSIA {
-mut:
-	s_type      StructureType
-	p_next      voidptr
-	color_space u32
-}
-
-pub struct BufferCollectionPropertiesFUCHSIA {
-mut:
-	s_type                              StructureType
-	p_next                              voidptr
-	memory_type_bits                    u32
-	buffer_count                        u32
-	create_info_index                   u32
-	sysmem_pixel_format                 u64
-	format_features                     FormatFeatureFlags
-	sysmem_color_space_index            SysmemColorSpaceFUCHSIA
-	sampler_ycbcr_conversion_components ComponentMapping
-	suggested_ycbcr_model               SamplerYcbcrModelConversion
-	suggested_ycbcr_range               SamplerYcbcrRange
-	suggested_x_chroma_offset           ChromaLocation
-	suggested_y_chroma_offset           ChromaLocation
-}
-
-pub struct ImageFormatConstraintsInfoFUCHSIA {
-mut:
-	s_type                   StructureType
-	p_next                   voidptr
-	image_create_info        ImageCreateInfo
-	required_format_features FormatFeatureFlags
-	flags                    ImageFormatConstraintsFlagsFUCHSIA
-	sysmem_pixel_format      u64
-	color_space_count        u32
-	p_color_spaces           &SysmemColorSpaceFUCHSIA
-}
-
-pub struct ImageConstraintsInfoFUCHSIA {
-mut:
-	s_type                        StructureType
-	p_next                        voidptr
-	format_constraints_count      u32
-	p_format_constraints          &ImageFormatConstraintsInfoFUCHSIA
-	buffer_collection_constraints BufferCollectionConstraintsInfoFUCHSIA
-	flags                         ImageConstraintsInfoFlagsFUCHSIA
-}
-
-type VkCreateBufferCollectionFUCHSIA = fn (C.Device, &BufferCollectionCreateInfoFUCHSIA, &AllocationCallbacks, &C.BufferCollectionFUCHSIA) Result
-
-pub fn create_buffer_collection_fuchsia(device C.Device, p_create_info &BufferCollectionCreateInfoFUCHSIA, p_allocator &AllocationCallbacks, p_collection &C.BufferCollectionFUCHSIA) Result {
-	f := VkCreateBufferCollectionFUCHSIA((*vulkan.loader_p).get_sym('vkCreateBufferCollectionFUCHSIA') or {
-		println("Couldn't load symbol for 'vkCreateBufferCollectionFUCHSIA': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_collection)
-}
-
-type VkSetBufferCollectionImageConstraintsFUCHSIA = fn (C.Device, C.BufferCollectionFUCHSIA, &ImageConstraintsInfoFUCHSIA) Result
-
-pub fn set_buffer_collection_image_constraints_fuchsia(device C.Device, collection C.BufferCollectionFUCHSIA, p_image_constraints_info &ImageConstraintsInfoFUCHSIA) Result {
-	f := VkSetBufferCollectionImageConstraintsFUCHSIA((*vulkan.loader_p).get_sym('vkSetBufferCollectionImageConstraintsFUCHSIA') or {
-		println("Couldn't load symbol for 'vkSetBufferCollectionImageConstraintsFUCHSIA': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, collection, p_image_constraints_info)
-}
-
-type VkSetBufferCollectionBufferConstraintsFUCHSIA = fn (C.Device, C.BufferCollectionFUCHSIA, &BufferConstraintsInfoFUCHSIA) Result
-
-pub fn set_buffer_collection_buffer_constraints_fuchsia(device C.Device, collection C.BufferCollectionFUCHSIA, p_buffer_constraints_info &BufferConstraintsInfoFUCHSIA) Result {
-	f := VkSetBufferCollectionBufferConstraintsFUCHSIA((*vulkan.loader_p).get_sym('vkSetBufferCollectionBufferConstraintsFUCHSIA') or {
-		println("Couldn't load symbol for 'vkSetBufferCollectionBufferConstraintsFUCHSIA': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, collection, p_buffer_constraints_info)
-}
-
-type VkDestroyBufferCollectionFUCHSIA = fn (C.Device, C.BufferCollectionFUCHSIA, &AllocationCallbacks)
-
-pub fn destroy_buffer_collection_fuchsia(device C.Device, collection C.BufferCollectionFUCHSIA, p_allocator &AllocationCallbacks) {
-	f := VkDestroyBufferCollectionFUCHSIA((*vulkan.loader_p).get_sym('vkDestroyBufferCollectionFUCHSIA') or {
-		println("Couldn't load symbol for 'vkDestroyBufferCollectionFUCHSIA': ${err}")
-		return
-	})
-	f(device, collection, p_allocator)
-}
-
-type VkGetBufferCollectionPropertiesFUCHSIA = fn (C.Device, C.BufferCollectionFUCHSIA, &BufferCollectionPropertiesFUCHSIA) Result
-
-pub fn get_buffer_collection_properties_fuchsia(device C.Device, collection C.BufferCollectionFUCHSIA, p_properties &BufferCollectionPropertiesFUCHSIA) Result {
-	f := VkGetBufferCollectionPropertiesFUCHSIA((*vulkan.loader_p).get_sym('vkGetBufferCollectionPropertiesFUCHSIA') or {
-		println("Couldn't load symbol for 'vkGetBufferCollectionPropertiesFUCHSIA': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, collection, p_properties)
-}
-
-// VK_HUAWEI_subpass_shading is a preprocessor guard. Do not pass it to API calls.
-const huawei_subpass_shading = 1
 pub const huawei_subpass_shading_spec_version = 3
 pub const huawei_subpass_shading_extension_name = 'VK_HAWEI_subpass_shading'
-// SubpassShadingPipelineCreateInfoHUAWEI extends VkComputePipelineCreateInfo
+
 pub struct SubpassShadingPipelineCreateInfoHUAWEI {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	render_pass C.RenderPass
 	subpass     u32
 }
 
-// PhysicalDeviceSubpassShadingFeaturesHUAWEI extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceSubpassShadingFeaturesHUAWEI {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	subpass_shading Bool32
 }
 
-// PhysicalDeviceSubpassShadingPropertiesHUAWEI extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceSubpassShadingPropertiesHUAWEI {
-mut:
+pub mut:
 	s_type                                          StructureType
 	p_next                                          voidptr
 	max_subpass_shading_workgroup_size_aspect_ratio u32
 }
 
-type VkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI = fn (C.Device, C.RenderPass, &Extent2D) Result
-
-pub fn get_device_subpass_shading_max_workgroup_size_huawei(device C.Device, renderpass C.RenderPass, p_max_workgroup_size &Extent2D) Result {
-	f := VkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI((*vulkan.loader_p).get_sym('vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI') or {
-		println("Couldn't load symbol for 'vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, renderpass, p_max_workgroup_size)
+fn C.vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI(C.Device,
+	C.RenderPass,
+	&Extent2D) Result
+pub fn get_device_subpass_shading_max_workgroup_size_huawei(device C.Device,
+	renderpass C.RenderPass,
+	p_max_workgroup_size &Extent2D) Result {
+	return C.vkGetDeviceSubpassShadingMaxWorkgroupSizeHUAWEI(device, renderpass, p_max_workgroup_size)
 }
 
-type VkCmdSubpassShadingHUAWEI = fn (C.CommandBuffer)
-
+fn C.vkCmdSubpassShadingHUAWEI(C.CommandBuffer)
 pub fn cmd_subpass_shading_huawei(command_buffer C.CommandBuffer) {
-	f := VkCmdSubpassShadingHUAWEI((*vulkan.loader_p).get_sym('vkCmdSubpassShadingHUAWEI') or {
-		println("Couldn't load symbol for 'vkCmdSubpassShadingHUAWEI': ${err}")
-		return
-	})
-	f(command_buffer)
+	C.vkCmdSubpassShadingHUAWEI(command_buffer)
 }
 
-// VK_HUAWEI_invocation_mask is a preprocessor guard. Do not pass it to API calls.
-const huawei_invocation_mask = 1
 pub const huawei_invocation_mask_spec_version = 1
 pub const huawei_invocation_mask_extension_name = 'VK_HAWEI_invocation_mask'
-// PhysicalDeviceInvocationMaskFeaturesHUAWEI extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceInvocationMaskFeaturesHUAWEI {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	invocation_mask Bool32
 }
 
-type VkCmdBindInvocationMaskHUAWEI = fn (C.CommandBuffer, C.ImageView, ImageLayout)
-
-pub fn cmd_bind_invocation_mask_huawei(command_buffer C.CommandBuffer, image_view C.ImageView, image_layout ImageLayout) {
-	f := VkCmdBindInvocationMaskHUAWEI((*vulkan.loader_p).get_sym('vkCmdBindInvocationMaskHUAWEI') or {
-		println("Couldn't load symbol for 'vkCmdBindInvocationMaskHUAWEI': ${err}")
-		return
-	})
-	f(command_buffer, image_view, image_layout)
+fn C.vkCmdBindInvocationMaskHUAWEI(C.CommandBuffer,
+	C.ImageView,
+	ImageLayout)
+pub fn cmd_bind_invocation_mask_huawei(command_buffer C.CommandBuffer,
+	image_view C.ImageView,
+	image_layout ImageLayout) {
+	C.vkCmdBindInvocationMaskHUAWEI(command_buffer, image_view, image_layout)
 }
-
-// VK_NV_external_memory_rdma is a preprocessor guard. Do not pass it to API calls.
-const nv_external_memory_rdma = 1
 
 pub type RemoteAddressNV = voidptr
 
@@ -19650,65 +17297,57 @@ pub const nv_external_memory_rdma_spec_version = 1
 pub const nv_external_memory_rdma_extension_name = 'VK_NV_external_memory_rdma'
 
 pub struct MemoryGetRemoteAddressInfoNV {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	memory      C.DeviceMemory
 	handle_type ExternalMemoryHandleTypeFlagBits
 }
 
-// PhysicalDeviceExternalMemoryRDMAFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceExternalMemoryRDMAFeaturesNV {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	external_memory_rdma Bool32
 }
 
-type VkGetMemoryRemoteAddressNV = fn (C.Device, &MemoryGetRemoteAddressInfoNV, &RemoteAddressNV) Result
-
-pub fn get_memory_remote_address_nv(device C.Device, p_memory_get_remote_address_info &MemoryGetRemoteAddressInfoNV, p_address &RemoteAddressNV) Result {
-	f := VkGetMemoryRemoteAddressNV((*vulkan.loader_p).get_sym('vkGetMemoryRemoteAddressNV') or {
-		println("Couldn't load symbol for 'vkGetMemoryRemoteAddressNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_memory_get_remote_address_info, p_address)
+fn C.vkGetMemoryRemoteAddressNV(C.Device,
+	&MemoryGetRemoteAddressInfoNV,
+	&RemoteAddressNV) Result
+pub fn get_memory_remote_address_nv(device C.Device,
+	p_memory_get_remote_address_info &MemoryGetRemoteAddressInfoNV,
+	p_address &RemoteAddressNV) Result {
+	return C.vkGetMemoryRemoteAddressNV(device, p_memory_get_remote_address_info, p_address)
 }
 
-// VK_EXT_pipeline_properties is a preprocessor guard. Do not pass it to API calls.
-const ext_pipeline_properties = 1
 pub const ext_pipeline_properties_spec_version = 1
 pub const ext_pipeline_properties_extension_name = 'VK_EXT_pipeline_properties'
 
 pub type PipelineInfoEXT = PipelineInfoKHR
 
 pub struct PipelinePropertiesIdentifierEXT {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
-	pipeline_identifier []u8
+	pipeline_identifier [uuid_size]u8
 }
 
-// PhysicalDevicePipelinePropertiesFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDevicePipelinePropertiesFeaturesEXT {
-mut:
+pub mut:
 	s_type                         StructureType
 	p_next                         voidptr
 	pipeline_properties_identifier Bool32
 }
 
-type VkGetPipelinePropertiesEXT = fn (C.Device, &PipelineInfoEXT, &BaseOutStructure) Result
-
-pub fn get_pipeline_properties_ext(device C.Device, p_pipeline_info &PipelineInfoEXT, p_pipeline_properties &BaseOutStructure) Result {
-	f := VkGetPipelinePropertiesEXT((*vulkan.loader_p).get_sym('vkGetPipelinePropertiesEXT') or {
-		println("Couldn't load symbol for 'vkGetPipelinePropertiesEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_pipeline_info, p_pipeline_properties)
+fn C.vkGetPipelinePropertiesEXT(C.Device,
+	&PipelineInfoEXT,
+	&BaseOutStructure) Result
+pub fn get_pipeline_properties_ext(device C.Device,
+	p_pipeline_info &PipelineInfoEXT,
+	p_pipeline_properties &BaseOutStructure) Result {
+	return C.vkGetPipelinePropertiesEXT(device, p_pipeline_info, p_pipeline_properties)
 }
 
-// VK_EXT_frame_boundary is a preprocessor guard. Do not pass it to API calls.
-const ext_frame_boundary = 1
 pub const ext_frame_boundary_spec_version = 1
 pub const ext_frame_boundary_extension_name = 'VK_EXT_frame_boundary'
 
@@ -19719,17 +17358,15 @@ pub enum FrameBoundaryFlagBitsEXT {
 
 pub type FrameBoundaryFlagsEXT = u32
 
-// PhysicalDeviceFrameBoundaryFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceFrameBoundaryFeaturesEXT {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	frame_boundary Bool32
 }
 
-// FrameBoundaryEXT extends VkSubmitInfo,VkSubmitInfo2,VkPresentInfoKHR,VkBindSparseInfo
 pub struct FrameBoundaryEXT {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	flags        FrameBoundaryFlagsEXT
@@ -19743,42 +17380,36 @@ mut:
 	p_tag        voidptr
 }
 
-// VK_EXT_multisampled_render_to_single_sampled is a preprocessor guard. Do not pass it to API calls.
-const ext_multisampled_render_to_single_sampled = 1
 pub const ext_multisampled_render_to_single_sampled_spec_version = 1
 pub const ext_multisampled_render_to_single_sampled_extension_name = 'VK_EXT_multisampled_render_to_single_sampled'
-// PhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT {
-mut:
+pub mut:
 	s_type                                StructureType
 	p_next                                voidptr
 	multisampled_render_to_single_sampled Bool32
 }
 
-// SubpassResolvePerformanceQueryEXT extends VkFormatProperties2
 pub struct SubpassResolvePerformanceQueryEXT {
-mut:
+pub mut:
 	s_type  StructureType
 	p_next  voidptr
 	optimal Bool32
 }
 
-// MultisampledRenderToSingleSampledInfoEXT extends VkSubpassDescription2,VkRenderingInfo
 pub struct MultisampledRenderToSingleSampledInfoEXT {
-mut:
+pub mut:
 	s_type                                       StructureType
 	p_next                                       voidptr
 	multisampled_render_to_single_sampled_enable Bool32
 	rasterization_samples                        SampleCountFlagBits
 }
 
-// VK_EXT_extended_dynamic_state2 is a preprocessor guard. Do not pass it to API calls.
-const ext_extended_dynamic_state2 = 1
 pub const ext_extended_dynamic_state_2_spec_version = 1
 pub const ext_extended_dynamic_state_2_extension_name = 'VK_EXT_extended_dynamic_state2'
-// PhysicalDeviceExtendedDynamicState2FeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceExtendedDynamicState2FeaturesEXT {
-mut:
+pub mut:
 	s_type                                       StructureType
 	p_next                                       voidptr
 	extended_dynamic_state2                      Bool32
@@ -19786,129 +17417,52 @@ mut:
 	extended_dynamic_state2_patch_control_points Bool32
 }
 
-type VkCmdSetPatchControlPointsEXT = fn (C.CommandBuffer, u32)
-
-pub fn cmd_set_patch_control_points_ext(command_buffer C.CommandBuffer, patch_control_points u32) {
-	f := VkCmdSetPatchControlPointsEXT((*vulkan.loader_p).get_sym('vkCmdSetPatchControlPointsEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetPatchControlPointsEXT': ${err}")
-		return
-	})
-	f(command_buffer, patch_control_points)
+fn C.vkCmdSetPatchControlPointsEXT(C.CommandBuffer,
+	u32)
+pub fn cmd_set_patch_control_points_ext(command_buffer C.CommandBuffer,
+	patch_control_points u32) {
+	C.vkCmdSetPatchControlPointsEXT(command_buffer, patch_control_points)
 }
 
-type VkCmdSetRasterizerDiscardEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_rasterizer_discard_enable_ext(command_buffer C.CommandBuffer, rasterizer_discard_enable Bool32) {
-	f := VkCmdSetRasterizerDiscardEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetRasterizerDiscardEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetRasterizerDiscardEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, rasterizer_discard_enable)
+fn C.vkCmdSetLogicOpEXT(C.CommandBuffer,
+	LogicOp)
+pub fn cmd_set_logic_op_ext(command_buffer C.CommandBuffer,
+	logic_op LogicOp) {
+	C.vkCmdSetLogicOpEXT(command_buffer, logic_op)
 }
 
-type VkCmdSetDepthBiasEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_bias_enable_ext(command_buffer C.CommandBuffer, depth_bias_enable Bool32) {
-	f := VkCmdSetDepthBiasEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetDepthBiasEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthBiasEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, depth_bias_enable)
-}
-
-type VkCmdSetLogicOpEXT = fn (C.CommandBuffer, LogicOp)
-
-pub fn cmd_set_logic_op_ext(command_buffer C.CommandBuffer, logic_op LogicOp) {
-	f := VkCmdSetLogicOpEXT((*vulkan.loader_p).get_sym('vkCmdSetLogicOpEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetLogicOpEXT': ${err}")
-		return
-	})
-	f(command_buffer, logic_op)
-}
-
-type VkCmdSetPrimitiveRestartEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_primitive_restart_enable_ext(command_buffer C.CommandBuffer, primitive_restart_enable Bool32) {
-	f := VkCmdSetPrimitiveRestartEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetPrimitiveRestartEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetPrimitiveRestartEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, primitive_restart_enable)
-}
-
-// VK_QNX_screen_surface is a preprocessor guard. Do not pass it to API calls.
-const qnx_screen_surface = 1
-pub const qnx_screen_surface_spec_version = 1
-pub const qnx_screen_surface_extension_name = 'VK_QNX_screen_surface'
-
-pub type ScreenSurfaceCreateFlagsQNX = u32
-
-pub struct ScreenSurfaceCreateInfoQNX {
-mut:
-	s_type  StructureType
-	p_next  voidptr
-	flags   ScreenSurfaceCreateFlagsQNX
-	context voidptr
-	window  voidptr
-}
-
-type VkCreateScreenSurfaceQNX = fn (C.Instance, &ScreenSurfaceCreateInfoQNX, &AllocationCallbacks, &C.SurfaceKHR) Result
-
-pub fn create_screen_surface_qnx(instance C.Instance, p_create_info &ScreenSurfaceCreateInfoQNX, p_allocator &AllocationCallbacks, p_surface &C.SurfaceKHR) Result {
-	f := VkCreateScreenSurfaceQNX((*vulkan.loader_p).get_sym('vkCreateScreenSurfaceQNX') or {
-		println("Couldn't load symbol for 'vkCreateScreenSurfaceQNX': ${err}")
-		return Result.error_unknown
-	})
-	return f(instance, p_create_info, p_allocator, p_surface)
-}
-
-type VkGetPhysicalDeviceScreenPresentationSupportQNX = fn (C.PhysicalDevice, u32, voidptr) Bool32
-
-pub fn get_physical_device_screen_presentation_support_qnx(physical_device C.PhysicalDevice, queue_family_index u32, window voidptr) Bool32 {
-	f := VkGetPhysicalDeviceScreenPresentationSupportQNX((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceScreenPresentationSupportQNX') or {
-		panic("Couldn't load symbol for 'vkGetPhysicalDeviceScreenPresentationSupportQNX': ${err}")
-	})
-	return f(physical_device, queue_family_index, window)
-}
-
-// VK_EXT_color_write_enable is a preprocessor guard. Do not pass it to API calls.
-const ext_color_write_enable = 1
 pub const ext_color_write_enable_spec_version = 1
 pub const ext_color_write_enable_extension_name = 'VK_EXT_color_write_enable'
-// PhysicalDeviceColorWriteEnableFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceColorWriteEnableFeaturesEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	color_write_enable Bool32
 }
 
-// PipelineColorWriteCreateInfoEXT extends VkPipelineColorBlendStateCreateInfo
 pub struct PipelineColorWriteCreateInfoEXT {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	attachment_count      u32
 	p_color_write_enables &Bool32
 }
 
-type VkCmdSetColorWriteEnableEXT = fn (C.CommandBuffer, u32, &Bool32)
-
-pub fn cmd_set_color_write_enable_ext(command_buffer C.CommandBuffer, attachment_count u32, p_color_write_enables &Bool32) {
-	f := VkCmdSetColorWriteEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetColorWriteEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetColorWriteEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, attachment_count, p_color_write_enables)
+fn C.vkCmdSetColorWriteEnableEXT(C.CommandBuffer,
+	u32,
+	&Bool32)
+pub fn cmd_set_color_write_enable_ext(command_buffer C.CommandBuffer,
+	attachment_count u32,
+	p_color_write_enables &Bool32) {
+	C.vkCmdSetColorWriteEnableEXT(command_buffer, attachment_count, p_color_write_enables)
 }
 
-// VK_EXT_primitives_generated_query is a preprocessor guard. Do not pass it to API calls.
-const ext_primitives_generated_query = 1
 pub const ext_primitives_generated_query_spec_version = 1
 pub const ext_primitives_generated_query_extension_name = 'VK_EXT_primitives_generated_query'
-// PhysicalDevicePrimitivesGeneratedQueryFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDevicePrimitivesGeneratedQueryFeaturesEXT {
-mut:
+pub mut:
 	s_type                                             StructureType
 	p_next                                             voidptr
 	primitives_generated_query                         Bool32
@@ -19916,8 +17470,6 @@ mut:
 	primitives_generated_query_with_non_zero_streams   Bool32
 }
 
-// VK_EXT_global_priority_query is a preprocessor guard. Do not pass it to API calls.
-const ext_global_priority_query = 1
 pub const ext_global_priority_query_spec_version = 1
 pub const ext_global_priority_query_extension_name = 'VK_EXT_global_priority_query'
 pub const max_global_priority_size_ext = max_global_priority_size_khr
@@ -19926,100 +17478,103 @@ pub type PhysicalDeviceGlobalPriorityQueryFeaturesEXT = PhysicalDeviceGlobalPrio
 
 pub type QueueFamilyGlobalPriorityPropertiesEXT = QueueFamilyGlobalPriorityPropertiesKHR
 
-// VK_EXT_image_view_min_lod is a preprocessor guard. Do not pass it to API calls.
-const ext_image_view_min_lod = 1
 pub const ext_image_view_min_lod_spec_version = 1
 pub const ext_image_view_min_lod_extension_name = 'VK_EXT_image_view_min_lod'
-// PhysicalDeviceImageViewMinLodFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceImageViewMinLodFeaturesEXT {
-mut:
+pub mut:
 	s_type  StructureType
 	p_next  voidptr
 	min_lod Bool32
 }
 
-// ImageViewMinLodCreateInfoEXT extends VkImageViewCreateInfo
 pub struct ImageViewMinLodCreateInfoEXT {
-mut:
+pub mut:
 	s_type  StructureType
 	p_next  voidptr
 	min_lod f32
 }
 
-// VK_EXT_multi_draw is a preprocessor guard. Do not pass it to API calls.
-const ext_multi_draw = 1
 pub const ext_multi_draw_spec_version = 1
 pub const ext_multi_draw_extension_name = 'VK_EXT_multi_draw'
-// PhysicalDeviceMultiDrawFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceMultiDrawFeaturesEXT {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	multi_draw Bool32
 }
 
-// PhysicalDeviceMultiDrawPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceMultiDrawPropertiesEXT {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	max_multi_draw_count u32
 }
 
 pub struct MultiDrawInfoEXT {
-mut:
+pub mut:
 	first_vertex u32
 	vertex_count u32
 }
 
 pub struct MultiDrawIndexedInfoEXT {
-mut:
+pub mut:
 	first_index   u32
 	index_count   u32
 	vertex_offset i32
 }
 
-type VkCmdDrawMultiEXT = fn (C.CommandBuffer, u32, &MultiDrawInfoEXT, u32, u32, u32)
-
-pub fn cmd_draw_multi_ext(command_buffer C.CommandBuffer, draw_count u32, p_vertex_info &MultiDrawInfoEXT, instance_count u32, first_instance u32, stride u32) {
-	f := VkCmdDrawMultiEXT((*vulkan.loader_p).get_sym('vkCmdDrawMultiEXT') or {
-		println("Couldn't load symbol for 'vkCmdDrawMultiEXT': ${err}")
-		return
-	})
-	f(command_buffer, draw_count, p_vertex_info, instance_count, first_instance, stride)
+fn C.vkCmdDrawMultiEXT(C.CommandBuffer,
+	u32,
+	&MultiDrawInfoEXT,
+	u32,
+	u32,
+	u32)
+pub fn cmd_draw_multi_ext(command_buffer C.CommandBuffer,
+	draw_count u32,
+	p_vertex_info &MultiDrawInfoEXT,
+	instance_count u32,
+	first_instance u32,
+	stride u32) {
+	C.vkCmdDrawMultiEXT(command_buffer, draw_count, p_vertex_info, instance_count, first_instance,
+		stride)
 }
 
-type VkCmdDrawMultiIndexedEXT = fn (C.CommandBuffer, u32, &MultiDrawIndexedInfoEXT, u32, u32, u32, &i32)
-
-pub fn cmd_draw_multi_indexed_ext(command_buffer C.CommandBuffer, draw_count u32, p_index_info &MultiDrawIndexedInfoEXT, instance_count u32, first_instance u32, stride u32, p_vertex_offset &i32) {
-	f := VkCmdDrawMultiIndexedEXT((*vulkan.loader_p).get_sym('vkCmdDrawMultiIndexedEXT') or {
-		println("Couldn't load symbol for 'vkCmdDrawMultiIndexedEXT': ${err}")
-		return
-	})
-	f(command_buffer, draw_count, p_index_info, instance_count, first_instance, stride,
-		p_vertex_offset)
+fn C.vkCmdDrawMultiIndexedEXT(C.CommandBuffer,
+	u32,
+	&MultiDrawIndexedInfoEXT,
+	u32,
+	u32,
+	u32,
+	&i32)
+pub fn cmd_draw_multi_indexed_ext(command_buffer C.CommandBuffer,
+	draw_count u32,
+	p_index_info &MultiDrawIndexedInfoEXT,
+	instance_count u32,
+	first_instance u32,
+	stride u32,
+	p_vertex_offset &i32) {
+	C.vkCmdDrawMultiIndexedEXT(command_buffer, draw_count, p_index_info, instance_count,
+		first_instance, stride, p_vertex_offset)
 }
 
-// VK_EXT_image_2d_view_of_3d is a preprocessor guard. Do not pass it to API calls.
-const ext_image_2d_view_of_3d = 1
 pub const ext_image_2d_view_of_3d_spec_version = 1
 pub const ext_image_2d_view_of_3d_extension_name = 'VK_EXT_image_2d_view_of_3d'
-// PhysicalDeviceImage2DViewOf3DFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceImage2DViewOf3DFeaturesEXT {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	image2_d_view_of3_d   Bool32
 	sampler2_d_view_of3_d Bool32
 }
 
-// VK_EXT_shader_tile_image is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_tile_image = 1
 pub const ext_shader_tile_image_spec_version = 1
 pub const ext_shader_tile_image_extension_name = 'VK_EXT_shader_tile_image'
-// PhysicalDeviceShaderTileImageFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderTileImageFeaturesEXT {
-mut:
+pub mut:
 	s_type                                StructureType
 	p_next                                voidptr
 	shader_tile_image_color_read_access   Bool32
@@ -20027,18 +17582,14 @@ mut:
 	shader_tile_image_stencil_read_access Bool32
 }
 
-// PhysicalDeviceShaderTileImagePropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceShaderTileImagePropertiesEXT {
-mut:
+pub mut:
 	s_type                                                   StructureType
 	p_next                                                   voidptr
 	shader_tile_image_coherent_read_accelerated              Bool32
 	shader_tile_image_read_sample_from_pixel_rate_invocation Bool32
 	shader_tile_image_read_from_helper_invocation            Bool32
 }
-
-// VK_EXT_opacity_micromap is a preprocessor guard. Do not pass it to API calls.
-const ext_opacity_micromap = 1
 
 pub type C.MicromapEXT = voidptr
 
@@ -20107,20 +17658,20 @@ pub enum MicromapCreateFlagBitsEXT {
 pub type MicromapCreateFlagsEXT = u32
 
 pub struct MicromapUsageEXT {
-mut:
+pub mut:
 	count             u32
 	subdivision_level u32
 	format            u32
 }
 
 pub union DeviceOrHostAddressKHR {
-mut:
+pub mut:
 	device_address DeviceAddress
 	host_address   voidptr
 }
 
 pub struct MicromapBuildInfoEXT {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	vktype                MicromapTypeEXT
@@ -20137,7 +17688,7 @@ mut:
 }
 
 pub struct MicromapCreateInfoEXT {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	create_flags   MicromapCreateFlagsEXT
@@ -20148,9 +17699,8 @@ mut:
 	device_address DeviceAddress
 }
 
-// PhysicalDeviceOpacityMicromapFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceOpacityMicromapFeaturesEXT {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	micromap                Bool32
@@ -20158,9 +17708,8 @@ mut:
 	micromap_host_commands  Bool32
 }
 
-// PhysicalDeviceOpacityMicromapPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceOpacityMicromapPropertiesEXT {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	max_opacity2_state_subdivision_level u32
@@ -20168,14 +17717,14 @@ mut:
 }
 
 pub struct MicromapVersionInfoEXT {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	p_version_data &u8
 }
 
 pub struct CopyMicromapToMemoryInfoEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	src    C.MicromapEXT
@@ -20184,7 +17733,7 @@ mut:
 }
 
 pub struct CopyMemoryToMicromapInfoEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	src    DeviceOrHostAddressConstKHR
@@ -20193,7 +17742,7 @@ mut:
 }
 
 pub struct CopyMicromapInfoEXT {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	src    C.MicromapEXT
@@ -20202,7 +17751,7 @@ mut:
 }
 
 pub struct MicromapBuildSizesInfoEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	micromap_size      DeviceSize
@@ -20210,9 +17759,8 @@ mut:
 	discardable        Bool32
 }
 
-// AccelerationStructureTrianglesOpacityMicromapEXT extends VkAccelerationStructureGeometryTrianglesDataKHR
 pub struct AccelerationStructureTrianglesOpacityMicromapEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	index_type         IndexType
@@ -20226,311 +17774,248 @@ mut:
 }
 
 pub struct MicromapTriangleEXT {
-mut:
+pub mut:
 	data_offset       u32
 	subdivision_level u16
 	format            u16
 }
 
-type VkCreateMicromapEXT = fn (C.Device, &MicromapCreateInfoEXT, &AllocationCallbacks, &C.MicromapEXT) Result
-
-pub fn create_micromap_ext(device C.Device, p_create_info &MicromapCreateInfoEXT, p_allocator &AllocationCallbacks, p_micromap &C.MicromapEXT) Result {
-	f := VkCreateMicromapEXT((*vulkan.loader_p).get_sym('vkCreateMicromapEXT') or {
-		println("Couldn't load symbol for 'vkCreateMicromapEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_micromap)
+fn C.vkCreateMicromapEXT(C.Device,
+	&MicromapCreateInfoEXT,
+	&AllocationCallbacks,
+	&C.MicromapEXT) Result
+pub fn create_micromap_ext(device C.Device,
+	p_create_info &MicromapCreateInfoEXT,
+	p_allocator &AllocationCallbacks,
+	p_micromap &C.MicromapEXT) Result {
+	return C.vkCreateMicromapEXT(device, p_create_info, p_allocator, p_micromap)
 }
 
-type VkDestroyMicromapEXT = fn (C.Device, C.MicromapEXT, &AllocationCallbacks)
-
-pub fn destroy_micromap_ext(device C.Device, micromap C.MicromapEXT, p_allocator &AllocationCallbacks) {
-	f := VkDestroyMicromapEXT((*vulkan.loader_p).get_sym('vkDestroyMicromapEXT') or {
-		println("Couldn't load symbol for 'vkDestroyMicromapEXT': ${err}")
-		return
-	})
-	f(device, micromap, p_allocator)
+fn C.vkDestroyMicromapEXT(C.Device,
+	C.MicromapEXT,
+	&AllocationCallbacks)
+pub fn destroy_micromap_ext(device C.Device,
+	micromap C.MicromapEXT,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyMicromapEXT(device, micromap, p_allocator)
 }
 
-type VkCmdBuildMicromapsEXT = fn (C.CommandBuffer, u32, &MicromapBuildInfoEXT)
-
-pub fn cmd_build_micromaps_ext(command_buffer C.CommandBuffer, info_count u32, p_infos &MicromapBuildInfoEXT) {
-	f := VkCmdBuildMicromapsEXT((*vulkan.loader_p).get_sym('vkCmdBuildMicromapsEXT') or {
-		println("Couldn't load symbol for 'vkCmdBuildMicromapsEXT': ${err}")
-		return
-	})
-	f(command_buffer, info_count, p_infos)
+fn C.vkCmdBuildMicromapsEXT(C.CommandBuffer,
+	u32,
+	&MicromapBuildInfoEXT)
+pub fn cmd_build_micromaps_ext(command_buffer C.CommandBuffer,
+	info_count u32,
+	p_infos &MicromapBuildInfoEXT) {
+	C.vkCmdBuildMicromapsEXT(command_buffer, info_count, p_infos)
 }
 
-type VkBuildMicromapsEXT = fn (C.Device, C.DeferredOperationKHR, u32, &MicromapBuildInfoEXT) Result
-
-pub fn build_micromaps_ext(device C.Device, deferred_operation C.DeferredOperationKHR, info_count u32, p_infos &MicromapBuildInfoEXT) Result {
-	f := VkBuildMicromapsEXT((*vulkan.loader_p).get_sym('vkBuildMicromapsEXT') or {
-		println("Couldn't load symbol for 'vkBuildMicromapsEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, deferred_operation, info_count, p_infos)
+fn C.vkBuildMicromapsEXT(C.Device,
+	C.DeferredOperationKHR,
+	u32,
+	&MicromapBuildInfoEXT) Result
+pub fn build_micromaps_ext(device C.Device,
+	deferred_operation C.DeferredOperationKHR,
+	info_count u32,
+	p_infos &MicromapBuildInfoEXT) Result {
+	return C.vkBuildMicromapsEXT(device, deferred_operation, info_count, p_infos)
 }
 
-type VkCopyMicromapEXT = fn (C.Device, C.DeferredOperationKHR, &CopyMicromapInfoEXT) Result
-
-pub fn copy_micromap_ext(device C.Device, deferred_operation C.DeferredOperationKHR, p_info &CopyMicromapInfoEXT) Result {
-	f := VkCopyMicromapEXT((*vulkan.loader_p).get_sym('vkCopyMicromapEXT') or {
-		println("Couldn't load symbol for 'vkCopyMicromapEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, deferred_operation, p_info)
+fn C.vkCopyMicromapEXT(C.Device,
+	C.DeferredOperationKHR,
+	&CopyMicromapInfoEXT) Result
+pub fn copy_micromap_ext(device C.Device,
+	deferred_operation C.DeferredOperationKHR,
+	p_info &CopyMicromapInfoEXT) Result {
+	return C.vkCopyMicromapEXT(device, deferred_operation, p_info)
 }
 
-type VkCopyMicromapToMemoryEXT = fn (C.Device, C.DeferredOperationKHR, &CopyMicromapToMemoryInfoEXT) Result
-
-pub fn copy_micromap_to_memory_ext(device C.Device, deferred_operation C.DeferredOperationKHR, p_info &CopyMicromapToMemoryInfoEXT) Result {
-	f := VkCopyMicromapToMemoryEXT((*vulkan.loader_p).get_sym('vkCopyMicromapToMemoryEXT') or {
-		println("Couldn't load symbol for 'vkCopyMicromapToMemoryEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, deferred_operation, p_info)
+fn C.vkCopyMicromapToMemoryEXT(C.Device,
+	C.DeferredOperationKHR,
+	&CopyMicromapToMemoryInfoEXT) Result
+pub fn copy_micromap_to_memory_ext(device C.Device,
+	deferred_operation C.DeferredOperationKHR,
+	p_info &CopyMicromapToMemoryInfoEXT) Result {
+	return C.vkCopyMicromapToMemoryEXT(device, deferred_operation, p_info)
 }
 
-type VkCopyMemoryToMicromapEXT = fn (C.Device, C.DeferredOperationKHR, &CopyMemoryToMicromapInfoEXT) Result
-
-pub fn copy_memory_to_micromap_ext(device C.Device, deferred_operation C.DeferredOperationKHR, p_info &CopyMemoryToMicromapInfoEXT) Result {
-	f := VkCopyMemoryToMicromapEXT((*vulkan.loader_p).get_sym('vkCopyMemoryToMicromapEXT') or {
-		println("Couldn't load symbol for 'vkCopyMemoryToMicromapEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, deferred_operation, p_info)
+fn C.vkCopyMemoryToMicromapEXT(C.Device,
+	C.DeferredOperationKHR,
+	&CopyMemoryToMicromapInfoEXT) Result
+pub fn copy_memory_to_micromap_ext(device C.Device,
+	deferred_operation C.DeferredOperationKHR,
+	p_info &CopyMemoryToMicromapInfoEXT) Result {
+	return C.vkCopyMemoryToMicromapEXT(device, deferred_operation, p_info)
 }
 
-type VkWriteMicromapsPropertiesEXT = fn (C.Device, u32, &C.MicromapEXT, QueryType, usize, voidptr, usize) Result
-
-pub fn write_micromaps_properties_ext(device C.Device, micromap_count u32, p_micromaps &C.MicromapEXT, query_type QueryType, data_size usize, p_data voidptr, stride usize) Result {
-	f := VkWriteMicromapsPropertiesEXT((*vulkan.loader_p).get_sym('vkWriteMicromapsPropertiesEXT') or {
-		println("Couldn't load symbol for 'vkWriteMicromapsPropertiesEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, micromap_count, p_micromaps, query_type, data_size, p_data, stride)
+fn C.vkWriteMicromapsPropertiesEXT(C.Device,
+	u32,
+	&C.MicromapEXT,
+	QueryType,
+	usize,
+	voidptr,
+	usize) Result
+pub fn write_micromaps_properties_ext(device C.Device,
+	micromap_count u32,
+	p_micromaps &C.MicromapEXT,
+	query_type QueryType,
+	data_size usize,
+	p_data voidptr,
+	stride usize) Result {
+	return C.vkWriteMicromapsPropertiesEXT(device, micromap_count, p_micromaps, query_type,
+		data_size, p_data, stride)
 }
 
-type VkCmdCopyMicromapEXT = fn (C.CommandBuffer, &CopyMicromapInfoEXT)
-
-pub fn cmd_copy_micromap_ext(command_buffer C.CommandBuffer, p_info &CopyMicromapInfoEXT) {
-	f := VkCmdCopyMicromapEXT((*vulkan.loader_p).get_sym('vkCmdCopyMicromapEXT') or {
-		println("Couldn't load symbol for 'vkCmdCopyMicromapEXT': ${err}")
-		return
-	})
-	f(command_buffer, p_info)
+fn C.vkCmdCopyMicromapEXT(C.CommandBuffer,
+	&CopyMicromapInfoEXT)
+pub fn cmd_copy_micromap_ext(command_buffer C.CommandBuffer,
+	p_info &CopyMicromapInfoEXT) {
+	C.vkCmdCopyMicromapEXT(command_buffer, p_info)
 }
 
-type VkCmdCopyMicromapToMemoryEXT = fn (C.CommandBuffer, &CopyMicromapToMemoryInfoEXT)
-
-pub fn cmd_copy_micromap_to_memory_ext(command_buffer C.CommandBuffer, p_info &CopyMicromapToMemoryInfoEXT) {
-	f := VkCmdCopyMicromapToMemoryEXT((*vulkan.loader_p).get_sym('vkCmdCopyMicromapToMemoryEXT') or {
-		println("Couldn't load symbol for 'vkCmdCopyMicromapToMemoryEXT': ${err}")
-		return
-	})
-	f(command_buffer, p_info)
+fn C.vkCmdCopyMicromapToMemoryEXT(C.CommandBuffer,
+	&CopyMicromapToMemoryInfoEXT)
+pub fn cmd_copy_micromap_to_memory_ext(command_buffer C.CommandBuffer,
+	p_info &CopyMicromapToMemoryInfoEXT) {
+	C.vkCmdCopyMicromapToMemoryEXT(command_buffer, p_info)
 }
 
-type VkCmdCopyMemoryToMicromapEXT = fn (C.CommandBuffer, &CopyMemoryToMicromapInfoEXT)
-
-pub fn cmd_copy_memory_to_micromap_ext(command_buffer C.CommandBuffer, p_info &CopyMemoryToMicromapInfoEXT) {
-	f := VkCmdCopyMemoryToMicromapEXT((*vulkan.loader_p).get_sym('vkCmdCopyMemoryToMicromapEXT') or {
-		println("Couldn't load symbol for 'vkCmdCopyMemoryToMicromapEXT': ${err}")
-		return
-	})
-	f(command_buffer, p_info)
+fn C.vkCmdCopyMemoryToMicromapEXT(C.CommandBuffer,
+	&CopyMemoryToMicromapInfoEXT)
+pub fn cmd_copy_memory_to_micromap_ext(command_buffer C.CommandBuffer,
+	p_info &CopyMemoryToMicromapInfoEXT) {
+	C.vkCmdCopyMemoryToMicromapEXT(command_buffer, p_info)
 }
 
-type VkCmdWriteMicromapsPropertiesEXT = fn (C.CommandBuffer, u32, &C.MicromapEXT, QueryType, C.QueryPool, u32)
-
-pub fn cmd_write_micromaps_properties_ext(command_buffer C.CommandBuffer, micromap_count u32, p_micromaps &C.MicromapEXT, query_type QueryType, query_pool C.QueryPool, first_query u32) {
-	f := VkCmdWriteMicromapsPropertiesEXT((*vulkan.loader_p).get_sym('vkCmdWriteMicromapsPropertiesEXT') or {
-		println("Couldn't load symbol for 'vkCmdWriteMicromapsPropertiesEXT': ${err}")
-		return
-	})
-	f(command_buffer, micromap_count, p_micromaps, query_type, query_pool, first_query)
+fn C.vkCmdWriteMicromapsPropertiesEXT(C.CommandBuffer,
+	u32,
+	&C.MicromapEXT,
+	QueryType,
+	C.QueryPool,
+	u32)
+pub fn cmd_write_micromaps_properties_ext(command_buffer C.CommandBuffer,
+	micromap_count u32,
+	p_micromaps &C.MicromapEXT,
+	query_type QueryType,
+	query_pool C.QueryPool,
+	first_query u32) {
+	C.vkCmdWriteMicromapsPropertiesEXT(command_buffer, micromap_count, p_micromaps, query_type,
+		query_pool, first_query)
 }
 
-type VkGetDeviceMicromapCompatibilityEXT = fn (C.Device, &MicromapVersionInfoEXT, &AccelerationStructureCompatibilityKHR)
-
-pub fn get_device_micromap_compatibility_ext(device C.Device, p_version_info &MicromapVersionInfoEXT, p_compatibility &AccelerationStructureCompatibilityKHR) {
-	f := VkGetDeviceMicromapCompatibilityEXT((*vulkan.loader_p).get_sym('vkGetDeviceMicromapCompatibilityEXT') or {
-		println("Couldn't load symbol for 'vkGetDeviceMicromapCompatibilityEXT': ${err}")
-		return
-	})
-	f(device, p_version_info, p_compatibility)
+fn C.vkGetDeviceMicromapCompatibilityEXT(C.Device,
+	&MicromapVersionInfoEXT,
+	&AccelerationStructureCompatibilityKHR)
+pub fn get_device_micromap_compatibility_ext(device C.Device,
+	p_version_info &MicromapVersionInfoEXT,
+	p_compatibility &AccelerationStructureCompatibilityKHR) {
+	C.vkGetDeviceMicromapCompatibilityEXT(device, p_version_info, p_compatibility)
 }
 
-type VkGetMicromapBuildSizesEXT = fn (C.Device, AccelerationStructureBuildTypeKHR, &MicromapBuildInfoEXT, &MicromapBuildSizesInfoEXT)
-
-pub fn get_micromap_build_sizes_ext(device C.Device, build_type AccelerationStructureBuildTypeKHR, p_build_info &MicromapBuildInfoEXT, p_size_info &MicromapBuildSizesInfoEXT) {
-	f := VkGetMicromapBuildSizesEXT((*vulkan.loader_p).get_sym('vkGetMicromapBuildSizesEXT') or {
-		println("Couldn't load symbol for 'vkGetMicromapBuildSizesEXT': ${err}")
-		return
-	})
-	f(device, build_type, p_build_info, p_size_info)
+fn C.vkGetMicromapBuildSizesEXT(C.Device,
+	AccelerationStructureBuildTypeKHR,
+	&MicromapBuildInfoEXT,
+	&MicromapBuildSizesInfoEXT)
+pub fn get_micromap_build_sizes_ext(device C.Device,
+	build_type AccelerationStructureBuildTypeKHR,
+	p_build_info &MicromapBuildInfoEXT,
+	p_size_info &MicromapBuildSizesInfoEXT) {
+	C.vkGetMicromapBuildSizesEXT(device, build_type, p_build_info, p_size_info)
 }
 
-// VK_NV_displacement_micromap is a preprocessor guard. Do not pass it to API calls.
-const nv_displacement_micromap = 1
-pub const nv_displacement_micromap_spec_version = 2
-pub const nv_displacement_micromap_extension_name = 'VK_NV_displacement_micromap'
-
-pub enum DisplacementMicromapFormatNV {
-	displacement_micromap_format_64_triangles_64_bytes_nv    = int(1)
-	displacement_micromap_format_256_triangles_128_bytes_nv  = int(2)
-	displacement_micromap_format_1024_triangles_128_bytes_nv = int(3)
-	displacement_micromap_format_max_enum_nv                 = int(0x7FFFFFFF)
-}
-
-// PhysicalDeviceDisplacementMicromapFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub struct PhysicalDeviceDisplacementMicromapFeaturesNV {
-mut:
-	s_type                StructureType
-	p_next                voidptr
-	displacement_micromap Bool32
-}
-
-// PhysicalDeviceDisplacementMicromapPropertiesNV extends VkPhysicalDeviceProperties2
-pub struct PhysicalDeviceDisplacementMicromapPropertiesNV {
-mut:
-	s_type                                      StructureType
-	p_next                                      voidptr
-	max_displacement_micromap_subdivision_level u32
-}
-
-// AccelerationStructureTrianglesDisplacementMicromapNV extends VkAccelerationStructureGeometryTrianglesDataKHR
-pub struct AccelerationStructureTrianglesDisplacementMicromapNV {
-mut:
-	s_type                                    StructureType
-	p_next                                    voidptr
-	displacement_bias_and_scale_format        Format
-	displacement_vector_format                Format
-	displacement_bias_and_scale_buffer        DeviceOrHostAddressConstKHR
-	displacement_bias_and_scale_stride        DeviceSize
-	displacement_vector_buffer                DeviceOrHostAddressConstKHR
-	displacement_vector_stride                DeviceSize
-	displaced_micromap_primitive_flags        DeviceOrHostAddressConstKHR
-	displaced_micromap_primitive_flags_stride DeviceSize
-	index_type                                IndexType
-	index_buffer                              DeviceOrHostAddressConstKHR
-	index_stride                              DeviceSize
-	base_triangle                             u32
-	usage_counts_count                        u32
-	p_usage_counts                            &MicromapUsageEXT
-	pp_usage_counts                           &MicromapUsageEXT
-	micromap                                  C.MicromapEXT
-}
-
-// VK_EXT_load_store_op_none is a preprocessor guard. Do not pass it to API calls.
-const ext_load_store_op_none = 1
 pub const ext_load_store_op_none_spec_version = 1
 pub const ext_load_store_op_none_extension_name = 'VK_EXT_load_store_op_none'
 
-// VK_HUAWEI_cluster_culling_shader is a preprocessor guard. Do not pass it to API calls.
-const huawei_cluster_culling_shader = 1
 pub const huawei_cluster_culling_shader_spec_version = 3
 pub const huawei_cluster_culling_shader_extension_name = 'VK_HAWEI_cluster_culling_shader'
-// PhysicalDeviceClusterCullingShaderFeaturesHUAWEI extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceClusterCullingShaderFeaturesHUAWEI {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	clusterculling_shader            Bool32
 	multiview_cluster_culling_shader Bool32
 }
 
-// PhysicalDeviceClusterCullingShaderPropertiesHUAWEI extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceClusterCullingShaderPropertiesHUAWEI {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
-	max_work_group_count             []u32
-	max_work_group_size              []u32
+	max_work_group_count             [3]u32
+	max_work_group_size              [3]u32
 	max_output_cluster_count         u32
 	indirect_buffer_offset_alignment DeviceSize
 }
 
-// PhysicalDeviceClusterCullingShaderVrsFeaturesHUAWEI extends VkPhysicalDeviceClusterCullingShaderFeaturesHUAWEI
 pub struct PhysicalDeviceClusterCullingShaderVrsFeaturesHUAWEI {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	cluster_shading_rate Bool32
 }
 
-type VkCmdDrawClusterHUAWEI = fn (C.CommandBuffer, u32, u32, u32)
-
-pub fn cmd_draw_cluster_huawei(command_buffer C.CommandBuffer, group_count_x u32, group_count_y u32, group_count_z u32) {
-	f := VkCmdDrawClusterHUAWEI((*vulkan.loader_p).get_sym('vkCmdDrawClusterHUAWEI') or {
-		println("Couldn't load symbol for 'vkCmdDrawClusterHUAWEI': ${err}")
-		return
-	})
-	f(command_buffer, group_count_x, group_count_y, group_count_z)
+fn C.vkCmdDrawClusterHUAWEI(C.CommandBuffer,
+	u32,
+	u32,
+	u32)
+pub fn cmd_draw_cluster_huawei(command_buffer C.CommandBuffer,
+	group_count_x u32,
+	group_count_y u32,
+	group_count_z u32) {
+	C.vkCmdDrawClusterHUAWEI(command_buffer, group_count_x, group_count_y, group_count_z)
 }
 
-type VkCmdDrawClusterIndirectHUAWEI = fn (C.CommandBuffer, C.Buffer, DeviceSize)
-
-pub fn cmd_draw_cluster_indirect_huawei(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize) {
-	f := VkCmdDrawClusterIndirectHUAWEI((*vulkan.loader_p).get_sym('vkCmdDrawClusterIndirectHUAWEI') or {
-		println("Couldn't load symbol for 'vkCmdDrawClusterIndirectHUAWEI': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset)
+fn C.vkCmdDrawClusterIndirectHUAWEI(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize)
+pub fn cmd_draw_cluster_indirect_huawei(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize) {
+	C.vkCmdDrawClusterIndirectHUAWEI(command_buffer, buffer, offset)
 }
 
-// VK_EXT_border_color_swizzle is a preprocessor guard. Do not pass it to API calls.
-const ext_border_color_swizzle = 1
 pub const ext_border_color_swizzle_spec_version = 1
 pub const ext_border_color_swizzle_extension_name = 'VK_EXT_border_color_swizzle'
-// PhysicalDeviceBorderColorSwizzleFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceBorderColorSwizzleFeaturesEXT {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	border_color_swizzle            Bool32
 	border_color_swizzle_from_image Bool32
 }
 
-// SamplerBorderColorComponentMappingCreateInfoEXT extends VkSamplerCreateInfo
 pub struct SamplerBorderColorComponentMappingCreateInfoEXT {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	components ComponentMapping
 	srgb       Bool32
 }
 
-// VK_EXT_pageable_device_local_memory is a preprocessor guard. Do not pass it to API calls.
-const ext_pageable_device_local_memory = 1
 pub const ext_pageable_device_local_memory_spec_version = 1
 pub const ext_pageable_device_local_memory_extension_name = 'VK_EXT_pageable_device_local_memory'
-// PhysicalDevicePageableDeviceLocalMemoryFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDevicePageableDeviceLocalMemoryFeaturesEXT {
-mut:
+pub mut:
 	s_type                       StructureType
 	p_next                       voidptr
 	pageable_device_local_memory Bool32
 }
 
-type VkSetDeviceMemoryPriorityEXT = fn (C.Device, C.DeviceMemory, f32)
-
-pub fn set_device_memory_priority_ext(device C.Device, memory C.DeviceMemory, priority f32) {
-	f := VkSetDeviceMemoryPriorityEXT((*vulkan.loader_p).get_sym('vkSetDeviceMemoryPriorityEXT') or {
-		println("Couldn't load symbol for 'vkSetDeviceMemoryPriorityEXT': ${err}")
-		return
-	})
-	f(device, memory, priority)
+fn C.vkSetDeviceMemoryPriorityEXT(C.Device,
+	C.DeviceMemory,
+	f32)
+pub fn set_device_memory_priority_ext(device C.Device,
+	memory C.DeviceMemory,
+	priority f32) {
+	C.vkSetDeviceMemoryPriorityEXT(device, memory, priority)
 }
 
-// VK_ARM_shader_core_properties is a preprocessor guard. Do not pass it to API calls.
-const arm_shader_core_properties = 1
 pub const arm_shader_core_properties_spec_version = 1
 pub const arm_shader_core_properties_extension_name = 'VK_ARM_shader_core_properties'
-// PhysicalDeviceShaderCorePropertiesARM extends VkPhysicalDeviceProperties2
+
 pub struct PhysicalDeviceShaderCorePropertiesARM {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	pixel_rate u32
@@ -20538,78 +18023,68 @@ mut:
 	fma_rate   u32
 }
 
-// VK_ARM_scheduling_controls is a preprocessor guard. Do not pass it to API calls.
-const arm_scheduling_controls = 1
 pub const arm_scheduling_controls_spec_version = 1
 pub const arm_scheduling_controls_extension_name = 'VK_ARM_scheduling_controls'
 
 pub type PhysicalDeviceSchedulingControlsFlagsARM = u64
 
-pub enum PhysicalDeviceSchedulingControlsFlagBitsARM {
-	physical_device_scheduling_controls_shader_core_count_arm  = int(0x00000001)
-	physical_device_scheduling_controls_flag_bits_max_enum_arm = int(0x7FFFFFFF)
-}
+// Flag bits for PhysicalDeviceSchedulingControlsFlagBitsARM
+pub type PhysicalDeviceSchedulingControlsFlagBitsARM = u64
 
-// DeviceQueueShaderCoreControlCreateInfoARM extends VkDeviceQueueCreateInfo,VkDeviceCreateInfo
+pub const physical_device_scheduling_controls_shader_core_count_arm = u64(0x00000001)
+
 pub struct DeviceQueueShaderCoreControlCreateInfoARM {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	shader_core_count u32
 }
 
-// PhysicalDeviceSchedulingControlsFeaturesARM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceSchedulingControlsFeaturesARM {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	scheduling_controls Bool32
 }
 
-// PhysicalDeviceSchedulingControlsPropertiesARM extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceSchedulingControlsPropertiesARM {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	scheduling_controls_flags PhysicalDeviceSchedulingControlsFlagsARM
 }
 
-// VK_EXT_image_sliced_view_of_3d is a preprocessor guard. Do not pass it to API calls.
-const ext_image_sliced_view_of_3d = 1
 pub const ext_image_sliced_view_of_3d_spec_version = 1
 pub const ext_image_sliced_view_of_3d_extension_name = 'VK_EXT_image_sliced_view_of_3d'
 pub const remaining_3d_slices_ext = ~u32(0)
-// PhysicalDeviceImageSlicedViewOf3DFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceImageSlicedViewOf3DFeaturesEXT {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	image_sliced_view_of3_d Bool32
 }
 
-// ImageViewSlicedCreateInfoEXT extends VkImageViewCreateInfo
 pub struct ImageViewSlicedCreateInfoEXT {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	slice_offset u32
 	slice_count  u32
 }
 
-// VK_VALVE_descriptor_set_host_mapping is a preprocessor guard. Do not pass it to API calls.
-const valve_descriptor_set_host_mapping = 1
 pub const valve_descriptor_set_host_mapping_spec_version = 1
 pub const valve_descriptor_set_host_mapping_extension_name = 'VK_VAVE_descriptor_set_host_mapping'
-// PhysicalDeviceDescriptorSetHostMappingFeaturesVALVE extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceDescriptorSetHostMappingFeaturesVALVE {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	descriptor_set_host_mapping Bool32
 }
 
 pub struct DescriptorSetBindingReferenceVALVE {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	descriptor_set_layout C.DescriptorSetLayout
@@ -20617,72 +18092,63 @@ mut:
 }
 
 pub struct DescriptorSetLayoutHostMappingInfoVALVE {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	descriptor_offset usize
 	descriptor_size   u32
 }
 
-type VkGetDescriptorSetLayoutHostMappingInfoVALVE = fn (C.Device, &DescriptorSetBindingReferenceVALVE, &DescriptorSetLayoutHostMappingInfoVALVE)
-
-pub fn get_descriptor_set_layout_host_mapping_info_valve(device C.Device, p_binding_reference &DescriptorSetBindingReferenceVALVE, p_host_mapping &DescriptorSetLayoutHostMappingInfoVALVE) {
-	f := VkGetDescriptorSetLayoutHostMappingInfoVALVE((*vulkan.loader_p).get_sym('vkGetDescriptorSetLayoutHostMappingInfoVALVE') or {
-		println("Couldn't load symbol for 'vkGetDescriptorSetLayoutHostMappingInfoVALVE': ${err}")
-		return
-	})
-	f(device, p_binding_reference, p_host_mapping)
+fn C.vkGetDescriptorSetLayoutHostMappingInfoVALVE(C.Device,
+	&DescriptorSetBindingReferenceVALVE,
+	&DescriptorSetLayoutHostMappingInfoVALVE)
+pub fn get_descriptor_set_layout_host_mapping_info_valve(device C.Device,
+	p_binding_reference &DescriptorSetBindingReferenceVALVE,
+	p_host_mapping &DescriptorSetLayoutHostMappingInfoVALVE) {
+	C.vkGetDescriptorSetLayoutHostMappingInfoVALVE(device, p_binding_reference, p_host_mapping)
 }
 
-type VkGetDescriptorSetHostMappingVALVE = fn (C.Device, C.DescriptorSet, &voidptr)
-
-pub fn get_descriptor_set_host_mapping_valve(device C.Device, descriptor_set C.DescriptorSet, pp_data &voidptr) {
-	f := VkGetDescriptorSetHostMappingVALVE((*vulkan.loader_p).get_sym('vkGetDescriptorSetHostMappingVALVE') or {
-		println("Couldn't load symbol for 'vkGetDescriptorSetHostMappingVALVE': ${err}")
-		return
-	})
-	f(device, descriptor_set, pp_data)
+fn C.vkGetDescriptorSetHostMappingVALVE(C.Device,
+	C.DescriptorSet,
+	&voidptr)
+pub fn get_descriptor_set_host_mapping_valve(device C.Device,
+	descriptor_set C.DescriptorSet,
+	pp_data &voidptr) {
+	C.vkGetDescriptorSetHostMappingVALVE(device, descriptor_set, pp_data)
 }
 
-// VK_EXT_depth_clamp_zero_one is a preprocessor guard. Do not pass it to API calls.
-const ext_depth_clamp_zero_one = 1
 pub const ext_depth_clamp_zero_one_spec_version = 1
 pub const ext_depth_clamp_zero_one_extension_name = 'VK_EXT_depth_clamp_zero_one'
-// PhysicalDeviceDepthClampZeroOneFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceDepthClampZeroOneFeaturesEXT {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	depth_clamp_zero_one Bool32
 }
 
-// VK_EXT_non_seamless_cube_map is a preprocessor guard. Do not pass it to API calls.
-const ext_non_seamless_cube_map = 1
 pub const ext_non_seamless_cube_map_spec_version = 1
 pub const ext_non_seamless_cube_map_extension_name = 'VK_EXT_non_seamless_cube_map'
-// PhysicalDeviceNonSeamlessCubeMapFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceNonSeamlessCubeMapFeaturesEXT {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	non_seamless_cube_map Bool32
 }
 
-// VK_ARM_render_pass_striped is a preprocessor guard. Do not pass it to API calls.
-const arm_render_pass_striped = 1
 pub const arm_render_pass_striped_spec_version = 1
 pub const arm_render_pass_striped_extension_name = 'VK_ARM_render_pass_striped'
-// PhysicalDeviceRenderPassStripedFeaturesARM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceRenderPassStripedFeaturesARM {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	render_pass_striped Bool32
 }
 
-// PhysicalDeviceRenderPassStripedPropertiesARM extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceRenderPassStripedPropertiesARM {
-mut:
+pub mut:
 	s_type                         StructureType
 	p_next                         voidptr
 	render_pass_stripe_granularity Extent2D
@@ -20690,73 +18156,65 @@ mut:
 }
 
 pub struct RenderPassStripeInfoARM {
-mut:
+pub mut:
 	s_type      StructureType
 	p_next      voidptr
 	stripe_area Rect2D
 }
 
-// RenderPassStripeBeginInfoARM extends VkRenderingInfo,VkRenderPassBeginInfo
 pub struct RenderPassStripeBeginInfoARM {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	stripe_info_count u32
 	p_stripe_infos    &RenderPassStripeInfoARM
 }
 
-// RenderPassStripeSubmitInfoARM extends VkCommandBufferSubmitInfo
 pub struct RenderPassStripeSubmitInfoARM {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	stripe_semaphore_info_count u32
 	p_stripe_semaphore_infos    &SemaphoreSubmitInfo
 }
 
-// VK_QCOM_fragment_density_map_offset is a preprocessor guard. Do not pass it to API calls.
-const qcom_fragment_density_map_offset = 1
-pub const qcom_fragment_density_map_offset_spec_version = 1
+pub const qcom_fragment_density_map_offset_spec_version = 2
 pub const qcom_fragment_density_map_offset_extension_name = 'VK_QCOM_fragment_density_map_offset'
-// PhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	fragment_density_map_offset Bool32
 }
 
-// PhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM {
-mut:
+pub mut:
 	s_type                              StructureType
 	p_next                              voidptr
 	fragment_density_offset_granularity Extent2D
 }
 
-// SubpassFragmentDensityMapOffsetEndInfoQCOM extends VkSubpassEndInfo
 pub struct SubpassFragmentDensityMapOffsetEndInfoQCOM {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	fragment_density_offset_count u32
 	p_fragment_density_offsets    &Offset2D
 }
 
-// VK_NV_copy_memory_indirect is a preprocessor guard. Do not pass it to API calls.
-const nv_copy_memory_indirect = 1
 pub const nv_copy_memory_indirect_spec_version = 1
 pub const nv_copy_memory_indirect_extension_name = 'VK_NV_copy_memory_indirect'
 
 pub struct CopyMemoryIndirectCommandNV {
-mut:
+pub mut:
 	src_address DeviceAddress
 	dst_address DeviceAddress
 	size        DeviceSize
 }
 
 pub struct CopyMemoryToImageIndirectCommandNV {
-mut:
+pub mut:
 	src_address         DeviceAddress
 	buffer_row_length   u32
 	buffer_image_height u32
@@ -20765,45 +18223,49 @@ mut:
 	image_extent        Extent3D
 }
 
-// PhysicalDeviceCopyMemoryIndirectFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceCopyMemoryIndirectFeaturesNV {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	indirect_copy Bool32
 }
 
-// PhysicalDeviceCopyMemoryIndirectPropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceCopyMemoryIndirectPropertiesNV {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	supported_queues QueueFlags
 }
 
-type VkCmdCopyMemoryIndirectNV = fn (C.CommandBuffer, DeviceAddress, u32, u32)
-
-pub fn cmd_copy_memory_indirect_nv(command_buffer C.CommandBuffer, copy_buffer_address DeviceAddress, copy_count u32, stride u32) {
-	f := VkCmdCopyMemoryIndirectNV((*vulkan.loader_p).get_sym('vkCmdCopyMemoryIndirectNV') or {
-		println("Couldn't load symbol for 'vkCmdCopyMemoryIndirectNV': ${err}")
-		return
-	})
-	f(command_buffer, copy_buffer_address, copy_count, stride)
+fn C.vkCmdCopyMemoryIndirectNV(C.CommandBuffer,
+	DeviceAddress,
+	u32,
+	u32)
+pub fn cmd_copy_memory_indirect_nv(command_buffer C.CommandBuffer,
+	copy_buffer_address DeviceAddress,
+	copy_count u32,
+	stride u32) {
+	C.vkCmdCopyMemoryIndirectNV(command_buffer, copy_buffer_address, copy_count, stride)
 }
 
-type VkCmdCopyMemoryToImageIndirectNV = fn (C.CommandBuffer, DeviceAddress, u32, u32, C.Image, ImageLayout, &ImageSubresourceLayers)
-
-pub fn cmd_copy_memory_to_image_indirect_nv(command_buffer C.CommandBuffer, copy_buffer_address DeviceAddress, copy_count u32, stride u32, dst_image C.Image, dst_image_layout ImageLayout, p_image_subresources &ImageSubresourceLayers) {
-	f := VkCmdCopyMemoryToImageIndirectNV((*vulkan.loader_p).get_sym('vkCmdCopyMemoryToImageIndirectNV') or {
-		println("Couldn't load symbol for 'vkCmdCopyMemoryToImageIndirectNV': ${err}")
-		return
-	})
-	f(command_buffer, copy_buffer_address, copy_count, stride, dst_image, dst_image_layout,
-		p_image_subresources)
+fn C.vkCmdCopyMemoryToImageIndirectNV(C.CommandBuffer,
+	DeviceAddress,
+	u32,
+	u32,
+	C.Image,
+	ImageLayout,
+	&ImageSubresourceLayers)
+pub fn cmd_copy_memory_to_image_indirect_nv(command_buffer C.CommandBuffer,
+	copy_buffer_address DeviceAddress,
+	copy_count u32,
+	stride u32,
+	dst_image C.Image,
+	dst_image_layout ImageLayout,
+	p_image_subresources &ImageSubresourceLayers) {
+	C.vkCmdCopyMemoryToImageIndirectNV(command_buffer, copy_buffer_address, copy_count,
+		stride, dst_image, dst_image_layout, p_image_subresources)
 }
 
-// VK_NV_memory_decompression is a preprocessor guard. Do not pass it to API calls.
-const nv_memory_decompression = 1
 pub const nv_memory_decompression_spec_version = 1
 pub const nv_memory_decompression_extension_name = 'VK_NV_memory_decompression'
 
@@ -20815,7 +18277,7 @@ pub const memory_decompression_method_gdeflate_1_0_bit_nv = u64(0x00000001)
 pub type MemoryDecompressionMethodFlagsNV = u64
 
 pub struct DecompressMemoryRegionNV {
-mut:
+pub mut:
 	src_address          DeviceAddress
 	dst_address          DeviceAddress
 	compressed_size      DeviceSize
@@ -20823,50 +18285,47 @@ mut:
 	decompression_method MemoryDecompressionMethodFlagsNV
 }
 
-// PhysicalDeviceMemoryDecompressionFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceMemoryDecompressionFeaturesNV {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	memory_decompression Bool32
 }
 
-// PhysicalDeviceMemoryDecompressionPropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceMemoryDecompressionPropertiesNV {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	decompression_methods            MemoryDecompressionMethodFlagsNV
 	max_decompression_indirect_count u64
 }
 
-type VkCmdDecompressMemoryNV = fn (C.CommandBuffer, u32, &DecompressMemoryRegionNV)
-
-pub fn cmd_decompress_memory_nv(command_buffer C.CommandBuffer, decompress_region_count u32, p_decompress_memory_regions &DecompressMemoryRegionNV) {
-	f := VkCmdDecompressMemoryNV((*vulkan.loader_p).get_sym('vkCmdDecompressMemoryNV') or {
-		println("Couldn't load symbol for 'vkCmdDecompressMemoryNV': ${err}")
-		return
-	})
-	f(command_buffer, decompress_region_count, p_decompress_memory_regions)
+fn C.vkCmdDecompressMemoryNV(C.CommandBuffer,
+	u32,
+	&DecompressMemoryRegionNV)
+pub fn cmd_decompress_memory_nv(command_buffer C.CommandBuffer,
+	decompress_region_count u32,
+	p_decompress_memory_regions &DecompressMemoryRegionNV) {
+	C.vkCmdDecompressMemoryNV(command_buffer, decompress_region_count, p_decompress_memory_regions)
 }
 
-type VkCmdDecompressMemoryIndirectCountNV = fn (C.CommandBuffer, DeviceAddress, DeviceAddress, u32)
-
-pub fn cmd_decompress_memory_indirect_count_nv(command_buffer C.CommandBuffer, indirect_commands_address DeviceAddress, indirect_commands_count_address DeviceAddress, stride u32) {
-	f := VkCmdDecompressMemoryIndirectCountNV((*vulkan.loader_p).get_sym('vkCmdDecompressMemoryIndirectCountNV') or {
-		println("Couldn't load symbol for 'vkCmdDecompressMemoryIndirectCountNV': ${err}")
-		return
-	})
-	f(command_buffer, indirect_commands_address, indirect_commands_count_address, stride)
+fn C.vkCmdDecompressMemoryIndirectCountNV(C.CommandBuffer,
+	DeviceAddress,
+	DeviceAddress,
+	u32)
+pub fn cmd_decompress_memory_indirect_count_nv(command_buffer C.CommandBuffer,
+	indirect_commands_address DeviceAddress,
+	indirect_commands_count_address DeviceAddress,
+	stride u32) {
+	C.vkCmdDecompressMemoryIndirectCountNV(command_buffer, indirect_commands_address,
+		indirect_commands_count_address, stride)
 }
 
-// VK_NV_device_generated_commands_compute is a preprocessor guard. Do not pass it to API calls.
-const nv_device_generated_commands_compute = 1
 pub const nv_device_generated_commands_compute_spec_version = 2
 pub const nv_device_generated_commands_compute_extension_name = 'VK_NV_device_generated_commands_compute'
-// PhysicalDeviceDeviceGeneratedCommandsComputeFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceDeviceGeneratedCommandsComputeFeaturesNV {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	device_generated_compute                Bool32
@@ -20875,7 +18334,7 @@ mut:
 }
 
 pub struct ComputePipelineIndirectBufferInfoNV {
-mut:
+pub mut:
 	s_type                                 StructureType
 	p_next                                 voidptr
 	device_address                         DeviceAddress
@@ -20884,7 +18343,7 @@ mut:
 }
 
 pub struct PipelineIndirectDeviceAddressInfoNV {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	pipeline_bind_point PipelineBindPoint
@@ -20892,75 +18351,63 @@ mut:
 }
 
 pub struct BindPipelineIndirectCommandNV {
-mut:
+pub mut:
 	pipeline_address DeviceAddress
 }
 
-type VkGetPipelineIndirectMemoryRequirementsNV = fn (C.Device, &ComputePipelineCreateInfo, &MemoryRequirements2)
-
-pub fn get_pipeline_indirect_memory_requirements_nv(device C.Device, p_create_info &ComputePipelineCreateInfo, p_memory_requirements &MemoryRequirements2) {
-	f := VkGetPipelineIndirectMemoryRequirementsNV((*vulkan.loader_p).get_sym('vkGetPipelineIndirectMemoryRequirementsNV') or {
-		println("Couldn't load symbol for 'vkGetPipelineIndirectMemoryRequirementsNV': ${err}")
-		return
-	})
-	f(device, p_create_info, p_memory_requirements)
+fn C.vkGetPipelineIndirectMemoryRequirementsNV(C.Device,
+	&ComputePipelineCreateInfo,
+	&MemoryRequirements2)
+pub fn get_pipeline_indirect_memory_requirements_nv(device C.Device,
+	p_create_info &ComputePipelineCreateInfo,
+	p_memory_requirements &MemoryRequirements2) {
+	C.vkGetPipelineIndirectMemoryRequirementsNV(device, p_create_info, p_memory_requirements)
 }
 
-type VkCmdUpdatePipelineIndirectBufferNV = fn (C.CommandBuffer, PipelineBindPoint, C.Pipeline)
-
-pub fn cmd_update_pipeline_indirect_buffer_nv(command_buffer C.CommandBuffer, pipeline_bind_point PipelineBindPoint, pipeline C.Pipeline) {
-	f := VkCmdUpdatePipelineIndirectBufferNV((*vulkan.loader_p).get_sym('vkCmdUpdatePipelineIndirectBufferNV') or {
-		println("Couldn't load symbol for 'vkCmdUpdatePipelineIndirectBufferNV': ${err}")
-		return
-	})
-	f(command_buffer, pipeline_bind_point, pipeline)
+fn C.vkCmdUpdatePipelineIndirectBufferNV(C.CommandBuffer,
+	PipelineBindPoint,
+	C.Pipeline)
+pub fn cmd_update_pipeline_indirect_buffer_nv(command_buffer C.CommandBuffer,
+	pipeline_bind_point PipelineBindPoint,
+	pipeline C.Pipeline) {
+	C.vkCmdUpdatePipelineIndirectBufferNV(command_buffer, pipeline_bind_point, pipeline)
 }
 
-type VkGetPipelineIndirectDeviceAddressNV = fn (C.Device, &PipelineIndirectDeviceAddressInfoNV) DeviceAddress
-
-pub fn get_pipeline_indirect_device_address_nv(device C.Device, p_info &PipelineIndirectDeviceAddressInfoNV) DeviceAddress {
-	f := VkGetPipelineIndirectDeviceAddressNV((*vulkan.loader_p).get_sym('vkGetPipelineIndirectDeviceAddressNV') or {
-		panic("Couldn't load symbol for 'vkGetPipelineIndirectDeviceAddressNV': ${err}")
-	})
-	return f(device, p_info)
+fn C.vkGetPipelineIndirectDeviceAddressNV(C.Device,
+	&PipelineIndirectDeviceAddressInfoNV) DeviceAddress
+pub fn get_pipeline_indirect_device_address_nv(device C.Device,
+	p_info &PipelineIndirectDeviceAddressInfoNV) DeviceAddress {
+	return C.vkGetPipelineIndirectDeviceAddressNV(device, p_info)
 }
 
-// VK_NV_linear_color_attachment is a preprocessor guard. Do not pass it to API calls.
-const nv_linear_color_attachment = 1
 pub const nv_linear_color_attachment_spec_version = 1
 pub const nv_linear_color_attachment_extension_name = 'VK_NV_linear_color_attachment'
-// PhysicalDeviceLinearColorAttachmentFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceLinearColorAttachmentFeaturesNV {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	linear_color_attachment Bool32
 }
 
-// VK_GOOGLE_surfaceless_query is a preprocessor guard. Do not pass it to API calls.
-const google_surfaceless_query = 1
 pub const google_surfaceless_query_spec_version = 2
 pub const google_surfaceless_query_extension_name = 'VK_GOOGE_surfaceless_query'
 
-// VK_EXT_image_compression_control_swapchain is a preprocessor guard. Do not pass it to API calls.
-const ext_image_compression_control_swapchain = 1
 pub const ext_image_compression_control_swapchain_spec_version = 1
 pub const ext_image_compression_control_swapchain_extension_name = 'VK_EXT_image_compression_control_swapchain'
-// PhysicalDeviceImageCompressionControlSwapchainFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceImageCompressionControlSwapchainFeaturesEXT {
-mut:
+pub mut:
 	s_type                              StructureType
 	p_next                              voidptr
 	image_compression_control_swapchain Bool32
 }
 
-// VK_QCOM_image_processing is a preprocessor guard. Do not pass it to API calls.
-const qcom_image_processing = 1
 pub const qcom_image_processing_spec_version = 1
 pub const qcom_image_processing_extension_name = 'VK_QCOM_image_processing'
-// ImageViewSampleWeightCreateInfoQCOM extends VkImageViewCreateInfo
+
 pub struct ImageViewSampleWeightCreateInfoQCOM {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	filter_center Offset2D
@@ -20968,9 +18415,8 @@ mut:
 	num_phases    u32
 }
 
-// PhysicalDeviceImageProcessingFeaturesQCOM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceImageProcessingFeaturesQCOM {
-mut:
+pub mut:
 	s_type                  StructureType
 	p_next                  voidptr
 	texture_sample_weighted Bool32
@@ -20978,9 +18424,8 @@ mut:
 	texture_block_match     Bool32
 }
 
-// PhysicalDeviceImageProcessingPropertiesQCOM extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceImageProcessingPropertiesQCOM {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	max_weight_filter_phases    u32
@@ -20989,13 +18434,11 @@ mut:
 	max_box_filter_block_size   Extent2D
 }
 
-// VK_EXT_nested_command_buffer is a preprocessor guard. Do not pass it to API calls.
-const ext_nested_command_buffer = 1
 pub const ext_nested_command_buffer_spec_version = 1
 pub const ext_nested_command_buffer_extension_name = 'VK_EXT_nested_command_buffer'
-// PhysicalDeviceNestedCommandBufferFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceNestedCommandBufferFeaturesEXT {
-mut:
+pub mut:
 	s_type                                 StructureType
 	p_next                                 voidptr
 	nested_command_buffer                  Bool32
@@ -21003,33 +18446,28 @@ mut:
 	nested_command_buffer_simultaneous_use Bool32
 }
 
-// PhysicalDeviceNestedCommandBufferPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceNestedCommandBufferPropertiesEXT {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	max_command_buffer_nesting_level u32
 }
 
-// VK_EXT_external_memory_acquire_unmodified is a preprocessor guard. Do not pass it to API calls.
-const ext_external_memory_acquire_unmodified = 1
 pub const ext_external_memory_acquire_unmodified_spec_version = 1
 pub const ext_external_memory_acquire_unmodified_extension_name = 'VK_EXT_external_memory_acquire_unmodified'
-// ExternalMemoryAcquireUnmodifiedEXT extends VkBufferMemoryBarrier,VkBufferMemoryBarrier2,VkImageMemoryBarrier,VkImageMemoryBarrier2
+
 pub struct ExternalMemoryAcquireUnmodifiedEXT {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	acquire_unmodified_memory Bool32
 }
 
-// VK_EXT_extended_dynamic_state3 is a preprocessor guard. Do not pass it to API calls.
-const ext_extended_dynamic_state3 = 1
 pub const ext_extended_dynamic_state_3_spec_version = 2
 pub const ext_extended_dynamic_state_3_extension_name = 'VK_EXT_extended_dynamic_state3'
-// PhysicalDeviceExtendedDynamicState3FeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceExtendedDynamicState3FeaturesEXT {
-mut:
+pub mut:
 	s_type                                                      StructureType
 	p_next                                                      voidptr
 	extended_dynamic_state3_tessellation_domain_origin          Bool32
@@ -21065,16 +18503,15 @@ mut:
 	extended_dynamic_state3_shading_rate_image_enable           Bool32
 }
 
-// PhysicalDeviceExtendedDynamicState3PropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceExtendedDynamicState3PropertiesEXT {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	dynamic_primitive_topology_unrestricted Bool32
 }
 
 pub struct ColorBlendEquationEXT {
-mut:
+pub mut:
 	src_color_blend_factor BlendFactor
 	dst_color_blend_factor BlendFactor
 	color_blend_op         BlendOp
@@ -21084,7 +18521,7 @@ mut:
 }
 
 pub struct ColorBlendAdvancedEXT {
-mut:
+pub mut:
 	advanced_blend_op BlendOp
 	src_premultiplied Bool32
 	dst_premultiplied Bool32
@@ -21092,318 +18529,251 @@ mut:
 	clamp_results     Bool32
 }
 
-type VkCmdSetTessellationDomainOriginEXT = fn (C.CommandBuffer, TessellationDomainOrigin)
-
-pub fn cmd_set_tessellation_domain_origin_ext(command_buffer C.CommandBuffer, domain_origin TessellationDomainOrigin) {
-	f := VkCmdSetTessellationDomainOriginEXT((*vulkan.loader_p).get_sym('vkCmdSetTessellationDomainOriginEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetTessellationDomainOriginEXT': ${err}")
-		return
-	})
-	f(command_buffer, domain_origin)
+fn C.vkCmdSetDepthClampEnableEXT(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_depth_clamp_enable_ext(command_buffer C.CommandBuffer,
+	depth_clamp_enable Bool32) {
+	C.vkCmdSetDepthClampEnableEXT(command_buffer, depth_clamp_enable)
 }
 
-type VkCmdSetDepthClampEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_clamp_enable_ext(command_buffer C.CommandBuffer, depth_clamp_enable Bool32) {
-	f := VkCmdSetDepthClampEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetDepthClampEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthClampEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, depth_clamp_enable)
+fn C.vkCmdSetPolygonModeEXT(C.CommandBuffer,
+	PolygonMode)
+pub fn cmd_set_polygon_mode_ext(command_buffer C.CommandBuffer,
+	polygon_mode PolygonMode) {
+	C.vkCmdSetPolygonModeEXT(command_buffer, polygon_mode)
 }
 
-type VkCmdSetPolygonModeEXT = fn (C.CommandBuffer, PolygonMode)
-
-pub fn cmd_set_polygon_mode_ext(command_buffer C.CommandBuffer, polygon_mode PolygonMode) {
-	f := VkCmdSetPolygonModeEXT((*vulkan.loader_p).get_sym('vkCmdSetPolygonModeEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetPolygonModeEXT': ${err}")
-		return
-	})
-	f(command_buffer, polygon_mode)
+fn C.vkCmdSetRasterizationSamplesEXT(C.CommandBuffer,
+	SampleCountFlagBits)
+pub fn cmd_set_rasterization_samples_ext(command_buffer C.CommandBuffer,
+	rasterization_samples SampleCountFlagBits) {
+	C.vkCmdSetRasterizationSamplesEXT(command_buffer, rasterization_samples)
 }
 
-type VkCmdSetRasterizationSamplesEXT = fn (C.CommandBuffer, SampleCountFlagBits)
-
-pub fn cmd_set_rasterization_samples_ext(command_buffer C.CommandBuffer, rasterization_samples SampleCountFlagBits) {
-	f := VkCmdSetRasterizationSamplesEXT((*vulkan.loader_p).get_sym('vkCmdSetRasterizationSamplesEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetRasterizationSamplesEXT': ${err}")
-		return
-	})
-	f(command_buffer, rasterization_samples)
+fn C.vkCmdSetSampleMaskEXT(C.CommandBuffer,
+	SampleCountFlagBits,
+	&SampleMask)
+pub fn cmd_set_sample_mask_ext(command_buffer C.CommandBuffer,
+	samples SampleCountFlagBits,
+	p_sample_mask &SampleMask) {
+	C.vkCmdSetSampleMaskEXT(command_buffer, samples, p_sample_mask)
 }
 
-type VkCmdSetSampleMaskEXT = fn (C.CommandBuffer, SampleCountFlagBits, &SampleMask)
-
-pub fn cmd_set_sample_mask_ext(command_buffer C.CommandBuffer, samples SampleCountFlagBits, p_sample_mask &SampleMask) {
-	f := VkCmdSetSampleMaskEXT((*vulkan.loader_p).get_sym('vkCmdSetSampleMaskEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetSampleMaskEXT': ${err}")
-		return
-	})
-	f(command_buffer, samples, p_sample_mask)
+fn C.vkCmdSetAlphaToCoverageEnableEXT(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_alpha_to_coverage_enable_ext(command_buffer C.CommandBuffer,
+	alpha_to_coverage_enable Bool32) {
+	C.vkCmdSetAlphaToCoverageEnableEXT(command_buffer, alpha_to_coverage_enable)
 }
 
-type VkCmdSetAlphaToCoverageEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_alpha_to_coverage_enable_ext(command_buffer C.CommandBuffer, alpha_to_coverage_enable Bool32) {
-	f := VkCmdSetAlphaToCoverageEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetAlphaToCoverageEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetAlphaToCoverageEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, alpha_to_coverage_enable)
+fn C.vkCmdSetAlphaToOneEnableEXT(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_alpha_to_one_enable_ext(command_buffer C.CommandBuffer,
+	alpha_to_one_enable Bool32) {
+	C.vkCmdSetAlphaToOneEnableEXT(command_buffer, alpha_to_one_enable)
 }
 
-type VkCmdSetAlphaToOneEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_alpha_to_one_enable_ext(command_buffer C.CommandBuffer, alpha_to_one_enable Bool32) {
-	f := VkCmdSetAlphaToOneEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetAlphaToOneEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetAlphaToOneEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, alpha_to_one_enable)
+fn C.vkCmdSetLogicOpEnableEXT(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_logic_op_enable_ext(command_buffer C.CommandBuffer,
+	logic_op_enable Bool32) {
+	C.vkCmdSetLogicOpEnableEXT(command_buffer, logic_op_enable)
 }
 
-type VkCmdSetLogicOpEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_logic_op_enable_ext(command_buffer C.CommandBuffer, logic_op_enable Bool32) {
-	f := VkCmdSetLogicOpEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetLogicOpEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetLogicOpEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, logic_op_enable)
+fn C.vkCmdSetColorBlendEnableEXT(C.CommandBuffer,
+	u32,
+	u32,
+	&Bool32)
+pub fn cmd_set_color_blend_enable_ext(command_buffer C.CommandBuffer,
+	first_attachment u32,
+	attachment_count u32,
+	p_color_blend_enables &Bool32) {
+	C.vkCmdSetColorBlendEnableEXT(command_buffer, first_attachment, attachment_count,
+		p_color_blend_enables)
 }
 
-type VkCmdSetColorBlendEnableEXT = fn (C.CommandBuffer, u32, u32, &Bool32)
-
-pub fn cmd_set_color_blend_enable_ext(command_buffer C.CommandBuffer, first_attachment u32, attachment_count u32, p_color_blend_enables &Bool32) {
-	f := VkCmdSetColorBlendEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetColorBlendEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetColorBlendEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, first_attachment, attachment_count, p_color_blend_enables)
+fn C.vkCmdSetColorBlendEquationEXT(C.CommandBuffer,
+	u32,
+	u32,
+	&ColorBlendEquationEXT)
+pub fn cmd_set_color_blend_equation_ext(command_buffer C.CommandBuffer,
+	first_attachment u32,
+	attachment_count u32,
+	p_color_blend_equations &ColorBlendEquationEXT) {
+	C.vkCmdSetColorBlendEquationEXT(command_buffer, first_attachment, attachment_count,
+		p_color_blend_equations)
 }
 
-type VkCmdSetColorBlendEquationEXT = fn (C.CommandBuffer, u32, u32, &ColorBlendEquationEXT)
-
-pub fn cmd_set_color_blend_equation_ext(command_buffer C.CommandBuffer, first_attachment u32, attachment_count u32, p_color_blend_equations &ColorBlendEquationEXT) {
-	f := VkCmdSetColorBlendEquationEXT((*vulkan.loader_p).get_sym('vkCmdSetColorBlendEquationEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetColorBlendEquationEXT': ${err}")
-		return
-	})
-	f(command_buffer, first_attachment, attachment_count, p_color_blend_equations)
+fn C.vkCmdSetColorWriteMaskEXT(C.CommandBuffer,
+	u32,
+	u32,
+	&ColorComponentFlags)
+pub fn cmd_set_color_write_mask_ext(command_buffer C.CommandBuffer,
+	first_attachment u32,
+	attachment_count u32,
+	p_color_write_masks &ColorComponentFlags) {
+	C.vkCmdSetColorWriteMaskEXT(command_buffer, first_attachment, attachment_count, p_color_write_masks)
 }
 
-type VkCmdSetColorWriteMaskEXT = fn (C.CommandBuffer, u32, u32, &ColorComponentFlags)
-
-pub fn cmd_set_color_write_mask_ext(command_buffer C.CommandBuffer, first_attachment u32, attachment_count u32, p_color_write_masks &ColorComponentFlags) {
-	f := VkCmdSetColorWriteMaskEXT((*vulkan.loader_p).get_sym('vkCmdSetColorWriteMaskEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetColorWriteMaskEXT': ${err}")
-		return
-	})
-	f(command_buffer, first_attachment, attachment_count, p_color_write_masks)
+fn C.vkCmdSetTessellationDomainOriginEXT(C.CommandBuffer,
+	TessellationDomainOrigin)
+pub fn cmd_set_tessellation_domain_origin_ext(command_buffer C.CommandBuffer,
+	domain_origin TessellationDomainOrigin) {
+	C.vkCmdSetTessellationDomainOriginEXT(command_buffer, domain_origin)
 }
 
-type VkCmdSetRasterizationStreamEXT = fn (C.CommandBuffer, u32)
-
-pub fn cmd_set_rasterization_stream_ext(command_buffer C.CommandBuffer, rasterization_stream u32) {
-	f := VkCmdSetRasterizationStreamEXT((*vulkan.loader_p).get_sym('vkCmdSetRasterizationStreamEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetRasterizationStreamEXT': ${err}")
-		return
-	})
-	f(command_buffer, rasterization_stream)
+fn C.vkCmdSetRasterizationStreamEXT(C.CommandBuffer,
+	u32)
+pub fn cmd_set_rasterization_stream_ext(command_buffer C.CommandBuffer,
+	rasterization_stream u32) {
+	C.vkCmdSetRasterizationStreamEXT(command_buffer, rasterization_stream)
 }
 
-type VkCmdSetConservativeRasterizationModeEXT = fn (C.CommandBuffer, ConservativeRasterizationModeEXT)
-
-pub fn cmd_set_conservative_rasterization_mode_ext(command_buffer C.CommandBuffer, conservative_rasterization_mode ConservativeRasterizationModeEXT) {
-	f := VkCmdSetConservativeRasterizationModeEXT((*vulkan.loader_p).get_sym('vkCmdSetConservativeRasterizationModeEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetConservativeRasterizationModeEXT': ${err}")
-		return
-	})
-	f(command_buffer, conservative_rasterization_mode)
+fn C.vkCmdSetConservativeRasterizationModeEXT(C.CommandBuffer,
+	ConservativeRasterizationModeEXT)
+pub fn cmd_set_conservative_rasterization_mode_ext(command_buffer C.CommandBuffer,
+	conservative_rasterization_mode ConservativeRasterizationModeEXT) {
+	C.vkCmdSetConservativeRasterizationModeEXT(command_buffer, conservative_rasterization_mode)
 }
 
-type VkCmdSetExtraPrimitiveOverestimationSizeEXT = fn (C.CommandBuffer, f32)
-
-pub fn cmd_set_extra_primitive_overestimation_size_ext(command_buffer C.CommandBuffer, extra_primitive_overestimation_size f32) {
-	f := VkCmdSetExtraPrimitiveOverestimationSizeEXT((*vulkan.loader_p).get_sym('vkCmdSetExtraPrimitiveOverestimationSizeEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetExtraPrimitiveOverestimationSizeEXT': ${err}")
-		return
-	})
-	f(command_buffer, extra_primitive_overestimation_size)
+fn C.vkCmdSetExtraPrimitiveOverestimationSizeEXT(C.CommandBuffer,
+	f32)
+pub fn cmd_set_extra_primitive_overestimation_size_ext(command_buffer C.CommandBuffer,
+	extra_primitive_overestimation_size f32) {
+	C.vkCmdSetExtraPrimitiveOverestimationSizeEXT(command_buffer, extra_primitive_overestimation_size)
 }
 
-type VkCmdSetDepthClipEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_clip_enable_ext(command_buffer C.CommandBuffer, depth_clip_enable Bool32) {
-	f := VkCmdSetDepthClipEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetDepthClipEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthClipEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, depth_clip_enable)
+fn C.vkCmdSetDepthClipEnableEXT(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_depth_clip_enable_ext(command_buffer C.CommandBuffer,
+	depth_clip_enable Bool32) {
+	C.vkCmdSetDepthClipEnableEXT(command_buffer, depth_clip_enable)
 }
 
-type VkCmdSetSampleLocationsEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_sample_locations_enable_ext(command_buffer C.CommandBuffer, sample_locations_enable Bool32) {
-	f := VkCmdSetSampleLocationsEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetSampleLocationsEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetSampleLocationsEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, sample_locations_enable)
+fn C.vkCmdSetSampleLocationsEnableEXT(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_sample_locations_enable_ext(command_buffer C.CommandBuffer,
+	sample_locations_enable Bool32) {
+	C.vkCmdSetSampleLocationsEnableEXT(command_buffer, sample_locations_enable)
 }
 
-type VkCmdSetColorBlendAdvancedEXT = fn (C.CommandBuffer, u32, u32, &ColorBlendAdvancedEXT)
-
-pub fn cmd_set_color_blend_advanced_ext(command_buffer C.CommandBuffer, first_attachment u32, attachment_count u32, p_color_blend_advanced &ColorBlendAdvancedEXT) {
-	f := VkCmdSetColorBlendAdvancedEXT((*vulkan.loader_p).get_sym('vkCmdSetColorBlendAdvancedEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetColorBlendAdvancedEXT': ${err}")
-		return
-	})
-	f(command_buffer, first_attachment, attachment_count, p_color_blend_advanced)
+fn C.vkCmdSetColorBlendAdvancedEXT(C.CommandBuffer,
+	u32,
+	u32,
+	&ColorBlendAdvancedEXT)
+pub fn cmd_set_color_blend_advanced_ext(command_buffer C.CommandBuffer,
+	first_attachment u32,
+	attachment_count u32,
+	p_color_blend_advanced &ColorBlendAdvancedEXT) {
+	C.vkCmdSetColorBlendAdvancedEXT(command_buffer, first_attachment, attachment_count,
+		p_color_blend_advanced)
 }
 
-type VkCmdSetProvokingVertexModeEXT = fn (C.CommandBuffer, ProvokingVertexModeEXT)
-
-pub fn cmd_set_provoking_vertex_mode_ext(command_buffer C.CommandBuffer, provoking_vertex_mode ProvokingVertexModeEXT) {
-	f := VkCmdSetProvokingVertexModeEXT((*vulkan.loader_p).get_sym('vkCmdSetProvokingVertexModeEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetProvokingVertexModeEXT': ${err}")
-		return
-	})
-	f(command_buffer, provoking_vertex_mode)
+fn C.vkCmdSetProvokingVertexModeEXT(C.CommandBuffer,
+	ProvokingVertexModeEXT)
+pub fn cmd_set_provoking_vertex_mode_ext(command_buffer C.CommandBuffer,
+	provoking_vertex_mode ProvokingVertexModeEXT) {
+	C.vkCmdSetProvokingVertexModeEXT(command_buffer, provoking_vertex_mode)
 }
 
-type VkCmdSetLineRasterizationModeEXT = fn (C.CommandBuffer, LineRasterizationModeEXT)
-
-pub fn cmd_set_line_rasterization_mode_ext(command_buffer C.CommandBuffer, line_rasterization_mode LineRasterizationModeEXT) {
-	f := VkCmdSetLineRasterizationModeEXT((*vulkan.loader_p).get_sym('vkCmdSetLineRasterizationModeEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetLineRasterizationModeEXT': ${err}")
-		return
-	})
-	f(command_buffer, line_rasterization_mode)
+fn C.vkCmdSetLineRasterizationModeEXT(C.CommandBuffer,
+	LineRasterizationModeEXT)
+pub fn cmd_set_line_rasterization_mode_ext(command_buffer C.CommandBuffer,
+	line_rasterization_mode LineRasterizationModeEXT) {
+	C.vkCmdSetLineRasterizationModeEXT(command_buffer, line_rasterization_mode)
 }
 
-type VkCmdSetLineStippleEnableEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_line_stipple_enable_ext(command_buffer C.CommandBuffer, stippled_line_enable Bool32) {
-	f := VkCmdSetLineStippleEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetLineStippleEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetLineStippleEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, stippled_line_enable)
+fn C.vkCmdSetLineStippleEnableEXT(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_line_stipple_enable_ext(command_buffer C.CommandBuffer,
+	stippled_line_enable Bool32) {
+	C.vkCmdSetLineStippleEnableEXT(command_buffer, stippled_line_enable)
 }
 
-type VkCmdSetDepthClipNegativeOneToOneEXT = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_depth_clip_negative_one_to_one_ext(command_buffer C.CommandBuffer, negative_one_to_one Bool32) {
-	f := VkCmdSetDepthClipNegativeOneToOneEXT((*vulkan.loader_p).get_sym('vkCmdSetDepthClipNegativeOneToOneEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetDepthClipNegativeOneToOneEXT': ${err}")
-		return
-	})
-	f(command_buffer, negative_one_to_one)
+fn C.vkCmdSetDepthClipNegativeOneToOneEXT(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_depth_clip_negative_one_to_one_ext(command_buffer C.CommandBuffer,
+	negative_one_to_one Bool32) {
+	C.vkCmdSetDepthClipNegativeOneToOneEXT(command_buffer, negative_one_to_one)
 }
 
-type VkCmdSetViewportWScalingEnableNV = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_viewport_w_scaling_enable_nv(command_buffer C.CommandBuffer, viewport_w_scaling_enable Bool32) {
-	f := VkCmdSetViewportWScalingEnableNV((*vulkan.loader_p).get_sym('vkCmdSetViewportWScalingEnableNV') or {
-		println("Couldn't load symbol for 'vkCmdSetViewportWScalingEnableNV': ${err}")
-		return
-	})
-	f(command_buffer, viewport_w_scaling_enable)
+fn C.vkCmdSetViewportWScalingEnableNV(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_viewport_w_scaling_enable_nv(command_buffer C.CommandBuffer,
+	viewport_w_scaling_enable Bool32) {
+	C.vkCmdSetViewportWScalingEnableNV(command_buffer, viewport_w_scaling_enable)
 }
 
-type VkCmdSetViewportSwizzleNV = fn (C.CommandBuffer, u32, u32, &ViewportSwizzleNV)
-
-pub fn cmd_set_viewport_swizzle_nv(command_buffer C.CommandBuffer, first_viewport u32, viewport_count u32, p_viewport_swizzles &ViewportSwizzleNV) {
-	f := VkCmdSetViewportSwizzleNV((*vulkan.loader_p).get_sym('vkCmdSetViewportSwizzleNV') or {
-		println("Couldn't load symbol for 'vkCmdSetViewportSwizzleNV': ${err}")
-		return
-	})
-	f(command_buffer, first_viewport, viewport_count, p_viewport_swizzles)
+fn C.vkCmdSetViewportSwizzleNV(C.CommandBuffer,
+	u32,
+	u32,
+	&ViewportSwizzleNV)
+pub fn cmd_set_viewport_swizzle_nv(command_buffer C.CommandBuffer,
+	first_viewport u32,
+	viewport_count u32,
+	p_viewport_swizzles &ViewportSwizzleNV) {
+	C.vkCmdSetViewportSwizzleNV(command_buffer, first_viewport, viewport_count, p_viewport_swizzles)
 }
 
-type VkCmdSetCoverageToColorEnableNV = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_coverage_to_color_enable_nv(command_buffer C.CommandBuffer, coverage_to_color_enable Bool32) {
-	f := VkCmdSetCoverageToColorEnableNV((*vulkan.loader_p).get_sym('vkCmdSetCoverageToColorEnableNV') or {
-		println("Couldn't load symbol for 'vkCmdSetCoverageToColorEnableNV': ${err}")
-		return
-	})
-	f(command_buffer, coverage_to_color_enable)
+fn C.vkCmdSetCoverageToColorEnableNV(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_coverage_to_color_enable_nv(command_buffer C.CommandBuffer,
+	coverage_to_color_enable Bool32) {
+	C.vkCmdSetCoverageToColorEnableNV(command_buffer, coverage_to_color_enable)
 }
 
-type VkCmdSetCoverageToColorLocationNV = fn (C.CommandBuffer, u32)
-
-pub fn cmd_set_coverage_to_color_location_nv(command_buffer C.CommandBuffer, coverage_to_color_location u32) {
-	f := VkCmdSetCoverageToColorLocationNV((*vulkan.loader_p).get_sym('vkCmdSetCoverageToColorLocationNV') or {
-		println("Couldn't load symbol for 'vkCmdSetCoverageToColorLocationNV': ${err}")
-		return
-	})
-	f(command_buffer, coverage_to_color_location)
+fn C.vkCmdSetCoverageToColorLocationNV(C.CommandBuffer,
+	u32)
+pub fn cmd_set_coverage_to_color_location_nv(command_buffer C.CommandBuffer,
+	coverage_to_color_location u32) {
+	C.vkCmdSetCoverageToColorLocationNV(command_buffer, coverage_to_color_location)
 }
 
-type VkCmdSetCoverageModulationModeNV = fn (C.CommandBuffer, CoverageModulationModeNV)
-
-pub fn cmd_set_coverage_modulation_mode_nv(command_buffer C.CommandBuffer, coverage_modulation_mode CoverageModulationModeNV) {
-	f := VkCmdSetCoverageModulationModeNV((*vulkan.loader_p).get_sym('vkCmdSetCoverageModulationModeNV') or {
-		println("Couldn't load symbol for 'vkCmdSetCoverageModulationModeNV': ${err}")
-		return
-	})
-	f(command_buffer, coverage_modulation_mode)
+fn C.vkCmdSetCoverageModulationModeNV(C.CommandBuffer,
+	CoverageModulationModeNV)
+pub fn cmd_set_coverage_modulation_mode_nv(command_buffer C.CommandBuffer,
+	coverage_modulation_mode CoverageModulationModeNV) {
+	C.vkCmdSetCoverageModulationModeNV(command_buffer, coverage_modulation_mode)
 }
 
-type VkCmdSetCoverageModulationTableEnableNV = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_coverage_modulation_table_enable_nv(command_buffer C.CommandBuffer, coverage_modulation_table_enable Bool32) {
-	f := VkCmdSetCoverageModulationTableEnableNV((*vulkan.loader_p).get_sym('vkCmdSetCoverageModulationTableEnableNV') or {
-		println("Couldn't load symbol for 'vkCmdSetCoverageModulationTableEnableNV': ${err}")
-		return
-	})
-	f(command_buffer, coverage_modulation_table_enable)
+fn C.vkCmdSetCoverageModulationTableEnableNV(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_coverage_modulation_table_enable_nv(command_buffer C.CommandBuffer,
+	coverage_modulation_table_enable Bool32) {
+	C.vkCmdSetCoverageModulationTableEnableNV(command_buffer, coverage_modulation_table_enable)
 }
 
-type VkCmdSetCoverageModulationTableNV = fn (C.CommandBuffer, u32, &f32)
-
-pub fn cmd_set_coverage_modulation_table_nv(command_buffer C.CommandBuffer, coverage_modulation_table_count u32, p_coverage_modulation_table &f32) {
-	f := VkCmdSetCoverageModulationTableNV((*vulkan.loader_p).get_sym('vkCmdSetCoverageModulationTableNV') or {
-		println("Couldn't load symbol for 'vkCmdSetCoverageModulationTableNV': ${err}")
-		return
-	})
-	f(command_buffer, coverage_modulation_table_count, p_coverage_modulation_table)
+fn C.vkCmdSetCoverageModulationTableNV(C.CommandBuffer,
+	u32,
+	&f32)
+pub fn cmd_set_coverage_modulation_table_nv(command_buffer C.CommandBuffer,
+	coverage_modulation_table_count u32,
+	p_coverage_modulation_table &f32) {
+	C.vkCmdSetCoverageModulationTableNV(command_buffer, coverage_modulation_table_count,
+		p_coverage_modulation_table)
 }
 
-type VkCmdSetShadingRateImageEnableNV = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_shading_rate_image_enable_nv(command_buffer C.CommandBuffer, shading_rate_image_enable Bool32) {
-	f := VkCmdSetShadingRateImageEnableNV((*vulkan.loader_p).get_sym('vkCmdSetShadingRateImageEnableNV') or {
-		println("Couldn't load symbol for 'vkCmdSetShadingRateImageEnableNV': ${err}")
-		return
-	})
-	f(command_buffer, shading_rate_image_enable)
+fn C.vkCmdSetShadingRateImageEnableNV(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_shading_rate_image_enable_nv(command_buffer C.CommandBuffer,
+	shading_rate_image_enable Bool32) {
+	C.vkCmdSetShadingRateImageEnableNV(command_buffer, shading_rate_image_enable)
 }
 
-type VkCmdSetRepresentativeFragmentTestEnableNV = fn (C.CommandBuffer, Bool32)
-
-pub fn cmd_set_representative_fragment_test_enable_nv(command_buffer C.CommandBuffer, representative_fragment_test_enable Bool32) {
-	f := VkCmdSetRepresentativeFragmentTestEnableNV((*vulkan.loader_p).get_sym('vkCmdSetRepresentativeFragmentTestEnableNV') or {
-		println("Couldn't load symbol for 'vkCmdSetRepresentativeFragmentTestEnableNV': ${err}")
-		return
-	})
-	f(command_buffer, representative_fragment_test_enable)
+fn C.vkCmdSetRepresentativeFragmentTestEnableNV(C.CommandBuffer,
+	Bool32)
+pub fn cmd_set_representative_fragment_test_enable_nv(command_buffer C.CommandBuffer,
+	representative_fragment_test_enable Bool32) {
+	C.vkCmdSetRepresentativeFragmentTestEnableNV(command_buffer, representative_fragment_test_enable)
 }
 
-type VkCmdSetCoverageReductionModeNV = fn (C.CommandBuffer, CoverageReductionModeNV)
-
-pub fn cmd_set_coverage_reduction_mode_nv(command_buffer C.CommandBuffer, coverage_reduction_mode CoverageReductionModeNV) {
-	f := VkCmdSetCoverageReductionModeNV((*vulkan.loader_p).get_sym('vkCmdSetCoverageReductionModeNV') or {
-		println("Couldn't load symbol for 'vkCmdSetCoverageReductionModeNV': ${err}")
-		return
-	})
-	f(command_buffer, coverage_reduction_mode)
+fn C.vkCmdSetCoverageReductionModeNV(C.CommandBuffer,
+	CoverageReductionModeNV)
+pub fn cmd_set_coverage_reduction_mode_nv(command_buffer C.CommandBuffer,
+	coverage_reduction_mode CoverageReductionModeNV) {
+	C.vkCmdSetCoverageReductionModeNV(command_buffer, coverage_reduction_mode)
 }
 
-// VK_EXT_subpass_merge_feedback is a preprocessor guard. Do not pass it to API calls.
-const ext_subpass_merge_feedback = 1
 pub const ext_subpass_merge_feedback_spec_version = 2
 pub const ext_subpass_merge_feedback_extension_name = 'VK_EXT_subpass_merge_feedback'
 
@@ -21425,52 +18795,46 @@ pub enum SubpassMergeStatusEXT {
 	subpass_merge_status_max_enum_ext                                 = int(0x7FFFFFFF)
 }
 
-// PhysicalDeviceSubpassMergeFeedbackFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceSubpassMergeFeedbackFeaturesEXT {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	subpass_merge_feedback Bool32
 }
 
-// RenderPassCreationControlEXT extends VkRenderPassCreateInfo2,VkSubpassDescription2
 pub struct RenderPassCreationControlEXT {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	disallow_merging Bool32
 }
 
 pub struct RenderPassCreationFeedbackInfoEXT {
-mut:
+pub mut:
 	post_merge_subpass_count u32
 }
 
-// RenderPassCreationFeedbackCreateInfoEXT extends VkRenderPassCreateInfo2
 pub struct RenderPassCreationFeedbackCreateInfoEXT {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	p_render_pass_feedback &RenderPassCreationFeedbackInfoEXT
 }
 
 pub struct RenderPassSubpassFeedbackInfoEXT {
-mut:
+pub mut:
 	subpass_merge_status SubpassMergeStatusEXT
-	description          []char
+	description          [max_description_size]char
 	post_merge_index     u32
 }
 
-// RenderPassSubpassFeedbackCreateInfoEXT extends VkSubpassDescription2
 pub struct RenderPassSubpassFeedbackCreateInfoEXT {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	p_subpass_feedback &RenderPassSubpassFeedbackInfoEXT
 }
 
-// VK_LUNARG_direct_driver_loading is a preprocessor guard. Do not pass it to API calls.
-const lunarg_direct_driver_loading = 1
 pub const lunarg_direct_driver_loading_spec_version = 1
 pub const lunarg_direct_driver_loading_extension_name = 'VK_NARG_direct_driver_loading'
 
@@ -21481,19 +18845,18 @@ pub enum DirectDriverLoadingModeLUNARG {
 }
 
 pub type DirectDriverLoadingFlagsLUNARG = u32
-pub type PFN_vkGetInstanceProcAddrLUNARG = fn (instanceconst C.Instance, pName &char) voidptr
+pub type PFN_vkGetInstanceProcAddrLUNARG = fn (instanceconst C.Instance, pName &char)
 
 pub struct DirectDriverLoadingInfoLUNARG {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	flags                      DirectDriverLoadingFlagsLUNARG
 	pfn_get_instance_proc_addr PFN_vkGetInstanceProcAddrLUNARG = unsafe { nil }
 }
 
-// DirectDriverLoadingListLUNARG extends VkInstanceCreateInfo
 pub struct DirectDriverLoadingListLUNARG {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	mode         DirectDriverLoadingModeLUNARG
@@ -21501,30 +18864,26 @@ mut:
 	p_drivers    &DirectDriverLoadingInfoLUNARG
 }
 
-// VK_EXT_shader_module_identifier is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_module_identifier = 1
 pub const max_shader_module_identifier_size_ext = u32(32)
 pub const ext_shader_module_identifier_spec_version = 1
 pub const ext_shader_module_identifier_extension_name = 'VK_EXT_shader_module_identifier'
-// PhysicalDeviceShaderModuleIdentifierFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderModuleIdentifierFeaturesEXT {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	shader_module_identifier Bool32
 }
 
-// PhysicalDeviceShaderModuleIdentifierPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceShaderModuleIdentifierPropertiesEXT {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
-	shader_module_identifier_algorithm_uuid []u8
+	shader_module_identifier_algorithm_uuid [uuid_size]u8
 }
 
-// PipelineShaderStageModuleIdentifierCreateInfoEXT extends VkPipelineShaderStageCreateInfo
 pub struct PipelineShaderStageModuleIdentifierCreateInfoEXT {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	identifier_size u32
@@ -21532,40 +18891,33 @@ mut:
 }
 
 pub struct ShaderModuleIdentifierEXT {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	identifier_size u32
-	identifier      []u8
+	identifier      [max_shader_module_identifier_size_ext]u8
 }
 
-type VkGetShaderModuleIdentifierEXT = fn (C.Device, C.ShaderModule, &ShaderModuleIdentifierEXT)
-
-pub fn get_shader_module_identifier_ext(device C.Device, shader_module C.ShaderModule, p_identifier &ShaderModuleIdentifierEXT) {
-	f := VkGetShaderModuleIdentifierEXT((*vulkan.loader_p).get_sym('vkGetShaderModuleIdentifierEXT') or {
-		println("Couldn't load symbol for 'vkGetShaderModuleIdentifierEXT': ${err}")
-		return
-	})
-	f(device, shader_module, p_identifier)
+fn C.vkGetShaderModuleIdentifierEXT(C.Device,
+	C.ShaderModule,
+	&ShaderModuleIdentifierEXT)
+pub fn get_shader_module_identifier_ext(device C.Device,
+	shader_module C.ShaderModule,
+	p_identifier &ShaderModuleIdentifierEXT) {
+	C.vkGetShaderModuleIdentifierEXT(device, shader_module, p_identifier)
 }
 
-type VkGetShaderModuleCreateInfoIdentifierEXT = fn (C.Device, &ShaderModuleCreateInfo, &ShaderModuleIdentifierEXT)
-
-pub fn get_shader_module_create_info_identifier_ext(device C.Device, p_create_info &ShaderModuleCreateInfo, p_identifier &ShaderModuleIdentifierEXT) {
-	f := VkGetShaderModuleCreateInfoIdentifierEXT((*vulkan.loader_p).get_sym('vkGetShaderModuleCreateInfoIdentifierEXT') or {
-		println("Couldn't load symbol for 'vkGetShaderModuleCreateInfoIdentifierEXT': ${err}")
-		return
-	})
-	f(device, p_create_info, p_identifier)
+fn C.vkGetShaderModuleCreateInfoIdentifierEXT(C.Device,
+	&ShaderModuleCreateInfo,
+	&ShaderModuleIdentifierEXT)
+pub fn get_shader_module_create_info_identifier_ext(device C.Device,
+	p_create_info &ShaderModuleCreateInfo,
+	p_identifier &ShaderModuleIdentifierEXT) {
+	C.vkGetShaderModuleCreateInfoIdentifierEXT(device, p_create_info, p_identifier)
 }
 
-// VK_EXT_rasterization_order_attachment_access is a preprocessor guard. Do not pass it to API calls.
-const ext_rasterization_order_attachment_access = 1
 pub const ext_rasterization_order_attachment_access_spec_version = 1
 pub const ext_rasterization_order_attachment_access_extension_name = 'VK_EXT_rasterization_order_attachment_access'
-
-// VK_NV_optical_flow is a preprocessor guard. Do not pass it to API calls.
-const nv_optical_flow = 1
 
 pub type C.OpticalFlowSessionNV = voidptr
 
@@ -21634,17 +18986,15 @@ pub enum OpticalFlowExecuteFlagBitsNV {
 
 pub type OpticalFlowExecuteFlagsNV = u32
 
-// PhysicalDeviceOpticalFlowFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceOpticalFlowFeaturesNV {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	optical_flow Bool32
 }
 
-// PhysicalDeviceOpticalFlowPropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceOpticalFlowPropertiesNV {
-mut:
+pub mut:
 	s_type                       StructureType
 	p_next                       voidptr
 	supported_output_grid_sizes  OpticalFlowGridSizeFlagsNV
@@ -21660,23 +19010,22 @@ mut:
 	max_num_regions_of_interest  u32
 }
 
-// OpticalFlowImageFormatInfoNV extends VkPhysicalDeviceImageFormatInfo2,VkImageCreateInfo
 pub struct OpticalFlowImageFormatInfoNV {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	usage  OpticalFlowUsageFlagsNV
 }
 
 pub struct OpticalFlowImageFormatPropertiesNV {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	format Format
 }
 
 pub struct OpticalFlowSessionCreateInfoNV {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	width              u32
@@ -21690,9 +19039,8 @@ mut:
 	flags              OpticalFlowSessionCreateFlagsNV
 }
 
-// OpticalFlowSessionCreatePrivateDataInfoNV extends VkOpticalFlowSessionCreateInfoNV
 pub struct OpticalFlowSessionCreatePrivateDataInfoNV {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	id             u32
@@ -21701,7 +19049,7 @@ mut:
 }
 
 pub struct OpticalFlowExecuteInfoNV {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	flags        OpticalFlowExecuteFlagsNV
@@ -21709,112 +19057,79 @@ mut:
 	p_regions    &Rect2D
 }
 
-type VkGetPhysicalDeviceOpticalFlowImageFormatsNV = fn (C.PhysicalDevice, &OpticalFlowImageFormatInfoNV, &u32, &OpticalFlowImageFormatPropertiesNV) Result
-
-pub fn get_physical_device_optical_flow_image_formats_nv(physical_device C.PhysicalDevice, p_optical_flow_image_format_info &OpticalFlowImageFormatInfoNV, p_format_count &u32, p_image_format_properties &OpticalFlowImageFormatPropertiesNV) Result {
-	f := VkGetPhysicalDeviceOpticalFlowImageFormatsNV((*vulkan.loader_p).get_sym('vkGetPhysicalDeviceOpticalFlowImageFormatsNV') or {
-		println("Couldn't load symbol for 'vkGetPhysicalDeviceOpticalFlowImageFormatsNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(physical_device, p_optical_flow_image_format_info, p_format_count, p_image_format_properties)
+fn C.vkGetPhysicalDeviceOpticalFlowImageFormatsNV(C.PhysicalDevice,
+	&OpticalFlowImageFormatInfoNV,
+	&u32,
+	&OpticalFlowImageFormatPropertiesNV) Result
+pub fn get_physical_device_optical_flow_image_formats_nv(physical_device C.PhysicalDevice,
+	p_optical_flow_image_format_info &OpticalFlowImageFormatInfoNV,
+	p_format_count &u32,
+	p_image_format_properties &OpticalFlowImageFormatPropertiesNV) Result {
+	return C.vkGetPhysicalDeviceOpticalFlowImageFormatsNV(physical_device, p_optical_flow_image_format_info,
+		p_format_count, p_image_format_properties)
 }
 
-type VkCreateOpticalFlowSessionNV = fn (C.Device, &OpticalFlowSessionCreateInfoNV, &AllocationCallbacks, &C.OpticalFlowSessionNV) Result
-
-pub fn create_optical_flow_session_nv(device C.Device, p_create_info &OpticalFlowSessionCreateInfoNV, p_allocator &AllocationCallbacks, p_session &C.OpticalFlowSessionNV) Result {
-	f := VkCreateOpticalFlowSessionNV((*vulkan.loader_p).get_sym('vkCreateOpticalFlowSessionNV') or {
-		println("Couldn't load symbol for 'vkCreateOpticalFlowSessionNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_session)
+fn C.vkCreateOpticalFlowSessionNV(C.Device,
+	&OpticalFlowSessionCreateInfoNV,
+	&AllocationCallbacks,
+	&C.OpticalFlowSessionNV) Result
+pub fn create_optical_flow_session_nv(device C.Device,
+	p_create_info &OpticalFlowSessionCreateInfoNV,
+	p_allocator &AllocationCallbacks,
+	p_session &C.OpticalFlowSessionNV) Result {
+	return C.vkCreateOpticalFlowSessionNV(device, p_create_info, p_allocator, p_session)
 }
 
-type VkDestroyOpticalFlowSessionNV = fn (C.Device, C.OpticalFlowSessionNV, &AllocationCallbacks)
-
-pub fn destroy_optical_flow_session_nv(device C.Device, session C.OpticalFlowSessionNV, p_allocator &AllocationCallbacks) {
-	f := VkDestroyOpticalFlowSessionNV((*vulkan.loader_p).get_sym('vkDestroyOpticalFlowSessionNV') or {
-		println("Couldn't load symbol for 'vkDestroyOpticalFlowSessionNV': ${err}")
-		return
-	})
-	f(device, session, p_allocator)
+fn C.vkDestroyOpticalFlowSessionNV(C.Device,
+	C.OpticalFlowSessionNV,
+	&AllocationCallbacks)
+pub fn destroy_optical_flow_session_nv(device C.Device,
+	session C.OpticalFlowSessionNV,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyOpticalFlowSessionNV(device, session, p_allocator)
 }
 
-type VkBindOpticalFlowSessionImageNV = fn (C.Device, C.OpticalFlowSessionNV, OpticalFlowSessionBindingPointNV, C.ImageView, ImageLayout) Result
-
-pub fn bind_optical_flow_session_image_nv(device C.Device, session C.OpticalFlowSessionNV, binding_point OpticalFlowSessionBindingPointNV, view C.ImageView, layout ImageLayout) Result {
-	f := VkBindOpticalFlowSessionImageNV((*vulkan.loader_p).get_sym('vkBindOpticalFlowSessionImageNV') or {
-		println("Couldn't load symbol for 'vkBindOpticalFlowSessionImageNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, session, binding_point, view, layout)
+fn C.vkBindOpticalFlowSessionImageNV(C.Device,
+	C.OpticalFlowSessionNV,
+	OpticalFlowSessionBindingPointNV,
+	C.ImageView,
+	ImageLayout) Result
+pub fn bind_optical_flow_session_image_nv(device C.Device,
+	session C.OpticalFlowSessionNV,
+	binding_point OpticalFlowSessionBindingPointNV,
+	view C.ImageView,
+	layout ImageLayout) Result {
+	return C.vkBindOpticalFlowSessionImageNV(device, session, binding_point, view, layout)
 }
 
-type VkCmdOpticalFlowExecuteNV = fn (C.CommandBuffer, C.OpticalFlowSessionNV, &OpticalFlowExecuteInfoNV)
-
-pub fn cmd_optical_flow_execute_nv(command_buffer C.CommandBuffer, session C.OpticalFlowSessionNV, p_execute_info &OpticalFlowExecuteInfoNV) {
-	f := VkCmdOpticalFlowExecuteNV((*vulkan.loader_p).get_sym('vkCmdOpticalFlowExecuteNV') or {
-		println("Couldn't load symbol for 'vkCmdOpticalFlowExecuteNV': ${err}")
-		return
-	})
-	f(command_buffer, session, p_execute_info)
+fn C.vkCmdOpticalFlowExecuteNV(C.CommandBuffer,
+	C.OpticalFlowSessionNV,
+	&OpticalFlowExecuteInfoNV)
+pub fn cmd_optical_flow_execute_nv(command_buffer C.CommandBuffer,
+	session C.OpticalFlowSessionNV,
+	p_execute_info &OpticalFlowExecuteInfoNV) {
+	C.vkCmdOpticalFlowExecuteNV(command_buffer, session, p_execute_info)
 }
 
-// VK_EXT_legacy_dithering is a preprocessor guard. Do not pass it to API calls.
-const ext_legacy_dithering = 1
-pub const ext_legacy_dithering_spec_version = 1
+pub const ext_legacy_dithering_spec_version = 2
 pub const ext_legacy_dithering_extension_name = 'VK_EXT_legacy_dithering'
-// PhysicalDeviceLegacyDitheringFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceLegacyDitheringFeaturesEXT {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	legacy_dithering Bool32
 }
 
-// VK_EXT_pipeline_protected_access is a preprocessor guard. Do not pass it to API calls.
-const ext_pipeline_protected_access = 1
 pub const ext_pipeline_protected_access_spec_version = 1
 pub const ext_pipeline_protected_access_extension_name = 'VK_EXT_pipeline_protected_access'
-// PhysicalDevicePipelineProtectedAccessFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDevicePipelineProtectedAccessFeaturesEXT {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	pipeline_protected_access Bool32
 }
-
-// VK_ANDROID_external_format_resolve is a preprocessor guard. Do not pass it to API calls.
-const android_external_format_resolve = 1
-pub const android_external_format_resolve_spec_version = 1
-pub const android_external_format_resolve_extension_name = 'VK_ANDROID_external_format_resolve'
-// PhysicalDeviceExternalFormatResolveFeaturesANDROID extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub struct PhysicalDeviceExternalFormatResolveFeaturesANDROID {
-mut:
-	s_type                  StructureType
-	p_next                  voidptr
-	external_format_resolve Bool32
-}
-
-// PhysicalDeviceExternalFormatResolvePropertiesANDROID extends VkPhysicalDeviceProperties2
-pub struct PhysicalDeviceExternalFormatResolvePropertiesANDROID {
-mut:
-	s_type                                             StructureType
-	p_next                                             voidptr
-	null_color_attachment_with_external_format_resolve Bool32
-	external_format_resolve_chroma_offset_x            ChromaLocation
-	external_format_resolve_chroma_offset_y            ChromaLocation
-}
-
-// AndroidHardwareBufferFormatResolvePropertiesANDROID extends VkAndroidHardwareBufferPropertiesANDROID
-pub struct AndroidHardwareBufferFormatResolvePropertiesANDROID {
-mut:
-	s_type                  StructureType
-	p_next                  voidptr
-	color_attachment_format Format
-}
-
-// VK_EXT_shader_object is a preprocessor guard. Do not pass it to API calls.
-const ext_shader_object = 1
 
 pub type C.ShaderEXT = voidptr
 
@@ -21840,25 +19155,23 @@ pub enum ShaderCreateFlagBitsEXT {
 
 pub type ShaderCreateFlagsEXT = u32
 
-// PhysicalDeviceShaderObjectFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceShaderObjectFeaturesEXT {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	shader_object Bool32
 }
 
-// PhysicalDeviceShaderObjectPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceShaderObjectPropertiesEXT {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
-	shader_binary_uuid    []u8
+	shader_binary_uuid    [uuid_size]u8
 	shader_binary_version u32
 }
 
 pub struct ShaderCreateInfoEXT {
-mut:
+pub mut:
 	s_type                    StructureType
 	p_next                    voidptr
 	flags                     ShaderCreateFlagsEXT
@@ -21877,60 +19190,63 @@ mut:
 
 pub type ShaderRequiredSubgroupSizeCreateInfoEXT = PipelineShaderStageRequiredSubgroupSizeCreateInfo
 
-type VkCreateShadersEXT = fn (C.Device, u32, &ShaderCreateInfoEXT, &AllocationCallbacks, &C.ShaderEXT) Result
-
-pub fn create_shaders_ext(device C.Device, create_info_count u32, p_create_infos &ShaderCreateInfoEXT, p_allocator &AllocationCallbacks, p_shaders &C.ShaderEXT) Result {
-	f := VkCreateShadersEXT((*vulkan.loader_p).get_sym('vkCreateShadersEXT') or {
-		println("Couldn't load symbol for 'vkCreateShadersEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, create_info_count, p_create_infos, p_allocator, p_shaders)
+fn C.vkCreateShadersEXT(C.Device,
+	u32,
+	&ShaderCreateInfoEXT,
+	&AllocationCallbacks,
+	&C.ShaderEXT) Result
+pub fn create_shaders_ext(device C.Device,
+	create_info_count u32,
+	p_create_infos &ShaderCreateInfoEXT,
+	p_allocator &AllocationCallbacks,
+	p_shaders &C.ShaderEXT) Result {
+	return C.vkCreateShadersEXT(device, create_info_count, p_create_infos, p_allocator,
+		p_shaders)
 }
 
-type VkDestroyShaderEXT = fn (C.Device, C.ShaderEXT, &AllocationCallbacks)
-
-pub fn destroy_shader_ext(device C.Device, shader C.ShaderEXT, p_allocator &AllocationCallbacks) {
-	f := VkDestroyShaderEXT((*vulkan.loader_p).get_sym('vkDestroyShaderEXT') or {
-		println("Couldn't load symbol for 'vkDestroyShaderEXT': ${err}")
-		return
-	})
-	f(device, shader, p_allocator)
+fn C.vkDestroyShaderEXT(C.Device,
+	C.ShaderEXT,
+	&AllocationCallbacks)
+pub fn destroy_shader_ext(device C.Device,
+	shader C.ShaderEXT,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyShaderEXT(device, shader, p_allocator)
 }
 
-type VkGetShaderBinaryDataEXT = fn (C.Device, C.ShaderEXT, &usize, voidptr) Result
-
-pub fn get_shader_binary_data_ext(device C.Device, shader C.ShaderEXT, p_data_size &usize, p_data voidptr) Result {
-	f := VkGetShaderBinaryDataEXT((*vulkan.loader_p).get_sym('vkGetShaderBinaryDataEXT') or {
-		println("Couldn't load symbol for 'vkGetShaderBinaryDataEXT': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, shader, p_data_size, p_data)
+fn C.vkGetShaderBinaryDataEXT(C.Device,
+	C.ShaderEXT,
+	&usize,
+	voidptr) Result
+pub fn get_shader_binary_data_ext(device C.Device,
+	shader C.ShaderEXT,
+	p_data_size &usize,
+	p_data voidptr) Result {
+	return C.vkGetShaderBinaryDataEXT(device, shader, p_data_size, p_data)
 }
 
-type VkCmdBindShadersEXT = fn (C.CommandBuffer, u32, &ShaderStageFlagBits, &C.ShaderEXT)
-
-pub fn cmd_bind_shaders_ext(command_buffer C.CommandBuffer, stage_count u32, p_stages &ShaderStageFlagBits, p_shaders &C.ShaderEXT) {
-	f := VkCmdBindShadersEXT((*vulkan.loader_p).get_sym('vkCmdBindShadersEXT') or {
-		println("Couldn't load symbol for 'vkCmdBindShadersEXT': ${err}")
-		return
-	})
-	f(command_buffer, stage_count, p_stages, p_shaders)
+fn C.vkCmdBindShadersEXT(C.CommandBuffer,
+	u32,
+	&ShaderStageFlagBits,
+	&C.ShaderEXT)
+pub fn cmd_bind_shaders_ext(command_buffer C.CommandBuffer,
+	stage_count u32,
+	p_stages &ShaderStageFlagBits,
+	p_shaders &C.ShaderEXT) {
+	C.vkCmdBindShadersEXT(command_buffer, stage_count, p_stages, p_shaders)
 }
 
-// VK_QCOM_tile_properties is a preprocessor guard. Do not pass it to API calls.
-const qcom_tile_properties = 1
 pub const qcom_tile_properties_spec_version = 1
 pub const qcom_tile_properties_extension_name = 'VK_QCOM_tile_properties'
-// PhysicalDeviceTilePropertiesFeaturesQCOM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceTilePropertiesFeaturesQCOM {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	tile_properties Bool32
 }
 
 pub struct TilePropertiesQCOM {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	tile_size  Extent3D
@@ -21938,61 +19254,55 @@ mut:
 	origin     Offset2D
 }
 
-type VkGetFramebufferTilePropertiesQCOM = fn (C.Device, C.Framebuffer, &u32, &TilePropertiesQCOM) Result
-
-pub fn get_framebuffer_tile_properties_qcom(device C.Device, framebuffer C.Framebuffer, p_properties_count &u32, p_properties &TilePropertiesQCOM) Result {
-	f := VkGetFramebufferTilePropertiesQCOM((*vulkan.loader_p).get_sym('vkGetFramebufferTilePropertiesQCOM') or {
-		println("Couldn't load symbol for 'vkGetFramebufferTilePropertiesQCOM': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, framebuffer, p_properties_count, p_properties)
+fn C.vkGetFramebufferTilePropertiesQCOM(C.Device,
+	C.Framebuffer,
+	&u32,
+	&TilePropertiesQCOM) Result
+pub fn get_framebuffer_tile_properties_qcom(device C.Device,
+	framebuffer C.Framebuffer,
+	p_properties_count &u32,
+	p_properties &TilePropertiesQCOM) Result {
+	return C.vkGetFramebufferTilePropertiesQCOM(device, framebuffer, p_properties_count,
+		p_properties)
 }
 
-type VkGetDynamicRenderingTilePropertiesQCOM = fn (C.Device, &RenderingInfo, &TilePropertiesQCOM) Result
-
-pub fn get_dynamic_rendering_tile_properties_qcom(device C.Device, p_rendering_info &RenderingInfo, p_properties &TilePropertiesQCOM) Result {
-	f := VkGetDynamicRenderingTilePropertiesQCOM((*vulkan.loader_p).get_sym('vkGetDynamicRenderingTilePropertiesQCOM') or {
-		println("Couldn't load symbol for 'vkGetDynamicRenderingTilePropertiesQCOM': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_rendering_info, p_properties)
+fn C.vkGetDynamicRenderingTilePropertiesQCOM(C.Device,
+	&RenderingInfo,
+	&TilePropertiesQCOM) Result
+pub fn get_dynamic_rendering_tile_properties_qcom(device C.Device,
+	p_rendering_info &RenderingInfo,
+	p_properties &TilePropertiesQCOM) Result {
+	return C.vkGetDynamicRenderingTilePropertiesQCOM(device, p_rendering_info, p_properties)
 }
 
-// VK_SEC_amigo_profiling is a preprocessor guard. Do not pass it to API calls.
-const sec_amigo_profiling = 1
 pub const sec_amigo_profiling_spec_version = 1
 pub const sec_amigo_profiling_extension_name = 'VK_SEC_amigo_profiling'
-// PhysicalDeviceAmigoProfilingFeaturesSEC extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceAmigoProfilingFeaturesSEC {
-mut:
+pub mut:
 	s_type          StructureType
 	p_next          voidptr
 	amigo_profiling Bool32
 }
 
-// AmigoProfilingSubmitInfoSEC extends VkSubmitInfo
 pub struct AmigoProfilingSubmitInfoSEC {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	first_draw_timestamp  u64
 	swap_buffer_timestamp u64
 }
 
-// VK_QCOM_multiview_per_view_viewports is a preprocessor guard. Do not pass it to API calls.
-const qcom_multiview_per_view_viewports = 1
 pub const qcom_multiview_per_view_viewports_spec_version = 1
 pub const qcom_multiview_per_view_viewports_extension_name = 'VK_QCOM_multiview_per_view_viewports'
-// PhysicalDeviceMultiviewPerViewViewportsFeaturesQCOM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceMultiviewPerViewViewportsFeaturesQCOM {
-mut:
+pub mut:
 	s_type                       StructureType
 	p_next                       voidptr
 	multiview_per_view_viewports Bool32
 }
 
-// VK_NV_ray_tracing_invocation_reorder is a preprocessor guard. Do not pass it to API calls.
-const nv_ray_tracing_invocation_reorder = 1
 pub const nv_ray_tracing_invocation_reorder_spec_version = 1
 pub const nv_ray_tracing_invocation_reorder_extension_name = 'VK_NV_ray_tracing_invocation_reorder'
 
@@ -22002,37 +19312,32 @@ pub enum RayTracingInvocationReorderModeNV {
 	ray_tracing_invocation_reorder_mode_max_enum_nv = int(0x7FFFFFFF)
 }
 
-// PhysicalDeviceRayTracingInvocationReorderPropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceRayTracingInvocationReorderPropertiesNV {
-mut:
+pub mut:
 	s_type                                         StructureType
 	p_next                                         voidptr
 	ray_tracing_invocation_reorder_reordering_hint RayTracingInvocationReorderModeNV
 }
 
-// PhysicalDeviceRayTracingInvocationReorderFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceRayTracingInvocationReorderFeaturesNV {
-mut:
+pub mut:
 	s_type                         StructureType
 	p_next                         voidptr
 	ray_tracing_invocation_reorder Bool32
 }
 
-// VK_NV_extended_sparse_address_space is a preprocessor guard. Do not pass it to API calls.
-const nv_extended_sparse_address_space = 1
 pub const nv_extended_sparse_address_space_spec_version = 1
 pub const nv_extended_sparse_address_space_extension_name = 'VK_NV_extended_sparse_address_space'
-// PhysicalDeviceExtendedSparseAddressSpaceFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceExtendedSparseAddressSpaceFeaturesNV {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	extended_sparse_address_space Bool32
 }
 
-// PhysicalDeviceExtendedSparseAddressSpacePropertiesNV extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceExtendedSparseAddressSpacePropertiesNV {
-mut:
+pub mut:
 	s_type                             StructureType
 	p_next                             voidptr
 	extended_sparse_address_space_size DeviceSize
@@ -22040,13 +19345,26 @@ mut:
 	extended_sparse_buffer_usage_flags BufferUsageFlags
 }
 
-// VK_EXT_mutable_descriptor_type is a preprocessor guard. Do not pass it to API calls.
-const ext_mutable_descriptor_type = 1
 pub const ext_mutable_descriptor_type_spec_version = 1
 pub const ext_mutable_descriptor_type_extension_name = 'VK_EXT_mutable_descriptor_type'
 
-// VK_EXT_layer_settings is a preprocessor guard. Do not pass it to API calls.
-const ext_layer_settings = 1
+pub const ext_legacy_vertex_attributes_spec_version = 1
+pub const ext_legacy_vertex_attributes_extension_name = 'VK_EXT_legacy_vertex_attributes'
+
+pub struct PhysicalDeviceLegacyVertexAttributesFeaturesEXT {
+pub mut:
+	s_type                   StructureType
+	p_next                   voidptr
+	legacy_vertex_attributes Bool32
+}
+
+pub struct PhysicalDeviceLegacyVertexAttributesPropertiesEXT {
+pub mut:
+	s_type                       StructureType
+	p_next                       voidptr
+	native_unaligned_performance Bool32
+}
+
 pub const ext_layer_settings_spec_version = 2
 pub const ext_layer_settings_extension_name = 'VK_EXT_layer_settings'
 
@@ -22063,7 +19381,7 @@ pub enum LayerSettingTypeEXT {
 }
 
 pub struct LayerSettingEXT {
-mut:
+pub mut:
 	p_layer_name   &char
 	p_setting_name &char
 	vktype         LayerSettingTypeEXT
@@ -22071,30 +19389,26 @@ mut:
 	p_values       voidptr
 }
 
-// LayerSettingsCreateInfoEXT extends VkInstanceCreateInfo
 pub struct LayerSettingsCreateInfoEXT {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	setting_count u32
 	p_settings    &LayerSettingEXT
 }
 
-// VK_ARM_shader_core_builtins is a preprocessor guard. Do not pass it to API calls.
-const arm_shader_core_builtins = 1
 pub const arm_shader_core_builtins_spec_version = 2
 pub const arm_shader_core_builtins_extension_name = 'VK_ARM_shader_core_builtins'
-// PhysicalDeviceShaderCoreBuiltinsFeaturesARM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceShaderCoreBuiltinsFeaturesARM {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	shader_core_builtins Bool32
 }
 
-// PhysicalDeviceShaderCoreBuiltinsPropertiesARM extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceShaderCoreBuiltinsPropertiesARM {
-mut:
+pub mut:
 	s_type                StructureType
 	p_next                voidptr
 	shader_core_mask      u64
@@ -22102,32 +19416,26 @@ mut:
 	shader_warps_per_core u32
 }
 
-// VK_EXT_pipeline_library_group_handles is a preprocessor guard. Do not pass it to API calls.
-const ext_pipeline_library_group_handles = 1
 pub const ext_pipeline_library_group_handles_spec_version = 1
 pub const ext_pipeline_library_group_handles_extension_name = 'VK_EXT_pipeline_library_group_handles'
-// PhysicalDevicePipelineLibraryGroupHandlesFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDevicePipelineLibraryGroupHandlesFeaturesEXT {
-mut:
+pub mut:
 	s_type                         StructureType
 	p_next                         voidptr
 	pipeline_library_group_handles Bool32
 }
 
-// VK_EXT_dynamic_rendering_unused_attachments is a preprocessor guard. Do not pass it to API calls.
-const ext_dynamic_rendering_unused_attachments = 1
 pub const ext_dynamic_rendering_unused_attachments_spec_version = 1
 pub const ext_dynamic_rendering_unused_attachments_extension_name = 'VK_EXT_dynamic_rendering_unused_attachments'
-// PhysicalDeviceDynamicRenderingUnusedAttachmentsFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceDynamicRenderingUnusedAttachmentsFeaturesEXT {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	dynamic_rendering_unused_attachments Bool32
 }
 
-// VK_NV_low_latency2 is a preprocessor guard. Do not pass it to API calls.
-const nv_low_latency2 = 1
 pub const nv_low_latency_2_spec_version = 2
 pub const nv_low_latency_2_extension_name = 'VK_NV_low_latency2'
 
@@ -22154,7 +19462,7 @@ pub enum OutOfBandQueueTypeNV {
 }
 
 pub struct LatencySleepModeInfoNV {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	low_latency_mode    Bool32
@@ -22163,7 +19471,7 @@ mut:
 }
 
 pub struct LatencySleepInfoNV {
-mut:
+pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	signal_semaphore C.Semaphore
@@ -22171,7 +19479,7 @@ mut:
 }
 
 pub struct SetLatencyMarkerInfoNV {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	present_id u64
@@ -22179,7 +19487,7 @@ mut:
 }
 
 pub struct LatencyTimingsFrameReportNV {
-mut:
+pub mut:
 	s_type                        StructureType
 	p_next                        voidptr
 	present_id                    u64
@@ -22199,118 +19507,114 @@ mut:
 }
 
 pub struct GetLatencyMarkerInfoNV {
-mut:
+pub mut:
 	s_type       StructureType
 	p_next       voidptr
 	timing_count u32
 	p_timings    &LatencyTimingsFrameReportNV
 }
 
-// LatencySubmissionPresentIdNV extends VkSubmitInfo,VkSubmitInfo2
 pub struct LatencySubmissionPresentIdNV {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	present_id u64
 }
 
-// SwapchainLatencyCreateInfoNV extends VkSwapchainCreateInfoKHR
 pub struct SwapchainLatencyCreateInfoNV {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	latency_mode_enable Bool32
 }
 
 pub struct OutOfBandQueueTypeInfoNV {
-mut:
+pub mut:
 	s_type     StructureType
 	p_next     voidptr
 	queue_type OutOfBandQueueTypeNV
 }
 
-// LatencySurfaceCapabilitiesNV extends VkSurfaceCapabilities2KHR
 pub struct LatencySurfaceCapabilitiesNV {
-mut:
+pub mut:
 	s_type             StructureType
 	p_next             voidptr
 	present_mode_count u32
 	p_present_modes    &PresentModeKHR
 }
 
-type VkSetLatencySleepModeNV = fn (C.Device, C.SwapchainKHR, &LatencySleepModeInfoNV) Result
-
-pub fn set_latency_sleep_mode_nv(device C.Device, swapchain C.SwapchainKHR, p_sleep_mode_info &LatencySleepModeInfoNV) Result {
-	f := VkSetLatencySleepModeNV((*vulkan.loader_p).get_sym('vkSetLatencySleepModeNV') or {
-		println("Couldn't load symbol for 'vkSetLatencySleepModeNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain, p_sleep_mode_info)
+fn C.vkSetLatencySleepModeNV(C.Device,
+	C.SwapchainKHR,
+	&LatencySleepModeInfoNV) Result
+pub fn set_latency_sleep_mode_nv(device C.Device,
+	swapchain C.SwapchainKHR,
+	p_sleep_mode_info &LatencySleepModeInfoNV) Result {
+	return C.vkSetLatencySleepModeNV(device, swapchain, p_sleep_mode_info)
 }
 
-type VkLatencySleepNV = fn (C.Device, C.SwapchainKHR, &LatencySleepInfoNV) Result
-
-pub fn latency_sleep_nv(device C.Device, swapchain C.SwapchainKHR, p_sleep_info &LatencySleepInfoNV) Result {
-	f := VkLatencySleepNV((*vulkan.loader_p).get_sym('vkLatencySleepNV') or {
-		println("Couldn't load symbol for 'vkLatencySleepNV': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, swapchain, p_sleep_info)
+fn C.vkLatencySleepNV(C.Device,
+	C.SwapchainKHR,
+	&LatencySleepInfoNV) Result
+pub fn latency_sleep_nv(device C.Device,
+	swapchain C.SwapchainKHR,
+	p_sleep_info &LatencySleepInfoNV) Result {
+	return C.vkLatencySleepNV(device, swapchain, p_sleep_info)
 }
 
-type VkSetLatencyMarkerNV = fn (C.Device, C.SwapchainKHR, &SetLatencyMarkerInfoNV)
-
-pub fn set_latency_marker_nv(device C.Device, swapchain C.SwapchainKHR, p_latency_marker_info &SetLatencyMarkerInfoNV) {
-	f := VkSetLatencyMarkerNV((*vulkan.loader_p).get_sym('vkSetLatencyMarkerNV') or {
-		println("Couldn't load symbol for 'vkSetLatencyMarkerNV': ${err}")
-		return
-	})
-	f(device, swapchain, p_latency_marker_info)
+fn C.vkSetLatencyMarkerNV(C.Device,
+	C.SwapchainKHR,
+	&SetLatencyMarkerInfoNV)
+pub fn set_latency_marker_nv(device C.Device,
+	swapchain C.SwapchainKHR,
+	p_latency_marker_info &SetLatencyMarkerInfoNV) {
+	C.vkSetLatencyMarkerNV(device, swapchain, p_latency_marker_info)
 }
 
-type VkGetLatencyTimingsNV = fn (C.Device, C.SwapchainKHR, &GetLatencyMarkerInfoNV)
-
-pub fn get_latency_timings_nv(device C.Device, swapchain C.SwapchainKHR, p_latency_marker_info &GetLatencyMarkerInfoNV) {
-	f := VkGetLatencyTimingsNV((*vulkan.loader_p).get_sym('vkGetLatencyTimingsNV') or {
-		println("Couldn't load symbol for 'vkGetLatencyTimingsNV': ${err}")
-		return
-	})
-	f(device, swapchain, p_latency_marker_info)
+fn C.vkGetLatencyTimingsNV(C.Device,
+	C.SwapchainKHR,
+	&GetLatencyMarkerInfoNV)
+pub fn get_latency_timings_nv(device C.Device,
+	swapchain C.SwapchainKHR,
+	p_latency_marker_info &GetLatencyMarkerInfoNV) {
+	C.vkGetLatencyTimingsNV(device, swapchain, p_latency_marker_info)
 }
 
-type VkQueueNotifyOutOfBandNV = fn (C.Queue, &OutOfBandQueueTypeInfoNV)
-
-pub fn queue_notify_out_of_band_nv(queue C.Queue, p_queue_type_info &OutOfBandQueueTypeInfoNV) {
-	f := VkQueueNotifyOutOfBandNV((*vulkan.loader_p).get_sym('vkQueueNotifyOutOfBandNV') or {
-		println("Couldn't load symbol for 'vkQueueNotifyOutOfBandNV': ${err}")
-		return
-	})
-	f(queue, p_queue_type_info)
+fn C.vkQueueNotifyOutOfBandNV(C.Queue,
+	&OutOfBandQueueTypeInfoNV)
+pub fn queue_notify_out_of_band_nv(queue C.Queue,
+	p_queue_type_info &OutOfBandQueueTypeInfoNV) {
+	C.vkQueueNotifyOutOfBandNV(queue, p_queue_type_info)
 }
 
-// VK_QCOM_multiview_per_view_render_areas is a preprocessor guard. Do not pass it to API calls.
-const qcom_multiview_per_view_render_areas = 1
 pub const qcom_multiview_per_view_render_areas_spec_version = 1
 pub const qcom_multiview_per_view_render_areas_extension_name = 'VK_QCOM_multiview_per_view_render_areas'
-// PhysicalDeviceMultiviewPerViewRenderAreasFeaturesQCOM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceMultiviewPerViewRenderAreasFeaturesQCOM {
-mut:
+pub mut:
 	s_type                          StructureType
 	p_next                          voidptr
 	multiview_per_view_render_areas Bool32
 }
 
-// MultiviewPerViewRenderAreasRenderPassBeginInfoQCOM extends VkRenderPassBeginInfo,VkRenderingInfo
 pub struct MultiviewPerViewRenderAreasRenderPassBeginInfoQCOM {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	per_view_render_area_count u32
 	p_per_view_render_areas    &Rect2D
 }
 
-// VK_QCOM_image_processing2 is a preprocessor guard. Do not pass it to API calls.
-const qcom_image_processing2 = 1
+pub const nv_per_stage_descriptor_set_spec_version = 1
+pub const nv_per_stage_descriptor_set_extension_name = 'VK_NV_per_stage_descriptor_set'
+
+pub struct PhysicalDevicePerStageDescriptorSetFeaturesNV {
+pub mut:
+	s_type                   StructureType
+	p_next                   voidptr
+	per_stage_descriptor_set Bool32
+	dynamic_pipeline_layout  Bool32
+}
+
 pub const qcom_image_processing_2_spec_version = 1
 pub const qcom_image_processing_2_extension_name = 'VK_QCOM_image_processing2'
 
@@ -22320,33 +19624,28 @@ pub enum BlockMatchWindowCompareModeQCOM {
 	block_match_window_compare_mode_max_enum_qcom = int(0x7FFFFFFF)
 }
 
-// PhysicalDeviceImageProcessing2FeaturesQCOM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceImageProcessing2FeaturesQCOM {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	texture_block_match2 Bool32
 }
 
-// PhysicalDeviceImageProcessing2PropertiesQCOM extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceImageProcessing2PropertiesQCOM {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	max_block_match_window Extent2D
 }
 
-// SamplerBlockMatchWindowCreateInfoQCOM extends VkSamplerCreateInfo
 pub struct SamplerBlockMatchWindowCreateInfoQCOM {
-mut:
+pub mut:
 	s_type              StructureType
 	p_next              voidptr
 	window_extent       Extent2D
 	window_compare_mode BlockMatchWindowCompareModeQCOM
 }
 
-// VK_QCOM_filter_cubic_weights is a preprocessor guard. Do not pass it to API calls.
-const qcom_filter_cubic_weights = 1
 pub const qcom_filter_cubic_weights_spec_version = 1
 pub const qcom_filter_cubic_weights_extension_name = 'VK_QCOM_filter_cubic_weights'
 
@@ -22358,150 +19657,72 @@ pub enum CubicFilterWeightsQCOM {
 	cubic_filter_weights_max_enum_qcom              = int(0x7FFFFFFF)
 }
 
-// PhysicalDeviceCubicWeightsFeaturesQCOM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceCubicWeightsFeaturesQCOM {
-mut:
+pub mut:
 	s_type                   StructureType
 	p_next                   voidptr
 	selectable_cubic_weights Bool32
 }
 
-// SamplerCubicWeightsCreateInfoQCOM extends VkSamplerCreateInfo
 pub struct SamplerCubicWeightsCreateInfoQCOM {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	cubic_weights CubicFilterWeightsQCOM
 }
 
-// BlitImageCubicWeightsInfoQCOM extends VkBlitImageInfo2
 pub struct BlitImageCubicWeightsInfoQCOM {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	cubic_weights CubicFilterWeightsQCOM
 }
 
-// VK_QCOM_ycbcr_degamma is a preprocessor guard. Do not pass it to API calls.
-const qcom_ycbcr_degamma = 1
 pub const qcom_ycbcr_degamma_spec_version = 1
 pub const qcom_ycbcr_degamma_extension_name = 'VK_QCOM_ycbcr_degamma'
-// PhysicalDeviceYcbcrDegammaFeaturesQCOM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceYcbcrDegammaFeaturesQCOM {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	ycbcr_degamma Bool32
 }
 
-// SamplerYcbcrConversionYcbcrDegammaCreateInfoQCOM extends VkSamplerYcbcrConversionCreateInfo
 pub struct SamplerYcbcrConversionYcbcrDegammaCreateInfoQCOM {
-mut:
+pub mut:
 	s_type               StructureType
 	p_next               voidptr
 	enable_y_degamma     Bool32
 	enable_cb_cr_degamma Bool32
 }
 
-// VK_QCOM_filter_cubic_clamp is a preprocessor guard. Do not pass it to API calls.
-const qcom_filter_cubic_clamp = 1
 pub const qcom_filter_cubic_clamp_spec_version = 1
 pub const qcom_filter_cubic_clamp_extension_name = 'VK_QCOM_filter_cubic_clamp'
-// PhysicalDeviceCubicClampFeaturesQCOM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceCubicClampFeaturesQCOM {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	cubic_range_clamp Bool32
 }
 
-// VK_EXT_attachment_feedback_loop_dynamic_state is a preprocessor guard. Do not pass it to API calls.
-const ext_attachment_feedback_loop_dynamic_state = 1
 pub const ext_attachment_feedback_loop_dynamic_state_spec_version = 1
 pub const ext_attachment_feedback_loop_dynamic_state_extension_name = 'VK_EXT_attachment_feedback_loop_dynamic_state'
-// PhysicalDeviceAttachmentFeedbackLoopDynamicStateFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceAttachmentFeedbackLoopDynamicStateFeaturesEXT {
-mut:
+pub mut:
 	s_type                                 StructureType
 	p_next                                 voidptr
 	attachment_feedback_loop_dynamic_state Bool32
 }
 
-type VkCmdSetAttachmentFeedbackLoopEnableEXT = fn (C.CommandBuffer, ImageAspectFlags)
-
-pub fn cmd_set_attachment_feedback_loop_enable_ext(command_buffer C.CommandBuffer, aspect_mask ImageAspectFlags) {
-	f := VkCmdSetAttachmentFeedbackLoopEnableEXT((*vulkan.loader_p).get_sym('vkCmdSetAttachmentFeedbackLoopEnableEXT') or {
-		println("Couldn't load symbol for 'vkCmdSetAttachmentFeedbackLoopEnableEXT': ${err}")
-		return
-	})
-	f(command_buffer, aspect_mask)
+fn C.vkCmdSetAttachmentFeedbackLoopEnableEXT(C.CommandBuffer,
+	ImageAspectFlags)
+pub fn cmd_set_attachment_feedback_loop_enable_ext(command_buffer C.CommandBuffer,
+	aspect_mask ImageAspectFlags) {
+	C.vkCmdSetAttachmentFeedbackLoopEnableEXT(command_buffer, aspect_mask)
 }
 
-// VK_QNX_external_memory_screen_buffer is a preprocessor guard. Do not pass it to API calls.
-const qnx_external_memory_screen_buffer = 1
-pub const qnx_external_memory_screen_buffer_spec_version = 1
-pub const qnx_external_memory_screen_buffer_extension_name = 'VK_QNX_external_memory_screen_buffer'
-
-pub struct ScreenBufferPropertiesQNX {
-mut:
-	s_type           StructureType
-	p_next           voidptr
-	allocation_size  DeviceSize
-	memory_type_bits u32
-}
-
-// ScreenBufferFormatPropertiesQNX extends VkScreenBufferPropertiesQNX
-pub struct ScreenBufferFormatPropertiesQNX {
-mut:
-	s_type                              StructureType
-	p_next                              voidptr
-	format                              Format
-	external_format                     u64
-	screen_usage                        u64
-	format_features                     FormatFeatureFlags
-	sampler_ycbcr_conversion_components ComponentMapping
-	suggested_ycbcr_model               SamplerYcbcrModelConversion
-	suggested_ycbcr_range               SamplerYcbcrRange
-	suggested_x_chroma_offset           ChromaLocation
-	suggested_y_chroma_offset           ChromaLocation
-}
-
-// ImportScreenBufferInfoQNX extends VkMemoryAllocateInfo
-pub struct ImportScreenBufferInfoQNX {
-mut:
-	s_type StructureType
-	p_next voidptr
-	buffer voidptr
-}
-
-// ExternalFormatQNX extends VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo
-pub struct ExternalFormatQNX {
-mut:
-	s_type          StructureType
-	p_next          voidptr
-	external_format u64
-}
-
-// PhysicalDeviceExternalMemoryScreenBufferFeaturesQNX extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub struct PhysicalDeviceExternalMemoryScreenBufferFeaturesQNX {
-mut:
-	s_type               StructureType
-	p_next               voidptr
-	screen_buffer_import Bool32
-}
-
-type VkGetScreenBufferPropertiesQNX = fn (C.Device, voidptr, &ScreenBufferPropertiesQNX) Result
-
-pub fn get_screen_buffer_properties_qnx(device C.Device, buffer voidptr, p_properties &ScreenBufferPropertiesQNX) Result {
-	f := VkGetScreenBufferPropertiesQNX((*vulkan.loader_p).get_sym('vkGetScreenBufferPropertiesQNX') or {
-		println("Couldn't load symbol for 'vkGetScreenBufferPropertiesQNX': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, buffer, p_properties)
-}
-
-// VK_MSFT_layered_driver is a preprocessor guard. Do not pass it to API calls.
-const msft_layered_driver = 1
 pub const msft_layered_driver_spec_version = 1
 pub const msft_layered_driver_extension_name = 'VK_MST_layered_driver'
 
@@ -22511,28 +19732,87 @@ pub enum LayeredDriverUnderlyingApiMSFT {
 	layered_driver_underlying_api_max_enum_msft = int(0x7FFFFFFF)
 }
 
-// PhysicalDeviceLayeredDriverPropertiesMSFT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceLayeredDriverPropertiesMSFT {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	underlying_api LayeredDriverUnderlyingApiMSFT
 }
 
-// VK_NV_descriptor_pool_overallocation is a preprocessor guard. Do not pass it to API calls.
-const nv_descriptor_pool_overallocation = 1
 pub const nv_descriptor_pool_overallocation_spec_version = 1
 pub const nv_descriptor_pool_overallocation_extension_name = 'VK_NV_descriptor_pool_overallocation'
-// PhysicalDeviceDescriptorPoolOverallocationFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceDescriptorPoolOverallocationFeaturesNV {
-mut:
+pub mut:
 	s_type                         StructureType
 	p_next                         voidptr
 	descriptor_pool_overallocation Bool32
 }
 
-// VK_KHR_acceleration_structure is a preprocessor guard. Do not pass it to API calls.
-const khr_acceleration_structure = 1
+pub const nv_raw_access_chains_spec_version = 1
+pub const nv_raw_access_chains_extension_name = 'VK_NV_raw_access_chains'
+
+pub struct PhysicalDeviceRawAccessChainsFeaturesNV {
+pub mut:
+	s_type                   StructureType
+	p_next                   voidptr
+	shader_raw_access_chains Bool32
+}
+
+pub const nv_shader_atomic_float16_vector_spec_version = 1
+pub const nv_shader_atomic_float16_vector_extension_name = 'VK_NV_shader_atomic_float16_vector'
+
+pub struct PhysicalDeviceShaderAtomicFloat16VectorFeaturesNV {
+pub mut:
+	s_type                        StructureType
+	p_next                        voidptr
+	shader_float16_vector_atomics Bool32
+}
+
+pub const ext_shader_replicated_composites_spec_version = 1
+pub const ext_shader_replicated_composites_extension_name = 'VK_EXT_shader_replicated_composites'
+
+pub struct PhysicalDeviceShaderReplicatedCompositesFeaturesEXT {
+pub mut:
+	s_type                       StructureType
+	p_next                       voidptr
+	shader_replicated_composites Bool32
+}
+
+pub const nv_ray_tracing_validation_spec_version = 1
+pub const nv_ray_tracing_validation_extension_name = 'VK_NV_ray_tracing_validation'
+
+pub struct PhysicalDeviceRayTracingValidationFeaturesNV {
+pub mut:
+	s_type                 StructureType
+	p_next                 voidptr
+	ray_tracing_validation Bool32
+}
+
+pub const mesa_image_alignment_control_spec_version = 1
+pub const mesa_image_alignment_control_extension_name = 'VK_MESA_image_alignment_control'
+
+pub struct PhysicalDeviceImageAlignmentControlFeaturesMESA {
+pub mut:
+	s_type                  StructureType
+	p_next                  voidptr
+	image_alignment_control Bool32
+}
+
+pub struct PhysicalDeviceImageAlignmentControlPropertiesMESA {
+pub mut:
+	s_type                         StructureType
+	p_next                         voidptr
+	supported_image_alignment_mask u32
+}
+
+pub struct ImageAlignmentControlCreateInfoMESA {
+pub mut:
+	s_type                      StructureType
+	p_next                      voidptr
+	maximum_requested_alignment u32
+}
+
 pub const khr_acceleration_structure_spec_version = 13
 pub const khr_acceleration_structure_extension_name = 'VK_KHR_acceleration_structure'
 
@@ -22552,7 +19832,7 @@ pub enum AccelerationStructureCreateFlagBitsKHR {
 pub type AccelerationStructureCreateFlagsKHR = u32
 
 pub struct AccelerationStructureBuildRangeInfoKHR {
-mut:
+pub mut:
 	primitive_count  u32
 	primitive_offset u32
 	first_vertex     u32
@@ -22560,7 +19840,7 @@ mut:
 }
 
 pub struct AccelerationStructureGeometryTrianglesDataKHR {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	vertex_format  Format
@@ -22573,7 +19853,7 @@ mut:
 }
 
 pub struct AccelerationStructureGeometryAabbsDataKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	data   DeviceOrHostAddressConstKHR
@@ -22581,7 +19861,7 @@ mut:
 }
 
 pub struct AccelerationStructureGeometryInstancesDataKHR {
-mut:
+pub mut:
 	s_type            StructureType
 	p_next            voidptr
 	array_of_pointers Bool32
@@ -22589,14 +19869,14 @@ mut:
 }
 
 pub union AccelerationStructureGeometryDataKHR {
-mut:
+pub mut:
 	triangles AccelerationStructureGeometryTrianglesDataKHR
 	aabbs     AccelerationStructureGeometryAabbsDataKHR
 	instances AccelerationStructureGeometryInstancesDataKHR
 }
 
 pub struct AccelerationStructureGeometryKHR {
-mut:
+pub mut:
 	s_type        StructureType
 	p_next        voidptr
 	geometry_type GeometryTypeKHR
@@ -22605,7 +19885,7 @@ mut:
 }
 
 pub struct AccelerationStructureBuildGeometryInfoKHR {
-mut:
+pub mut:
 	s_type                     StructureType
 	p_next                     voidptr
 	vktype                     AccelerationStructureTypeKHR
@@ -22620,7 +19900,7 @@ mut:
 }
 
 pub struct AccelerationStructureCreateInfoKHR {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	create_flags   AccelerationStructureCreateFlagsKHR
@@ -22631,18 +19911,16 @@ mut:
 	device_address DeviceAddress
 }
 
-// WriteDescriptorSetAccelerationStructureKHR extends VkWriteDescriptorSet
 pub struct WriteDescriptorSetAccelerationStructureKHR {
-mut:
+pub mut:
 	s_type                       StructureType
 	p_next                       voidptr
 	acceleration_structure_count u32
 	p_acceleration_structures    &C.AccelerationStructureKHR
 }
 
-// PhysicalDeviceAccelerationStructureFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceAccelerationStructureFeaturesKHR {
-mut:
+pub mut:
 	s_type                                                      StructureType
 	p_next                                                      voidptr
 	acceleration_structure                                      Bool32
@@ -22652,9 +19930,8 @@ mut:
 	descriptor_binding_acceleration_structure_update_after_bind Bool32
 }
 
-// PhysicalDeviceAccelerationStructurePropertiesKHR extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceAccelerationStructurePropertiesKHR {
-mut:
+pub mut:
 	s_type                                                             StructureType
 	p_next                                                             voidptr
 	max_geometry_count                                                 u64
@@ -22668,21 +19945,21 @@ mut:
 }
 
 pub struct AccelerationStructureDeviceAddressInfoKHR {
-mut:
+pub mut:
 	s_type                 StructureType
 	p_next                 voidptr
 	acceleration_structure C.AccelerationStructureKHR
 }
 
 pub struct AccelerationStructureVersionInfoKHR {
-mut:
+pub mut:
 	s_type         StructureType
 	p_next         voidptr
 	p_version_data &u8
 }
 
 pub struct CopyAccelerationStructureToMemoryInfoKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	src    C.AccelerationStructureKHR
@@ -22691,7 +19968,7 @@ mut:
 }
 
 pub struct CopyMemoryToAccelerationStructureInfoKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	src    DeviceOrHostAddressConstKHR
@@ -22700,7 +19977,7 @@ mut:
 }
 
 pub struct CopyAccelerationStructureInfoKHR {
-mut:
+pub mut:
 	s_type StructureType
 	p_next voidptr
 	src    C.AccelerationStructureKHR
@@ -22709,7 +19986,7 @@ mut:
 }
 
 pub struct AccelerationStructureBuildSizesInfoKHR {
-mut:
+pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	acceleration_structure_size DeviceSize
@@ -22717,170 +19994,179 @@ mut:
 	build_scratch_size          DeviceSize
 }
 
-type VkCreateAccelerationStructureKHR = fn (C.Device, &AccelerationStructureCreateInfoKHR, &AllocationCallbacks, &C.AccelerationStructureKHR) Result
-
-pub fn create_acceleration_structure_khr(device C.Device, p_create_info &AccelerationStructureCreateInfoKHR, p_allocator &AllocationCallbacks, p_acceleration_structure &C.AccelerationStructureKHR) Result {
-	f := VkCreateAccelerationStructureKHR((*vulkan.loader_p).get_sym('vkCreateAccelerationStructureKHR') or {
-		println("Couldn't load symbol for 'vkCreateAccelerationStructureKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, p_create_info, p_allocator, p_acceleration_structure)
+fn C.vkCreateAccelerationStructureKHR(C.Device,
+	&AccelerationStructureCreateInfoKHR,
+	&AllocationCallbacks,
+	&C.AccelerationStructureKHR) Result
+pub fn create_acceleration_structure_khr(device C.Device,
+	p_create_info &AccelerationStructureCreateInfoKHR,
+	p_allocator &AllocationCallbacks,
+	p_acceleration_structure &C.AccelerationStructureKHR) Result {
+	return C.vkCreateAccelerationStructureKHR(device, p_create_info, p_allocator, p_acceleration_structure)
 }
 
-type VkDestroyAccelerationStructureKHR = fn (C.Device, C.AccelerationStructureKHR, &AllocationCallbacks)
-
-pub fn destroy_acceleration_structure_khr(device C.Device, acceleration_structure C.AccelerationStructureKHR, p_allocator &AllocationCallbacks) {
-	f := VkDestroyAccelerationStructureKHR((*vulkan.loader_p).get_sym('vkDestroyAccelerationStructureKHR') or {
-		println("Couldn't load symbol for 'vkDestroyAccelerationStructureKHR': ${err}")
-		return
-	})
-	f(device, acceleration_structure, p_allocator)
+fn C.vkDestroyAccelerationStructureKHR(C.Device,
+	C.AccelerationStructureKHR,
+	&AllocationCallbacks)
+pub fn destroy_acceleration_structure_khr(device C.Device,
+	acceleration_structure C.AccelerationStructureKHR,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyAccelerationStructureKHR(device, acceleration_structure, p_allocator)
 }
 
-type VkCmdBuildAccelerationStructuresKHR = fn (C.CommandBuffer, u32, &AccelerationStructureBuildGeometryInfoKHR, &AccelerationStructureBuildRangeInfoKHR)
-
-pub fn cmd_build_acceleration_structures_khr(command_buffer C.CommandBuffer, info_count u32, p_infos &AccelerationStructureBuildGeometryInfoKHR, pp_build_range_infos &AccelerationStructureBuildRangeInfoKHR) {
-	f := VkCmdBuildAccelerationStructuresKHR((*vulkan.loader_p).get_sym('vkCmdBuildAccelerationStructuresKHR') or {
-		println("Couldn't load symbol for 'vkCmdBuildAccelerationStructuresKHR': ${err}")
-		return
-	})
-	f(command_buffer, info_count, p_infos, pp_build_range_infos)
+fn C.vkCmdBuildAccelerationStructuresKHR(C.CommandBuffer,
+	u32,
+	&AccelerationStructureBuildGeometryInfoKHR,
+	&AccelerationStructureBuildRangeInfoKHR)
+pub fn cmd_build_acceleration_structures_khr(command_buffer C.CommandBuffer,
+	info_count u32,
+	p_infos &AccelerationStructureBuildGeometryInfoKHR,
+	pp_build_range_infos &AccelerationStructureBuildRangeInfoKHR) {
+	C.vkCmdBuildAccelerationStructuresKHR(command_buffer, info_count, p_infos, pp_build_range_infos)
 }
 
-type VkCmdBuildAccelerationStructuresIndirectKHR = fn (C.CommandBuffer, u32, &AccelerationStructureBuildGeometryInfoKHR, &DeviceAddress, &u32, &u32)
-
-pub fn cmd_build_acceleration_structures_indirect_khr(command_buffer C.CommandBuffer, info_count u32, p_infos &AccelerationStructureBuildGeometryInfoKHR, p_indirect_device_addresses &DeviceAddress, p_indirect_strides &u32, pp_max_primitive_counts &u32) {
-	f := VkCmdBuildAccelerationStructuresIndirectKHR((*vulkan.loader_p).get_sym('vkCmdBuildAccelerationStructuresIndirectKHR') or {
-		println("Couldn't load symbol for 'vkCmdBuildAccelerationStructuresIndirectKHR': ${err}")
-		return
-	})
-	f(command_buffer, info_count, p_infos, p_indirect_device_addresses, p_indirect_strides,
-		pp_max_primitive_counts)
+fn C.vkCmdBuildAccelerationStructuresIndirectKHR(C.CommandBuffer,
+	u32,
+	&AccelerationStructureBuildGeometryInfoKHR,
+	&DeviceAddress,
+	&u32,
+	&u32)
+pub fn cmd_build_acceleration_structures_indirect_khr(command_buffer C.CommandBuffer,
+	info_count u32,
+	p_infos &AccelerationStructureBuildGeometryInfoKHR,
+	p_indirect_device_addresses &DeviceAddress,
+	p_indirect_strides &u32,
+	pp_max_primitive_counts &u32) {
+	C.vkCmdBuildAccelerationStructuresIndirectKHR(command_buffer, info_count, p_infos,
+		p_indirect_device_addresses, p_indirect_strides, pp_max_primitive_counts)
 }
 
-type VkBuildAccelerationStructuresKHR = fn (C.Device, C.DeferredOperationKHR, u32, &AccelerationStructureBuildGeometryInfoKHR, &AccelerationStructureBuildRangeInfoKHR) Result
-
-pub fn build_acceleration_structures_khr(device C.Device, deferred_operation C.DeferredOperationKHR, info_count u32, p_infos &AccelerationStructureBuildGeometryInfoKHR, pp_build_range_infos &AccelerationStructureBuildRangeInfoKHR) Result {
-	f := VkBuildAccelerationStructuresKHR((*vulkan.loader_p).get_sym('vkBuildAccelerationStructuresKHR') or {
-		println("Couldn't load symbol for 'vkBuildAccelerationStructuresKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, deferred_operation, info_count, p_infos, pp_build_range_infos)
+fn C.vkBuildAccelerationStructuresKHR(C.Device,
+	C.DeferredOperationKHR,
+	u32,
+	&AccelerationStructureBuildGeometryInfoKHR,
+	&AccelerationStructureBuildRangeInfoKHR) Result
+pub fn build_acceleration_structures_khr(device C.Device,
+	deferred_operation C.DeferredOperationKHR,
+	info_count u32,
+	p_infos &AccelerationStructureBuildGeometryInfoKHR,
+	pp_build_range_infos &AccelerationStructureBuildRangeInfoKHR) Result {
+	return C.vkBuildAccelerationStructuresKHR(device, deferred_operation, info_count,
+		p_infos, pp_build_range_infos)
 }
 
-type VkCopyAccelerationStructureKHR = fn (C.Device, C.DeferredOperationKHR, &CopyAccelerationStructureInfoKHR) Result
-
-pub fn copy_acceleration_structure_khr(device C.Device, deferred_operation C.DeferredOperationKHR, p_info &CopyAccelerationStructureInfoKHR) Result {
-	f := VkCopyAccelerationStructureKHR((*vulkan.loader_p).get_sym('vkCopyAccelerationStructureKHR') or {
-		println("Couldn't load symbol for 'vkCopyAccelerationStructureKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, deferred_operation, p_info)
+fn C.vkCopyAccelerationStructureKHR(C.Device,
+	C.DeferredOperationKHR,
+	&CopyAccelerationStructureInfoKHR) Result
+pub fn copy_acceleration_structure_khr(device C.Device,
+	deferred_operation C.DeferredOperationKHR,
+	p_info &CopyAccelerationStructureInfoKHR) Result {
+	return C.vkCopyAccelerationStructureKHR(device, deferred_operation, p_info)
 }
 
-type VkCopyAccelerationStructureToMemoryKHR = fn (C.Device, C.DeferredOperationKHR, &CopyAccelerationStructureToMemoryInfoKHR) Result
-
-pub fn copy_acceleration_structure_to_memory_khr(device C.Device, deferred_operation C.DeferredOperationKHR, p_info &CopyAccelerationStructureToMemoryInfoKHR) Result {
-	f := VkCopyAccelerationStructureToMemoryKHR((*vulkan.loader_p).get_sym('vkCopyAccelerationStructureToMemoryKHR') or {
-		println("Couldn't load symbol for 'vkCopyAccelerationStructureToMemoryKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, deferred_operation, p_info)
+fn C.vkCopyAccelerationStructureToMemoryKHR(C.Device,
+	C.DeferredOperationKHR,
+	&CopyAccelerationStructureToMemoryInfoKHR) Result
+pub fn copy_acceleration_structure_to_memory_khr(device C.Device,
+	deferred_operation C.DeferredOperationKHR,
+	p_info &CopyAccelerationStructureToMemoryInfoKHR) Result {
+	return C.vkCopyAccelerationStructureToMemoryKHR(device, deferred_operation, p_info)
 }
 
-type VkCopyMemoryToAccelerationStructureKHR = fn (C.Device, C.DeferredOperationKHR, &CopyMemoryToAccelerationStructureInfoKHR) Result
-
-pub fn copy_memory_to_acceleration_structure_khr(device C.Device, deferred_operation C.DeferredOperationKHR, p_info &CopyMemoryToAccelerationStructureInfoKHR) Result {
-	f := VkCopyMemoryToAccelerationStructureKHR((*vulkan.loader_p).get_sym('vkCopyMemoryToAccelerationStructureKHR') or {
-		println("Couldn't load symbol for 'vkCopyMemoryToAccelerationStructureKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, deferred_operation, p_info)
+fn C.vkCopyMemoryToAccelerationStructureKHR(C.Device,
+	C.DeferredOperationKHR,
+	&CopyMemoryToAccelerationStructureInfoKHR) Result
+pub fn copy_memory_to_acceleration_structure_khr(device C.Device,
+	deferred_operation C.DeferredOperationKHR,
+	p_info &CopyMemoryToAccelerationStructureInfoKHR) Result {
+	return C.vkCopyMemoryToAccelerationStructureKHR(device, deferred_operation, p_info)
 }
 
-type VkWriteAccelerationStructuresPropertiesKHR = fn (C.Device, u32, &C.AccelerationStructureKHR, QueryType, usize, voidptr, usize) Result
-
-pub fn write_acceleration_structures_properties_khr(device C.Device, acceleration_structure_count u32, p_acceleration_structures &C.AccelerationStructureKHR, query_type QueryType, data_size usize, p_data voidptr, stride usize) Result {
-	f := VkWriteAccelerationStructuresPropertiesKHR((*vulkan.loader_p).get_sym('vkWriteAccelerationStructuresPropertiesKHR') or {
-		println("Couldn't load symbol for 'vkWriteAccelerationStructuresPropertiesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, acceleration_structure_count, p_acceleration_structures, query_type,
-		data_size, p_data, stride)
+fn C.vkWriteAccelerationStructuresPropertiesKHR(C.Device,
+	u32,
+	&C.AccelerationStructureKHR,
+	QueryType,
+	usize,
+	voidptr,
+	usize) Result
+pub fn write_acceleration_structures_properties_khr(device C.Device,
+	acceleration_structure_count u32,
+	p_acceleration_structures &C.AccelerationStructureKHR,
+	query_type QueryType,
+	data_size usize,
+	p_data voidptr,
+	stride usize) Result {
+	return C.vkWriteAccelerationStructuresPropertiesKHR(device, acceleration_structure_count,
+		p_acceleration_structures, query_type, data_size, p_data, stride)
 }
 
-type VkCmdCopyAccelerationStructureKHR = fn (C.CommandBuffer, &CopyAccelerationStructureInfoKHR)
-
-pub fn cmd_copy_acceleration_structure_khr(command_buffer C.CommandBuffer, p_info &CopyAccelerationStructureInfoKHR) {
-	f := VkCmdCopyAccelerationStructureKHR((*vulkan.loader_p).get_sym('vkCmdCopyAccelerationStructureKHR') or {
-		println("Couldn't load symbol for 'vkCmdCopyAccelerationStructureKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_info)
+fn C.vkCmdCopyAccelerationStructureKHR(C.CommandBuffer,
+	&CopyAccelerationStructureInfoKHR)
+pub fn cmd_copy_acceleration_structure_khr(command_buffer C.CommandBuffer,
+	p_info &CopyAccelerationStructureInfoKHR) {
+	C.vkCmdCopyAccelerationStructureKHR(command_buffer, p_info)
 }
 
-type VkCmdCopyAccelerationStructureToMemoryKHR = fn (C.CommandBuffer, &CopyAccelerationStructureToMemoryInfoKHR)
-
-pub fn cmd_copy_acceleration_structure_to_memory_khr(command_buffer C.CommandBuffer, p_info &CopyAccelerationStructureToMemoryInfoKHR) {
-	f := VkCmdCopyAccelerationStructureToMemoryKHR((*vulkan.loader_p).get_sym('vkCmdCopyAccelerationStructureToMemoryKHR') or {
-		println("Couldn't load symbol for 'vkCmdCopyAccelerationStructureToMemoryKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_info)
+fn C.vkCmdCopyAccelerationStructureToMemoryKHR(C.CommandBuffer,
+	&CopyAccelerationStructureToMemoryInfoKHR)
+pub fn cmd_copy_acceleration_structure_to_memory_khr(command_buffer C.CommandBuffer,
+	p_info &CopyAccelerationStructureToMemoryInfoKHR) {
+	C.vkCmdCopyAccelerationStructureToMemoryKHR(command_buffer, p_info)
 }
 
-type VkCmdCopyMemoryToAccelerationStructureKHR = fn (C.CommandBuffer, &CopyMemoryToAccelerationStructureInfoKHR)
-
-pub fn cmd_copy_memory_to_acceleration_structure_khr(command_buffer C.CommandBuffer, p_info &CopyMemoryToAccelerationStructureInfoKHR) {
-	f := VkCmdCopyMemoryToAccelerationStructureKHR((*vulkan.loader_p).get_sym('vkCmdCopyMemoryToAccelerationStructureKHR') or {
-		println("Couldn't load symbol for 'vkCmdCopyMemoryToAccelerationStructureKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_info)
+fn C.vkCmdCopyMemoryToAccelerationStructureKHR(C.CommandBuffer,
+	&CopyMemoryToAccelerationStructureInfoKHR)
+pub fn cmd_copy_memory_to_acceleration_structure_khr(command_buffer C.CommandBuffer,
+	p_info &CopyMemoryToAccelerationStructureInfoKHR) {
+	C.vkCmdCopyMemoryToAccelerationStructureKHR(command_buffer, p_info)
 }
 
-type VkGetAccelerationStructureDeviceAddressKHR = fn (C.Device, &AccelerationStructureDeviceAddressInfoKHR) DeviceAddress
-
-pub fn get_acceleration_structure_device_address_khr(device C.Device, p_info &AccelerationStructureDeviceAddressInfoKHR) DeviceAddress {
-	f := VkGetAccelerationStructureDeviceAddressKHR((*vulkan.loader_p).get_sym('vkGetAccelerationStructureDeviceAddressKHR') or {
-		panic("Couldn't load symbol for 'vkGetAccelerationStructureDeviceAddressKHR': ${err}")
-	})
-	return f(device, p_info)
+fn C.vkGetAccelerationStructureDeviceAddressKHR(C.Device,
+	&AccelerationStructureDeviceAddressInfoKHR) DeviceAddress
+pub fn get_acceleration_structure_device_address_khr(device C.Device,
+	p_info &AccelerationStructureDeviceAddressInfoKHR) DeviceAddress {
+	return C.vkGetAccelerationStructureDeviceAddressKHR(device, p_info)
 }
 
-type VkCmdWriteAccelerationStructuresPropertiesKHR = fn (C.CommandBuffer, u32, &C.AccelerationStructureKHR, QueryType, C.QueryPool, u32)
-
-pub fn cmd_write_acceleration_structures_properties_khr(command_buffer C.CommandBuffer, acceleration_structure_count u32, p_acceleration_structures &C.AccelerationStructureKHR, query_type QueryType, query_pool C.QueryPool, first_query u32) {
-	f := VkCmdWriteAccelerationStructuresPropertiesKHR((*vulkan.loader_p).get_sym('vkCmdWriteAccelerationStructuresPropertiesKHR') or {
-		println("Couldn't load symbol for 'vkCmdWriteAccelerationStructuresPropertiesKHR': ${err}")
-		return
-	})
-	f(command_buffer, acceleration_structure_count, p_acceleration_structures, query_type,
-		query_pool, first_query)
+fn C.vkCmdWriteAccelerationStructuresPropertiesKHR(C.CommandBuffer,
+	u32,
+	&C.AccelerationStructureKHR,
+	QueryType,
+	C.QueryPool,
+	u32)
+pub fn cmd_write_acceleration_structures_properties_khr(command_buffer C.CommandBuffer,
+	acceleration_structure_count u32,
+	p_acceleration_structures &C.AccelerationStructureKHR,
+	query_type QueryType,
+	query_pool C.QueryPool,
+	first_query u32) {
+	C.vkCmdWriteAccelerationStructuresPropertiesKHR(command_buffer, acceleration_structure_count,
+		p_acceleration_structures, query_type, query_pool, first_query)
 }
 
-type VkGetDeviceAccelerationStructureCompatibilityKHR = fn (C.Device, &AccelerationStructureVersionInfoKHR, &AccelerationStructureCompatibilityKHR)
-
-pub fn get_device_acceleration_structure_compatibility_khr(device C.Device, p_version_info &AccelerationStructureVersionInfoKHR, p_compatibility &AccelerationStructureCompatibilityKHR) {
-	f := VkGetDeviceAccelerationStructureCompatibilityKHR((*vulkan.loader_p).get_sym('vkGetDeviceAccelerationStructureCompatibilityKHR') or {
-		println("Couldn't load symbol for 'vkGetDeviceAccelerationStructureCompatibilityKHR': ${err}")
-		return
-	})
-	f(device, p_version_info, p_compatibility)
+fn C.vkGetDeviceAccelerationStructureCompatibilityKHR(C.Device,
+	&AccelerationStructureVersionInfoKHR,
+	&AccelerationStructureCompatibilityKHR)
+pub fn get_device_acceleration_structure_compatibility_khr(device C.Device,
+	p_version_info &AccelerationStructureVersionInfoKHR,
+	p_compatibility &AccelerationStructureCompatibilityKHR) {
+	C.vkGetDeviceAccelerationStructureCompatibilityKHR(device, p_version_info, p_compatibility)
 }
 
-type VkGetAccelerationStructureBuildSizesKHR = fn (C.Device, AccelerationStructureBuildTypeKHR, &AccelerationStructureBuildGeometryInfoKHR, &u32, &AccelerationStructureBuildSizesInfoKHR)
-
-pub fn get_acceleration_structure_build_sizes_khr(device C.Device, build_type AccelerationStructureBuildTypeKHR, p_build_info &AccelerationStructureBuildGeometryInfoKHR, p_max_primitive_counts &u32, p_size_info &AccelerationStructureBuildSizesInfoKHR) {
-	f := VkGetAccelerationStructureBuildSizesKHR((*vulkan.loader_p).get_sym('vkGetAccelerationStructureBuildSizesKHR') or {
-		println("Couldn't load symbol for 'vkGetAccelerationStructureBuildSizesKHR': ${err}")
-		return
-	})
-	f(device, build_type, p_build_info, p_max_primitive_counts, p_size_info)
+fn C.vkGetAccelerationStructureBuildSizesKHR(C.Device,
+	AccelerationStructureBuildTypeKHR,
+	&AccelerationStructureBuildGeometryInfoKHR,
+	&u32,
+	&AccelerationStructureBuildSizesInfoKHR)
+pub fn get_acceleration_structure_build_sizes_khr(device C.Device,
+	build_type AccelerationStructureBuildTypeKHR,
+	p_build_info &AccelerationStructureBuildGeometryInfoKHR,
+	p_max_primitive_counts &u32,
+	p_size_info &AccelerationStructureBuildSizesInfoKHR) {
+	C.vkGetAccelerationStructureBuildSizesKHR(device, build_type, p_build_info, p_max_primitive_counts,
+		p_size_info)
 }
 
-// VK_KHR_ray_tracing_pipeline is a preprocessor guard. Do not pass it to API calls.
-const khr_ray_tracing_pipeline = 1
 pub const khr_ray_tracing_pipeline_spec_version = 1
 pub const khr_ray_tracing_pipeline_extension_name = 'VK_KHR_ray_tracing_pipeline'
 
@@ -22893,7 +20179,7 @@ pub enum ShaderGroupShaderKHR {
 }
 
 pub struct RayTracingShaderGroupCreateInfoKHR {
-mut:
+pub mut:
 	s_type                               StructureType
 	p_next                               voidptr
 	vktype                               RayTracingShaderGroupTypeKHR
@@ -22905,7 +20191,7 @@ mut:
 }
 
 pub struct RayTracingPipelineInterfaceCreateInfoKHR {
-mut:
+pub mut:
 	s_type                              StructureType
 	p_next                              voidptr
 	max_pipeline_ray_payload_size       u32
@@ -22913,7 +20199,7 @@ mut:
 }
 
 pub struct RayTracingPipelineCreateInfoKHR {
-mut:
+pub mut:
 	s_type                           StructureType
 	p_next                           voidptr
 	flags                            PipelineCreateFlags
@@ -22930,9 +20216,8 @@ mut:
 	base_pipeline_index              i32
 }
 
-// PhysicalDeviceRayTracingPipelineFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub struct PhysicalDeviceRayTracingPipelineFeaturesKHR {
-mut:
+pub mut:
 	s_type                                                        StructureType
 	p_next                                                        voidptr
 	ray_tracing_pipeline                                          Bool32
@@ -22942,9 +20227,8 @@ mut:
 	ray_traversal_primitive_culling                               Bool32
 }
 
-// PhysicalDeviceRayTracingPipelinePropertiesKHR extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceRayTracingPipelinePropertiesKHR {
-mut:
+pub mut:
 	s_type                                  StructureType
 	p_next                                  voidptr
 	shader_group_handle_size                u32
@@ -22958,100 +20242,122 @@ mut:
 }
 
 pub struct StridedDeviceAddressRegionKHR {
-mut:
+pub mut:
 	device_address DeviceAddress
 	stride         DeviceSize
 	size           DeviceSize
 }
 
 pub struct TraceRaysIndirectCommandKHR {
-mut:
+pub mut:
 	width  u32
 	height u32
 	depth  u32
 }
 
-type VkCmdTraceRaysKHR = fn (C.CommandBuffer, &StridedDeviceAddressRegionKHR, &StridedDeviceAddressRegionKHR, &StridedDeviceAddressRegionKHR, &StridedDeviceAddressRegionKHR, u32, u32, u32)
-
-pub fn cmd_trace_rays_khr(command_buffer C.CommandBuffer, p_raygen_shader_binding_table &StridedDeviceAddressRegionKHR, p_miss_shader_binding_table &StridedDeviceAddressRegionKHR, p_hit_shader_binding_table &StridedDeviceAddressRegionKHR, p_callable_shader_binding_table &StridedDeviceAddressRegionKHR, width u32, height u32, depth u32) {
-	f := VkCmdTraceRaysKHR((*vulkan.loader_p).get_sym('vkCmdTraceRaysKHR') or {
-		println("Couldn't load symbol for 'vkCmdTraceRaysKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_raygen_shader_binding_table, p_miss_shader_binding_table, p_hit_shader_binding_table,
-		p_callable_shader_binding_table, width, height, depth)
+fn C.vkCmdTraceRaysKHR(C.CommandBuffer,
+	&StridedDeviceAddressRegionKHR,
+	&StridedDeviceAddressRegionKHR,
+	&StridedDeviceAddressRegionKHR,
+	&StridedDeviceAddressRegionKHR,
+	u32,
+	u32,
+	u32)
+pub fn cmd_trace_rays_khr(command_buffer C.CommandBuffer,
+	p_raygen_shader_binding_table &StridedDeviceAddressRegionKHR,
+	p_miss_shader_binding_table &StridedDeviceAddressRegionKHR,
+	p_hit_shader_binding_table &StridedDeviceAddressRegionKHR,
+	p_callable_shader_binding_table &StridedDeviceAddressRegionKHR,
+	width u32,
+	height u32,
+	depth u32) {
+	C.vkCmdTraceRaysKHR(command_buffer, p_raygen_shader_binding_table, p_miss_shader_binding_table,
+		p_hit_shader_binding_table, p_callable_shader_binding_table, width, height, depth)
 }
 
-type VkCreateRayTracingPipelinesKHR = fn (C.Device, C.DeferredOperationKHR, C.PipelineCache, u32, &RayTracingPipelineCreateInfoKHR, &AllocationCallbacks, &C.Pipeline) Result
-
-pub fn create_ray_tracing_pipelines_khr(device C.Device, deferred_operation C.DeferredOperationKHR, pipeline_cache C.PipelineCache, create_info_count u32, p_create_infos &RayTracingPipelineCreateInfoKHR, p_allocator &AllocationCallbacks, p_pipelines &C.Pipeline) Result {
-	f := VkCreateRayTracingPipelinesKHR((*vulkan.loader_p).get_sym('vkCreateRayTracingPipelinesKHR') or {
-		println("Couldn't load symbol for 'vkCreateRayTracingPipelinesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, deferred_operation, pipeline_cache, create_info_count, p_create_infos,
-		p_allocator, p_pipelines)
+fn C.vkCreateRayTracingPipelinesKHR(C.Device,
+	C.DeferredOperationKHR,
+	C.PipelineCache,
+	u32,
+	&RayTracingPipelineCreateInfoKHR,
+	&AllocationCallbacks,
+	&C.Pipeline) Result
+pub fn create_ray_tracing_pipelines_khr(device C.Device,
+	deferred_operation C.DeferredOperationKHR,
+	pipeline_cache C.PipelineCache,
+	create_info_count u32,
+	p_create_infos &RayTracingPipelineCreateInfoKHR,
+	p_allocator &AllocationCallbacks,
+	p_pipelines &C.Pipeline) Result {
+	return C.vkCreateRayTracingPipelinesKHR(device, deferred_operation, pipeline_cache,
+		create_info_count, p_create_infos, p_allocator, p_pipelines)
 }
 
-type VkGetRayTracingCaptureReplayShaderGroupHandlesKHR = fn (C.Device, C.Pipeline, u32, u32, usize, voidptr) Result
-
-pub fn get_ray_tracing_capture_replay_shader_group_handles_khr(device C.Device, pipeline C.Pipeline, first_group u32, group_count u32, data_size usize, p_data voidptr) Result {
-	f := VkGetRayTracingCaptureReplayShaderGroupHandlesKHR((*vulkan.loader_p).get_sym('vkGetRayTracingCaptureReplayShaderGroupHandlesKHR') or {
-		println("Couldn't load symbol for 'vkGetRayTracingCaptureReplayShaderGroupHandlesKHR': ${err}")
-		return Result.error_unknown
-	})
-	return f(device, pipeline, first_group, group_count, data_size, p_data)
+fn C.vkGetRayTracingCaptureReplayShaderGroupHandlesKHR(C.Device,
+	C.Pipeline,
+	u32,
+	u32,
+	usize,
+	voidptr) Result
+pub fn get_ray_tracing_capture_replay_shader_group_handles_khr(device C.Device,
+	pipeline C.Pipeline,
+	first_group u32,
+	group_count u32,
+	data_size usize,
+	p_data voidptr) Result {
+	return C.vkGetRayTracingCaptureReplayShaderGroupHandlesKHR(device, pipeline, first_group,
+		group_count, data_size, p_data)
 }
 
-type VkCmdTraceRaysIndirectKHR = fn (C.CommandBuffer, &StridedDeviceAddressRegionKHR, &StridedDeviceAddressRegionKHR, &StridedDeviceAddressRegionKHR, &StridedDeviceAddressRegionKHR, DeviceAddress)
-
-pub fn cmd_trace_rays_indirect_khr(command_buffer C.CommandBuffer, p_raygen_shader_binding_table &StridedDeviceAddressRegionKHR, p_miss_shader_binding_table &StridedDeviceAddressRegionKHR, p_hit_shader_binding_table &StridedDeviceAddressRegionKHR, p_callable_shader_binding_table &StridedDeviceAddressRegionKHR, indirect_device_address DeviceAddress) {
-	f := VkCmdTraceRaysIndirectKHR((*vulkan.loader_p).get_sym('vkCmdTraceRaysIndirectKHR') or {
-		println("Couldn't load symbol for 'vkCmdTraceRaysIndirectKHR': ${err}")
-		return
-	})
-	f(command_buffer, p_raygen_shader_binding_table, p_miss_shader_binding_table, p_hit_shader_binding_table,
-		p_callable_shader_binding_table, indirect_device_address)
+fn C.vkCmdTraceRaysIndirectKHR(C.CommandBuffer,
+	&StridedDeviceAddressRegionKHR,
+	&StridedDeviceAddressRegionKHR,
+	&StridedDeviceAddressRegionKHR,
+	&StridedDeviceAddressRegionKHR,
+	DeviceAddress)
+pub fn cmd_trace_rays_indirect_khr(command_buffer C.CommandBuffer,
+	p_raygen_shader_binding_table &StridedDeviceAddressRegionKHR,
+	p_miss_shader_binding_table &StridedDeviceAddressRegionKHR,
+	p_hit_shader_binding_table &StridedDeviceAddressRegionKHR,
+	p_callable_shader_binding_table &StridedDeviceAddressRegionKHR,
+	indirect_device_address DeviceAddress) {
+	C.vkCmdTraceRaysIndirectKHR(command_buffer, p_raygen_shader_binding_table, p_miss_shader_binding_table,
+		p_hit_shader_binding_table, p_callable_shader_binding_table, indirect_device_address)
 }
 
-type VkGetRayTracingShaderGroupStackSizeKHR = fn (C.Device, C.Pipeline, u32, ShaderGroupShaderKHR) DeviceSize
-
-pub fn get_ray_tracing_shader_group_stack_size_khr(device C.Device, pipeline C.Pipeline, group u32, group_shader ShaderGroupShaderKHR) DeviceSize {
-	f := VkGetRayTracingShaderGroupStackSizeKHR((*vulkan.loader_p).get_sym('vkGetRayTracingShaderGroupStackSizeKHR') or {
-		panic("Couldn't load symbol for 'vkGetRayTracingShaderGroupStackSizeKHR': ${err}")
-	})
-	return f(device, pipeline, group, group_shader)
+fn C.vkGetRayTracingShaderGroupStackSizeKHR(C.Device,
+	C.Pipeline,
+	u32,
+	ShaderGroupShaderKHR) DeviceSize
+pub fn get_ray_tracing_shader_group_stack_size_khr(device C.Device,
+	pipeline C.Pipeline,
+	group u32,
+	group_shader ShaderGroupShaderKHR) DeviceSize {
+	return C.vkGetRayTracingShaderGroupStackSizeKHR(device, pipeline, group, group_shader)
 }
 
-type VkCmdSetRayTracingPipelineStackSizeKHR = fn (C.CommandBuffer, u32)
-
-pub fn cmd_set_ray_tracing_pipeline_stack_size_khr(command_buffer C.CommandBuffer, pipeline_stack_size u32) {
-	f := VkCmdSetRayTracingPipelineStackSizeKHR((*vulkan.loader_p).get_sym('vkCmdSetRayTracingPipelineStackSizeKHR') or {
-		println("Couldn't load symbol for 'vkCmdSetRayTracingPipelineStackSizeKHR': ${err}")
-		return
-	})
-	f(command_buffer, pipeline_stack_size)
+fn C.vkCmdSetRayTracingPipelineStackSizeKHR(C.CommandBuffer,
+	u32)
+pub fn cmd_set_ray_tracing_pipeline_stack_size_khr(command_buffer C.CommandBuffer,
+	pipeline_stack_size u32) {
+	C.vkCmdSetRayTracingPipelineStackSizeKHR(command_buffer, pipeline_stack_size)
 }
 
-// VK_KHR_ray_query is a preprocessor guard. Do not pass it to API calls.
-const khr_ray_query = 1
 pub const khr_ray_query_spec_version = 1
 pub const khr_ray_query_extension_name = 'VK_KHR_ray_query'
-// PhysicalDeviceRayQueryFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceRayQueryFeaturesKHR {
-mut:
+pub mut:
 	s_type    StructureType
 	p_next    voidptr
 	ray_query Bool32
 }
 
-// VK_EXT_mesh_shader is a preprocessor guard. Do not pass it to API calls.
-const ext_mesh_shader = 1
 pub const ext_mesh_shader_spec_version = 1
 pub const ext_mesh_shader_extension_name = 'VK_EXT_mesh_shader'
-// PhysicalDeviceMeshShaderFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+
 pub struct PhysicalDeviceMeshShaderFeaturesEXT {
-mut:
+pub mut:
 	s_type                                      StructureType
 	p_next                                      voidptr
 	task_shader                                 Bool32
@@ -23061,22 +20367,21 @@ mut:
 	mesh_shader_queries                         Bool32
 }
 
-// PhysicalDeviceMeshShaderPropertiesEXT extends VkPhysicalDeviceProperties2
 pub struct PhysicalDeviceMeshShaderPropertiesEXT {
-mut:
+pub mut:
 	s_type                                    StructureType
 	p_next                                    voidptr
 	max_task_work_group_total_count           u32
-	max_task_work_group_count                 []u32
+	max_task_work_group_count                 [3]u32
 	max_task_work_group_invocations           u32
-	max_task_work_group_size                  []u32
+	max_task_work_group_size                  [3]u32
 	max_task_payload_size                     u32
 	max_task_shared_memory_size               u32
 	max_task_payload_and_shared_memory_size   u32
 	max_mesh_work_group_total_count           u32
-	max_mesh_work_group_count                 []u32
+	max_mesh_work_group_count                 [3]u32
 	max_mesh_work_group_invocations           u32
-	max_mesh_work_group_size                  []u32
+	max_mesh_work_group_size                  [3]u32
 	max_mesh_shared_memory_size               u32
 	max_mesh_payload_and_shared_memory_size   u32
 	max_mesh_output_memory_size               u32
@@ -23097,39 +20402,50 @@ mut:
 }
 
 pub struct DrawMeshTasksIndirectCommandEXT {
-mut:
+pub mut:
 	group_count_x u32
 	group_count_y u32
 	group_count_z u32
 }
 
-type VkCmdDrawMeshTasksEXT = fn (C.CommandBuffer, u32, u32, u32)
-
-pub fn cmd_draw_mesh_tasks_ext(command_buffer C.CommandBuffer, group_count_x u32, group_count_y u32, group_count_z u32) {
-	f := VkCmdDrawMeshTasksEXT((*vulkan.loader_p).get_sym('vkCmdDrawMeshTasksEXT') or {
-		println("Couldn't load symbol for 'vkCmdDrawMeshTasksEXT': ${err}")
-		return
-	})
-	f(command_buffer, group_count_x, group_count_y, group_count_z)
+fn C.vkCmdDrawMeshTasksEXT(C.CommandBuffer,
+	u32,
+	u32,
+	u32)
+pub fn cmd_draw_mesh_tasks_ext(command_buffer C.CommandBuffer,
+	group_count_x u32,
+	group_count_y u32,
+	group_count_z u32) {
+	C.vkCmdDrawMeshTasksEXT(command_buffer, group_count_x, group_count_y, group_count_z)
 }
 
-type VkCmdDrawMeshTasksIndirectEXT = fn (C.CommandBuffer, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_mesh_tasks_indirect_ext(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, draw_count u32, stride u32) {
-	f := VkCmdDrawMeshTasksIndirectEXT((*vulkan.loader_p).get_sym('vkCmdDrawMeshTasksIndirectEXT') or {
-		println("Couldn't load symbol for 'vkCmdDrawMeshTasksIndirectEXT': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, draw_count, stride)
+fn C.vkCmdDrawMeshTasksIndirectEXT(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	u32,
+	u32)
+pub fn cmd_draw_mesh_tasks_indirect_ext(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize,
+	draw_count u32,
+	stride u32) {
+	C.vkCmdDrawMeshTasksIndirectEXT(command_buffer, buffer, offset, draw_count, stride)
 }
 
-type VkCmdDrawMeshTasksIndirectCountEXT = fn (C.CommandBuffer, C.Buffer, DeviceSize, C.Buffer, DeviceSize, u32, u32)
-
-pub fn cmd_draw_mesh_tasks_indirect_count_ext(command_buffer C.CommandBuffer, buffer C.Buffer, offset DeviceSize, count_buffer C.Buffer, count_buffer_offset DeviceSize, max_draw_count u32, stride u32) {
-	f := VkCmdDrawMeshTasksIndirectCountEXT((*vulkan.loader_p).get_sym('vkCmdDrawMeshTasksIndirectCountEXT') or {
-		println("Couldn't load symbol for 'vkCmdDrawMeshTasksIndirectCountEXT': ${err}")
-		return
-	})
-	f(command_buffer, buffer, offset, count_buffer, count_buffer_offset, max_draw_count,
-		stride)
+fn C.vkCmdDrawMeshTasksIndirectCountEXT(C.CommandBuffer,
+	C.Buffer,
+	DeviceSize,
+	C.Buffer,
+	DeviceSize,
+	u32,
+	u32)
+pub fn cmd_draw_mesh_tasks_indirect_count_ext(command_buffer C.CommandBuffer,
+	buffer C.Buffer,
+	offset DeviceSize,
+	count_buffer C.Buffer,
+	count_buffer_offset DeviceSize,
+	max_draw_count u32,
+	stride u32) {
+	C.vkCmdDrawMeshTasksIndirectCountEXT(command_buffer, buffer, offset, count_buffer,
+		count_buffer_offset, max_draw_count, stride)
 }
