@@ -26,7 +26,6 @@ import vulkan as vk
 #flag windows -lglfw3
 // Please see https://www.glfw.org/docs/latest/build_guide.html#build_macros for more information
 #flag windows -DGLFW_INCLUDE_GLCOREARB=1 // makes the GLFW header include the modern GL/glcorearb.h header (OpenGL/gl3.h on macOS) instead of the regular OpenGL header.
-#flag -DGLFW_INCLUDE_VULKAN=1 // makes the GLFW header include the Vulkan vulkan/vulkan.h header
 
 // Volk
 // https://github.com/zeux/volk#basic-usage
@@ -122,7 +121,6 @@ fn main() {
 		enabled_extension_count:    glfw_required_instance_extensions_cnt
 	}
 	create_instance_result := vk.create_instance(&create_info, unsafe { nil }, &app.vk_instance)
-	println('created instance')
 	// Note: You can use string_VkResult in /usr/include/vulkan/generated/vk_enum_string_helper.h
 	// otherwise the string value of ${result} will just be the enum name, eg. 'success'
 	if create_instance_result != vk.Result.success {
@@ -183,11 +181,6 @@ fn main() {
 	if enumerate_device_extension_properties_result != vk.Result.success {
 		panic('Could not enumerate_device_extension_properties to get the properties array')
 	}
-	// TODO: Fix or update vlang doc.
-	// C.functions() can not be used directly as function parameters.
-	// The results have to be stored in an extra variable first,
-	// which also can not have the same name as the C.function	
-	// device_extensions_required_cnt := C.device_extensions_required_count()
 	device_extensions_required := [c'VK_KHR_swapchain']
 	device_extension_properties := to_v_array[vk.ExtensionProperties](device_extension_properties_c,
 		device_extension_properties_count)
