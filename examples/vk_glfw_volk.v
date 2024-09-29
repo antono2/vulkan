@@ -220,7 +220,6 @@ fn key_callback_function(window &C.GLFWwindow, key int, scancode int, action int
 		// get user data pointer from glfw.window
 		mut app := unsafe { &App(glfw_get_user_pointer(window)) }
 		if key == glfw_key_enter {
-			// if enter key pressed
 			txt := 'Enter key pressed'
 			app.share_data << txt
 		}
