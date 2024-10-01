@@ -92,14 +92,6 @@ There are some C. functions for GLFW at the bottom of the example. V bindings fo
 ### Manipulating vulkan.v
 If you need to remove extensions or functions for later versions of vulkan, create your own `vulkan.v` and just pick the things you need. Nothing - except includes ofc. - outside that file is referenced.
 
-## Pull Request
-There is always stuff to do and help is welcome. The goal is to cover some more vulkan functionality by example. Roughly like [this](https://github.com/SaschaWillems/Vulkan).
-
-Please rebase your local branch with origin/master and squash the commit log before creating the pull request.
-It helps with readability and generally improves life quality.
-Note that `vulkan.v` is generated in a different repository (not open source yet) and can not be edited directly.
-In that case, please feel free to open an issue or start a discussion.
-
 ## LICENSE
 
 `Public Domain` for anything in this repository.
