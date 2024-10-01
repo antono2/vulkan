@@ -3,8 +3,6 @@
 # Vulkan Bindings for Vlang
 The bindings in `src/vulkan.v` were generated from the official [vk.xml](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml) vulkan registry.
 
-Vulkan Version 1.3.290
-
 # Important
 This is still work in progress.
 
