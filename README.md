@@ -3,9 +3,6 @@
 # Vulkan Bindings for Vlang
 The bindings in `src/vulkan.v` were generated from the official [vk.xml](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml) vulkan registry.
 
-# Important
-This is still work in progress.
-
 ## Dependencies
 I assume `VULKAN_SDK` is a standard environment variable and contains the path to your [Vulkan SDK](https://vulkan.lunarg.com/doc/sdk/latest/), like `$HOME/vulkansdk-linux-x86_64-1.3.290.0`. Please create it, if not there.
 
