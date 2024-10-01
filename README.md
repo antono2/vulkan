@@ -78,7 +78,6 @@ v run .
 ### Compiler #Flags
 `VULKAN_SDK` is a standard environment variable and should contain the path to your [Vulkan SDK](https://vulkan.lunarg.com/doc/sdk/latest/), like `$HOME/vulkansdk-linux-x86_64-1.3.290.0/x86_64`. Please create it, if not there.
 There are some `#include` in the vulkan bindings, for which the correct compiler flags have to be set by you.
-The example already contains all required flags for Windows and Linux x64.
 
 ### Why [Volk](https://github.com/zeux/volk)?
 Any vulkan function has some name (symbol) and address in your local library. These addresses have to be found either at compile time or dynamically.
