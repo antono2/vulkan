@@ -8,12 +8,11 @@ module main
 
 import vulkan as vk
 
-// Please double check for path and architecture
-#flag linux -I$env('VULKAN_SDK')/x86_64/include
-#flag linux -I$env('VULKAN_SDK')/x86_64/include/vulkan
+#flag linux -I$env('VULKAN_SDK')/include
+#flag linux -I$env('VULKAN_SDK')/include/vulkan
 #flag windows -I$env('VULKAN_SDK')/Include
 #flag windows -I$env('VULKAN_SDK')/Include/vulkan
-#flag linux -L$env('VULKAN_SDK')/x86_64/lib
+#flag linux -L$env('VULKAN_SDK')/lib
 #flag windows -L$env('VULKAN_SDK')/Lib
 
 // GLFW
