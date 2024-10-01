@@ -41,7 +41,7 @@ Set GLFW paths in `examples\vk_glfw_volk.v`.
 GLFW releases different binaries for different compilers, which are in different directories.
 I assume you will also have to pass the `-cc <compiler>` parameter to V when compiling the app.
 
-Alternatively, you can keep the default tcc compiler in V and just build the [GLFW binaries from source](https://www.glfw.org/docs/latest/build_guide.html).
+Alternatively, you can keep the default tcc compiler in V and build the [GLFW binaries from source](https://www.glfw.org/docs/latest/build_guide.html).
 
 ## Run Examples
 There is an app `vk_glfw_volk.v`, which opens a window and listens for keyboard events.
@@ -57,7 +57,7 @@ v run examples/vk_glfw_volk.v
 
 ```
 ### Windows
-As of this writing, V expects a directory structure like `modules/vulkan/vulkan.v` for the example app to find the bindings. On Linux we can cheat with a symbolic link, on Windows we can duplicate `vulkan.v` and move the example app. Please make sure to pick the tag matching your SDK installation, like `--branch v1.3.290`.
+As of this writing, V expects a directory structure like `modules/vulkan/vulkan.v` for the example app to find the bindings. On Linux we can cheat with a symbolic link, on Windows we have to duplicate `vulkan.v` and move the example app.
 
 ```
 
