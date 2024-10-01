@@ -44,11 +44,12 @@ I assume you will also have to pass the `-cc <compiler>` parameter to V when com
 Alternatively, you can keep the default tcc compiler in V and just build the [GLFW binaries from source](https://www.glfw.org/docs/latest/build_guide.html).
 
 ## Run Examples
-There is an app `vk_glfw_volk.v`, which opens a window and listens for keyboard events. You can run it with
+There is an app `vk_glfw_volk.v`, which opens a window and listens for keyboard events.
+Please make sure to pick the tag matching your SDK installation, like `--branch v1.3.290`.
 ### Linux
 ```
 
-git clone https://github.com/antono2/vulkan.git
+git clone --depth 1 --branch <YOUR_VERSION> https://github.com/antono2/vulkan.git
 
 cd vulkan
 
@@ -56,10 +57,11 @@ v run examples/vk_glfw_volk.v
 
 ```
 ### Windows
-As of this writing, V expects a directory structure like `modules/vulkan/vulkan.v` for the example app to find the bindings. On Linux we can cheat with a symbolic link, on Windows we can duplicate `vulkan.v` and move the example app.
+As of this writing, V expects a directory structure like `modules/vulkan/vulkan.v` for the example app to find the bindings. On Linux we can cheat with a symbolic link, on Windows we can duplicate `vulkan.v` and move the example app. Please make sure to pick the tag matching your SDK installation, like `--branch v1.3.290`.
+
 ```
 
-git clone https://github.com/antono2/vulkan.git
+git clone --depth 1 --branch <YOUR_VERSION> https://github.com/antono2/vulkan.git
 
 cd vulkan
 
