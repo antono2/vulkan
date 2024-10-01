@@ -1,6 +1,6 @@
 
 
-# Vulkan Bindings for Vlang
+# Vulkan Bindings for [Vlang](https://vlang.io/)
 The bindings in `src/vulkan.v` were generated from the official [vk.xml](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml) vulkan registry.
 
 ## Dependencies
