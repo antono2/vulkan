@@ -87,7 +87,7 @@ Unfortunately this requires conditional compilation for extension code blocks in
 Alternatively we can load the function address whenever we first call it. Well, V has a [built in dynamic loader](https://modules.vlang.io/dl.loader.html), but there is a ready to use solution. We can just use [Volk](https://github.com/zeux/volk), which is provided by the [Vulkan SDK](https://vulkan.lunarg.com/doc/sdk/latest/) and does the same thing.
 
 ### [GLFW](https://www.glfw.org/download.html) Bindings?
-There are some C. functions for GLFW at the bottom of the example. V bindings for GLFW are available, but I prefer to control the global namespace for C. functions, as they might overlap and cause issues later. This will change in future.
+There are some `C.` functions for GLFW at the bottom of the example. V bindings for GLFW are available, but I prefer to control the global namespace for C. functions, as they might overlap and cause issues later. This will change in future.
 ### Manipulating vulkan.v
 If you need to remove extensions or functions for later versions of vulkan, create your own `vulkan.v` and just pick the things you need. Nothing - except includes ofc. - outside that file is referenced.
 
