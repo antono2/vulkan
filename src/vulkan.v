@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 290
+pub const header_version = 296
 pub const header_version_complete = make_api_version(0, 1, 3, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -132,6 +132,8 @@ pub enum Result {
 	error_invalid_video_std_parameters_khr             = int(-1000299000)
 	error_compression_exhausted_ext                    = int(-1000338000)
 	incompatible_shader_binary_ext                     = int(1000482000)
+	pipeline_binary_missing_khr                        = int(1000483000)
+	error_not_enough_space_khr                         = int(-1000483000)
 	result_max_enum                                    = int(0x7FFFFFFF)
 }
 
@@ -606,7 +608,6 @@ pub enum StructureType {
 	structure_type_device_memory_overallocation_create_info_amd                        = int(1000189000)
 	structure_type_physical_device_vertex_attribute_divisor_properties_ext             = int(1000190000)
 	structure_type_present_frame_token_ggp                                             = int(1000191000)
-	structure_type_physical_device_compute_shader_derivatives_features_nv              = int(1000201000)
 	structure_type_physical_device_mesh_shader_features_nv                             = int(1000202000)
 	structure_type_physical_device_mesh_shader_properties_nv                           = int(1000202001)
 	structure_type_physical_device_shader_image_footprint_features_nv                  = int(1000204000)
@@ -939,10 +940,23 @@ pub enum StructureType {
 	structure_type_image_subresource_2_khr                                             = int(1000338003)
 	structure_type_pipeline_create_flags_2_create_info_khr                             = int(1000470005)
 	structure_type_buffer_usage_flags_2_create_info_khr                                = int(1000470006)
+	structure_type_physical_device_anti_lag_features_amd                               = int(1000476000)
+	structure_type_anti_lag_data_amd                                                   = int(1000476001)
+	structure_type_anti_lag_presentation_info_amd                                      = int(1000476002)
 	structure_type_physical_device_ray_tracing_position_fetch_features_khr             = int(1000481000)
 	structure_type_physical_device_shader_object_features_ext                          = int(1000482000)
 	structure_type_physical_device_shader_object_properties_ext                        = int(1000482001)
 	structure_type_shader_create_info_ext                                              = int(1000482002)
+	structure_type_physical_device_pipeline_binary_features_khr                        = int(1000483000)
+	structure_type_pipeline_binary_create_info_khr                                     = int(1000483001)
+	structure_type_pipeline_binary_info_khr                                            = int(1000483002)
+	structure_type_pipeline_binary_key_khr                                             = int(1000483003)
+	structure_type_physical_device_pipeline_binary_properties_khr                      = int(1000483004)
+	structure_type_release_captured_pipeline_data_info_khr                             = int(1000483005)
+	structure_type_pipeline_binary_data_info_khr                                       = int(1000483006)
+	structure_type_pipeline_create_info_khr                                            = int(1000483007)
+	structure_type_device_pipeline_binary_internal_cache_control_khr                   = int(1000483008)
+	structure_type_pipeline_binary_handles_info_khr                                    = int(1000483009)
 	structure_type_physical_device_tile_properties_features_qcom                       = int(1000484000)
 	structure_type_tile_properties_qcom                                                = int(1000484001)
 	structure_type_physical_device_amigo_profiling_features_sec                        = int(1000485000)
@@ -975,6 +989,8 @@ pub enum StructureType {
 	structure_type_physical_device_cooperative_matrix_properties_khr                   = int(1000506002)
 	structure_type_physical_device_multiview_per_view_render_areas_features_qcom       = int(1000510000)
 	structure_type_multiview_per_view_render_areas_render_pass_begin_info_qcom         = int(1000510001)
+	structure_type_physical_device_compute_shader_derivatives_features_khr             = int(1000201000)
+	structure_type_physical_device_compute_shader_derivatives_properties_khr           = int(1000511000)
 	structure_type_video_decode_av1_capabilities_khr                                   = int(1000512000)
 	structure_type_video_decode_av1_picture_info_khr                                   = int(1000512001)
 	structure_type_video_decode_av1_profile_info_khr                                   = int(1000512003)
@@ -1021,6 +1037,7 @@ pub enum StructureType {
 	structure_type_physical_device_descriptor_pool_overallocation_features_nv          = int(1000546000)
 	structure_type_physical_device_raw_access_chains_features_nv                       = int(1000555000)
 	structure_type_physical_device_shader_relaxed_extended_instruction_features_khr    = int(1000558000)
+	structure_type_physical_device_command_buffer_inheritance_features_nv              = int(1000559000)
 	structure_type_physical_device_maintenance_7_features_khr                          = int(1000562000)
 	structure_type_physical_device_maintenance_7_properties_khr                        = int(1000562001)
 	structure_type_physical_device_layered_api_properties_list_khr                     = int(1000562002)
@@ -1029,9 +1046,25 @@ pub enum StructureType {
 	structure_type_physical_device_shader_atomic_float16_vector_features_nv            = int(1000563000)
 	structure_type_physical_device_shader_replicated_composites_features_ext           = int(1000564000)
 	structure_type_physical_device_ray_tracing_validation_features_nv                  = int(1000568000)
+	structure_type_physical_device_device_generated_commands_features_ext              = int(1000572000)
+	structure_type_physical_device_device_generated_commands_properties_ext            = int(1000572001)
+	structure_type_generated_commands_memory_requirements_info_ext                     = int(1000572002)
+	structure_type_indirect_execution_set_create_info_ext                              = int(1000572003)
+	structure_type_generated_commands_info_ext                                         = int(1000572004)
+	structure_type_indirect_commands_layout_create_info_ext                            = int(1000572006)
+	structure_type_indirect_commands_layout_token_ext                                  = int(1000572007)
+	structure_type_write_indirect_execution_set_pipeline_ext                           = int(1000572008)
+	structure_type_write_indirect_execution_set_shader_ext                             = int(1000572009)
+	structure_type_indirect_execution_set_pipeline_info_ext                            = int(1000572010)
+	structure_type_indirect_execution_set_shader_info_ext                              = int(1000572011)
+	structure_type_indirect_execution_set_shader_layout_info_ext                       = int(1000572012)
+	structure_type_generated_commands_pipeline_info_ext                                = int(1000572013)
+	structure_type_generated_commands_shader_info_ext                                  = int(1000572014)
 	structure_type_physical_device_image_alignment_control_features_mesa               = int(1000575000)
 	structure_type_physical_device_image_alignment_control_properties_mesa             = int(1000575001)
 	structure_type_image_alignment_control_create_info_mesa                            = int(1000575002)
+	structure_type_physical_device_depth_clamp_control_features_ext                    = int(1000582000)
+	structure_type_pipeline_viewport_depth_clamp_control_create_info_ext               = int(1000582001)
 	structure_type_max_enum                                                            = int(0x7FFFFFFF)
 }
 
@@ -1125,6 +1158,9 @@ pub enum ObjectType {
 	object_type_micromap_ext                    = int(1000396000)
 	object_type_optical_flow_session_nv         = int(1000464000)
 	object_type_shader_ext                      = int(1000482000)
+	object_type_pipeline_binary_khr             = int(1000483000)
+	object_type_indirect_commands_layout_ext    = int(1000572000)
+	object_type_indirect_execution_set_ext      = int(1000572001)
 	object_type_max_enum                        = int(0x7FFFFFFF)
 }
 
@@ -1643,6 +1679,7 @@ pub enum DynamicState {
 	dynamic_state_coverage_reduction_mode_nv              = int(1000455032)
 	dynamic_state_attachment_feedback_loop_enable_ext     = int(1000524000)
 	dynamic_state_line_stipple_khr                        = int(1000259000)
+	dynamic_state_depth_clamp_range_ext                   = int(1000582000)
 	dynamic_state_max_enum                                = int(0x7FFFFFFF)
 }
 
@@ -7041,6 +7078,7 @@ pub const pipeline_stage_2_video_encode_bit_khr = u64(0x08000000)
 pub const pipeline_stage_2_transform_feedback_bit_ext = u64(0x01000000)
 pub const pipeline_stage_2_conditional_rendering_bit_ext = u64(0x00040000)
 pub const pipeline_stage_2_command_preprocess_bit_nv = u64(0x00020000)
+pub const pipeline_stage_2_command_preprocess_bit_ext = pipeline_stage_2_command_preprocess_bit_nv
 pub const pipeline_stage_2_fragment_shading_rate_attachment_bit_khr = u64(0x00400000)
 pub const pipeline_stage_2_shading_rate_image_bit_nv = pipeline_stage_2_fragment_shading_rate_attachment_bit_khr
 pub const pipeline_stage_2_acceleration_structure_build_bit_khr = u64(0x02000000)
@@ -7118,6 +7156,8 @@ pub const access_2_transform_feedback_counter_write_bit_ext = u64(0x08000000)
 pub const access_2_conditional_rendering_read_bit_ext = u64(0x00100000)
 pub const access_2_command_preprocess_read_bit_nv = u64(0x00020000)
 pub const access_2_command_preprocess_write_bit_nv = u64(0x00040000)
+pub const access_2_command_preprocess_read_bit_ext = access_2_command_preprocess_read_bit_nv
+pub const access_2_command_preprocess_write_bit_ext = access_2_command_preprocess_write_bit_nv
 pub const access_2_fragment_shading_rate_attachment_read_bit_khr = u64(0x00800000)
 pub const access_2_shading_rate_image_read_bit_nv = access_2_fragment_shading_rate_attachment_read_bit_khr
 pub const access_2_acceleration_structure_read_bit_khr = u64(0x00200000)
@@ -8152,15 +8192,16 @@ pub enum PresentModeKHR {
 }
 
 pub enum ColorSpaceKHR {
-	color_space_srgb_nonlinear_khr          = int(0)
-	color_space_display_p3_nonlinear_ext    = int(1000104001)
-	color_space_extended_srgb_linear_ext    = int(1000104002)
-	color_space_display_p3_linear_ext       = int(1000104003)
-	color_space_dci_p3_nonlinear_ext        = int(1000104004)
-	color_space_bt709_linear_ext            = int(1000104005)
-	color_space_bt709_nonlinear_ext         = int(1000104006)
-	color_space_bt2020_linear_ext           = int(1000104007)
-	color_space_hdr10_st2084_ext            = int(1000104008)
+	color_space_srgb_nonlinear_khr       = int(0)
+	color_space_display_p3_nonlinear_ext = int(1000104001)
+	color_space_extended_srgb_linear_ext = int(1000104002)
+	color_space_display_p3_linear_ext    = int(1000104003)
+	color_space_dci_p3_nonlinear_ext     = int(1000104004)
+	color_space_bt709_linear_ext         = int(1000104005)
+	color_space_bt709_nonlinear_ext      = int(1000104006)
+	color_space_bt2020_linear_ext        = int(1000104007)
+	color_space_hdr10_st2084_ext         = int(1000104008)
+	// VK_COLOR_SPACE_DOLBYVISION_EXT is deprecated, but no reason was given in the API XML
 	color_space_dolbyvision_ext             = int(1000104009)
 	color_space_hdr10_hlg_ext               = int(1000104010)
 	color_space_adobergb_linear_ext         = int(1000104011)
@@ -11053,10 +11094,6 @@ pub enum VideoEncodeTuningModeKHR {
 	video_encode_tuning_mode_max_enum_khr          = int(0x7FFFFFFF)
 }
 
-pub enum VideoEncodeFlagBitsKHR {
-	video_encode_flag_bits_max_enum_khr = int(0x7FFFFFFF)
-}
-
 pub type VideoEncodeFlagsKHR = u32
 
 pub enum VideoEncodeCapabilityFlagBitsKHR {
@@ -11496,6 +11533,8 @@ pub const pipeline_create_2_no_protected_access_bit_ext = u64(0x08000000)
 pub const pipeline_create_2_protected_access_only_bit_ext = u64(0x40000000)
 pub const pipeline_create_2_ray_tracing_displacement_micromap_bit_nv = u64(0x10000000)
 pub const pipeline_create_2_descriptor_buffer_bit_ext = u64(0x20000000)
+pub const pipeline_create_2_capture_data_bit_khr = u64(0x80000000)
+pub const pipeline_create_2_indirect_bindable_bit_ext = u64(0x4000000000)
 
 pub type BufferUsageFlags2KHR = u64
 
@@ -11529,6 +11568,7 @@ pub const buffer_usage_2_resource_descriptor_buffer_bit_ext = u64(0x00400000)
 pub const buffer_usage_2_push_descriptors_descriptor_buffer_bit_ext = u64(0x04000000)
 pub const buffer_usage_2_micromap_build_input_read_only_bit_ext = u64(0x00800000)
 pub const buffer_usage_2_micromap_storage_bit_ext = u64(0x01000000)
+pub const buffer_usage_2_preprocess_buffer_bit_ext = u64(0x80000000)
 
 pub struct PhysicalDeviceMaintenance5FeaturesKHR {
 pub mut:
@@ -11648,6 +11688,155 @@ pub mut:
 	ray_tracing_position_fetch Bool32
 }
 
+pub type C.PipelineBinaryKHR = voidptr
+
+pub const max_pipeline_binary_key_size_khr = u32(32)
+pub const khr_pipeline_binary_spec_version = 1
+pub const khr_pipeline_binary_extension_name = 'VK_KHR_pipeline_binary'
+
+pub struct PhysicalDevicePipelineBinaryFeaturesKHR {
+pub mut:
+	s_type            StructureType
+	p_next            voidptr
+	pipeline_binaries Bool32
+}
+
+pub struct PhysicalDevicePipelineBinaryPropertiesKHR {
+pub mut:
+	s_type                                     StructureType
+	p_next                                     voidptr
+	pipeline_binary_internal_cache             Bool32
+	pipeline_binary_internal_cache_control     Bool32
+	pipeline_binary_prefers_internal_cache     Bool32
+	pipeline_binary_precompiled_internal_cache Bool32
+	pipeline_binary_compressed_data            Bool32
+}
+
+pub struct DevicePipelineBinaryInternalCacheControlKHR {
+pub mut:
+	s_type                 StructureType
+	p_next                 voidptr
+	disable_internal_cache Bool32
+}
+
+pub struct PipelineBinaryKeyKHR {
+pub mut:
+	s_type   StructureType
+	p_next   voidptr
+	key_size u32
+	key      [max_pipeline_binary_key_size_khr]u8
+}
+
+pub struct PipelineBinaryDataKHR {
+pub mut:
+	data_size usize
+	p_data    voidptr
+}
+
+pub struct PipelineBinaryKeysAndDataKHR {
+pub mut:
+	binary_count           u32
+	p_pipeline_binary_keys &PipelineBinaryKeyKHR
+	p_pipeline_binary_data &PipelineBinaryDataKHR
+}
+
+pub struct PipelineCreateInfoKHR {
+pub mut:
+	s_type StructureType
+	p_next voidptr
+}
+
+pub struct PipelineBinaryCreateInfoKHR {
+pub mut:
+	s_type                 StructureType
+	p_next                 voidptr
+	p_keys_and_data_info   &PipelineBinaryKeysAndDataKHR
+	pipeline               C.Pipeline
+	p_pipeline_create_info &PipelineCreateInfoKHR
+}
+
+pub struct PipelineBinaryInfoKHR {
+pub mut:
+	s_type              StructureType
+	p_next              voidptr
+	binary_count        u32
+	p_pipeline_binaries &C.PipelineBinaryKHR
+}
+
+pub struct ReleaseCapturedPipelineDataInfoKHR {
+pub mut:
+	s_type   StructureType
+	p_next   voidptr
+	pipeline C.Pipeline
+}
+
+pub struct PipelineBinaryDataInfoKHR {
+pub mut:
+	s_type          StructureType
+	p_next          voidptr
+	pipeline_binary C.PipelineBinaryKHR
+}
+
+pub struct PipelineBinaryHandlesInfoKHR {
+pub mut:
+	s_type                StructureType
+	p_next                voidptr
+	pipeline_binary_count u32
+	p_pipeline_binaries   &C.PipelineBinaryKHR
+}
+
+fn C.vkCreatePipelineBinariesKHR(C.Device,
+	&PipelineBinaryCreateInfoKHR,
+	&AllocationCallbacks,
+	&PipelineBinaryHandlesInfoKHR) Result
+pub fn create_pipeline_binaries_khr(device C.Device,
+	p_create_info &PipelineBinaryCreateInfoKHR,
+	p_allocator &AllocationCallbacks,
+	p_binaries &PipelineBinaryHandlesInfoKHR) Result {
+	return C.vkCreatePipelineBinariesKHR(device, p_create_info, p_allocator, p_binaries)
+}
+
+fn C.vkDestroyPipelineBinaryKHR(C.Device,
+	C.PipelineBinaryKHR,
+	&AllocationCallbacks)
+pub fn destroy_pipeline_binary_khr(device C.Device,
+	pipeline_binary C.PipelineBinaryKHR,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyPipelineBinaryKHR(device, pipeline_binary, p_allocator)
+}
+
+fn C.vkGetPipelineKeyKHR(C.Device,
+	&PipelineCreateInfoKHR,
+	&PipelineBinaryKeyKHR) Result
+pub fn get_pipeline_key_khr(device C.Device,
+	p_pipeline_create_info &PipelineCreateInfoKHR,
+	p_pipeline_key &PipelineBinaryKeyKHR) Result {
+	return C.vkGetPipelineKeyKHR(device, p_pipeline_create_info, p_pipeline_key)
+}
+
+fn C.vkGetPipelineBinaryDataKHR(C.Device,
+	&PipelineBinaryDataInfoKHR,
+	&PipelineBinaryKeyKHR,
+	&usize,
+	voidptr) Result
+pub fn get_pipeline_binary_data_khr(device C.Device,
+	p_info &PipelineBinaryDataInfoKHR,
+	p_pipeline_binary_key &PipelineBinaryKeyKHR,
+	p_pipeline_binary_data_size &usize,
+	p_pipeline_binary_data voidptr) Result {
+	return C.vkGetPipelineBinaryDataKHR(device, p_info, p_pipeline_binary_key, p_pipeline_binary_data_size,
+		p_pipeline_binary_data)
+}
+
+fn C.vkReleaseCapturedPipelineDataKHR(C.Device,
+	&ReleaseCapturedPipelineDataInfoKHR,
+	&AllocationCallbacks) Result
+pub fn release_captured_pipeline_data_khr(device C.Device,
+	p_info &ReleaseCapturedPipelineDataInfoKHR,
+	p_allocator &AllocationCallbacks) Result {
+	return C.vkReleaseCapturedPipelineDataKHR(device, p_info, p_allocator)
+}
+
 pub const khr_cooperative_matrix_spec_version = 2
 pub const khr_cooperative_matrix_extension_name = 'VK_KHR_cooperative_matrix'
 
@@ -11712,6 +11901,24 @@ pub fn get_physical_device_cooperative_matrix_properties_khr(physical_device C.P
 	p_properties &CooperativeMatrixPropertiesKHR) Result {
 	return C.vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR(physical_device, p_property_count,
 		p_properties)
+}
+
+pub const khr_compute_shader_derivatives_spec_version = 1
+pub const khr_compute_shader_derivatives_extension_name = 'VK_KHR_compute_shader_derivatives'
+
+pub struct PhysicalDeviceComputeShaderDerivativesFeaturesKHR {
+pub mut:
+	s_type                          StructureType
+	p_next                          voidptr
+	compute_derivative_group_quads  Bool32
+	compute_derivative_group_linear Bool32
+}
+
+pub struct PhysicalDeviceComputeShaderDerivativesPropertiesKHR {
+pub mut:
+	s_type                           StructureType
+	p_next                           voidptr
+	mesh_and_task_shader_derivatives Bool32
 }
 
 #include "vk_video/vulkan_video_codec_av1std.h"
@@ -14635,13 +14842,7 @@ pub const nv_shader_subgroup_partitioned_extension_name = 'VK_NV_shader_subgroup
 pub const nv_compute_shader_derivatives_spec_version = 1
 pub const nv_compute_shader_derivatives_extension_name = 'VK_NV_compute_shader_derivatives'
 
-pub struct PhysicalDeviceComputeShaderDerivativesFeaturesNV {
-pub mut:
-	s_type                          StructureType
-	p_next                          voidptr
-	compute_derivative_group_quads  Bool32
-	compute_derivative_group_linear Bool32
-}
+pub type PhysicalDeviceComputeShaderDerivativesFeaturesNV = PhysicalDeviceComputeShaderDerivativesFeaturesKHR
 
 pub const nv_mesh_shader_spec_version = 1
 pub const nv_mesh_shader_extension_name = 'VK_NV_mesh_shader'
@@ -19131,6 +19332,53 @@ pub mut:
 	pipeline_protected_access Bool32
 }
 
+pub const amd_anti_lag_spec_version = 1
+pub const amd_anti_lag_extension_name = 'VK_AMD_anti_lag'
+
+pub enum AntiLagModeAMD {
+	anti_lag_mode_driver_control_amd = int(0)
+	anti_lag_mode_on_amd             = int(1)
+	anti_lag_mode_off_amd            = int(2)
+	anti_lag_mode_max_enum_amd       = int(0x7FFFFFFF)
+}
+
+pub enum AntiLagStageAMD {
+	anti_lag_stage_input_amd    = int(0)
+	anti_lag_stage_present_amd  = int(1)
+	anti_lag_stage_max_enum_amd = int(0x7FFFFFFF)
+}
+
+pub struct PhysicalDeviceAntiLagFeaturesAMD {
+pub mut:
+	s_type   StructureType
+	p_next   voidptr
+	anti_lag Bool32
+}
+
+pub struct AntiLagPresentationInfoAMD {
+pub mut:
+	s_type      StructureType
+	p_next      voidptr
+	stage       AntiLagStageAMD
+	frame_index u64
+}
+
+pub struct AntiLagDataAMD {
+pub mut:
+	s_type              StructureType
+	p_next              voidptr
+	mode                AntiLagModeAMD
+	max_fps             u32
+	p_presentation_info &AntiLagPresentationInfoAMD
+}
+
+fn C.vkAntiLagUpdateAMD(C.Device,
+	&AntiLagDataAMD)
+pub fn anti_lag_update_amd(device C.Device,
+	p_data &AntiLagDataAMD) {
+	C.vkAntiLagUpdateAMD(device, p_data)
+}
+
 pub type C.ShaderEXT = voidptr
 
 pub const ext_shader_object_spec_version = 1
@@ -19142,6 +19390,12 @@ pub enum ShaderCodeTypeEXT {
 	shader_code_type_max_enum_ext = int(0x7FFFFFFF)
 }
 
+pub enum DepthClampModeEXT {
+	depth_clamp_mode_viewport_range_ext     = int(0)
+	depth_clamp_mode_user_defined_range_ext = int(1)
+	depth_clamp_mode_max_enum_ext           = int(0x7FFFFFFF)
+}
+
 pub enum ShaderCreateFlagBitsEXT {
 	shader_create_link_stage_bit_ext                       = int(0x00000001)
 	shader_create_allow_varying_subgroup_size_bit_ext      = int(0x00000002)
@@ -19150,6 +19404,7 @@ pub enum ShaderCreateFlagBitsEXT {
 	shader_create_dispatch_base_bit_ext                    = int(0x00000010)
 	shader_create_fragment_shading_rate_attachment_bit_ext = int(0x00000020)
 	shader_create_fragment_density_map_attachment_bit_ext  = int(0x00000040)
+	shader_create_indirect_bindable_bit_ext                = int(0x00000080)
 	shader_create_flag_bits_max_enum_ext                   = int(0x7FFFFFFF)
 }
 
@@ -19189,6 +19444,12 @@ pub mut:
 }
 
 pub type ShaderRequiredSubgroupSizeCreateInfoEXT = PipelineShaderStageRequiredSubgroupSizeCreateInfo
+
+pub struct DepthClampRangeEXT {
+pub mut:
+	min_depth_clamp f32
+	max_depth_clamp f32
+}
 
 fn C.vkCreateShadersEXT(C.Device,
 	u32,
@@ -19233,6 +19494,15 @@ pub fn cmd_bind_shaders_ext(command_buffer C.CommandBuffer,
 	p_stages &ShaderStageFlagBits,
 	p_shaders &C.ShaderEXT) {
 	C.vkCmdBindShadersEXT(command_buffer, stage_count, p_stages, p_shaders)
+}
+
+fn C.vkCmdSetDepthClampRangeEXT(C.CommandBuffer,
+	DepthClampModeEXT,
+	&DepthClampRangeEXT)
+pub fn cmd_set_depth_clamp_range_ext(command_buffer C.CommandBuffer,
+	depth_clamp_mode DepthClampModeEXT,
+	p_depth_clamp_range &DepthClampRangeEXT) {
+	C.vkCmdSetDepthClampRangeEXT(command_buffer, depth_clamp_mode, p_depth_clamp_range)
 }
 
 pub const qcom_tile_properties_spec_version = 1
@@ -19759,6 +20029,16 @@ pub mut:
 	shader_raw_access_chains Bool32
 }
 
+pub const nv_command_buffer_inheritance_spec_version = 1
+pub const nv_command_buffer_inheritance_extension_name = 'VK_NV_command_buffer_inheritance'
+
+pub struct PhysicalDeviceCommandBufferInheritanceFeaturesNV {
+pub mut:
+	s_type                     StructureType
+	p_next                     voidptr
+	command_buffer_inheritance Bool32
+}
+
 pub const nv_shader_atomic_float16_vector_spec_version = 1
 pub const nv_shader_atomic_float16_vector_extension_name = 'VK_NV_shader_atomic_float16_vector'
 
@@ -19789,6 +20069,340 @@ pub mut:
 	ray_tracing_validation Bool32
 }
 
+pub type C.IndirectExecutionSetEXT = voidptr
+pub type C.IndirectCommandsLayoutEXT = voidptr
+
+pub const ext_device_generated_commands_spec_version = 1
+pub const ext_device_generated_commands_extension_name = 'VK_EXT_device_generated_commands'
+
+pub enum IndirectExecutionSetInfoTypeEXT {
+	indirect_execution_set_info_type_pipelines_ext      = int(0)
+	indirect_execution_set_info_type_shader_objects_ext = int(1)
+	indirect_execution_set_info_type_max_enum_ext       = int(0x7FFFFFFF)
+}
+
+pub enum IndirectCommandsTokenTypeEXT {
+	indirect_commands_token_type_execution_set_ext            = int(0)
+	indirect_commands_token_type_push_constant_ext            = int(1)
+	indirect_commands_token_type_sequence_index_ext           = int(2)
+	indirect_commands_token_type_index_buffer_ext             = int(3)
+	indirect_commands_token_type_vertex_buffer_ext            = int(4)
+	indirect_commands_token_type_draw_indexed_ext             = int(5)
+	indirect_commands_token_type_draw_ext                     = int(6)
+	indirect_commands_token_type_draw_indexed_count_ext       = int(7)
+	indirect_commands_token_type_draw_count_ext               = int(8)
+	indirect_commands_token_type_dispatch_ext                 = int(9)
+	indirect_commands_token_type_draw_mesh_tasks_nv_ext       = int(1000202002)
+	indirect_commands_token_type_draw_mesh_tasks_count_nv_ext = int(1000202003)
+	indirect_commands_token_type_draw_mesh_tasks_ext          = int(1000328000)
+	indirect_commands_token_type_draw_mesh_tasks_count_ext    = int(1000328001)
+	indirect_commands_token_type_trace_rays2_ext              = int(1000386004)
+	indirect_commands_token_type_max_enum_ext                 = int(0x7FFFFFFF)
+}
+
+pub enum IndirectCommandsInputModeFlagBitsEXT {
+	indirect_commands_input_mode_vulkan_index_buffer_ext = int(0x00000001)
+	indirect_commands_input_mode_dxgi_index_buffer_ext   = int(0x00000002)
+	indirect_commands_input_mode_flag_bits_max_enum_ext  = int(0x7FFFFFFF)
+}
+
+pub type IndirectCommandsInputModeFlagsEXT = u32
+
+pub enum IndirectCommandsLayoutUsageFlagBitsEXT {
+	indirect_commands_layout_usage_explicit_preprocess_bit_ext = int(0x00000001)
+	indirect_commands_layout_usage_unordered_sequences_bit_ext = int(0x00000002)
+	indirect_commands_layout_usage_flag_bits_max_enum_ext      = int(0x7FFFFFFF)
+}
+
+pub type IndirectCommandsLayoutUsageFlagsEXT = u32
+
+pub struct PhysicalDeviceDeviceGeneratedCommandsFeaturesEXT {
+pub mut:
+	s_type                            StructureType
+	p_next                            voidptr
+	device_generated_commands         Bool32
+	dynamic_generated_pipeline_layout Bool32
+}
+
+pub struct PhysicalDeviceDeviceGeneratedCommandsPropertiesEXT {
+pub mut:
+	s_type                                                     StructureType
+	p_next                                                     voidptr
+	max_indirect_pipeline_count                                u32
+	max_indirect_shader_object_count                           u32
+	max_indirect_sequence_count                                u32
+	max_indirect_commands_token_count                          u32
+	max_indirect_commands_token_offset                         u32
+	max_indirect_commands_indirect_stride                      u32
+	supported_indirect_commands_input_modes                    IndirectCommandsInputModeFlagsEXT
+	supported_indirect_commands_shader_stages                  ShaderStageFlags
+	supported_indirect_commands_shader_stages_pipeline_binding ShaderStageFlags
+	supported_indirect_commands_shader_stages_shader_binding   ShaderStageFlags
+	device_generated_commands_transform_feedback               Bool32
+	device_generated_commands_multi_draw_indirect_count        Bool32
+}
+
+pub struct GeneratedCommandsMemoryRequirementsInfoEXT {
+pub mut:
+	s_type                   StructureType
+	p_next                   voidptr
+	indirect_execution_set   C.IndirectExecutionSetEXT
+	indirect_commands_layout C.IndirectCommandsLayoutEXT
+	max_sequence_count       u32
+	max_draw_count           u32
+}
+
+pub struct IndirectExecutionSetPipelineInfoEXT {
+pub mut:
+	s_type             StructureType
+	p_next             voidptr
+	initial_pipeline   C.Pipeline
+	max_pipeline_count u32
+}
+
+pub struct IndirectExecutionSetShaderLayoutInfoEXT {
+pub mut:
+	s_type           StructureType
+	p_next           voidptr
+	set_layout_count u32
+	p_set_layouts    &C.DescriptorSetLayout
+}
+
+pub struct IndirectExecutionSetShaderInfoEXT {
+pub mut:
+	s_type                    StructureType
+	p_next                    voidptr
+	shader_count              u32
+	p_initial_shaders         &C.ShaderEXT
+	p_set_layout_infos        &IndirectExecutionSetShaderLayoutInfoEXT
+	max_shader_count          u32
+	push_constant_range_count u32
+	p_push_constant_ranges    &PushConstantRange
+}
+
+pub union IndirectExecutionSetInfoEXT {
+pub mut:
+	p_pipeline_info &IndirectExecutionSetPipelineInfoEXT
+	p_shader_info   &IndirectExecutionSetShaderInfoEXT
+}
+
+pub struct IndirectExecutionSetCreateInfoEXT {
+pub mut:
+	s_type StructureType
+	p_next voidptr
+	vktype IndirectExecutionSetInfoTypeEXT
+	info   IndirectExecutionSetInfoEXT
+}
+
+pub struct GeneratedCommandsInfoEXT {
+pub mut:
+	s_type                   StructureType
+	p_next                   voidptr
+	shader_stages            ShaderStageFlags
+	indirect_execution_set   C.IndirectExecutionSetEXT
+	indirect_commands_layout C.IndirectCommandsLayoutEXT
+	indirect_address         DeviceAddress
+	indirect_address_size    DeviceSize
+	preprocess_address       DeviceAddress
+	preprocess_size          DeviceSize
+	max_sequence_count       u32
+	sequence_count_address   DeviceAddress
+	max_draw_count           u32
+}
+
+pub struct WriteIndirectExecutionSetPipelineEXT {
+pub mut:
+	s_type   StructureType
+	p_next   voidptr
+	index    u32
+	pipeline C.Pipeline
+}
+
+pub struct IndirectCommandsPushConstantTokenEXT {
+pub mut:
+	update_range PushConstantRange
+}
+
+pub struct IndirectCommandsVertexBufferTokenEXT {
+pub mut:
+	vertex_binding_unit u32
+}
+
+pub struct IndirectCommandsIndexBufferTokenEXT {
+pub mut:
+	mode IndirectCommandsInputModeFlagBitsEXT
+}
+
+pub struct IndirectCommandsExecutionSetTokenEXT {
+pub mut:
+	vktype        IndirectExecutionSetInfoTypeEXT
+	shader_stages ShaderStageFlags
+}
+
+pub union IndirectCommandsTokenDataEXT {
+pub mut:
+	p_push_constant &IndirectCommandsPushConstantTokenEXT
+	p_vertex_buffer &IndirectCommandsVertexBufferTokenEXT
+	p_index_buffer  &IndirectCommandsIndexBufferTokenEXT
+	p_execution_set &IndirectCommandsExecutionSetTokenEXT
+}
+
+pub struct IndirectCommandsLayoutTokenEXT {
+pub mut:
+	s_type StructureType
+	p_next voidptr
+	vktype IndirectCommandsTokenTypeEXT
+	data   IndirectCommandsTokenDataEXT
+	offset u32
+}
+
+pub struct IndirectCommandsLayoutCreateInfoEXT {
+pub mut:
+	s_type          StructureType
+	p_next          voidptr
+	flags           IndirectCommandsLayoutUsageFlagsEXT
+	shader_stages   ShaderStageFlags
+	indirect_stride u32
+	pipeline_layout C.PipelineLayout
+	token_count     u32
+	p_tokens        &IndirectCommandsLayoutTokenEXT
+}
+
+pub struct DrawIndirectCountIndirectCommandEXT {
+pub mut:
+	buffer_address DeviceAddress
+	stride         u32
+	command_count  u32
+}
+
+pub struct BindVertexBufferIndirectCommandEXT {
+pub mut:
+	buffer_address DeviceAddress
+	size           u32
+	stride         u32
+}
+
+pub struct BindIndexBufferIndirectCommandEXT {
+pub mut:
+	buffer_address DeviceAddress
+	size           u32
+	index_type     IndexType
+}
+
+pub struct GeneratedCommandsPipelineInfoEXT {
+pub mut:
+	s_type   StructureType
+	p_next   voidptr
+	pipeline C.Pipeline
+}
+
+pub struct GeneratedCommandsShaderInfoEXT {
+pub mut:
+	s_type       StructureType
+	p_next       voidptr
+	shader_count u32
+	p_shaders    &C.ShaderEXT
+}
+
+pub struct WriteIndirectExecutionSetShaderEXT {
+pub mut:
+	s_type StructureType
+	p_next voidptr
+	index  u32
+	shader C.ShaderEXT
+}
+
+fn C.vkGetGeneratedCommandsMemoryRequirementsEXT(C.Device,
+	&GeneratedCommandsMemoryRequirementsInfoEXT,
+	&MemoryRequirements2)
+pub fn get_generated_commands_memory_requirements_ext(device C.Device,
+	p_info &GeneratedCommandsMemoryRequirementsInfoEXT,
+	p_memory_requirements &MemoryRequirements2) {
+	C.vkGetGeneratedCommandsMemoryRequirementsEXT(device, p_info, p_memory_requirements)
+}
+
+fn C.vkCmdPreprocessGeneratedCommandsEXT(C.CommandBuffer,
+	&GeneratedCommandsInfoEXT,
+	C.CommandBuffer)
+pub fn cmd_preprocess_generated_commands_ext(command_buffer C.CommandBuffer,
+	p_generated_commands_info &GeneratedCommandsInfoEXT,
+	state_command_buffer C.CommandBuffer) {
+	C.vkCmdPreprocessGeneratedCommandsEXT(command_buffer, p_generated_commands_info, state_command_buffer)
+}
+
+fn C.vkCmdExecuteGeneratedCommandsEXT(C.CommandBuffer,
+	Bool32,
+	&GeneratedCommandsInfoEXT)
+pub fn cmd_execute_generated_commands_ext(command_buffer C.CommandBuffer,
+	is_preprocessed Bool32,
+	p_generated_commands_info &GeneratedCommandsInfoEXT) {
+	C.vkCmdExecuteGeneratedCommandsEXT(command_buffer, is_preprocessed, p_generated_commands_info)
+}
+
+fn C.vkCreateIndirectCommandsLayoutEXT(C.Device,
+	&IndirectCommandsLayoutCreateInfoEXT,
+	&AllocationCallbacks,
+	&C.IndirectCommandsLayoutEXT) Result
+pub fn create_indirect_commands_layout_ext(device C.Device,
+	p_create_info &IndirectCommandsLayoutCreateInfoEXT,
+	p_allocator &AllocationCallbacks,
+	p_indirect_commands_layout &C.IndirectCommandsLayoutEXT) Result {
+	return C.vkCreateIndirectCommandsLayoutEXT(device, p_create_info, p_allocator, p_indirect_commands_layout)
+}
+
+fn C.vkDestroyIndirectCommandsLayoutEXT(C.Device,
+	C.IndirectCommandsLayoutEXT,
+	&AllocationCallbacks)
+pub fn destroy_indirect_commands_layout_ext(device C.Device,
+	indirect_commands_layout C.IndirectCommandsLayoutEXT,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyIndirectCommandsLayoutEXT(device, indirect_commands_layout, p_allocator)
+}
+
+fn C.vkCreateIndirectExecutionSetEXT(C.Device,
+	&IndirectExecutionSetCreateInfoEXT,
+	&AllocationCallbacks,
+	&C.IndirectExecutionSetEXT) Result
+pub fn create_indirect_execution_set_ext(device C.Device,
+	p_create_info &IndirectExecutionSetCreateInfoEXT,
+	p_allocator &AllocationCallbacks,
+	p_indirect_execution_set &C.IndirectExecutionSetEXT) Result {
+	return C.vkCreateIndirectExecutionSetEXT(device, p_create_info, p_allocator, p_indirect_execution_set)
+}
+
+fn C.vkDestroyIndirectExecutionSetEXT(C.Device,
+	C.IndirectExecutionSetEXT,
+	&AllocationCallbacks)
+pub fn destroy_indirect_execution_set_ext(device C.Device,
+	indirect_execution_set C.IndirectExecutionSetEXT,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyIndirectExecutionSetEXT(device, indirect_execution_set, p_allocator)
+}
+
+fn C.vkUpdateIndirectExecutionSetPipelineEXT(C.Device,
+	C.IndirectExecutionSetEXT,
+	u32,
+	&WriteIndirectExecutionSetPipelineEXT)
+pub fn update_indirect_execution_set_pipeline_ext(device C.Device,
+	indirect_execution_set C.IndirectExecutionSetEXT,
+	execution_set_write_count u32,
+	p_execution_set_writes &WriteIndirectExecutionSetPipelineEXT) {
+	C.vkUpdateIndirectExecutionSetPipelineEXT(device, indirect_execution_set, execution_set_write_count,
+		p_execution_set_writes)
+}
+
+fn C.vkUpdateIndirectExecutionSetShaderEXT(C.Device,
+	C.IndirectExecutionSetEXT,
+	u32,
+	&WriteIndirectExecutionSetShaderEXT)
+pub fn update_indirect_execution_set_shader_ext(device C.Device,
+	indirect_execution_set C.IndirectExecutionSetEXT,
+	execution_set_write_count u32,
+	p_execution_set_writes &WriteIndirectExecutionSetShaderEXT) {
+	C.vkUpdateIndirectExecutionSetShaderEXT(device, indirect_execution_set, execution_set_write_count,
+		p_execution_set_writes)
+}
+
 pub const mesa_image_alignment_control_spec_version = 1
 pub const mesa_image_alignment_control_extension_name = 'VK_MESA_image_alignment_control'
 
@@ -19811,6 +20425,24 @@ pub mut:
 	s_type                      StructureType
 	p_next                      voidptr
 	maximum_requested_alignment u32
+}
+
+pub const ext_depth_clamp_control_spec_version = 1
+pub const ext_depth_clamp_control_extension_name = 'VK_EXT_depth_clamp_control'
+
+pub struct PhysicalDeviceDepthClampControlFeaturesEXT {
+pub mut:
+	s_type              StructureType
+	p_next              voidptr
+	depth_clamp_control Bool32
+}
+
+pub struct PipelineViewportDepthClampControlCreateInfoEXT {
+pub mut:
+	s_type              StructureType
+	p_next              voidptr
+	depth_clamp_mode    DepthClampModeEXT
+	p_depth_clamp_range &DepthClampRangeEXT
 }
 
 pub const khr_acceleration_structure_spec_version = 13
