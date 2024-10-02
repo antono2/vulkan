@@ -103,7 +103,6 @@ fn main() {
 	enabled_layer_names_count := u32(1)
 
 	create_info := vk.InstanceCreateInfo{
-		s_type:                     vk.StructureType.structure_type_instance_create_info
 		p_next:                     unsafe { nil }
 		flags:                      0
 		p_application_info:         &vk.ApplicationInfo{
