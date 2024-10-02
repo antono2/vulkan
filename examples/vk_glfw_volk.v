@@ -72,7 +72,7 @@ fn main() {
 	glfw_initialize()
 	mut window := unsafe { nil }
 	glfw_window_hint(glfw_client_api, glfw_no_api)
-	window = glfw_create_window(960, 480, 'Thought I was in a cubicle for a sec', unsafe { nil },
+	window = glfw_create_window(960, 480, 'Greetings!', unsafe { nil },
 		unsafe { nil })
 
 	mut app := init_app(window)
