@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 296
+pub const header_version = 290
 pub const header_version_complete = make_api_version(0, 1, 3, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -132,8 +132,6 @@ pub enum Result {
 	error_invalid_video_std_parameters_khr             = int(-1000299000)
 	error_compression_exhausted_ext                    = int(-1000338000)
 	incompatible_shader_binary_ext                     = int(1000482000)
-	pipeline_binary_missing_khr                        = int(1000483000)
-	error_not_enough_space_khr                         = int(-1000483000)
 	result_max_enum                                    = int(0x7FFFFFFF)
 }
 
@@ -608,6 +606,7 @@ pub enum StructureType {
 	structure_type_device_memory_overallocation_create_info_amd                        = int(1000189000)
 	structure_type_physical_device_vertex_attribute_divisor_properties_ext             = int(1000190000)
 	structure_type_present_frame_token_ggp                                             = int(1000191000)
+	structure_type_physical_device_compute_shader_derivatives_features_nv              = int(1000201000)
 	structure_type_physical_device_mesh_shader_features_nv                             = int(1000202000)
 	structure_type_physical_device_mesh_shader_properties_nv                           = int(1000202001)
 	structure_type_physical_device_shader_image_footprint_features_nv                  = int(1000204000)
@@ -940,23 +939,10 @@ pub enum StructureType {
 	structure_type_image_subresource_2_khr                                             = int(1000338003)
 	structure_type_pipeline_create_flags_2_create_info_khr                             = int(1000470005)
 	structure_type_buffer_usage_flags_2_create_info_khr                                = int(1000470006)
-	structure_type_physical_device_anti_lag_features_amd                               = int(1000476000)
-	structure_type_anti_lag_data_amd                                                   = int(1000476001)
-	structure_type_anti_lag_presentation_info_amd                                      = int(1000476002)
 	structure_type_physical_device_ray_tracing_position_fetch_features_khr             = int(1000481000)
 	structure_type_physical_device_shader_object_features_ext                          = int(1000482000)
 	structure_type_physical_device_shader_object_properties_ext                        = int(1000482001)
 	structure_type_shader_create_info_ext                                              = int(1000482002)
-	structure_type_physical_device_pipeline_binary_features_khr                        = int(1000483000)
-	structure_type_pipeline_binary_create_info_khr                                     = int(1000483001)
-	structure_type_pipeline_binary_info_khr                                            = int(1000483002)
-	structure_type_pipeline_binary_key_khr                                             = int(1000483003)
-	structure_type_physical_device_pipeline_binary_properties_khr                      = int(1000483004)
-	structure_type_release_captured_pipeline_data_info_khr                             = int(1000483005)
-	structure_type_pipeline_binary_data_info_khr                                       = int(1000483006)
-	structure_type_pipeline_create_info_khr                                            = int(1000483007)
-	structure_type_device_pipeline_binary_internal_cache_control_khr                   = int(1000483008)
-	structure_type_pipeline_binary_handles_info_khr                                    = int(1000483009)
 	structure_type_physical_device_tile_properties_features_qcom                       = int(1000484000)
 	structure_type_tile_properties_qcom                                                = int(1000484001)
 	structure_type_physical_device_amigo_profiling_features_sec                        = int(1000485000)
@@ -989,8 +975,6 @@ pub enum StructureType {
 	structure_type_physical_device_cooperative_matrix_properties_khr                   = int(1000506002)
 	structure_type_physical_device_multiview_per_view_render_areas_features_qcom       = int(1000510000)
 	structure_type_multiview_per_view_render_areas_render_pass_begin_info_qcom         = int(1000510001)
-	structure_type_physical_device_compute_shader_derivatives_features_khr             = int(1000201000)
-	structure_type_physical_device_compute_shader_derivatives_properties_khr           = int(1000511000)
 	structure_type_video_decode_av1_capabilities_khr                                   = int(1000512000)
 	structure_type_video_decode_av1_picture_info_khr                                   = int(1000512001)
 	structure_type_video_decode_av1_profile_info_khr                                   = int(1000512003)
@@ -1037,7 +1021,6 @@ pub enum StructureType {
 	structure_type_physical_device_descriptor_pool_overallocation_features_nv          = int(1000546000)
 	structure_type_physical_device_raw_access_chains_features_nv                       = int(1000555000)
 	structure_type_physical_device_shader_relaxed_extended_instruction_features_khr    = int(1000558000)
-	structure_type_physical_device_command_buffer_inheritance_features_nv              = int(1000559000)
 	structure_type_physical_device_maintenance_7_features_khr                          = int(1000562000)
 	structure_type_physical_device_maintenance_7_properties_khr                        = int(1000562001)
 	structure_type_physical_device_layered_api_properties_list_khr                     = int(1000562002)
@@ -1046,25 +1029,9 @@ pub enum StructureType {
 	structure_type_physical_device_shader_atomic_float16_vector_features_nv            = int(1000563000)
 	structure_type_physical_device_shader_replicated_composites_features_ext           = int(1000564000)
 	structure_type_physical_device_ray_tracing_validation_features_nv                  = int(1000568000)
-	structure_type_physical_device_device_generated_commands_features_ext              = int(1000572000)
-	structure_type_physical_device_device_generated_commands_properties_ext            = int(1000572001)
-	structure_type_generated_commands_memory_requirements_info_ext                     = int(1000572002)
-	structure_type_indirect_execution_set_create_info_ext                              = int(1000572003)
-	structure_type_generated_commands_info_ext                                         = int(1000572004)
-	structure_type_indirect_commands_layout_create_info_ext                            = int(1000572006)
-	structure_type_indirect_commands_layout_token_ext                                  = int(1000572007)
-	structure_type_write_indirect_execution_set_pipeline_ext                           = int(1000572008)
-	structure_type_write_indirect_execution_set_shader_ext                             = int(1000572009)
-	structure_type_indirect_execution_set_pipeline_info_ext                            = int(1000572010)
-	structure_type_indirect_execution_set_shader_info_ext                              = int(1000572011)
-	structure_type_indirect_execution_set_shader_layout_info_ext                       = int(1000572012)
-	structure_type_generated_commands_pipeline_info_ext                                = int(1000572013)
-	structure_type_generated_commands_shader_info_ext                                  = int(1000572014)
 	structure_type_physical_device_image_alignment_control_features_mesa               = int(1000575000)
 	structure_type_physical_device_image_alignment_control_properties_mesa             = int(1000575001)
 	structure_type_image_alignment_control_create_info_mesa                            = int(1000575002)
-	structure_type_physical_device_depth_clamp_control_features_ext                    = int(1000582000)
-	structure_type_pipeline_viewport_depth_clamp_control_create_info_ext               = int(1000582001)
 	structure_type_max_enum                                                            = int(0x7FFFFFFF)
 }
 
@@ -1158,9 +1125,6 @@ pub enum ObjectType {
 	object_type_micromap_ext                    = int(1000396000)
 	object_type_optical_flow_session_nv         = int(1000464000)
 	object_type_shader_ext                      = int(1000482000)
-	object_type_pipeline_binary_khr             = int(1000483000)
-	object_type_indirect_commands_layout_ext    = int(1000572000)
-	object_type_indirect_execution_set_ext      = int(1000572001)
 	object_type_max_enum                        = int(0x7FFFFFFF)
 }
 
@@ -1679,7 +1643,6 @@ pub enum DynamicState {
 	dynamic_state_coverage_reduction_mode_nv              = int(1000455032)
 	dynamic_state_attachment_feedback_loop_enable_ext     = int(1000524000)
 	dynamic_state_line_stipple_khr                        = int(1000259000)
-	dynamic_state_depth_clamp_range_ext                   = int(1000582000)
 	dynamic_state_max_enum                                = int(0x7FFFFFFF)
 }
 
@@ -2513,7 +2476,7 @@ pub mut:
 
 pub struct BufferMemoryBarrier {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_buffer_memory_barrier
 	p_next                 voidptr
 	src_access_mask        AccessFlags
 	dst_access_mask        AccessFlags
@@ -2559,7 +2522,7 @@ pub mut:
 
 pub struct ImageMemoryBarrier {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_image_memory_barrier
 	p_next                 voidptr
 	src_access_mask        AccessFlags
 	dst_access_mask        AccessFlags
@@ -2573,7 +2536,7 @@ pub mut:
 
 pub struct MemoryBarrier {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_memory_barrier
 	p_next          voidptr
 	src_access_mask AccessFlags
 	dst_access_mask AccessFlags
@@ -2612,7 +2575,7 @@ pub mut:
 
 pub struct ApplicationInfo {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_application_info
 	p_next              voidptr
 	p_application_name  &char
 	application_version u32
@@ -2639,7 +2602,7 @@ pub mut:
 
 pub struct InstanceCreateInfo {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_instance_create_info
 	p_next                     voidptr
 	flags                      InstanceCreateFlags
 	p_application_info         &ApplicationInfo
@@ -2664,7 +2627,7 @@ pub mut:
 pub struct PhysicalDeviceFeatures {
 pub mut:
 	robust_buffer_access                         Bool32
-	full_draw_index_uint32                       Bool32
+	full_draw_index_uint_3_2                     Bool32
 	image_cube_array                             Bool32
 	independent_blend                            Bool32
 	geometry_shader                              Bool32
@@ -2702,19 +2665,19 @@ pub mut:
 	shader_storage_image_array_dynamic_indexing  Bool32
 	shader_clip_distance                         Bool32
 	shader_cull_distance                         Bool32
-	shader_float64                               Bool32
-	shader_int64                                 Bool32
-	shader_int16                                 Bool32
+	shader_float_6_4                             Bool32
+	shader_int_6_4                               Bool32
+	shader_int_1_6                               Bool32
 	shader_resource_residency                    Bool32
 	shader_resource_min_lod                      Bool32
 	sparse_binding                               Bool32
 	sparse_residency_buffer                      Bool32
-	sparse_residency_image2_d                    Bool32
-	sparse_residency_image3_d                    Bool32
-	sparse_residency2_samples                    Bool32
-	sparse_residency4_samples                    Bool32
-	sparse_residency8_samples                    Bool32
-	sparse_residency16_samples                   Bool32
+	sparse_residency_image_2_d                   Bool32
+	sparse_residency_image_3_d                   Bool32
+	sparse_residency_2_samples                   Bool32
+	sparse_residency_4_samples                   Bool32
+	sparse_residency_8_samples                   Bool32
+	sparse_residency_1_6_samples                 Bool32
 	sparse_residency_aliased                     Bool32
 	variable_multisample_rate                    Bool32
 	inherited_queries                            Bool32
@@ -2722,9 +2685,9 @@ pub mut:
 
 pub struct PhysicalDeviceLimits {
 pub mut:
-	max_image_dimension1_d                                u32
-	max_image_dimension2_d                                u32
-	max_image_dimension3_d                                u32
+	max_image_dimension_1_d                               u32
+	max_image_dimension_2_d                               u32
+	max_image_dimension_3_d                               u32
 	max_image_dimension_cube                              u32
 	max_image_array_layers                                u32
 	max_texel_buffer_elements                             u32
@@ -2840,11 +2803,11 @@ pub mut:
 
 pub struct PhysicalDeviceSparseProperties {
 pub mut:
-	residency_standard2_d_block_shape             Bool32
-	residency_standard2_d_multisample_block_shape Bool32
-	residency_standard3_d_block_shape             Bool32
-	residency_aligned_mip_size                    Bool32
-	residency_non_resident_strict                 Bool32
+	residency_standard_2_d_block_shape             Bool32
+	residency_standard_2_d_multisample_block_shape Bool32
+	residency_standard_3_d_block_shape             Bool32
+	residency_aligned_mip_size                     Bool32
+	residency_non_resident_strict                  Bool32
 }
 
 pub struct PhysicalDeviceProperties {
@@ -2870,7 +2833,7 @@ pub mut:
 
 pub struct DeviceQueueCreateInfo {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_device_queue_create_info
 	p_next             voidptr
 	flags              DeviceQueueCreateFlags
 	queue_family_index u32
@@ -2880,7 +2843,7 @@ pub mut:
 
 pub struct DeviceCreateInfo {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_device_create_info
 	p_next                  voidptr
 	flags                   DeviceCreateFlags
 	queue_create_info_count u32
@@ -2910,7 +2873,7 @@ pub mut:
 
 pub struct SubmitInfo {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_submit_info
 	p_next                 voidptr
 	wait_semaphore_count   u32
 	p_wait_semaphores      &C.Semaphore
@@ -2923,7 +2886,7 @@ pub mut:
 
 pub struct MappedMemoryRange {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_mapped_memory_range
 	p_next voidptr
 	memory C.DeviceMemory
 	offset DeviceSize
@@ -2932,7 +2895,7 @@ pub mut:
 
 pub struct MemoryAllocateInfo {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_memory_allocate_info
 	p_next            voidptr
 	allocation_size   DeviceSize
 	memory_type_index u32
@@ -2994,7 +2957,7 @@ pub mut:
 
 pub struct BindSparseInfo {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_bind_sparse_info
 	p_next                  voidptr
 	wait_semaphore_count    u32
 	p_wait_semaphores       &C.Semaphore
@@ -3026,28 +2989,28 @@ pub mut:
 
 pub struct FenceCreateInfo {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_fence_create_info
 	p_next voidptr
 	flags  FenceCreateFlags
 }
 
 pub struct SemaphoreCreateInfo {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_semaphore_create_info
 	p_next voidptr
 	flags  SemaphoreCreateFlags
 }
 
 pub struct EventCreateInfo {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_event_create_info
 	p_next voidptr
 	flags  EventCreateFlags
 }
 
 pub struct QueryPoolCreateInfo {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_query_pool_create_info
 	p_next              voidptr
 	flags               QueryPoolCreateFlags
 	query_type          QueryType
@@ -3057,7 +3020,7 @@ pub mut:
 
 pub struct BufferCreateInfo {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_buffer_create_info
 	p_next                   voidptr
 	flags                    BufferCreateFlags
 	size                     DeviceSize
@@ -3069,7 +3032,7 @@ pub mut:
 
 pub struct BufferViewCreateInfo {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_buffer_view_create_info
 	p_next voidptr
 	flags  BufferViewCreateFlags
 	buffer C.Buffer
@@ -3080,7 +3043,7 @@ pub mut:
 
 pub struct ImageCreateInfo {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_image_create_info
 	p_next                   voidptr
 	flags                    ImageCreateFlags
 	image_type               ImageType
@@ -3116,7 +3079,7 @@ pub mut:
 
 pub struct ImageViewCreateInfo {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_image_view_create_info
 	p_next            voidptr
 	flags             ImageViewCreateFlags
 	image             C.Image
@@ -3128,7 +3091,7 @@ pub mut:
 
 pub struct ShaderModuleCreateInfo {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_shader_module_create_info
 	p_next    voidptr
 	flags     ShaderModuleCreateFlags
 	code_size usize
@@ -3137,7 +3100,7 @@ pub mut:
 
 pub struct PipelineCacheCreateInfo {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_pipeline_cache_create_info
 	p_next            voidptr
 	flags             PipelineCacheCreateFlags
 	initial_data_size usize
@@ -3161,7 +3124,7 @@ pub mut:
 
 pub struct PipelineShaderStageCreateInfo {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_pipeline_shader_stage_create_info
 	p_next                voidptr
 	flags                 PipelineShaderStageCreateFlags
 	stage                 ShaderStageFlagBits
@@ -3172,7 +3135,7 @@ pub mut:
 
 pub struct ComputePipelineCreateInfo {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_compute_pipeline_create_info
 	p_next               voidptr
 	flags                PipelineCreateFlags
 	stage                PipelineShaderStageCreateInfo
@@ -3198,7 +3161,7 @@ pub mut:
 
 pub struct PipelineVertexInputStateCreateInfo {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_pipeline_vertex_input_state_create_info
 	p_next                             voidptr
 	flags                              PipelineVertexInputStateCreateFlags
 	vertex_binding_description_count   u32
@@ -3209,7 +3172,7 @@ pub mut:
 
 pub struct PipelineInputAssemblyStateCreateInfo {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_pipeline_input_assembly_state_create_info
 	p_next                   voidptr
 	flags                    PipelineInputAssemblyStateCreateFlags
 	topology                 PrimitiveTopology
@@ -3218,7 +3181,7 @@ pub mut:
 
 pub struct PipelineTessellationStateCreateInfo {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_pipeline_tessellation_state_create_info
 	p_next               voidptr
 	flags                PipelineTessellationStateCreateFlags
 	patch_control_points u32
@@ -3236,7 +3199,7 @@ pub mut:
 
 pub struct PipelineViewportStateCreateInfo {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_pipeline_viewport_state_create_info
 	p_next         voidptr
 	flags          PipelineViewportStateCreateFlags
 	viewport_count u32
@@ -3247,7 +3210,7 @@ pub mut:
 
 pub struct PipelineRasterizationStateCreateInfo {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_pipeline_rasterization_state_create_info
 	p_next                     voidptr
 	flags                      PipelineRasterizationStateCreateFlags
 	depth_clamp_enable         Bool32
@@ -3264,7 +3227,7 @@ pub mut:
 
 pub struct PipelineMultisampleStateCreateInfo {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_pipeline_multisample_state_create_info
 	p_next                   voidptr
 	flags                    PipelineMultisampleStateCreateFlags
 	rasterization_samples    SampleCountFlagBits
@@ -3288,7 +3251,7 @@ pub mut:
 
 pub struct PipelineDepthStencilStateCreateInfo {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_pipeline_depth_stencil_state_create_info
 	p_next                   voidptr
 	flags                    PipelineDepthStencilStateCreateFlags
 	depth_test_enable        Bool32
@@ -3316,7 +3279,7 @@ pub mut:
 
 pub struct PipelineColorBlendStateCreateInfo {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_pipeline_color_blend_state_create_info
 	p_next           voidptr
 	flags            PipelineColorBlendStateCreateFlags
 	logic_op_enable  Bool32
@@ -3328,7 +3291,7 @@ pub mut:
 
 pub struct PipelineDynamicStateCreateInfo {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_pipeline_dynamic_state_create_info
 	p_next              voidptr
 	flags               PipelineDynamicStateCreateFlags
 	dynamic_state_count u32
@@ -3337,7 +3300,7 @@ pub mut:
 
 pub struct GraphicsPipelineCreateInfo {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_graphics_pipeline_create_info
 	p_next                 voidptr
 	flags                  PipelineCreateFlags
 	stage_count            u32
@@ -3367,7 +3330,7 @@ pub mut:
 
 pub struct PipelineLayoutCreateInfo {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_pipeline_layout_create_info
 	p_next                    voidptr
 	flags                     PipelineLayoutCreateFlags
 	set_layout_count          u32
@@ -3378,7 +3341,7 @@ pub mut:
 
 pub struct SamplerCreateInfo {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_sampler_create_info
 	p_next                   voidptr
 	flags                    SamplerCreateFlags
 	mag_filter               Filter
@@ -3400,7 +3363,7 @@ pub mut:
 
 pub struct CopyDescriptorSet {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_copy_descriptor_set
 	p_next            voidptr
 	src_set           C.DescriptorSet
 	src_binding       u32
@@ -3433,7 +3396,7 @@ pub mut:
 
 pub struct DescriptorPoolCreateInfo {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_descriptor_pool_create_info
 	p_next          voidptr
 	flags           DescriptorPoolCreateFlags
 	max_sets        u32
@@ -3443,7 +3406,7 @@ pub mut:
 
 pub struct DescriptorSetAllocateInfo {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_descriptor_set_allocate_info
 	p_next               voidptr
 	descriptor_pool      C.DescriptorPool
 	descriptor_set_count u32
@@ -3461,7 +3424,7 @@ pub mut:
 
 pub struct DescriptorSetLayoutCreateInfo {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_descriptor_set_layout_create_info
 	p_next        voidptr
 	flags         DescriptorSetLayoutCreateFlags
 	binding_count u32
@@ -3470,7 +3433,7 @@ pub mut:
 
 pub struct WriteDescriptorSet {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_write_descriptor_set
 	p_next              voidptr
 	dst_set             C.DescriptorSet
 	dst_binding         u32
@@ -3503,7 +3466,7 @@ pub mut:
 
 pub struct FramebufferCreateInfo {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_framebuffer_create_info
 	p_next           voidptr
 	flags            FramebufferCreateFlags
 	render_pass      C.RenderPass
@@ -3541,7 +3504,7 @@ pub mut:
 
 pub struct RenderPassCreateInfo {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_render_pass_create_info
 	p_next           voidptr
 	flags            RenderPassCreateFlags
 	attachment_count u32
@@ -3554,7 +3517,7 @@ pub mut:
 
 pub struct CommandPoolCreateInfo {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_command_pool_create_info
 	p_next             voidptr
 	flags              CommandPoolCreateFlags
 	queue_family_index u32
@@ -3562,7 +3525,7 @@ pub mut:
 
 pub struct CommandBufferAllocateInfo {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_command_buffer_allocate_info
 	p_next               voidptr
 	command_pool         C.CommandPool
 	level                CommandBufferLevel
@@ -3571,7 +3534,7 @@ pub mut:
 
 pub struct CommandBufferInheritanceInfo {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_command_buffer_inheritance_info
 	p_next                 voidptr
 	render_pass            C.RenderPass
 	subpass                u32
@@ -3583,7 +3546,7 @@ pub mut:
 
 pub struct CommandBufferBeginInfo {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_command_buffer_begin_info
 	p_next             voidptr
 	flags              CommandBufferUsageFlags
 	p_inheritance_info &CommandBufferInheritanceInfo
@@ -3616,9 +3579,9 @@ pub mut:
 
 pub union ClearColorValue {
 pub mut:
-	float32 [4]f32
-	int32   [4]i32
-	uint32  [4]u32
+	float_3_2 [4]f32
+	int_3_2   [4]i32
+	uint_3_2  [4]u32
 }
 
 pub struct ClearDepthStencilValue {
@@ -3675,7 +3638,7 @@ pub mut:
 
 pub struct RenderPassBeginInfo {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_render_pass_begin_info
 	p_next            voidptr
 	render_pass       C.RenderPass
 	framebuffer       C.Framebuffer
@@ -5337,7 +5300,7 @@ pub type ExternalSemaphoreFeatureFlags = u32
 
 pub struct PhysicalDeviceSubgroupProperties {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_physical_device_subgroup_properties
 	p_next                        voidptr
 	subgroup_size                 u32
 	supported_stages              ShaderStageFlags
@@ -5347,7 +5310,7 @@ pub mut:
 
 pub struct BindBufferMemoryInfo {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_bind_buffer_memory_info
 	p_next        voidptr
 	buffer        C.Buffer
 	memory        C.DeviceMemory
@@ -5356,7 +5319,7 @@ pub mut:
 
 pub struct BindImageMemoryInfo {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_bind_image_memory_info
 	p_next        voidptr
 	image         C.Image
 	memory        C.DeviceMemory
@@ -5365,17 +5328,17 @@ pub mut:
 
 pub struct PhysicalDevice16BitStorageFeatures {
 pub mut:
-	s_type                                  StructureType
-	p_next                                  voidptr
-	storage_buffer16_bit_access             Bool32
-	uniform_and_storage_buffer16_bit_access Bool32
-	storage_push_constant16                 Bool32
-	storage_input_output16                  Bool32
+	s_type                                    StructureType
+	p_next                                    voidptr
+	storage_buffer_1_6_bit_access             Bool32
+	uniform_and_storage_buffer_1_6_bit_access Bool32
+	storage_push_constant_1_6                 Bool32
+	storage_input_output_1_6                  Bool32
 }
 
 pub struct MemoryDedicatedRequirements {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_memory_dedicated_requirements
 	p_next                        voidptr
 	prefers_dedicated_allocation  Bool32
 	requires_dedicated_allocation Bool32
@@ -5383,7 +5346,7 @@ pub mut:
 
 pub struct MemoryDedicatedAllocateInfo {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_memory_dedicated_allocate_info
 	p_next voidptr
 	image  C.Image
 	buffer C.Buffer
@@ -5391,7 +5354,7 @@ pub mut:
 
 pub struct MemoryAllocateFlagsInfo {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_memory_allocate_flags_info
 	p_next      voidptr
 	flags       MemoryAllocateFlags
 	device_mask u32
@@ -5399,7 +5362,7 @@ pub mut:
 
 pub struct DeviceGroupRenderPassBeginInfo {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_device_group_render_pass_begin_info
 	p_next                   voidptr
 	device_mask              u32
 	device_render_area_count u32
@@ -5408,14 +5371,14 @@ pub mut:
 
 pub struct DeviceGroupCommandBufferBeginInfo {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_device_group_command_buffer_begin_info
 	p_next      voidptr
 	device_mask u32
 }
 
 pub struct DeviceGroupSubmitInfo {
 pub mut:
-	s_type                            StructureType
+	s_type                            StructureType = StructureType.structure_type_device_group_submit_info
 	p_next                            voidptr
 	wait_semaphore_count              u32
 	p_wait_semaphore_device_indices   &u32
@@ -5427,7 +5390,7 @@ pub mut:
 
 pub struct DeviceGroupBindSparseInfo {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_device_group_bind_sparse_info
 	p_next                voidptr
 	resource_device_index u32
 	memory_device_index   u32
@@ -5435,7 +5398,7 @@ pub mut:
 
 pub struct BindBufferMemoryDeviceGroupInfo {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_bind_buffer_memory_device_group_info
 	p_next             voidptr
 	device_index_count u32
 	p_device_indices   &u32
@@ -5443,7 +5406,7 @@ pub mut:
 
 pub struct BindImageMemoryDeviceGroupInfo {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_bind_image_memory_device_group_info
 	p_next                           voidptr
 	device_index_count               u32
 	p_device_indices                 &u32
@@ -5453,7 +5416,7 @@ pub mut:
 
 pub struct PhysicalDeviceGroupProperties {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_physical_device_group_properties
 	p_next                voidptr
 	physical_device_count u32
 	physical_devices      [max_device_group_size]C.PhysicalDevice
@@ -5462,7 +5425,7 @@ pub mut:
 
 pub struct DeviceGroupDeviceCreateInfo {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_device_group_device_create_info
 	p_next                voidptr
 	physical_device_count u32
 	p_physical_devices    &C.PhysicalDevice
@@ -5470,70 +5433,70 @@ pub mut:
 
 pub struct BufferMemoryRequirementsInfo2 {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_buffer_memory_requirements_info_2
 	p_next voidptr
 	buffer C.Buffer
 }
 
 pub struct ImageMemoryRequirementsInfo2 {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_image_memory_requirements_info_2
 	p_next voidptr
 	image  C.Image
 }
 
 pub struct ImageSparseMemoryRequirementsInfo2 {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_image_sparse_memory_requirements_info_2
 	p_next voidptr
 	image  C.Image
 }
 
 pub struct MemoryRequirements2 {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_memory_requirements_2
 	p_next              voidptr
 	memory_requirements MemoryRequirements
 }
 
 pub struct SparseImageMemoryRequirements2 {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_sparse_image_memory_requirements_2
 	p_next              voidptr
 	memory_requirements SparseImageMemoryRequirements
 }
 
 pub struct PhysicalDeviceFeatures2 {
 pub mut:
-	s_type   StructureType
+	s_type   StructureType = StructureType.structure_type_physical_device_features_2
 	p_next   voidptr
 	features PhysicalDeviceFeatures
 }
 
 pub struct PhysicalDeviceProperties2 {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_physical_device_properties_2
 	p_next     voidptr
 	properties PhysicalDeviceProperties
 }
 
 pub struct FormatProperties2 {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_format_properties_2
 	p_next            voidptr
 	format_properties FormatProperties
 }
 
 pub struct ImageFormatProperties2 {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_image_format_properties_2
 	p_next                  voidptr
 	image_format_properties ImageFormatProperties
 }
 
 pub struct PhysicalDeviceImageFormatInfo2 {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_physical_device_image_format_info_2
 	p_next voidptr
 	format Format
 	vktype ImageType
@@ -5544,28 +5507,28 @@ pub mut:
 
 pub struct QueueFamilyProperties2 {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_queue_family_properties_2
 	p_next                  voidptr
 	queue_family_properties QueueFamilyProperties
 }
 
 pub struct PhysicalDeviceMemoryProperties2 {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_physical_device_memory_properties_2
 	p_next            voidptr
 	memory_properties PhysicalDeviceMemoryProperties
 }
 
 pub struct SparseImageFormatProperties2 {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_sparse_image_format_properties_2
 	p_next     voidptr
 	properties SparseImageFormatProperties
 }
 
 pub struct PhysicalDeviceSparseImageFormatInfo2 {
 pub mut:
-	s_type  StructureType
+	s_type  StructureType = StructureType.structure_type_physical_device_sparse_image_format_info_2
 	p_next  voidptr
 	format  Format
 	vktype  ImageType
@@ -5576,7 +5539,7 @@ pub mut:
 
 pub struct PhysicalDevicePointClippingProperties {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_physical_device_point_clipping_properties
 	p_next                  voidptr
 	point_clipping_behavior PointClippingBehavior
 }
@@ -5590,7 +5553,7 @@ pub mut:
 
 pub struct RenderPassInputAttachmentAspectCreateInfo {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_render_pass_input_attachment_aspect_create_info
 	p_next                 voidptr
 	aspect_reference_count u32
 	p_aspect_references    &InputAttachmentAspectReference
@@ -5598,21 +5561,21 @@ pub mut:
 
 pub struct ImageViewUsageCreateInfo {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_image_view_usage_create_info
 	p_next voidptr
 	usage  ImageUsageFlags
 }
 
 pub struct PipelineTessellationDomainOriginStateCreateInfo {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_pipeline_tessellation_domain_origin_state_create_info
 	p_next        voidptr
 	domain_origin TessellationDomainOrigin
 }
 
 pub struct RenderPassMultiviewCreateInfo {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_render_pass_multiview_create_info
 	p_next                 voidptr
 	subpass_count          u32
 	p_view_masks           &u32
@@ -5624,7 +5587,7 @@ pub mut:
 
 pub struct PhysicalDeviceMultiviewFeatures {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_physical_device_multiview_features
 	p_next                        voidptr
 	multiview                     Bool32
 	multiview_geometry_shader     Bool32
@@ -5633,7 +5596,7 @@ pub mut:
 
 pub struct PhysicalDeviceMultiviewProperties {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_physical_device_multiview_properties
 	p_next                       voidptr
 	max_multiview_view_count     u32
 	max_multiview_instance_index u32
@@ -5641,7 +5604,7 @@ pub mut:
 
 pub struct PhysicalDeviceVariablePointersFeatures {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_variable_pointers_features
 	p_next                           voidptr
 	variable_pointers_storage_buffer Bool32
 	variable_pointers                Bool32
@@ -5651,21 +5614,21 @@ pub type PhysicalDeviceVariablePointerFeatures = PhysicalDeviceVariablePointersF
 
 pub struct PhysicalDeviceProtectedMemoryFeatures {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_physical_device_protected_memory_features
 	p_next           voidptr
 	protected_memory Bool32
 }
 
 pub struct PhysicalDeviceProtectedMemoryProperties {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_physical_device_protected_memory_properties
 	p_next             voidptr
 	protected_no_fault Bool32
 }
 
 pub struct DeviceQueueInfo2 {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_device_queue_info_2
 	p_next             voidptr
 	flags              DeviceQueueCreateFlags
 	queue_family_index u32
@@ -5674,14 +5637,14 @@ pub mut:
 
 pub struct ProtectedSubmitInfo {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_protected_submit_info
 	p_next           voidptr
 	protected_submit Bool32
 }
 
 pub struct SamplerYcbcrConversionCreateInfo {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_sampler_ycbcr_conversion_create_info
 	p_next                        voidptr
 	format                        Format
 	ycbcr_model                   SamplerYcbcrModelConversion
@@ -5695,35 +5658,35 @@ pub mut:
 
 pub struct SamplerYcbcrConversionInfo {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_sampler_ycbcr_conversion_info
 	p_next     voidptr
 	conversion C.SamplerYcbcrConversion
 }
 
 pub struct BindImagePlaneMemoryInfo {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_bind_image_plane_memory_info
 	p_next       voidptr
 	plane_aspect ImageAspectFlagBits
 }
 
 pub struct ImagePlaneMemoryRequirementsInfo {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_image_plane_memory_requirements_info
 	p_next       voidptr
 	plane_aspect ImageAspectFlagBits
 }
 
 pub struct PhysicalDeviceSamplerYcbcrConversionFeatures {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_physical_device_sampler_ycbcr_conversion_features
 	p_next                   voidptr
 	sampler_ycbcr_conversion Bool32
 }
 
 pub struct SamplerYcbcrConversionImageFormatProperties {
 pub mut:
-	s_type                                  StructureType
+	s_type                                  StructureType = StructureType.structure_type_sampler_ycbcr_conversion_image_format_properties
 	p_next                                  voidptr
 	combined_image_sampler_descriptor_count u32
 }
@@ -5740,7 +5703,7 @@ pub mut:
 
 pub struct DescriptorUpdateTemplateCreateInfo {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_descriptor_update_template_create_info
 	p_next                        voidptr
 	flags                         DescriptorUpdateTemplateCreateFlags
 	descriptor_update_entry_count u32
@@ -5761,21 +5724,21 @@ pub mut:
 
 pub struct PhysicalDeviceExternalImageFormatInfo {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_physical_device_external_image_format_info
 	p_next      voidptr
 	handle_type ExternalMemoryHandleTypeFlagBits
 }
 
 pub struct ExternalImageFormatProperties {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_external_image_format_properties
 	p_next                     voidptr
 	external_memory_properties ExternalMemoryProperties
 }
 
 pub struct PhysicalDeviceExternalBufferInfo {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_physical_device_external_buffer_info
 	p_next      voidptr
 	flags       BufferCreateFlags
 	usage       BufferUsageFlags
@@ -5784,14 +5747,14 @@ pub mut:
 
 pub struct ExternalBufferProperties {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_external_buffer_properties
 	p_next                     voidptr
 	external_memory_properties ExternalMemoryProperties
 }
 
 pub struct PhysicalDeviceIDProperties {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_physical_device_id_properties
 	p_next            voidptr
 	device_uuid       [uuid_size]u8
 	driver_uuid       [uuid_size]u8
@@ -5802,35 +5765,35 @@ pub mut:
 
 pub struct ExternalMemoryImageCreateInfo {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_external_memory_image_create_info
 	p_next       voidptr
 	handle_types ExternalMemoryHandleTypeFlags
 }
 
 pub struct ExternalMemoryBufferCreateInfo {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_external_memory_buffer_create_info
 	p_next       voidptr
 	handle_types ExternalMemoryHandleTypeFlags
 }
 
 pub struct ExportMemoryAllocateInfo {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_export_memory_allocate_info
 	p_next       voidptr
 	handle_types ExternalMemoryHandleTypeFlags
 }
 
 pub struct PhysicalDeviceExternalFenceInfo {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_physical_device_external_fence_info
 	p_next      voidptr
 	handle_type ExternalFenceHandleTypeFlagBits
 }
 
 pub struct ExternalFenceProperties {
 pub mut:
-	s_type                            StructureType
+	s_type                            StructureType = StructureType.structure_type_external_fence_properties
 	p_next                            voidptr
 	export_from_imported_handle_types ExternalFenceHandleTypeFlags
 	compatible_handle_types           ExternalFenceHandleTypeFlags
@@ -5839,28 +5802,28 @@ pub mut:
 
 pub struct ExportFenceCreateInfo {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_export_fence_create_info
 	p_next       voidptr
 	handle_types ExternalFenceHandleTypeFlags
 }
 
 pub struct ExportSemaphoreCreateInfo {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_export_semaphore_create_info
 	p_next       voidptr
 	handle_types ExternalSemaphoreHandleTypeFlags
 }
 
 pub struct PhysicalDeviceExternalSemaphoreInfo {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_physical_device_external_semaphore_info
 	p_next      voidptr
 	handle_type ExternalSemaphoreHandleTypeFlagBits
 }
 
 pub struct ExternalSemaphoreProperties {
 pub mut:
-	s_type                            StructureType
+	s_type                            StructureType = StructureType.structure_type_external_semaphore_properties
 	p_next                            voidptr
 	export_from_imported_handle_types ExternalSemaphoreHandleTypeFlags
 	compatible_handle_types           ExternalSemaphoreHandleTypeFlags
@@ -5869,7 +5832,7 @@ pub mut:
 
 pub struct PhysicalDeviceMaintenance3Properties {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_physical_device_maintenance_3_properties
 	p_next                     voidptr
 	max_per_set_descriptors    u32
 	max_memory_allocation_size DeviceSize
@@ -5877,14 +5840,14 @@ pub mut:
 
 pub struct DescriptorSetLayoutSupport {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_descriptor_set_layout_support
 	p_next    voidptr
 	supported Bool32
 }
 
 pub struct PhysicalDeviceShaderDrawParametersFeatures {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_physical_device_shader_draw_parameters_features
 	p_next                 voidptr
 	shader_draw_parameters Bool32
 }
@@ -5899,7 +5862,7 @@ pub fn enumerate_instance_version(p_api_version &u32) Result {
 fn C.vkBindBufferMemory2(C.Device,
 	u32,
 	&BindBufferMemoryInfo) Result
-pub fn bind_buffer_memory2(device C.Device,
+pub fn bind_buffer_memory_2(device C.Device,
 	bind_info_count u32,
 	p_bind_infos &BindBufferMemoryInfo) Result {
 	return C.vkBindBufferMemory2(device, bind_info_count, p_bind_infos)
@@ -5908,7 +5871,7 @@ pub fn bind_buffer_memory2(device C.Device,
 fn C.vkBindImageMemory2(C.Device,
 	u32,
 	&BindImageMemoryInfo) Result
-pub fn bind_image_memory2(device C.Device,
+pub fn bind_image_memory_2(device C.Device,
 	bind_info_count u32,
 	p_bind_infos &BindImageMemoryInfo) Result {
 	return C.vkBindImageMemory2(device, bind_info_count, p_bind_infos)
@@ -5966,7 +5929,7 @@ pub fn enumerate_physical_device_groups(instance C.Instance,
 fn C.vkGetImageMemoryRequirements2(C.Device,
 	&ImageMemoryRequirementsInfo2,
 	&MemoryRequirements2)
-pub fn get_image_memory_requirements2(device C.Device,
+pub fn get_image_memory_requirements_2(device C.Device,
 	p_info &ImageMemoryRequirementsInfo2,
 	p_memory_requirements &MemoryRequirements2) {
 	C.vkGetImageMemoryRequirements2(device, p_info, p_memory_requirements)
@@ -5975,7 +5938,7 @@ pub fn get_image_memory_requirements2(device C.Device,
 fn C.vkGetBufferMemoryRequirements2(C.Device,
 	&BufferMemoryRequirementsInfo2,
 	&MemoryRequirements2)
-pub fn get_buffer_memory_requirements2(device C.Device,
+pub fn get_buffer_memory_requirements_2(device C.Device,
 	p_info &BufferMemoryRequirementsInfo2,
 	p_memory_requirements &MemoryRequirements2) {
 	C.vkGetBufferMemoryRequirements2(device, p_info, p_memory_requirements)
@@ -5985,7 +5948,7 @@ fn C.vkGetImageSparseMemoryRequirements2(C.Device,
 	&ImageSparseMemoryRequirementsInfo2,
 	&u32,
 	&SparseImageMemoryRequirements2)
-pub fn get_image_sparse_memory_requirements2(device C.Device,
+pub fn get_image_sparse_memory_requirements_2(device C.Device,
 	p_info &ImageSparseMemoryRequirementsInfo2,
 	p_sparse_memory_requirement_count &u32,
 	p_sparse_memory_requirements &SparseImageMemoryRequirements2) {
@@ -5995,14 +5958,14 @@ pub fn get_image_sparse_memory_requirements2(device C.Device,
 
 fn C.vkGetPhysicalDeviceFeatures2(C.PhysicalDevice,
 	&PhysicalDeviceFeatures2)
-pub fn get_physical_device_features2(physical_device C.PhysicalDevice,
+pub fn get_physical_device_features_2(physical_device C.PhysicalDevice,
 	p_features &PhysicalDeviceFeatures2) {
 	C.vkGetPhysicalDeviceFeatures2(physical_device, p_features)
 }
 
 fn C.vkGetPhysicalDeviceProperties2(C.PhysicalDevice,
 	&PhysicalDeviceProperties2)
-pub fn get_physical_device_properties2(physical_device C.PhysicalDevice,
+pub fn get_physical_device_properties_2(physical_device C.PhysicalDevice,
 	p_properties &PhysicalDeviceProperties2) {
 	C.vkGetPhysicalDeviceProperties2(physical_device, p_properties)
 }
@@ -6010,7 +5973,7 @@ pub fn get_physical_device_properties2(physical_device C.PhysicalDevice,
 fn C.vkGetPhysicalDeviceFormatProperties2(C.PhysicalDevice,
 	Format,
 	&FormatProperties2)
-pub fn get_physical_device_format_properties2(physical_device C.PhysicalDevice,
+pub fn get_physical_device_format_properties_2(physical_device C.PhysicalDevice,
 	format Format,
 	p_format_properties &FormatProperties2) {
 	C.vkGetPhysicalDeviceFormatProperties2(physical_device, format, p_format_properties)
@@ -6019,7 +5982,7 @@ pub fn get_physical_device_format_properties2(physical_device C.PhysicalDevice,
 fn C.vkGetPhysicalDeviceImageFormatProperties2(C.PhysicalDevice,
 	&PhysicalDeviceImageFormatInfo2,
 	&ImageFormatProperties2) Result
-pub fn get_physical_device_image_format_properties2(physical_device C.PhysicalDevice,
+pub fn get_physical_device_image_format_properties_2(physical_device C.PhysicalDevice,
 	p_image_format_info &PhysicalDeviceImageFormatInfo2,
 	p_image_format_properties &ImageFormatProperties2) Result {
 	return C.vkGetPhysicalDeviceImageFormatProperties2(physical_device, p_image_format_info,
@@ -6029,7 +5992,7 @@ pub fn get_physical_device_image_format_properties2(physical_device C.PhysicalDe
 fn C.vkGetPhysicalDeviceQueueFamilyProperties2(C.PhysicalDevice,
 	&u32,
 	&QueueFamilyProperties2)
-pub fn get_physical_device_queue_family_properties2(physical_device C.PhysicalDevice,
+pub fn get_physical_device_queue_family_properties_2(physical_device C.PhysicalDevice,
 	p_queue_family_property_count &u32,
 	p_queue_family_properties &QueueFamilyProperties2) {
 	C.vkGetPhysicalDeviceQueueFamilyProperties2(physical_device, p_queue_family_property_count,
@@ -6038,7 +6001,7 @@ pub fn get_physical_device_queue_family_properties2(physical_device C.PhysicalDe
 
 fn C.vkGetPhysicalDeviceMemoryProperties2(C.PhysicalDevice,
 	&PhysicalDeviceMemoryProperties2)
-pub fn get_physical_device_memory_properties2(physical_device C.PhysicalDevice,
+pub fn get_physical_device_memory_properties_2(physical_device C.PhysicalDevice,
 	p_memory_properties &PhysicalDeviceMemoryProperties2) {
 	C.vkGetPhysicalDeviceMemoryProperties2(physical_device, p_memory_properties)
 }
@@ -6047,7 +6010,7 @@ fn C.vkGetPhysicalDeviceSparseImageFormatProperties2(C.PhysicalDevice,
 	&PhysicalDeviceSparseImageFormatInfo2,
 	&u32,
 	&SparseImageFormatProperties2)
-pub fn get_physical_device_sparse_image_format_properties2(physical_device C.PhysicalDevice,
+pub fn get_physical_device_sparse_image_format_properties_2(physical_device C.PhysicalDevice,
 	p_format_info &PhysicalDeviceSparseImageFormatInfo2,
 	p_property_count &u32,
 	p_properties &SparseImageFormatProperties2) {
@@ -6067,7 +6030,7 @@ pub fn trim_command_pool(device C.Device,
 fn C.vkGetDeviceQueue2(C.Device,
 	&DeviceQueueInfo2,
 	&C.Queue)
-pub fn get_device_queue2(device C.Device,
+pub fn get_device_queue_2(device C.Device,
 	p_queue_info &DeviceQueueInfo2,
 	p_queue &C.Queue) {
 	C.vkGetDeviceQueue2(device, p_queue_info, p_queue)
@@ -6253,25 +6216,25 @@ pub type SemaphoreWaitFlags = u32
 
 pub struct PhysicalDeviceVulkan11Features {
 pub mut:
-	s_type                                  StructureType
-	p_next                                  voidptr
-	storage_buffer16_bit_access             Bool32
-	uniform_and_storage_buffer16_bit_access Bool32
-	storage_push_constant16                 Bool32
-	storage_input_output16                  Bool32
-	multiview                               Bool32
-	multiview_geometry_shader               Bool32
-	multiview_tessellation_shader           Bool32
-	variable_pointers_storage_buffer        Bool32
-	variable_pointers                       Bool32
-	protected_memory                        Bool32
-	sampler_ycbcr_conversion                Bool32
-	shader_draw_parameters                  Bool32
+	s_type                                    StructureType = StructureType.structure_type_physical_device_vulkan_1_1_features
+	p_next                                    voidptr
+	storage_buffer_1_6_bit_access             Bool32
+	uniform_and_storage_buffer_1_6_bit_access Bool32
+	storage_push_constant_1_6                 Bool32
+	storage_input_output_1_6                  Bool32
+	multiview                                 Bool32
+	multiview_geometry_shader                 Bool32
+	multiview_tessellation_shader             Bool32
+	variable_pointers_storage_buffer          Bool32
+	variable_pointers                         Bool32
+	protected_memory                          Bool32
+	sampler_ycbcr_conversion                  Bool32
+	shader_draw_parameters                    Bool32
 }
 
 pub struct PhysicalDeviceVulkan11Properties {
 pub mut:
-	s_type                                 StructureType
+	s_type                                 StructureType = StructureType.structure_type_physical_device_vulkan_1_1_properties
 	p_next                                 voidptr
 	device_uuid                            [uuid_size]u8
 	driver_uuid                            [uuid_size]u8
@@ -6292,17 +6255,17 @@ pub mut:
 
 pub struct PhysicalDeviceVulkan12Features {
 pub mut:
-	s_type                                                    StructureType
+	s_type                                                    StructureType = StructureType.structure_type_physical_device_vulkan_1_2_features
 	p_next                                                    voidptr
 	sampler_mirror_clamp_to_edge                              Bool32
 	draw_indirect_count                                       Bool32
-	storage_buffer8_bit_access                                Bool32
-	uniform_and_storage_buffer8_bit_access                    Bool32
-	storage_push_constant8                                    Bool32
-	shader_buffer_int64_atomics                               Bool32
-	shader_shared_int64_atomics                               Bool32
-	shader_float16                                            Bool32
-	shader_int8                                               Bool32
+	storage_buffer_8_bit_access                               Bool32
+	uniform_and_storage_buffer_8_bit_access                   Bool32
+	storage_push_constant_8                                   Bool32
+	shader_buffer_int_6_4_atomics                             Bool32
+	shader_shared_int_6_4_atomics                             Bool32
+	shader_float_1_6                                          Bool32
+	shader_int_8                                              Bool32
 	descriptor_indexing                                       Bool32
 	shader_input_attachment_array_dynamic_indexing            Bool32
 	shader_uniform_texel_buffer_array_dynamic_indexing        Bool32
@@ -6353,7 +6316,7 @@ pub mut:
 
 pub struct PhysicalDeviceVulkan12Properties {
 pub mut:
-	s_type                                                       StructureType
+	s_type                                                       StructureType = StructureType.structure_type_physical_device_vulkan_1_2_properties
 	p_next                                                       voidptr
 	driver_id                                                    DriverId
 	driver_name                                                  [max_driver_name_size]char
@@ -6361,21 +6324,21 @@ pub mut:
 	conformance_version                                          ConformanceVersion
 	denorm_behavior_independence                                 ShaderFloatControlsIndependence
 	rounding_mode_independence                                   ShaderFloatControlsIndependence
-	shader_signed_zero_inf_nan_preserve_float16                  Bool32
-	shader_signed_zero_inf_nan_preserve_float32                  Bool32
-	shader_signed_zero_inf_nan_preserve_float64                  Bool32
-	shader_denorm_preserve_float16                               Bool32
-	shader_denorm_preserve_float32                               Bool32
-	shader_denorm_preserve_float64                               Bool32
-	shader_denorm_flush_to_zero_float16                          Bool32
-	shader_denorm_flush_to_zero_float32                          Bool32
-	shader_denorm_flush_to_zero_float64                          Bool32
-	shader_rounding_mode_rte_float16                             Bool32
-	shader_rounding_mode_rte_float32                             Bool32
-	shader_rounding_mode_rte_float64                             Bool32
-	shader_rounding_mode_rtz_float16                             Bool32
-	shader_rounding_mode_rtz_float32                             Bool32
-	shader_rounding_mode_rtz_float64                             Bool32
+	shader_signed_zero_inf_nan_preserve_float_1_6                Bool32
+	shader_signed_zero_inf_nan_preserve_float_3_2                Bool32
+	shader_signed_zero_inf_nan_preserve_float_6_4                Bool32
+	shader_denorm_preserve_float_1_6                             Bool32
+	shader_denorm_preserve_float_3_2                             Bool32
+	shader_denorm_preserve_float_6_4                             Bool32
+	shader_denorm_flush_to_zero_float_1_6                        Bool32
+	shader_denorm_flush_to_zero_float_3_2                        Bool32
+	shader_denorm_flush_to_zero_float_6_4                        Bool32
+	shader_rounding_mode_rte_float_1_6                           Bool32
+	shader_rounding_mode_rte_float_3_2                           Bool32
+	shader_rounding_mode_rte_float_6_4                           Bool32
+	shader_rounding_mode_rtz_float_1_6                           Bool32
+	shader_rounding_mode_rtz_float_3_2                           Bool32
+	shader_rounding_mode_rtz_float_6_4                           Bool32
 	max_update_after_bind_descriptors_in_all_pools               u32
 	shader_uniform_buffer_array_non_uniform_indexing_native      Bool32
 	shader_sampled_image_array_non_uniform_indexing_native       Bool32
@@ -6411,7 +6374,7 @@ pub mut:
 
 pub struct ImageFormatListCreateInfo {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_image_format_list_create_info
 	p_next            voidptr
 	view_format_count u32
 	p_view_formats    &Format
@@ -6419,7 +6382,7 @@ pub mut:
 
 pub struct AttachmentDescription2 {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_attachment_description_2
 	p_next           voidptr
 	flags            AttachmentDescriptionFlags
 	format           Format
@@ -6434,7 +6397,7 @@ pub mut:
 
 pub struct AttachmentReference2 {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_attachment_reference_2
 	p_next      voidptr
 	attachment  u32
 	layout      ImageLayout
@@ -6443,7 +6406,7 @@ pub mut:
 
 pub struct SubpassDescription2 {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_subpass_description_2
 	p_next                     voidptr
 	flags                      SubpassDescriptionFlags
 	pipeline_bind_point        PipelineBindPoint
@@ -6460,7 +6423,7 @@ pub mut:
 
 pub struct SubpassDependency2 {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_subpass_dependency_2
 	p_next           voidptr
 	src_subpass      u32
 	dst_subpass      u32
@@ -6474,7 +6437,7 @@ pub mut:
 
 pub struct RenderPassCreateInfo2 {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_render_pass_create_info_2
 	p_next                     voidptr
 	flags                      RenderPassCreateFlags
 	attachment_count           u32
@@ -6489,29 +6452,29 @@ pub mut:
 
 pub struct SubpassBeginInfo {
 pub mut:
-	s_type   StructureType
+	s_type   StructureType = StructureType.structure_type_subpass_begin_info
 	p_next   voidptr
 	contents SubpassContents
 }
 
 pub struct SubpassEndInfo {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_subpass_end_info
 	p_next voidptr
 }
 
 pub struct PhysicalDevice8BitStorageFeatures {
 pub mut:
-	s_type                                 StructureType
-	p_next                                 voidptr
-	storage_buffer8_bit_access             Bool32
-	uniform_and_storage_buffer8_bit_access Bool32
-	storage_push_constant8                 Bool32
+	s_type                                  StructureType
+	p_next                                  voidptr
+	storage_buffer_8_bit_access             Bool32
+	uniform_and_storage_buffer_8_bit_access Bool32
+	storage_push_constant_8                 Bool32
 }
 
 pub struct PhysicalDeviceDriverProperties {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_physical_device_driver_properties
 	p_next              voidptr
 	driver_id           DriverId
 	driver_name         [max_driver_name_size]char
@@ -6521,46 +6484,46 @@ pub mut:
 
 pub struct PhysicalDeviceShaderAtomicInt64Features {
 pub mut:
-	s_type                      StructureType
-	p_next                      voidptr
-	shader_buffer_int64_atomics Bool32
-	shader_shared_int64_atomics Bool32
+	s_type                        StructureType
+	p_next                        voidptr
+	shader_buffer_int_6_4_atomics Bool32
+	shader_shared_int_6_4_atomics Bool32
 }
 
 pub struct PhysicalDeviceShaderFloat16Int8Features {
 pub mut:
-	s_type         StructureType
-	p_next         voidptr
-	shader_float16 Bool32
-	shader_int8    Bool32
+	s_type           StructureType
+	p_next           voidptr
+	shader_float_1_6 Bool32
+	shader_int_8     Bool32
 }
 
 pub struct PhysicalDeviceFloatControlsProperties {
 pub mut:
-	s_type                                      StructureType
-	p_next                                      voidptr
-	denorm_behavior_independence                ShaderFloatControlsIndependence
-	rounding_mode_independence                  ShaderFloatControlsIndependence
-	shader_signed_zero_inf_nan_preserve_float16 Bool32
-	shader_signed_zero_inf_nan_preserve_float32 Bool32
-	shader_signed_zero_inf_nan_preserve_float64 Bool32
-	shader_denorm_preserve_float16              Bool32
-	shader_denorm_preserve_float32              Bool32
-	shader_denorm_preserve_float64              Bool32
-	shader_denorm_flush_to_zero_float16         Bool32
-	shader_denorm_flush_to_zero_float32         Bool32
-	shader_denorm_flush_to_zero_float64         Bool32
-	shader_rounding_mode_rte_float16            Bool32
-	shader_rounding_mode_rte_float32            Bool32
-	shader_rounding_mode_rte_float64            Bool32
-	shader_rounding_mode_rtz_float16            Bool32
-	shader_rounding_mode_rtz_float32            Bool32
-	shader_rounding_mode_rtz_float64            Bool32
+	s_type                                        StructureType = StructureType.structure_type_physical_device_float_controls_properties
+	p_next                                        voidptr
+	denorm_behavior_independence                  ShaderFloatControlsIndependence
+	rounding_mode_independence                    ShaderFloatControlsIndependence
+	shader_signed_zero_inf_nan_preserve_float_1_6 Bool32
+	shader_signed_zero_inf_nan_preserve_float_3_2 Bool32
+	shader_signed_zero_inf_nan_preserve_float_6_4 Bool32
+	shader_denorm_preserve_float_1_6              Bool32
+	shader_denorm_preserve_float_3_2              Bool32
+	shader_denorm_preserve_float_6_4              Bool32
+	shader_denorm_flush_to_zero_float_1_6         Bool32
+	shader_denorm_flush_to_zero_float_3_2         Bool32
+	shader_denorm_flush_to_zero_float_6_4         Bool32
+	shader_rounding_mode_rte_float_1_6            Bool32
+	shader_rounding_mode_rte_float_3_2            Bool32
+	shader_rounding_mode_rte_float_6_4            Bool32
+	shader_rounding_mode_rtz_float_1_6            Bool32
+	shader_rounding_mode_rtz_float_3_2            Bool32
+	shader_rounding_mode_rtz_float_6_4            Bool32
 }
 
 pub struct DescriptorSetLayoutBindingFlagsCreateInfo {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_descriptor_set_layout_binding_flags_create_info
 	p_next          voidptr
 	binding_count   u32
 	p_binding_flags &DescriptorBindingFlags
@@ -6568,7 +6531,7 @@ pub mut:
 
 pub struct PhysicalDeviceDescriptorIndexingFeatures {
 pub mut:
-	s_type                                                    StructureType
+	s_type                                                    StructureType = StructureType.structure_type_physical_device_descriptor_indexing_features
 	p_next                                                    voidptr
 	shader_input_attachment_array_dynamic_indexing            Bool32
 	shader_uniform_texel_buffer_array_dynamic_indexing        Bool32
@@ -6594,7 +6557,7 @@ pub mut:
 
 pub struct PhysicalDeviceDescriptorIndexingProperties {
 pub mut:
-	s_type                                                       StructureType
+	s_type                                                       StructureType = StructureType.structure_type_physical_device_descriptor_indexing_properties
 	p_next                                                       voidptr
 	max_update_after_bind_descriptors_in_all_pools               u32
 	shader_uniform_buffer_array_non_uniform_indexing_native      Bool32
@@ -6623,7 +6586,7 @@ pub mut:
 
 pub struct DescriptorSetVariableDescriptorCountAllocateInfo {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_descriptor_set_variable_descriptor_count_allocate_info
 	p_next               voidptr
 	descriptor_set_count u32
 	p_descriptor_counts  &u32
@@ -6631,14 +6594,14 @@ pub mut:
 
 pub struct DescriptorSetVariableDescriptorCountLayoutSupport {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_descriptor_set_variable_descriptor_count_layout_support
 	p_next                        voidptr
 	max_variable_descriptor_count u32
 }
 
 pub struct SubpassDescriptionDepthStencilResolve {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_subpass_description_depth_stencil_resolve
 	p_next                             voidptr
 	depth_resolve_mode                 ResolveModeFlagBits
 	stencil_resolve_mode               ResolveModeFlagBits
@@ -6647,7 +6610,7 @@ pub mut:
 
 pub struct PhysicalDeviceDepthStencilResolveProperties {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_physical_device_depth_stencil_resolve_properties
 	p_next                          voidptr
 	supported_depth_resolve_modes   ResolveModeFlags
 	supported_stencil_resolve_modes ResolveModeFlags
@@ -6657,28 +6620,28 @@ pub mut:
 
 pub struct PhysicalDeviceScalarBlockLayoutFeatures {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_physical_device_scalar_block_layout_features
 	p_next              voidptr
 	scalar_block_layout Bool32
 }
 
 pub struct ImageStencilUsageCreateInfo {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_image_stencil_usage_create_info
 	p_next        voidptr
 	stencil_usage ImageUsageFlags
 }
 
 pub struct SamplerReductionModeCreateInfo {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_sampler_reduction_mode_create_info
 	p_next         voidptr
 	reduction_mode SamplerReductionMode
 }
 
 pub struct PhysicalDeviceSamplerFilterMinmaxProperties {
 pub mut:
-	s_type                                 StructureType
+	s_type                                 StructureType = StructureType.structure_type_physical_device_sampler_filter_minmax_properties
 	p_next                                 voidptr
 	filter_minmax_single_component_formats Bool32
 	filter_minmax_image_component_mapping  Bool32
@@ -6686,7 +6649,7 @@ pub mut:
 
 pub struct PhysicalDeviceVulkanMemoryModelFeatures {
 pub mut:
-	s_type                                             StructureType
+	s_type                                             StructureType = StructureType.structure_type_physical_device_vulkan_memory_model_features
 	p_next                                             voidptr
 	vulkan_memory_model                                Bool32
 	vulkan_memory_model_device_scope                   Bool32
@@ -6695,14 +6658,14 @@ pub mut:
 
 pub struct PhysicalDeviceImagelessFramebufferFeatures {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_physical_device_imageless_framebuffer_features
 	p_next                voidptr
 	imageless_framebuffer Bool32
 }
 
 pub struct FramebufferAttachmentImageInfo {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_framebuffer_attachment_image_info
 	p_next            voidptr
 	flags             ImageCreateFlags
 	usage             ImageUsageFlags
@@ -6715,7 +6678,7 @@ pub mut:
 
 pub struct FramebufferAttachmentsCreateInfo {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_framebuffer_attachments_create_info
 	p_next                      voidptr
 	attachment_image_info_count u32
 	p_attachment_image_infos    &FramebufferAttachmentImageInfo
@@ -6723,7 +6686,7 @@ pub mut:
 
 pub struct RenderPassAttachmentBeginInfo {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_render_pass_attachment_begin_info
 	p_next           voidptr
 	attachment_count u32
 	p_attachments    &C.ImageView
@@ -6731,35 +6694,35 @@ pub mut:
 
 pub struct PhysicalDeviceUniformBufferStandardLayoutFeatures {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_physical_device_uniform_buffer_standard_layout_features
 	p_next                         voidptr
 	uniform_buffer_standard_layout Bool32
 }
 
 pub struct PhysicalDeviceShaderSubgroupExtendedTypesFeatures {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_physical_device_shader_subgroup_extended_types_features
 	p_next                         voidptr
 	shader_subgroup_extended_types Bool32
 }
 
 pub struct PhysicalDeviceSeparateDepthStencilLayoutsFeatures {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_physical_device_separate_depth_stencil_layouts_features
 	p_next                         voidptr
 	separate_depth_stencil_layouts Bool32
 }
 
 pub struct AttachmentReferenceStencilLayout {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_attachment_reference_stencil_layout
 	p_next         voidptr
 	stencil_layout ImageLayout
 }
 
 pub struct AttachmentDescriptionStencilLayout {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_attachment_description_stencil_layout
 	p_next                 voidptr
 	stencil_initial_layout ImageLayout
 	stencil_final_layout   ImageLayout
@@ -6767,28 +6730,28 @@ pub mut:
 
 pub struct PhysicalDeviceHostQueryResetFeatures {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_physical_device_host_query_reset_features
 	p_next           voidptr
 	host_query_reset Bool32
 }
 
 pub struct PhysicalDeviceTimelineSemaphoreFeatures {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_physical_device_timeline_semaphore_features
 	p_next             voidptr
 	timeline_semaphore Bool32
 }
 
 pub struct PhysicalDeviceTimelineSemaphoreProperties {
 pub mut:
-	s_type                                  StructureType
+	s_type                                  StructureType = StructureType.structure_type_physical_device_timeline_semaphore_properties
 	p_next                                  voidptr
 	max_timeline_semaphore_value_difference u64
 }
 
 pub struct SemaphoreTypeCreateInfo {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_semaphore_type_create_info
 	p_next         voidptr
 	semaphore_type SemaphoreType
 	initial_value  u64
@@ -6796,7 +6759,7 @@ pub mut:
 
 pub struct TimelineSemaphoreSubmitInfo {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_timeline_semaphore_submit_info
 	p_next                       voidptr
 	wait_semaphore_value_count   u32
 	p_wait_semaphore_values      &u64
@@ -6806,7 +6769,7 @@ pub mut:
 
 pub struct SemaphoreWaitInfo {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_semaphore_wait_info
 	p_next          voidptr
 	flags           SemaphoreWaitFlags
 	semaphore_count u32
@@ -6816,7 +6779,7 @@ pub mut:
 
 pub struct SemaphoreSignalInfo {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_semaphore_signal_info
 	p_next    voidptr
 	semaphore C.Semaphore
 	value     u64
@@ -6824,7 +6787,7 @@ pub mut:
 
 pub struct PhysicalDeviceBufferDeviceAddressFeatures {
 pub mut:
-	s_type                               StructureType
+	s_type                               StructureType = StructureType.structure_type_physical_device_buffer_device_address_features
 	p_next                               voidptr
 	buffer_device_address                Bool32
 	buffer_device_address_capture_replay Bool32
@@ -6833,28 +6796,28 @@ pub mut:
 
 pub struct BufferDeviceAddressInfo {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_buffer_device_address_info
 	p_next voidptr
 	buffer C.Buffer
 }
 
 pub struct BufferOpaqueCaptureAddressCreateInfo {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_buffer_opaque_capture_address_create_info
 	p_next                 voidptr
 	opaque_capture_address u64
 }
 
 pub struct MemoryOpaqueCaptureAddressAllocateInfo {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_memory_opaque_capture_address_allocate_info
 	p_next                 voidptr
 	opaque_capture_address u64
 }
 
 pub struct DeviceMemoryOpaqueCaptureAddressInfo {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_device_memory_opaque_capture_address_info
 	p_next voidptr
 	memory C.DeviceMemory
 }
@@ -6899,7 +6862,7 @@ fn C.vkCreateRenderPass2(C.Device,
 	&RenderPassCreateInfo2,
 	&AllocationCallbacks,
 	&C.RenderPass) Result
-pub fn create_render_pass2(device C.Device,
+pub fn create_render_pass_2(device C.Device,
 	p_create_info &RenderPassCreateInfo2,
 	p_allocator &AllocationCallbacks,
 	p_render_pass &C.RenderPass) Result {
@@ -6909,7 +6872,7 @@ pub fn create_render_pass2(device C.Device,
 fn C.vkCmdBeginRenderPass2(C.CommandBuffer,
 	&RenderPassBeginInfo,
 	&SubpassBeginInfo)
-pub fn cmd_begin_render_pass2(command_buffer C.CommandBuffer,
+pub fn cmd_begin_render_pass_2(command_buffer C.CommandBuffer,
 	p_render_pass_begin &RenderPassBeginInfo,
 	p_subpass_begin_info &SubpassBeginInfo) {
 	C.vkCmdBeginRenderPass2(command_buffer, p_render_pass_begin, p_subpass_begin_info)
@@ -6918,7 +6881,7 @@ pub fn cmd_begin_render_pass2(command_buffer C.CommandBuffer,
 fn C.vkCmdNextSubpass2(C.CommandBuffer,
 	&SubpassBeginInfo,
 	&SubpassEndInfo)
-pub fn cmd_next_subpass2(command_buffer C.CommandBuffer,
+pub fn cmd_next_subpass_2(command_buffer C.CommandBuffer,
 	p_subpass_begin_info &SubpassBeginInfo,
 	p_subpass_end_info &SubpassEndInfo) {
 	C.vkCmdNextSubpass2(command_buffer, p_subpass_begin_info, p_subpass_end_info)
@@ -6926,7 +6889,7 @@ pub fn cmd_next_subpass2(command_buffer C.CommandBuffer,
 
 fn C.vkCmdEndRenderPass2(C.CommandBuffer,
 	&SubpassEndInfo)
-pub fn cmd_end_render_pass2(command_buffer C.CommandBuffer,
+pub fn cmd_end_render_pass_2(command_buffer C.CommandBuffer,
 	p_subpass_end_info &SubpassEndInfo) {
 	C.vkCmdEndRenderPass2(command_buffer, p_subpass_end_info)
 }
@@ -7078,7 +7041,6 @@ pub const pipeline_stage_2_video_encode_bit_khr = u64(0x08000000)
 pub const pipeline_stage_2_transform_feedback_bit_ext = u64(0x01000000)
 pub const pipeline_stage_2_conditional_rendering_bit_ext = u64(0x00040000)
 pub const pipeline_stage_2_command_preprocess_bit_nv = u64(0x00020000)
-pub const pipeline_stage_2_command_preprocess_bit_ext = pipeline_stage_2_command_preprocess_bit_nv
 pub const pipeline_stage_2_fragment_shading_rate_attachment_bit_khr = u64(0x00400000)
 pub const pipeline_stage_2_shading_rate_image_bit_nv = pipeline_stage_2_fragment_shading_rate_attachment_bit_khr
 pub const pipeline_stage_2_acceleration_structure_build_bit_khr = u64(0x02000000)
@@ -7156,8 +7118,6 @@ pub const access_2_transform_feedback_counter_write_bit_ext = u64(0x08000000)
 pub const access_2_conditional_rendering_read_bit_ext = u64(0x00100000)
 pub const access_2_command_preprocess_read_bit_nv = u64(0x00020000)
 pub const access_2_command_preprocess_write_bit_nv = u64(0x00040000)
-pub const access_2_command_preprocess_read_bit_ext = access_2_command_preprocess_read_bit_nv
-pub const access_2_command_preprocess_write_bit_ext = access_2_command_preprocess_write_bit_nv
 pub const access_2_fragment_shading_rate_attachment_read_bit_khr = u64(0x00800000)
 pub const access_2_shading_rate_image_read_bit_nv = access_2_fragment_shading_rate_attachment_read_bit_khr
 pub const access_2_acceleration_structure_read_bit_khr = u64(0x00200000)
@@ -7269,7 +7229,7 @@ pub const format_feature_2_optical_flow_cost_bit_nv = u64(0x40000000000)
 
 pub struct PhysicalDeviceVulkan13Features {
 pub mut:
-	s_type                                                    StructureType
+	s_type                                                    StructureType = StructureType.structure_type_physical_device_vulkan_1_3_features
 	p_next                                                    voidptr
 	robust_image_access                                       Bool32
 	inline_uniform_block                                      Bool32
@@ -7280,63 +7240,63 @@ pub mut:
 	shader_terminate_invocation                               Bool32
 	subgroup_size_control                                     Bool32
 	compute_full_subgroups                                    Bool32
-	synchronization2                                          Bool32
+	synchronization_2                                         Bool32
 	texture_compression_astc_hdr                              Bool32
 	shader_zero_initialize_workgroup_memory                   Bool32
 	dynamic_rendering                                         Bool32
 	shader_integer_dot_product                                Bool32
-	maintenance4                                              Bool32
+	maintenance_4                                             Bool32
 }
 
 pub struct PhysicalDeviceVulkan13Properties {
 pub mut:
-	s_type                                                                                 StructureType
-	p_next                                                                                 voidptr
-	min_subgroup_size                                                                      u32
-	max_subgroup_size                                                                      u32
-	max_compute_workgroup_subgroups                                                        u32
-	required_subgroup_size_stages                                                          ShaderStageFlags
-	max_inline_uniform_block_size                                                          u32
-	max_per_stage_descriptor_inline_uniform_blocks                                         u32
-	max_per_stage_descriptor_update_after_bind_inline_uniform_blocks                       u32
-	max_descriptor_set_inline_uniform_blocks                                               u32
-	max_descriptor_set_update_after_bind_inline_uniform_blocks                             u32
-	max_inline_uniform_total_size                                                          u32
-	integer_dot_product8_bit_unsigned_accelerated                                          Bool32
-	integer_dot_product8_bit_signed_accelerated                                            Bool32
-	integer_dot_product8_bit_mixed_signedness_accelerated                                  Bool32
-	integer_dot_product4x8_bit_packed_unsigned_accelerated                                 Bool32
-	integer_dot_product4x8_bit_packed_signed_accelerated                                   Bool32
-	integer_dot_product4x8_bit_packed_mixed_signedness_accelerated                         Bool32
-	integer_dot_product16_bit_unsigned_accelerated                                         Bool32
-	integer_dot_product16_bit_signed_accelerated                                           Bool32
-	integer_dot_product16_bit_mixed_signedness_accelerated                                 Bool32
-	integer_dot_product32_bit_unsigned_accelerated                                         Bool32
-	integer_dot_product32_bit_signed_accelerated                                           Bool32
-	integer_dot_product32_bit_mixed_signedness_accelerated                                 Bool32
-	integer_dot_product64_bit_unsigned_accelerated                                         Bool32
-	integer_dot_product64_bit_signed_accelerated                                           Bool32
-	integer_dot_product64_bit_mixed_signedness_accelerated                                 Bool32
-	integer_dot_product_accumulating_saturating8_bit_unsigned_accelerated                  Bool32
-	integer_dot_product_accumulating_saturating8_bit_signed_accelerated                    Bool32
-	integer_dot_product_accumulating_saturating8_bit_mixed_signedness_accelerated          Bool32
-	integer_dot_product_accumulating_saturating4x8_bit_packed_unsigned_accelerated         Bool32
-	integer_dot_product_accumulating_saturating4x8_bit_packed_signed_accelerated           Bool32
-	integer_dot_product_accumulating_saturating4x8_bit_packed_mixed_signedness_accelerated Bool32
-	integer_dot_product_accumulating_saturating16_bit_unsigned_accelerated                 Bool32
-	integer_dot_product_accumulating_saturating16_bit_signed_accelerated                   Bool32
-	integer_dot_product_accumulating_saturating16_bit_mixed_signedness_accelerated         Bool32
-	integer_dot_product_accumulating_saturating32_bit_unsigned_accelerated                 Bool32
-	integer_dot_product_accumulating_saturating32_bit_signed_accelerated                   Bool32
-	integer_dot_product_accumulating_saturating32_bit_mixed_signedness_accelerated         Bool32
-	integer_dot_product_accumulating_saturating64_bit_unsigned_accelerated                 Bool32
-	integer_dot_product_accumulating_saturating64_bit_signed_accelerated                   Bool32
-	integer_dot_product_accumulating_saturating64_bit_mixed_signedness_accelerated         Bool32
-	storage_texel_buffer_offset_alignment_bytes                                            DeviceSize
-	storage_texel_buffer_offset_single_texel_alignment                                     Bool32
-	uniform_texel_buffer_offset_alignment_bytes                                            DeviceSize
-	uniform_texel_buffer_offset_single_texel_alignment                                     Bool32
-	max_buffer_size                                                                        DeviceSize
+	s_type                                                                                   StructureType = StructureType.structure_type_physical_device_vulkan_1_3_properties
+	p_next                                                                                   voidptr
+	min_subgroup_size                                                                        u32
+	max_subgroup_size                                                                        u32
+	max_compute_workgroup_subgroups                                                          u32
+	required_subgroup_size_stages                                                            ShaderStageFlags
+	max_inline_uniform_block_size                                                            u32
+	max_per_stage_descriptor_inline_uniform_blocks                                           u32
+	max_per_stage_descriptor_update_after_bind_inline_uniform_blocks                         u32
+	max_descriptor_set_inline_uniform_blocks                                                 u32
+	max_descriptor_set_update_after_bind_inline_uniform_blocks                               u32
+	max_inline_uniform_total_size                                                            u32
+	integer_dot_product_8_bit_unsigned_accelerated                                           Bool32
+	integer_dot_product_8_bit_signed_accelerated                                             Bool32
+	integer_dot_product_8_bit_mixed_signedness_accelerated                                   Bool32
+	integer_dot_product_4x_8_bit_packed_unsigned_accelerated                                 Bool32
+	integer_dot_product_4x_8_bit_packed_signed_accelerated                                   Bool32
+	integer_dot_product_4x_8_bit_packed_mixed_signedness_accelerated                         Bool32
+	integer_dot_product_1_6_bit_unsigned_accelerated                                         Bool32
+	integer_dot_product_1_6_bit_signed_accelerated                                           Bool32
+	integer_dot_product_1_6_bit_mixed_signedness_accelerated                                 Bool32
+	integer_dot_product_3_2_bit_unsigned_accelerated                                         Bool32
+	integer_dot_product_3_2_bit_signed_accelerated                                           Bool32
+	integer_dot_product_3_2_bit_mixed_signedness_accelerated                                 Bool32
+	integer_dot_product_6_4_bit_unsigned_accelerated                                         Bool32
+	integer_dot_product_6_4_bit_signed_accelerated                                           Bool32
+	integer_dot_product_6_4_bit_mixed_signedness_accelerated                                 Bool32
+	integer_dot_product_accumulating_saturating_8_bit_unsigned_accelerated                   Bool32
+	integer_dot_product_accumulating_saturating_8_bit_signed_accelerated                     Bool32
+	integer_dot_product_accumulating_saturating_8_bit_mixed_signedness_accelerated           Bool32
+	integer_dot_product_accumulating_saturating_4x_8_bit_packed_unsigned_accelerated         Bool32
+	integer_dot_product_accumulating_saturating_4x_8_bit_packed_signed_accelerated           Bool32
+	integer_dot_product_accumulating_saturating_4x_8_bit_packed_mixed_signedness_accelerated Bool32
+	integer_dot_product_accumulating_saturating_1_6_bit_unsigned_accelerated                 Bool32
+	integer_dot_product_accumulating_saturating_1_6_bit_signed_accelerated                   Bool32
+	integer_dot_product_accumulating_saturating_1_6_bit_mixed_signedness_accelerated         Bool32
+	integer_dot_product_accumulating_saturating_3_2_bit_unsigned_accelerated                 Bool32
+	integer_dot_product_accumulating_saturating_3_2_bit_signed_accelerated                   Bool32
+	integer_dot_product_accumulating_saturating_3_2_bit_mixed_signedness_accelerated         Bool32
+	integer_dot_product_accumulating_saturating_6_4_bit_unsigned_accelerated                 Bool32
+	integer_dot_product_accumulating_saturating_6_4_bit_signed_accelerated                   Bool32
+	integer_dot_product_accumulating_saturating_6_4_bit_mixed_signedness_accelerated         Bool32
+	storage_texel_buffer_offset_alignment_bytes                                              DeviceSize
+	storage_texel_buffer_offset_single_texel_alignment                                       Bool32
+	uniform_texel_buffer_offset_alignment_bytes                                              DeviceSize
+	uniform_texel_buffer_offset_single_texel_alignment                                       Bool32
+	max_buffer_size                                                                          DeviceSize
 }
 
 pub struct PipelineCreationFeedback {
@@ -7347,7 +7307,7 @@ pub mut:
 
 pub struct PipelineCreationFeedbackCreateInfo {
 pub mut:
-	s_type                                 StructureType
+	s_type                                 StructureType = StructureType.structure_type_pipeline_creation_feedback_create_info
 	p_next                                 voidptr
 	p_pipeline_creation_feedback           &PipelineCreationFeedback
 	pipeline_stage_creation_feedback_count u32
@@ -7356,14 +7316,14 @@ pub mut:
 
 pub struct PhysicalDeviceShaderTerminateInvocationFeatures {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_physical_device_shader_terminate_invocation_features
 	p_next                      voidptr
 	shader_terminate_invocation Bool32
 }
 
 pub struct PhysicalDeviceToolProperties {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_physical_device_tool_properties
 	p_next      voidptr
 	name        [max_extension_name_size]char
 	version     [max_extension_name_size]char
@@ -7374,42 +7334,42 @@ pub mut:
 
 pub struct PhysicalDeviceShaderDemoteToHelperInvocationFeatures {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_physical_device_shader_demote_to_helper_invocation_features
 	p_next                             voidptr
 	shader_demote_to_helper_invocation Bool32
 }
 
 pub struct PhysicalDevicePrivateDataFeatures {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_physical_device_private_data_features
 	p_next       voidptr
 	private_data Bool32
 }
 
 pub struct DevicePrivateDataCreateInfo {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_device_private_data_create_info
 	p_next                          voidptr
 	private_data_slot_request_count u32
 }
 
 pub struct PrivateDataSlotCreateInfo {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_private_data_slot_create_info
 	p_next voidptr
 	flags  PrivateDataSlotCreateFlags
 }
 
 pub struct PhysicalDevicePipelineCreationCacheControlFeatures {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_physical_device_pipeline_creation_cache_control_features
 	p_next                          voidptr
 	pipeline_creation_cache_control Bool32
 }
 
 pub struct MemoryBarrier2 {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_memory_barrier_2
 	p_next          voidptr
 	src_stage_mask  PipelineStageFlags2
 	src_access_mask AccessFlags2
@@ -7419,7 +7379,7 @@ pub mut:
 
 pub struct BufferMemoryBarrier2 {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_buffer_memory_barrier_2
 	p_next                 voidptr
 	src_stage_mask         PipelineStageFlags2
 	src_access_mask        AccessFlags2
@@ -7434,7 +7394,7 @@ pub mut:
 
 pub struct ImageMemoryBarrier2 {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_image_memory_barrier_2
 	p_next                 voidptr
 	src_stage_mask         PipelineStageFlags2
 	src_access_mask        AccessFlags2
@@ -7450,7 +7410,7 @@ pub mut:
 
 pub struct DependencyInfo {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_dependency_info
 	p_next                      voidptr
 	dependency_flags            DependencyFlags
 	memory_barrier_count        u32
@@ -7463,7 +7423,7 @@ pub mut:
 
 pub struct SemaphoreSubmitInfo {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_semaphore_submit_info
 	p_next       voidptr
 	semaphore    C.Semaphore
 	value        u64
@@ -7473,7 +7433,7 @@ pub mut:
 
 pub struct CommandBufferSubmitInfo {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_command_buffer_submit_info
 	p_next         voidptr
 	command_buffer C.CommandBuffer
 	device_mask    u32
@@ -7481,7 +7441,7 @@ pub mut:
 
 pub struct SubmitInfo2 {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_submit_info_2
 	p_next                      voidptr
 	flags                       SubmitFlags
 	wait_semaphore_info_count   u32
@@ -7494,28 +7454,28 @@ pub mut:
 
 pub struct PhysicalDeviceSynchronization2Features {
 pub mut:
-	s_type           StructureType
-	p_next           voidptr
-	synchronization2 Bool32
+	s_type            StructureType = StructureType.structure_type_physical_device_synchronization_2_features
+	p_next            voidptr
+	synchronization_2 Bool32
 }
 
 pub struct PhysicalDeviceZeroInitializeWorkgroupMemoryFeatures {
 pub mut:
-	s_type                                  StructureType
+	s_type                                  StructureType = StructureType.structure_type_physical_device_zero_initialize_workgroup_memory_features
 	p_next                                  voidptr
 	shader_zero_initialize_workgroup_memory Bool32
 }
 
 pub struct PhysicalDeviceImageRobustnessFeatures {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_physical_device_image_robustness_features
 	p_next              voidptr
 	robust_image_access Bool32
 }
 
 pub struct BufferCopy2 {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_buffer_copy_2
 	p_next     voidptr
 	src_offset DeviceSize
 	dst_offset DeviceSize
@@ -7524,7 +7484,7 @@ pub mut:
 
 pub struct CopyBufferInfo2 {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_copy_buffer_info_2
 	p_next       voidptr
 	src_buffer   C.Buffer
 	dst_buffer   C.Buffer
@@ -7534,7 +7494,7 @@ pub mut:
 
 pub struct ImageCopy2 {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_image_copy_2
 	p_next          voidptr
 	src_subresource ImageSubresourceLayers
 	src_offset      Offset3D
@@ -7545,7 +7505,7 @@ pub mut:
 
 pub struct CopyImageInfo2 {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_copy_image_info_2
 	p_next           voidptr
 	src_image        C.Image
 	src_image_layout ImageLayout
@@ -7557,7 +7517,7 @@ pub mut:
 
 pub struct BufferImageCopy2 {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_buffer_image_copy_2
 	p_next              voidptr
 	buffer_offset       DeviceSize
 	buffer_row_length   u32
@@ -7569,7 +7529,7 @@ pub mut:
 
 pub struct CopyBufferToImageInfo2 {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_copy_buffer_to_image_info_2
 	p_next           voidptr
 	src_buffer       C.Buffer
 	dst_image        C.Image
@@ -7580,7 +7540,7 @@ pub mut:
 
 pub struct CopyImageToBufferInfo2 {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_copy_image_to_buffer_info_2
 	p_next           voidptr
 	src_image        C.Image
 	src_image_layout ImageLayout
@@ -7591,7 +7551,7 @@ pub mut:
 
 pub struct ImageBlit2 {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_image_blit_2
 	p_next          voidptr
 	src_subresource ImageSubresourceLayers
 	src_offsets     [2]Offset3D
@@ -7601,7 +7561,7 @@ pub mut:
 
 pub struct BlitImageInfo2 {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_blit_image_info_2
 	p_next           voidptr
 	src_image        C.Image
 	src_image_layout ImageLayout
@@ -7614,7 +7574,7 @@ pub mut:
 
 pub struct ImageResolve2 {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_image_resolve_2
 	p_next          voidptr
 	src_subresource ImageSubresourceLayers
 	src_offset      Offset3D
@@ -7625,7 +7585,7 @@ pub mut:
 
 pub struct ResolveImageInfo2 {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_resolve_image_info_2
 	p_next           voidptr
 	src_image        C.Image
 	src_image_layout ImageLayout
@@ -7637,7 +7597,7 @@ pub mut:
 
 pub struct PhysicalDeviceSubgroupSizeControlFeatures {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_physical_device_subgroup_size_control_features
 	p_next                 voidptr
 	subgroup_size_control  Bool32
 	compute_full_subgroups Bool32
@@ -7645,7 +7605,7 @@ pub mut:
 
 pub struct PhysicalDeviceSubgroupSizeControlProperties {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_physical_device_subgroup_size_control_properties
 	p_next                          voidptr
 	min_subgroup_size               u32
 	max_subgroup_size               u32
@@ -7655,14 +7615,14 @@ pub mut:
 
 pub struct PipelineShaderStageRequiredSubgroupSizeCreateInfo {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_pipeline_shader_stage_required_subgroup_size_create_info
 	p_next                 voidptr
 	required_subgroup_size u32
 }
 
 pub struct PhysicalDeviceInlineUniformBlockFeatures {
 pub mut:
-	s_type                                                    StructureType
+	s_type                                                    StructureType = StructureType.structure_type_physical_device_inline_uniform_block_features
 	p_next                                                    voidptr
 	inline_uniform_block                                      Bool32
 	descriptor_binding_inline_uniform_block_update_after_bind Bool32
@@ -7670,7 +7630,7 @@ pub mut:
 
 pub struct PhysicalDeviceInlineUniformBlockProperties {
 pub mut:
-	s_type                                                           StructureType
+	s_type                                                           StructureType = StructureType.structure_type_physical_device_inline_uniform_block_properties
 	p_next                                                           voidptr
 	max_inline_uniform_block_size                                    u32
 	max_per_stage_descriptor_inline_uniform_blocks                   u32
@@ -7681,7 +7641,7 @@ pub mut:
 
 pub struct WriteDescriptorSetInlineUniformBlock {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_write_descriptor_set_inline_uniform_block
 	p_next    voidptr
 	data_size u32
 	p_data    voidptr
@@ -7689,7 +7649,7 @@ pub mut:
 
 pub struct DescriptorPoolInlineUniformBlockCreateInfo {
 pub mut:
-	s_type                            StructureType
+	s_type                            StructureType = StructureType.structure_type_descriptor_pool_inline_uniform_block_create_info
 	p_next                            voidptr
 	max_inline_uniform_block_bindings u32
 }
@@ -7703,7 +7663,7 @@ pub mut:
 
 pub struct RenderingAttachmentInfo {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_rendering_attachment_info
 	p_next               voidptr
 	image_view           C.ImageView
 	image_layout         ImageLayout
@@ -7717,7 +7677,7 @@ pub mut:
 
 pub struct RenderingInfo {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_rendering_info
 	p_next                 voidptr
 	flags                  RenderingFlags
 	render_area            Rect2D
@@ -7731,7 +7691,7 @@ pub mut:
 
 pub struct PipelineRenderingCreateInfo {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_pipeline_rendering_create_info
 	p_next                     voidptr
 	view_mask                  u32
 	color_attachment_count     u32
@@ -7742,14 +7702,14 @@ pub mut:
 
 pub struct PhysicalDeviceDynamicRenderingFeatures {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_physical_device_dynamic_rendering_features
 	p_next            voidptr
 	dynamic_rendering Bool32
 }
 
 pub struct CommandBufferInheritanceRenderingInfo {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_command_buffer_inheritance_rendering_info
 	p_next                     voidptr
 	flags                      RenderingFlags
 	view_mask                  u32
@@ -7762,50 +7722,50 @@ pub mut:
 
 pub struct PhysicalDeviceShaderIntegerDotProductFeatures {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_physical_device_shader_integer_dot_product_features
 	p_next                     voidptr
 	shader_integer_dot_product Bool32
 }
 
 pub struct PhysicalDeviceShaderIntegerDotProductProperties {
 pub mut:
-	s_type                                                                                 StructureType
-	p_next                                                                                 voidptr
-	integer_dot_product8_bit_unsigned_accelerated                                          Bool32
-	integer_dot_product8_bit_signed_accelerated                                            Bool32
-	integer_dot_product8_bit_mixed_signedness_accelerated                                  Bool32
-	integer_dot_product4x8_bit_packed_unsigned_accelerated                                 Bool32
-	integer_dot_product4x8_bit_packed_signed_accelerated                                   Bool32
-	integer_dot_product4x8_bit_packed_mixed_signedness_accelerated                         Bool32
-	integer_dot_product16_bit_unsigned_accelerated                                         Bool32
-	integer_dot_product16_bit_signed_accelerated                                           Bool32
-	integer_dot_product16_bit_mixed_signedness_accelerated                                 Bool32
-	integer_dot_product32_bit_unsigned_accelerated                                         Bool32
-	integer_dot_product32_bit_signed_accelerated                                           Bool32
-	integer_dot_product32_bit_mixed_signedness_accelerated                                 Bool32
-	integer_dot_product64_bit_unsigned_accelerated                                         Bool32
-	integer_dot_product64_bit_signed_accelerated                                           Bool32
-	integer_dot_product64_bit_mixed_signedness_accelerated                                 Bool32
-	integer_dot_product_accumulating_saturating8_bit_unsigned_accelerated                  Bool32
-	integer_dot_product_accumulating_saturating8_bit_signed_accelerated                    Bool32
-	integer_dot_product_accumulating_saturating8_bit_mixed_signedness_accelerated          Bool32
-	integer_dot_product_accumulating_saturating4x8_bit_packed_unsigned_accelerated         Bool32
-	integer_dot_product_accumulating_saturating4x8_bit_packed_signed_accelerated           Bool32
-	integer_dot_product_accumulating_saturating4x8_bit_packed_mixed_signedness_accelerated Bool32
-	integer_dot_product_accumulating_saturating16_bit_unsigned_accelerated                 Bool32
-	integer_dot_product_accumulating_saturating16_bit_signed_accelerated                   Bool32
-	integer_dot_product_accumulating_saturating16_bit_mixed_signedness_accelerated         Bool32
-	integer_dot_product_accumulating_saturating32_bit_unsigned_accelerated                 Bool32
-	integer_dot_product_accumulating_saturating32_bit_signed_accelerated                   Bool32
-	integer_dot_product_accumulating_saturating32_bit_mixed_signedness_accelerated         Bool32
-	integer_dot_product_accumulating_saturating64_bit_unsigned_accelerated                 Bool32
-	integer_dot_product_accumulating_saturating64_bit_signed_accelerated                   Bool32
-	integer_dot_product_accumulating_saturating64_bit_mixed_signedness_accelerated         Bool32
+	s_type                                                                                   StructureType = StructureType.structure_type_physical_device_shader_integer_dot_product_properties
+	p_next                                                                                   voidptr
+	integer_dot_product_8_bit_unsigned_accelerated                                           Bool32
+	integer_dot_product_8_bit_signed_accelerated                                             Bool32
+	integer_dot_product_8_bit_mixed_signedness_accelerated                                   Bool32
+	integer_dot_product_4x_8_bit_packed_unsigned_accelerated                                 Bool32
+	integer_dot_product_4x_8_bit_packed_signed_accelerated                                   Bool32
+	integer_dot_product_4x_8_bit_packed_mixed_signedness_accelerated                         Bool32
+	integer_dot_product_1_6_bit_unsigned_accelerated                                         Bool32
+	integer_dot_product_1_6_bit_signed_accelerated                                           Bool32
+	integer_dot_product_1_6_bit_mixed_signedness_accelerated                                 Bool32
+	integer_dot_product_3_2_bit_unsigned_accelerated                                         Bool32
+	integer_dot_product_3_2_bit_signed_accelerated                                           Bool32
+	integer_dot_product_3_2_bit_mixed_signedness_accelerated                                 Bool32
+	integer_dot_product_6_4_bit_unsigned_accelerated                                         Bool32
+	integer_dot_product_6_4_bit_signed_accelerated                                           Bool32
+	integer_dot_product_6_4_bit_mixed_signedness_accelerated                                 Bool32
+	integer_dot_product_accumulating_saturating_8_bit_unsigned_accelerated                   Bool32
+	integer_dot_product_accumulating_saturating_8_bit_signed_accelerated                     Bool32
+	integer_dot_product_accumulating_saturating_8_bit_mixed_signedness_accelerated           Bool32
+	integer_dot_product_accumulating_saturating_4x_8_bit_packed_unsigned_accelerated         Bool32
+	integer_dot_product_accumulating_saturating_4x_8_bit_packed_signed_accelerated           Bool32
+	integer_dot_product_accumulating_saturating_4x_8_bit_packed_mixed_signedness_accelerated Bool32
+	integer_dot_product_accumulating_saturating_1_6_bit_unsigned_accelerated                 Bool32
+	integer_dot_product_accumulating_saturating_1_6_bit_signed_accelerated                   Bool32
+	integer_dot_product_accumulating_saturating_1_6_bit_mixed_signedness_accelerated         Bool32
+	integer_dot_product_accumulating_saturating_3_2_bit_unsigned_accelerated                 Bool32
+	integer_dot_product_accumulating_saturating_3_2_bit_signed_accelerated                   Bool32
+	integer_dot_product_accumulating_saturating_3_2_bit_mixed_signedness_accelerated         Bool32
+	integer_dot_product_accumulating_saturating_6_4_bit_unsigned_accelerated                 Bool32
+	integer_dot_product_accumulating_saturating_6_4_bit_signed_accelerated                   Bool32
+	integer_dot_product_accumulating_saturating_6_4_bit_mixed_signedness_accelerated         Bool32
 }
 
 pub struct PhysicalDeviceTexelBufferAlignmentProperties {
 pub mut:
-	s_type                                             StructureType
+	s_type                                             StructureType = StructureType.structure_type_physical_device_texel_buffer_alignment_properties
 	p_next                                             voidptr
 	storage_texel_buffer_offset_alignment_bytes        DeviceSize
 	storage_texel_buffer_offset_single_texel_alignment Bool32
@@ -7815,7 +7775,7 @@ pub mut:
 
 pub struct FormatProperties3 {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_format_properties_3
 	p_next                  voidptr
 	linear_tiling_features  FormatFeatureFlags2
 	optimal_tiling_features FormatFeatureFlags2
@@ -7824,28 +7784,28 @@ pub mut:
 
 pub struct PhysicalDeviceMaintenance4Features {
 pub mut:
-	s_type       StructureType
-	p_next       voidptr
-	maintenance4 Bool32
+	s_type        StructureType = StructureType.structure_type_physical_device_maintenance_4_features
+	p_next        voidptr
+	maintenance_4 Bool32
 }
 
 pub struct PhysicalDeviceMaintenance4Properties {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_maintenance_4_properties
 	p_next          voidptr
 	max_buffer_size DeviceSize
 }
 
 pub struct DeviceBufferMemoryRequirements {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_device_buffer_memory_requirements
 	p_next        voidptr
 	p_create_info &BufferCreateInfo
 }
 
 pub struct DeviceImageMemoryRequirements {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_device_image_memory_requirements
 	p_next        voidptr
 	p_create_info &ImageCreateInfo
 	plane_aspect  ImageAspectFlagBits
@@ -7909,7 +7869,7 @@ pub fn get_private_data(device C.Device,
 fn C.vkCmdSetEvent2(C.CommandBuffer,
 	C.Event,
 	&DependencyInfo)
-pub fn cmd_set_event2(command_buffer C.CommandBuffer,
+pub fn cmd_set_event_2(command_buffer C.CommandBuffer,
 	event C.Event,
 	p_dependency_info &DependencyInfo) {
 	C.vkCmdSetEvent2(command_buffer, event, p_dependency_info)
@@ -7918,7 +7878,7 @@ pub fn cmd_set_event2(command_buffer C.CommandBuffer,
 fn C.vkCmdResetEvent2(C.CommandBuffer,
 	C.Event,
 	PipelineStageFlags2)
-pub fn cmd_reset_event2(command_buffer C.CommandBuffer,
+pub fn cmd_reset_event_2(command_buffer C.CommandBuffer,
 	event C.Event,
 	stage_mask PipelineStageFlags2) {
 	C.vkCmdResetEvent2(command_buffer, event, stage_mask)
@@ -7928,7 +7888,7 @@ fn C.vkCmdWaitEvents2(C.CommandBuffer,
 	u32,
 	&C.Event,
 	&DependencyInfo)
-pub fn cmd_wait_events2(command_buffer C.CommandBuffer,
+pub fn cmd_wait_events_2(command_buffer C.CommandBuffer,
 	event_count u32,
 	p_events &C.Event,
 	p_dependency_infos &DependencyInfo) {
@@ -7937,7 +7897,7 @@ pub fn cmd_wait_events2(command_buffer C.CommandBuffer,
 
 fn C.vkCmdPipelineBarrier2(C.CommandBuffer,
 	&DependencyInfo)
-pub fn cmd_pipeline_barrier2(command_buffer C.CommandBuffer,
+pub fn cmd_pipeline_barrier_2(command_buffer C.CommandBuffer,
 	p_dependency_info &DependencyInfo) {
 	C.vkCmdPipelineBarrier2(command_buffer, p_dependency_info)
 }
@@ -7946,7 +7906,7 @@ fn C.vkCmdWriteTimestamp2(C.CommandBuffer,
 	PipelineStageFlags2,
 	C.QueryPool,
 	u32)
-pub fn cmd_write_timestamp2(command_buffer C.CommandBuffer,
+pub fn cmd_write_timestamp_2(command_buffer C.CommandBuffer,
 	stage PipelineStageFlags2,
 	query_pool C.QueryPool,
 	query u32) {
@@ -7957,7 +7917,7 @@ fn C.vkQueueSubmit2(C.Queue,
 	u32,
 	&SubmitInfo2,
 	C.Fence) Result
-pub fn queue_submit2(queue C.Queue,
+pub fn queue_submit_2(queue C.Queue,
 	submit_count u32,
 	p_submits &SubmitInfo2,
 	fence C.Fence) Result {
@@ -7966,42 +7926,42 @@ pub fn queue_submit2(queue C.Queue,
 
 fn C.vkCmdCopyBuffer2(C.CommandBuffer,
 	&CopyBufferInfo2)
-pub fn cmd_copy_buffer2(command_buffer C.CommandBuffer,
+pub fn cmd_copy_buffer_2(command_buffer C.CommandBuffer,
 	p_copy_buffer_info &CopyBufferInfo2) {
 	C.vkCmdCopyBuffer2(command_buffer, p_copy_buffer_info)
 }
 
 fn C.vkCmdCopyImage2(C.CommandBuffer,
 	&CopyImageInfo2)
-pub fn cmd_copy_image2(command_buffer C.CommandBuffer,
+pub fn cmd_copy_image_2(command_buffer C.CommandBuffer,
 	p_copy_image_info &CopyImageInfo2) {
 	C.vkCmdCopyImage2(command_buffer, p_copy_image_info)
 }
 
 fn C.vkCmdCopyBufferToImage2(C.CommandBuffer,
 	&CopyBufferToImageInfo2)
-pub fn cmd_copy_buffer_to_image2(command_buffer C.CommandBuffer,
+pub fn cmd_copy_buffer_to_image_2(command_buffer C.CommandBuffer,
 	p_copy_buffer_to_image_info &CopyBufferToImageInfo2) {
 	C.vkCmdCopyBufferToImage2(command_buffer, p_copy_buffer_to_image_info)
 }
 
 fn C.vkCmdCopyImageToBuffer2(C.CommandBuffer,
 	&CopyImageToBufferInfo2)
-pub fn cmd_copy_image_to_buffer2(command_buffer C.CommandBuffer,
+pub fn cmd_copy_image_to_buffer_2(command_buffer C.CommandBuffer,
 	p_copy_image_to_buffer_info &CopyImageToBufferInfo2) {
 	C.vkCmdCopyImageToBuffer2(command_buffer, p_copy_image_to_buffer_info)
 }
 
 fn C.vkCmdBlitImage2(C.CommandBuffer,
 	&BlitImageInfo2)
-pub fn cmd_blit_image2(command_buffer C.CommandBuffer,
+pub fn cmd_blit_image_2(command_buffer C.CommandBuffer,
 	p_blit_image_info &BlitImageInfo2) {
 	C.vkCmdBlitImage2(command_buffer, p_blit_image_info)
 }
 
 fn C.vkCmdResolveImage2(C.CommandBuffer,
 	&ResolveImageInfo2)
-pub fn cmd_resolve_image2(command_buffer C.CommandBuffer,
+pub fn cmd_resolve_image_2(command_buffer C.CommandBuffer,
 	p_resolve_image_info &ResolveImageInfo2) {
 	C.vkCmdResolveImage2(command_buffer, p_resolve_image_info)
 }
@@ -8064,7 +8024,7 @@ fn C.vkCmdBindVertexBuffers2(C.CommandBuffer,
 	&DeviceSize,
 	&DeviceSize,
 	&DeviceSize)
-pub fn cmd_bind_vertex_buffers2(command_buffer C.CommandBuffer,
+pub fn cmd_bind_vertex_buffers_2(command_buffer C.CommandBuffer,
 	first_binding u32,
 	binding_count u32,
 	p_buffers &C.Buffer,
@@ -8192,16 +8152,15 @@ pub enum PresentModeKHR {
 }
 
 pub enum ColorSpaceKHR {
-	color_space_srgb_nonlinear_khr       = int(0)
-	color_space_display_p3_nonlinear_ext = int(1000104001)
-	color_space_extended_srgb_linear_ext = int(1000104002)
-	color_space_display_p3_linear_ext    = int(1000104003)
-	color_space_dci_p3_nonlinear_ext     = int(1000104004)
-	color_space_bt709_linear_ext         = int(1000104005)
-	color_space_bt709_nonlinear_ext      = int(1000104006)
-	color_space_bt2020_linear_ext        = int(1000104007)
-	color_space_hdr10_st2084_ext         = int(1000104008)
-	// VK_COLOR_SPACE_DOLBYVISION_EXT is deprecated, but no reason was given in the API XML
+	color_space_srgb_nonlinear_khr          = int(0)
+	color_space_display_p3_nonlinear_ext    = int(1000104001)
+	color_space_extended_srgb_linear_ext    = int(1000104002)
+	color_space_display_p3_linear_ext       = int(1000104003)
+	color_space_dci_p3_nonlinear_ext        = int(1000104004)
+	color_space_bt709_linear_ext            = int(1000104005)
+	color_space_bt709_nonlinear_ext         = int(1000104006)
+	color_space_bt2020_linear_ext           = int(1000104007)
+	color_space_hdr10_st2084_ext            = int(1000104008)
 	color_space_dolbyvision_ext             = int(1000104009)
 	color_space_hdr10_hlg_ext               = int(1000104010)
 	color_space_adobergb_linear_ext         = int(1000104011)
@@ -8337,7 +8296,7 @@ pub type DeviceGroupPresentModeFlagsKHR = u32
 
 pub struct SwapchainCreateInfoKHR {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_swapchain_create_info_khr
 	p_next                   voidptr
 	flags                    SwapchainCreateFlagsKHR
 	surface                  C.SurfaceKHR
@@ -8359,7 +8318,7 @@ pub mut:
 
 pub struct PresentInfoKHR {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_present_info_khr
 	p_next               voidptr
 	wait_semaphore_count u32
 	p_wait_semaphores    &C.Semaphore
@@ -8371,14 +8330,14 @@ pub mut:
 
 pub struct ImageSwapchainCreateInfoKHR {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_image_swapchain_create_info_khr
 	p_next    voidptr
 	swapchain C.SwapchainKHR
 }
 
 pub struct BindImageMemorySwapchainInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_bind_image_memory_swapchain_info_khr
 	p_next      voidptr
 	swapchain   C.SwapchainKHR
 	image_index u32
@@ -8386,7 +8345,7 @@ pub mut:
 
 pub struct AcquireNextImageInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_acquire_next_image_info_khr
 	p_next      voidptr
 	swapchain   C.SwapchainKHR
 	timeout     u64
@@ -8397,7 +8356,7 @@ pub mut:
 
 pub struct DeviceGroupPresentCapabilitiesKHR {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_device_group_present_capabilities_khr
 	p_next       voidptr
 	present_mask [max_device_group_size]u32
 	modes        DeviceGroupPresentModeFlagsKHR
@@ -8405,7 +8364,7 @@ pub mut:
 
 pub struct DeviceGroupPresentInfoKHR {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_device_group_present_info_khr
 	p_next          voidptr
 	swapchain_count u32
 	p_device_masks  &u32
@@ -8414,7 +8373,7 @@ pub mut:
 
 pub struct DeviceGroupSwapchainCreateInfoKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_device_group_swapchain_create_info_khr
 	p_next voidptr
 	modes  DeviceGroupPresentModeFlagsKHR
 }
@@ -8503,7 +8462,7 @@ pub fn get_physical_device_present_rectangles_khr(physical_device C.PhysicalDevi
 fn C.vkAcquireNextImage2KHR(C.Device,
 	&AcquireNextImageInfoKHR,
 	&u32) Result
-pub fn acquire_next_image2_khr(device C.Device,
+pub fn acquire_next_image_2_khr(device C.Device,
 	p_acquire_info &AcquireNextImageInfoKHR,
 	p_image_index &u32) Result {
 	return C.vkAcquireNextImage2KHR(device, p_acquire_info, p_image_index)
@@ -8536,7 +8495,7 @@ pub mut:
 
 pub struct DisplayModeCreateInfoKHR {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_display_mode_create_info_khr
 	p_next     voidptr
 	flags      DisplayModeCreateFlagsKHR
 	parameters DisplayModeParametersKHR
@@ -8580,7 +8539,7 @@ pub mut:
 
 pub struct DisplaySurfaceCreateInfoKHR {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_display_surface_create_info_khr
 	p_next            voidptr
 	flags             DisplaySurfaceCreateFlagsKHR
 	display_mode      C.DisplayModeKHR
@@ -8677,7 +8636,7 @@ pub const khr_display_swapchain_extension_name = 'VK_KHR_display_swapchain'
 
 pub struct DisplayPresentInfoKHR {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_display_present_info_khr
 	p_next     voidptr
 	src_rect   Rect2D
 	dst_rect   Rect2D
@@ -8779,21 +8738,21 @@ pub type VideoCodingControlFlagsKHR = u32
 
 pub struct QueueFamilyQueryResultStatusPropertiesKHR {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_queue_family_query_result_status_properties_khr
 	p_next                      voidptr
 	query_result_status_support Bool32
 }
 
 pub struct QueueFamilyVideoPropertiesKHR {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_queue_family_video_properties_khr
 	p_next                 voidptr
 	video_codec_operations VideoCodecOperationFlagsKHR
 }
 
 pub struct VideoProfileInfoKHR {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_video_profile_info_khr
 	p_next                voidptr
 	video_codec_operation VideoCodecOperationFlagBitsKHR
 	chroma_subsampling    VideoChromaSubsamplingFlagsKHR
@@ -8803,7 +8762,7 @@ pub mut:
 
 pub struct VideoProfileListInfoKHR {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_video_profile_list_info_khr
 	p_next        voidptr
 	profile_count u32
 	p_profiles    &VideoProfileInfoKHR
@@ -8811,7 +8770,7 @@ pub mut:
 
 pub struct VideoCapabilitiesKHR {
 pub mut:
-	s_type                                StructureType
+	s_type                                StructureType = StructureType.structure_type_video_capabilities_khr
 	p_next                                voidptr
 	flags                                 VideoCapabilityFlagsKHR
 	min_bitstream_buffer_offset_alignment DeviceSize
@@ -8826,14 +8785,14 @@ pub mut:
 
 pub struct PhysicalDeviceVideoFormatInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_physical_device_video_format_info_khr
 	p_next      voidptr
 	image_usage ImageUsageFlags
 }
 
 pub struct VideoFormatPropertiesKHR {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_video_format_properties_khr
 	p_next             voidptr
 	format             Format
 	component_mapping  ComponentMapping
@@ -8845,7 +8804,7 @@ pub mut:
 
 pub struct VideoPictureResourceInfoKHR {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_video_picture_resource_info_khr
 	p_next             voidptr
 	coded_offset       Offset2D
 	coded_extent       Extent2D
@@ -8855,7 +8814,7 @@ pub mut:
 
 pub struct VideoReferenceSlotInfoKHR {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_video_reference_slot_info_khr
 	p_next             voidptr
 	slot_index         i32
 	p_picture_resource &VideoPictureResourceInfoKHR
@@ -8863,7 +8822,7 @@ pub mut:
 
 pub struct VideoSessionMemoryRequirementsKHR {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_video_session_memory_requirements_khr
 	p_next              voidptr
 	memory_bind_index   u32
 	memory_requirements MemoryRequirements
@@ -8871,7 +8830,7 @@ pub mut:
 
 pub struct BindVideoSessionMemoryInfoKHR {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_bind_video_session_memory_info_khr
 	p_next            voidptr
 	memory_bind_index u32
 	memory            C.DeviceMemory
@@ -8881,7 +8840,7 @@ pub mut:
 
 pub struct VideoSessionCreateInfoKHR {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_video_session_create_info_khr
 	p_next                        voidptr
 	queue_family_index            u32
 	flags                         VideoSessionCreateFlagsKHR
@@ -8896,7 +8855,7 @@ pub mut:
 
 pub struct VideoSessionParametersCreateInfoKHR {
 pub mut:
-	s_type                            StructureType
+	s_type                            StructureType = StructureType.structure_type_video_session_parameters_create_info_khr
 	p_next                            voidptr
 	flags                             VideoSessionParametersCreateFlagsKHR
 	video_session_parameters_template C.VideoSessionParametersKHR
@@ -8905,14 +8864,14 @@ pub mut:
 
 pub struct VideoSessionParametersUpdateInfoKHR {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_video_session_parameters_update_info_khr
 	p_next                voidptr
 	update_sequence_count u32
 }
 
 pub struct VideoBeginCodingInfoKHR {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_video_begin_coding_info_khr
 	p_next                   voidptr
 	flags                    VideoBeginCodingFlagsKHR
 	video_session            C.VideoSessionKHR
@@ -8923,14 +8882,14 @@ pub mut:
 
 pub struct VideoEndCodingInfoKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_video_end_coding_info_khr
 	p_next voidptr
 	flags  VideoEndCodingFlagsKHR
 }
 
 pub struct VideoCodingControlInfoKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_video_coding_control_info_khr
 	p_next voidptr
 	flags  VideoCodingControlFlagsKHR
 }
@@ -9075,21 +9034,21 @@ pub type VideoDecodeFlagsKHR = u32
 
 pub struct VideoDecodeCapabilitiesKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_video_decode_capabilities_khr
 	p_next voidptr
 	flags  VideoDecodeCapabilityFlagsKHR
 }
 
 pub struct VideoDecodeUsageInfoKHR {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_video_decode_usage_info_khr
 	p_next            voidptr
 	video_usage_hints VideoDecodeUsageFlagsKHR
 }
 
 pub struct VideoDecodeInfoKHR {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_video_decode_info_khr
 	p_next                 voidptr
 	flags                  VideoDecodeFlagsKHR
 	src_buffer             C.Buffer
@@ -9651,7 +9610,7 @@ pub type CommandBufferInheritanceRenderingInfoKHR = CommandBufferInheritanceRend
 
 pub struct RenderingFragmentShadingRateAttachmentInfoKHR {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_rendering_fragment_shading_rate_attachment_info_khr
 	p_next                             voidptr
 	image_view                         C.ImageView
 	image_layout                       ImageLayout
@@ -9660,7 +9619,7 @@ pub mut:
 
 pub struct RenderingFragmentDensityMapAttachmentInfoEXT {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_rendering_fragment_density_map_attachment_info_ext
 	p_next       voidptr
 	image_view   C.ImageView
 	image_layout ImageLayout
@@ -9668,7 +9627,7 @@ pub mut:
 
 pub struct AttachmentSampleCountInfoAMD {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_attachment_sample_count_info_amd
 	p_next                           voidptr
 	color_attachment_count           u32
 	p_color_attachment_samples       &SampleCountFlagBits
@@ -9679,7 +9638,7 @@ pub type AttachmentSampleCountInfoNV = AttachmentSampleCountInfoAMD
 
 pub struct MultiviewPerViewAttributesInfoNVX {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_multiview_per_view_attributes_info_nvx
 	p_next                              voidptr
 	per_view_attributes                 Bool32
 	per_view_attributes_position_x_only Bool32
@@ -9795,7 +9754,7 @@ pub const khr_external_memory_fd_extension_name = 'VK_KHR_external_memory_fd'
 
 pub struct ImportMemoryFdInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_import_memory_fd_info_khr
 	p_next      voidptr
 	handle_type ExternalMemoryHandleTypeFlagBits
 	fd          int
@@ -9803,14 +9762,14 @@ pub mut:
 
 pub struct MemoryFdPropertiesKHR {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_memory_fd_properties_khr
 	p_next           voidptr
 	memory_type_bits u32
 }
 
 pub struct MemoryGetFdInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_memory_get_fd_info_khr
 	p_next      voidptr
 	memory      C.DeviceMemory
 	handle_type ExternalMemoryHandleTypeFlagBits
@@ -9862,7 +9821,7 @@ pub const khr_external_semaphore_fd_extension_name = 'VK_KHR_external_semaphore_
 
 pub struct ImportSemaphoreFdInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_import_semaphore_fd_info_khr
 	p_next      voidptr
 	semaphore   C.Semaphore
 	flags       SemaphoreImportFlags
@@ -9872,7 +9831,7 @@ pub mut:
 
 pub struct SemaphoreGetFdInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_semaphore_get_fd_info_khr
 	p_next      voidptr
 	semaphore   C.Semaphore
 	handle_type ExternalSemaphoreHandleTypeFlagBits
@@ -9899,7 +9858,7 @@ pub const khr_push_descriptor_extension_name = 'VK_KHR_push_descriptor'
 
 pub struct PhysicalDevicePushDescriptorPropertiesKHR {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_physical_device_push_descriptor_properties_khr
 	p_next               voidptr
 	max_push_descriptors u32
 }
@@ -9964,7 +9923,7 @@ pub mut:
 
 pub struct PresentRegionsKHR {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_present_regions_khr
 	p_next          voidptr
 	swapchain_count u32
 	p_regions       &PresentRegionKHR
@@ -10015,7 +9974,7 @@ pub const khr_shared_presentable_image_extension_name = 'VK_KHR_shared_presentab
 
 pub struct SharedPresentSurfaceCapabilitiesKHR {
 pub mut:
-	s_type                               StructureType
+	s_type                               StructureType = StructureType.structure_type_shared_present_surface_capabilities_khr
 	p_next                               voidptr
 	shared_present_supported_usage_flags ImageUsageFlags
 }
@@ -10053,7 +10012,7 @@ pub const khr_external_fence_fd_extension_name = 'VK_KHR_external_fence_fd'
 
 pub struct ImportFenceFdInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_import_fence_fd_info_khr
 	p_next      voidptr
 	fence       C.Fence
 	flags       FenceImportFlags
@@ -10063,7 +10022,7 @@ pub mut:
 
 pub struct FenceGetFdInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_fence_get_fd_info_khr
 	p_next      voidptr
 	fence       C.Fence
 	handle_type ExternalFenceHandleTypeFlagBits
@@ -10136,7 +10095,7 @@ pub type AcquireProfilingLockFlagsKHR = u32
 
 pub struct PhysicalDevicePerformanceQueryFeaturesKHR {
 pub mut:
-	s_type                                   StructureType
+	s_type                                   StructureType = StructureType.structure_type_physical_device_performance_query_features_khr
 	p_next                                   voidptr
 	performance_counter_query_pools          Bool32
 	performance_counter_multiple_query_pools Bool32
@@ -10144,14 +10103,14 @@ pub mut:
 
 pub struct PhysicalDevicePerformanceQueryPropertiesKHR {
 pub mut:
-	s_type                            StructureType
+	s_type                            StructureType = StructureType.structure_type_physical_device_performance_query_properties_khr
 	p_next                            voidptr
 	allow_command_buffer_query_copies Bool32
 }
 
 pub struct PerformanceCounterKHR {
 pub mut:
-	s_type  StructureType
+	s_type  StructureType = StructureType.structure_type_performance_counter_khr
 	p_next  voidptr
 	unit    PerformanceCounterUnitKHR
 	scope   PerformanceCounterScopeKHR
@@ -10161,7 +10120,7 @@ pub mut:
 
 pub struct PerformanceCounterDescriptionKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_performance_counter_description_khr
 	p_next      voidptr
 	flags       PerformanceCounterDescriptionFlagsKHR
 	name        [max_description_size]char
@@ -10171,7 +10130,7 @@ pub mut:
 
 pub struct QueryPoolPerformanceCreateInfoKHR {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_query_pool_performance_create_info_khr
 	p_next              voidptr
 	queue_family_index  u32
 	counter_index_count u32
@@ -10180,17 +10139,17 @@ pub mut:
 
 pub union PerformanceCounterResultKHR {
 pub mut:
-	int32   i32
-	int64   i64
-	uint32  u32
-	uint64  u64
-	float32 f32
-	float64 f64
+	int_3_2   i32
+	int_6_4   i64
+	uint_3_2  u32
+	uint_6_4  u64
+	float_3_2 f32
+	float_6_4 f64
 }
 
 pub struct AcquireProfilingLockInfoKHR {
 pub mut:
-	s_type  StructureType
+	s_type  StructureType = StructureType.structure_type_acquire_profiling_lock_info_khr
 	p_next  voidptr
 	flags   AcquireProfilingLockFlagsKHR
 	timeout u64
@@ -10198,7 +10157,7 @@ pub mut:
 
 pub struct PerformanceQuerySubmitInfoKHR {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_performance_query_submit_info_khr
 	p_next             voidptr
 	counter_pass_index u32
 }
@@ -10265,21 +10224,21 @@ pub const khr_get_surface_capabilities_2_extension_name = 'VK_KHR_get_surface_ca
 
 pub struct PhysicalDeviceSurfaceInfo2KHR {
 pub mut:
-	s_type  StructureType
+	s_type  StructureType = StructureType.structure_type_physical_device_surface_info_2_khr
 	p_next  voidptr
 	surface C.SurfaceKHR
 }
 
 pub struct SurfaceCapabilities2KHR {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_surface_capabilities_2_khr
 	p_next               voidptr
 	surface_capabilities SurfaceCapabilitiesKHR
 }
 
 pub struct SurfaceFormat2KHR {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_surface_format_2_khr
 	p_next         voidptr
 	surface_format SurfaceFormatKHR
 }
@@ -10287,7 +10246,7 @@ pub mut:
 fn C.vkGetPhysicalDeviceSurfaceCapabilities2KHR(C.PhysicalDevice,
 	&PhysicalDeviceSurfaceInfo2KHR,
 	&SurfaceCapabilities2KHR) Result
-pub fn get_physical_device_surface_capabilities2_khr(physical_device C.PhysicalDevice,
+pub fn get_physical_device_surface_capabilities_2_khr(physical_device C.PhysicalDevice,
 	p_surface_info &PhysicalDeviceSurfaceInfo2KHR,
 	p_surface_capabilities &SurfaceCapabilities2KHR) Result {
 	return C.vkGetPhysicalDeviceSurfaceCapabilities2KHR(physical_device, p_surface_info,
@@ -10298,7 +10257,7 @@ fn C.vkGetPhysicalDeviceSurfaceFormats2KHR(C.PhysicalDevice,
 	&PhysicalDeviceSurfaceInfo2KHR,
 	&u32,
 	&SurfaceFormat2KHR) Result
-pub fn get_physical_device_surface_formats2_khr(physical_device C.PhysicalDevice,
+pub fn get_physical_device_surface_formats_2_khr(physical_device C.PhysicalDevice,
 	p_surface_info &PhysicalDeviceSurfaceInfo2KHR,
 	p_surface_format_count &u32,
 	p_surface_formats &SurfaceFormat2KHR) Result {
@@ -10318,28 +10277,28 @@ pub const khr_get_display_properties_2_extension_name = 'VK_KHR_get_display_prop
 
 pub struct DisplayProperties2KHR {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_display_properties_2_khr
 	p_next             voidptr
 	display_properties DisplayPropertiesKHR
 }
 
 pub struct DisplayPlaneProperties2KHR {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_display_plane_properties_2_khr
 	p_next                   voidptr
 	display_plane_properties DisplayPlanePropertiesKHR
 }
 
 pub struct DisplayModeProperties2KHR {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_display_mode_properties_2_khr
 	p_next                  voidptr
 	display_mode_properties DisplayModePropertiesKHR
 }
 
 pub struct DisplayPlaneInfo2KHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_display_plane_info_2_khr
 	p_next      voidptr
 	mode        C.DisplayModeKHR
 	plane_index u32
@@ -10347,7 +10306,7 @@ pub mut:
 
 pub struct DisplayPlaneCapabilities2KHR {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_display_plane_capabilities_2_khr
 	p_next       voidptr
 	capabilities DisplayPlaneCapabilitiesKHR
 }
@@ -10355,7 +10314,7 @@ pub mut:
 fn C.vkGetPhysicalDeviceDisplayProperties2KHR(C.PhysicalDevice,
 	&u32,
 	&DisplayProperties2KHR) Result
-pub fn get_physical_device_display_properties2_khr(physical_device C.PhysicalDevice,
+pub fn get_physical_device_display_properties_2_khr(physical_device C.PhysicalDevice,
 	p_property_count &u32,
 	p_properties &DisplayProperties2KHR) Result {
 	return C.vkGetPhysicalDeviceDisplayProperties2KHR(physical_device, p_property_count,
@@ -10365,7 +10324,7 @@ pub fn get_physical_device_display_properties2_khr(physical_device C.PhysicalDev
 fn C.vkGetPhysicalDeviceDisplayPlaneProperties2KHR(C.PhysicalDevice,
 	&u32,
 	&DisplayPlaneProperties2KHR) Result
-pub fn get_physical_device_display_plane_properties2_khr(physical_device C.PhysicalDevice,
+pub fn get_physical_device_display_plane_properties_2_khr(physical_device C.PhysicalDevice,
 	p_property_count &u32,
 	p_properties &DisplayPlaneProperties2KHR) Result {
 	return C.vkGetPhysicalDeviceDisplayPlaneProperties2KHR(physical_device, p_property_count,
@@ -10376,7 +10335,7 @@ fn C.vkGetDisplayModeProperties2KHR(C.PhysicalDevice,
 	C.DisplayKHR,
 	&u32,
 	&DisplayModeProperties2KHR) Result
-pub fn get_display_mode_properties2_khr(physical_device C.PhysicalDevice,
+pub fn get_display_mode_properties_2_khr(physical_device C.PhysicalDevice,
 	display C.DisplayKHR,
 	p_property_count &u32,
 	p_properties &DisplayModeProperties2KHR) Result {
@@ -10387,7 +10346,7 @@ pub fn get_display_mode_properties2_khr(physical_device C.PhysicalDevice,
 fn C.vkGetDisplayPlaneCapabilities2KHR(C.PhysicalDevice,
 	&DisplayPlaneInfo2KHR,
 	&DisplayPlaneCapabilities2KHR) Result
-pub fn get_display_plane_capabilities2_khr(physical_device C.PhysicalDevice,
+pub fn get_display_plane_capabilities_2_khr(physical_device C.PhysicalDevice,
 	p_display_plane_info &DisplayPlaneInfo2KHR,
 	p_capabilities &DisplayPlaneCapabilities2KHR) Result {
 	return C.vkGetDisplayPlaneCapabilities2KHR(physical_device, p_display_plane_info,
@@ -10489,7 +10448,7 @@ pub const khr_shader_clock_extension_name = 'VK_KHR_shader_clock'
 
 pub struct PhysicalDeviceShaderClockFeaturesKHR {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_physical_device_shader_clock_features_khr
 	p_next                voidptr
 	shader_subgroup_clock Bool32
 	shader_device_clock   Bool32
@@ -10566,21 +10525,21 @@ pub enum QueueGlobalPriorityKHR {
 
 pub struct DeviceQueueGlobalPriorityCreateInfoKHR {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_device_queue_global_priority_create_info_khr
 	p_next          voidptr
 	global_priority QueueGlobalPriorityKHR
 }
 
 pub struct PhysicalDeviceGlobalPriorityQueryFeaturesKHR {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_physical_device_global_priority_query_features_khr
 	p_next                voidptr
 	global_priority_query Bool32
 }
 
 pub struct QueueFamilyGlobalPriorityPropertiesKHR {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_queue_family_global_priority_properties_khr
 	p_next         voidptr
 	priority_count u32
 	priorities     [max_global_priority_size_khr]QueueGlobalPriorityKHR
@@ -10661,7 +10620,7 @@ pub enum FragmentShadingRateCombinerOpKHR {
 
 pub struct FragmentShadingRateAttachmentInfoKHR {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_fragment_shading_rate_attachment_info_khr
 	p_next                             voidptr
 	p_fragment_shading_rate_attachment &AttachmentReference2
 	shading_rate_attachment_texel_size Extent2D
@@ -10669,7 +10628,7 @@ pub mut:
 
 pub struct PipelineFragmentShadingRateStateCreateInfoKHR {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_pipeline_fragment_shading_rate_state_create_info_khr
 	p_next        voidptr
 	fragment_size Extent2D
 	combiner_ops  [2]FragmentShadingRateCombinerOpKHR
@@ -10677,7 +10636,7 @@ pub mut:
 
 pub struct PhysicalDeviceFragmentShadingRateFeaturesKHR {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_fragment_shading_rate_features_khr
 	p_next                           voidptr
 	pipeline_fragment_shading_rate   Bool32
 	primitive_fragment_shading_rate  Bool32
@@ -10686,7 +10645,7 @@ pub mut:
 
 pub struct PhysicalDeviceFragmentShadingRatePropertiesKHR {
 pub mut:
-	s_type                                                       StructureType
+	s_type                                                       StructureType = StructureType.structure_type_physical_device_fragment_shading_rate_properties_khr
 	p_next                                                       voidptr
 	min_fragment_shading_rate_attachment_texel_size              Extent2D
 	max_fragment_shading_rate_attachment_texel_size              Extent2D
@@ -10709,7 +10668,7 @@ pub mut:
 
 pub struct PhysicalDeviceFragmentShadingRateKHR {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_physical_device_fragment_shading_rate_khr
 	p_next        voidptr
 	sample_counts SampleCountFlags
 	fragment_size Extent2D
@@ -10739,14 +10698,14 @@ pub const khr_dynamic_rendering_local_read_extension_name = 'VK_KHR_dynamic_rend
 
 pub struct PhysicalDeviceDynamicRenderingLocalReadFeaturesKHR {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_physical_device_dynamic_rendering_local_read_features_khr
 	p_next                       voidptr
 	dynamic_rendering_local_read Bool32
 }
 
 pub struct RenderingAttachmentLocationInfoKHR {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_rendering_attachment_location_info_khr
 	p_next                       voidptr
 	color_attachment_count       u32
 	p_color_attachment_locations &u32
@@ -10754,7 +10713,7 @@ pub mut:
 
 pub struct RenderingInputAttachmentIndexInfoKHR {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_rendering_input_attachment_index_info_khr
 	p_next                           voidptr
 	color_attachment_count           u32
 	p_color_attachment_input_indices &u32
@@ -10781,7 +10740,7 @@ pub const khr_shader_quad_control_extension_name = 'VK_KHR_shader_quad_control'
 
 pub struct PhysicalDeviceShaderQuadControlFeaturesKHR {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_physical_device_shader_quad_control_features_khr
 	p_next              voidptr
 	shader_quad_control Bool32
 }
@@ -10794,7 +10753,7 @@ pub const khr_surface_protected_capabilities_extension_name = 'VK_KHR_surface_pr
 
 pub struct SurfaceProtectedCapabilitiesKHR {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_surface_protected_capabilities_khr
 	p_next             voidptr
 	supports_protected Bool32
 }
@@ -10813,7 +10772,7 @@ pub const khr_present_wait_extension_name = 'VK_KHR_present_wait'
 
 pub struct PhysicalDevicePresentWaitFeaturesKHR {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_physical_device_present_wait_features_khr
 	p_next       voidptr
 	present_wait Bool32
 }
@@ -10904,21 +10863,21 @@ pub enum PipelineExecutableStatisticFormatKHR {
 
 pub struct PhysicalDevicePipelineExecutablePropertiesFeaturesKHR {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_physical_device_pipeline_executable_properties_features_khr
 	p_next                   voidptr
 	pipeline_executable_info Bool32
 }
 
 pub struct PipelineInfoKHR {
 pub mut:
-	s_type   StructureType
+	s_type   StructureType = StructureType.structure_type_pipeline_info_khr
 	p_next   voidptr
 	pipeline C.Pipeline
 }
 
 pub struct PipelineExecutablePropertiesKHR {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_pipeline_executable_properties_khr
 	p_next        voidptr
 	stages        ShaderStageFlags
 	name          [max_description_size]char
@@ -10928,7 +10887,7 @@ pub mut:
 
 pub struct PipelineExecutableInfoKHR {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_pipeline_executable_info_khr
 	p_next           voidptr
 	pipeline         C.Pipeline
 	executable_index u32
@@ -10936,15 +10895,15 @@ pub mut:
 
 pub union PipelineExecutableStatisticValueKHR {
 pub mut:
-	b32 Bool32
-	i64 i64
-	u64 u64
-	f64 f64
+	b_3_2 Bool32
+	i_6_4 i64
+	u_6_4 u64
+	f_6_4 f64
 }
 
 pub struct PipelineExecutableStatisticKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_pipeline_executable_statistic_khr
 	p_next      voidptr
 	name        [max_description_size]char
 	description [max_description_size]char
@@ -10954,7 +10913,7 @@ pub mut:
 
 pub struct PipelineExecutableInternalRepresentationKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_pipeline_executable_internal_representation_khr
 	p_next      voidptr
 	name        [max_description_size]char
 	description [max_description_size]char
@@ -11011,7 +10970,7 @@ pub type MemoryUnmapFlagsKHR = u32
 
 pub struct MemoryMapInfoKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_memory_map_info_khr
 	p_next voidptr
 	flags  MemoryMapFlags
 	memory C.DeviceMemory
@@ -11021,7 +10980,7 @@ pub mut:
 
 pub struct MemoryUnmapInfoKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_memory_unmap_info_khr
 	p_next voidptr
 	flags  MemoryUnmapFlagsKHR
 	memory C.DeviceMemory
@@ -11030,7 +10989,7 @@ pub mut:
 fn C.vkMapMemory2KHR(C.Device,
 	&MemoryMapInfoKHR,
 	&voidptr) Result
-pub fn map_memory2_khr(device C.Device,
+pub fn map_memory_2_khr(device C.Device,
 	p_memory_map_info &MemoryMapInfoKHR,
 	pp_data &voidptr) Result {
 	return C.vkMapMemory2KHR(device, p_memory_map_info, pp_data)
@@ -11038,7 +10997,7 @@ pub fn map_memory2_khr(device C.Device,
 
 fn C.vkUnmapMemory2KHR(C.Device,
 	&MemoryUnmapInfoKHR) Result
-pub fn unmap_memory2_khr(device C.Device,
+pub fn unmap_memory_2_khr(device C.Device,
 	p_memory_unmap_info &MemoryUnmapInfoKHR) Result {
 	return C.vkUnmapMemory2KHR(device, p_memory_unmap_info)
 }
@@ -11055,7 +11014,7 @@ pub const khr_pipeline_library_extension_name = 'VK_KHR_pipeline_library'
 
 pub struct PipelineLibraryCreateInfoKHR {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_pipeline_library_create_info_khr
 	p_next        voidptr
 	library_count u32
 	p_libraries   &C.Pipeline
@@ -11069,7 +11028,7 @@ pub const khr_present_id_extension_name = 'VK_KHR_present_id'
 
 pub struct PresentIdKHR {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_present_id_khr
 	p_next          voidptr
 	swapchain_count u32
 	p_present_ids   &u64
@@ -11077,7 +11036,7 @@ pub mut:
 
 pub struct PhysicalDevicePresentIdFeaturesKHR {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_physical_device_present_id_features_khr
 	p_next     voidptr
 	present_id Bool32
 }
@@ -11092,6 +11051,10 @@ pub enum VideoEncodeTuningModeKHR {
 	video_encode_tuning_mode_ultra_low_latency_khr = int(3)
 	video_encode_tuning_mode_lossless_khr          = int(4)
 	video_encode_tuning_mode_max_enum_khr          = int(0x7FFFFFFF)
+}
+
+pub enum VideoEncodeFlagBitsKHR {
+	video_encode_flag_bits_max_enum_khr = int(0x7FFFFFFF)
 }
 
 pub type VideoEncodeFlagsKHR = u32
@@ -11147,7 +11110,7 @@ pub type VideoEncodeRateControlFlagsKHR = u32
 
 pub struct VideoEncodeInfoKHR {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_video_encode_info_khr
 	p_next                             voidptr
 	flags                              VideoEncodeFlagsKHR
 	dst_buffer                         C.Buffer
@@ -11162,7 +11125,7 @@ pub mut:
 
 pub struct VideoEncodeCapabilitiesKHR {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_video_encode_capabilities_khr
 	p_next                           voidptr
 	flags                            VideoEncodeCapabilityFlagsKHR
 	rate_control_modes               VideoEncodeRateControlModeFlagsKHR
@@ -11175,14 +11138,14 @@ pub mut:
 
 pub struct QueryPoolVideoEncodeFeedbackCreateInfoKHR {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_query_pool_video_encode_feedback_create_info_khr
 	p_next                voidptr
 	encode_feedback_flags VideoEncodeFeedbackFlagsKHR
 }
 
 pub struct VideoEncodeUsageInfoKHR {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_video_encode_usage_info_khr
 	p_next              voidptr
 	video_usage_hints   VideoEncodeUsageFlagsKHR
 	video_content_hints VideoEncodeContentFlagsKHR
@@ -11191,7 +11154,7 @@ pub mut:
 
 pub struct VideoEncodeRateControlLayerInfoKHR {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_video_encode_rate_control_layer_info_khr
 	p_next                 voidptr
 	average_bitrate        u64
 	max_bitrate            u64
@@ -11201,7 +11164,7 @@ pub mut:
 
 pub struct VideoEncodeRateControlInfoKHR {
 pub mut:
-	s_type                            StructureType
+	s_type                            StructureType = StructureType.structure_type_video_encode_rate_control_info_khr
 	p_next                            voidptr
 	flags                             VideoEncodeRateControlFlagsKHR
 	rate_control_mode                 VideoEncodeRateControlModeFlagBitsKHR
@@ -11213,7 +11176,7 @@ pub mut:
 
 pub struct PhysicalDeviceVideoEncodeQualityLevelInfoKHR {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_video_encode_quality_level_info_khr
 	p_next          voidptr
 	p_video_profile &VideoProfileInfoKHR
 	quality_level   u32
@@ -11221,7 +11184,7 @@ pub mut:
 
 pub struct VideoEncodeQualityLevelPropertiesKHR {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_video_encode_quality_level_properties_khr
 	p_next                             voidptr
 	preferred_rate_control_mode        VideoEncodeRateControlModeFlagBitsKHR
 	preferred_rate_control_layer_count u32
@@ -11229,21 +11192,21 @@ pub mut:
 
 pub struct VideoEncodeQualityLevelInfoKHR {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_video_encode_quality_level_info_khr
 	p_next        voidptr
 	quality_level u32
 }
 
 pub struct VideoEncodeSessionParametersGetInfoKHR {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_video_encode_session_parameters_get_info_khr
 	p_next                   voidptr
 	video_session_parameters C.VideoSessionParametersKHR
 }
 
 pub struct VideoEncodeSessionParametersFeedbackInfoKHR {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_video_encode_session_parameters_feedback_info_khr
 	p_next        voidptr
 	has_overrides Bool32
 }
@@ -11309,14 +11272,14 @@ pub type PhysicalDeviceSynchronization2FeaturesKHR = PhysicalDeviceSynchronizati
 
 pub struct QueueFamilyCheckpointProperties2NV {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_queue_family_checkpoint_properties_2_nv
 	p_next                          voidptr
 	checkpoint_execution_stage_mask PipelineStageFlags2
 }
 
 pub struct CheckpointData2NV {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_checkpoint_data_2_nv
 	p_next              voidptr
 	stage               PipelineStageFlags2
 	p_checkpoint_marker voidptr
@@ -11327,7 +11290,7 @@ fn C.vkCmdWriteBufferMarker2AMD(C.CommandBuffer,
 	C.Buffer,
 	DeviceSize,
 	u32)
-pub fn cmd_write_buffer_marker2_amd(command_buffer C.CommandBuffer,
+pub fn cmd_write_buffer_marker_2_amd(command_buffer C.CommandBuffer,
 	stage PipelineStageFlags2,
 	dst_buffer C.Buffer,
 	dst_offset DeviceSize,
@@ -11338,7 +11301,7 @@ pub fn cmd_write_buffer_marker2_amd(command_buffer C.CommandBuffer,
 fn C.vkGetQueueCheckpointData2NV(C.Queue,
 	&u32,
 	&CheckpointData2NV)
-pub fn get_queue_checkpoint_data2_nv(queue C.Queue,
+pub fn get_queue_checkpoint_data_2_nv(queue C.Queue,
 	p_checkpoint_data_count &u32,
 	p_checkpoint_data &CheckpointData2NV) {
 	C.vkGetQueueCheckpointData2NV(queue, p_checkpoint_data_count, p_checkpoint_data)
@@ -11349,14 +11312,14 @@ pub const khr_fragment_shader_barycentric_extension_name = 'VK_KHR_fragment_shad
 
 pub struct PhysicalDeviceFragmentShaderBarycentricFeaturesKHR {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_physical_device_fragment_shader_barycentric_features_khr
 	p_next                      voidptr
 	fragment_shader_barycentric Bool32
 }
 
 pub struct PhysicalDeviceFragmentShaderBarycentricPropertiesKHR {
 pub mut:
-	s_type                                                 StructureType
+	s_type                                                 StructureType = StructureType.structure_type_physical_device_fragment_shader_barycentric_properties_khr
 	p_next                                                 voidptr
 	tri_strip_vertex_order_independent_of_provoking_vertex Bool32
 }
@@ -11366,7 +11329,7 @@ pub const khr_shader_subgroup_uniform_control_flow_extension_name = 'VK_KHR_shad
 
 pub struct PhysicalDeviceShaderSubgroupUniformControlFlowFeaturesKHR {
 pub mut:
-	s_type                               StructureType
+	s_type                               StructureType = StructureType.structure_type_physical_device_shader_subgroup_uniform_control_flow_features_khr
 	p_next                               voidptr
 	shader_subgroup_uniform_control_flow Bool32
 }
@@ -11381,12 +11344,12 @@ pub const khr_workgroup_memory_explicit_layout_extension_name = 'VK_KHR_workgrou
 
 pub struct PhysicalDeviceWorkgroupMemoryExplicitLayoutFeaturesKHR {
 pub mut:
-	s_type                                               StructureType
+	s_type                                               StructureType = StructureType.structure_type_physical_device_workgroup_memory_explicit_layout_features_khr
 	p_next                                               voidptr
 	workgroup_memory_explicit_layout                     Bool32
 	workgroup_memory_explicit_layout_scalar_block_layout Bool32
-	workgroup_memory_explicit_layout8_bit_access         Bool32
-	workgroup_memory_explicit_layout16_bit_access        Bool32
+	workgroup_memory_explicit_layout_8_bit_access        Bool32
+	workgroup_memory_explicit_layout_1_6_bit_access      Bool32
 }
 
 pub const khr_copy_commands_2_spec_version = 1
@@ -11427,10 +11390,10 @@ pub const khr_ray_tracing_maintenance_1_extension_name = 'VK_KHR_ray_tracing_mai
 
 pub struct PhysicalDeviceRayTracingMaintenance1FeaturesKHR {
 pub mut:
-	s_type                                    StructureType
-	p_next                                    voidptr
-	ray_tracing_maintenance1                  Bool32
-	ray_tracing_pipeline_trace_rays_indirect2 Bool32
+	s_type                                     StructureType = StructureType.structure_type_physical_device_ray_tracing_maintenance_1_features_khr
+	p_next                                     voidptr
+	ray_tracing_maintenance_1                  Bool32
+	ray_tracing_pipeline_trace_rays_indirect_2 Bool32
 }
 
 pub struct TraceRaysIndirectCommand2KHR {
@@ -11453,7 +11416,7 @@ pub mut:
 
 fn C.vkCmdTraceRaysIndirect2KHR(C.CommandBuffer,
 	DeviceAddress)
-pub fn cmd_trace_rays_indirect2_khr(command_buffer C.CommandBuffer,
+pub fn cmd_trace_rays_indirect_2_khr(command_buffer C.CommandBuffer,
 	indirect_device_address DeviceAddress) {
 	C.vkCmdTraceRaysIndirect2KHR(command_buffer, indirect_device_address)
 }
@@ -11477,7 +11440,7 @@ pub const khr_shader_subgroup_rotate_extension_name = 'VK_KHR_shader_subgroup_ro
 
 pub struct PhysicalDeviceShaderSubgroupRotateFeaturesKHR {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_shader_subgroup_rotate_features_khr
 	p_next                           voidptr
 	shader_subgroup_rotate           Bool32
 	shader_subgroup_rotate_clustered Bool32
@@ -11488,7 +11451,7 @@ pub const khr_shader_maximal_reconvergence_extension_name = 'VK_KHR_shader_maxim
 
 pub struct PhysicalDeviceShaderMaximalReconvergenceFeaturesKHR {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_physical_device_shader_maximal_reconvergence_features_khr
 	p_next                       voidptr
 	shader_maximal_reconvergence Bool32
 }
@@ -11533,8 +11496,6 @@ pub const pipeline_create_2_no_protected_access_bit_ext = u64(0x08000000)
 pub const pipeline_create_2_protected_access_only_bit_ext = u64(0x40000000)
 pub const pipeline_create_2_ray_tracing_displacement_micromap_bit_nv = u64(0x10000000)
 pub const pipeline_create_2_descriptor_buffer_bit_ext = u64(0x20000000)
-pub const pipeline_create_2_capture_data_bit_khr = u64(0x80000000)
-pub const pipeline_create_2_indirect_bindable_bit_ext = u64(0x4000000000)
 
 pub type BufferUsageFlags2KHR = u64
 
@@ -11568,18 +11529,17 @@ pub const buffer_usage_2_resource_descriptor_buffer_bit_ext = u64(0x00400000)
 pub const buffer_usage_2_push_descriptors_descriptor_buffer_bit_ext = u64(0x04000000)
 pub const buffer_usage_2_micromap_build_input_read_only_bit_ext = u64(0x00800000)
 pub const buffer_usage_2_micromap_storage_bit_ext = u64(0x01000000)
-pub const buffer_usage_2_preprocess_buffer_bit_ext = u64(0x80000000)
 
 pub struct PhysicalDeviceMaintenance5FeaturesKHR {
 pub mut:
-	s_type       StructureType
-	p_next       voidptr
-	maintenance5 Bool32
+	s_type        StructureType = StructureType.structure_type_physical_device_maintenance_5_features_khr
+	p_next        voidptr
+	maintenance_5 Bool32
 }
 
 pub struct PhysicalDeviceMaintenance5PropertiesKHR {
 pub mut:
-	s_type                                                    StructureType
+	s_type                                                    StructureType = StructureType.structure_type_physical_device_maintenance_5_properties_khr
 	p_next                                                    voidptr
 	early_fragment_multisample_coverage_after_sample_counting Bool32
 	early_fragment_sample_mask_test_before_sample_counting    Bool32
@@ -11591,7 +11551,7 @@ pub mut:
 
 pub struct RenderingAreaInfoKHR {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_rendering_area_info_khr
 	p_next                     voidptr
 	view_mask                  u32
 	color_attachment_count     u32
@@ -11602,14 +11562,14 @@ pub mut:
 
 pub struct ImageSubresource2KHR {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_image_subresource_2_khr
 	p_next            voidptr
 	image_subresource ImageSubresource
 }
 
 pub struct DeviceImageSubresourceInfoKHR {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_device_image_subresource_info_khr
 	p_next        voidptr
 	p_create_info &ImageCreateInfo
 	p_subresource &ImageSubresource2KHR
@@ -11617,21 +11577,21 @@ pub mut:
 
 pub struct SubresourceLayout2KHR {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_subresource_layout_2_khr
 	p_next             voidptr
 	subresource_layout SubresourceLayout
 }
 
 pub struct PipelineCreateFlags2CreateInfoKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_pipeline_create_flags_2_create_info_khr
 	p_next voidptr
 	flags  PipelineCreateFlags2KHR
 }
 
 pub struct BufferUsageFlags2CreateInfoKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_buffer_usage_flags_2_create_info_khr
 	p_next voidptr
 	usage  BufferUsageFlags2KHR
 }
@@ -11641,7 +11601,7 @@ fn C.vkCmdBindIndexBuffer2KHR(C.CommandBuffer,
 	DeviceSize,
 	DeviceSize,
 	IndexType)
-pub fn cmd_bind_index_buffer2_khr(command_buffer C.CommandBuffer,
+pub fn cmd_bind_index_buffer_2_khr(command_buffer C.CommandBuffer,
 	buffer C.Buffer,
 	offset DeviceSize,
 	size DeviceSize,
@@ -11671,7 +11631,7 @@ fn C.vkGetImageSubresourceLayout2KHR(C.Device,
 	C.Image,
 	&ImageSubresource2KHR,
 	&SubresourceLayout2KHR)
-pub fn get_image_subresource_layout2_khr(device C.Device,
+pub fn get_image_subresource_layout_2_khr(device C.Device,
 	image C.Image,
 	p_subresource &ImageSubresource2KHR,
 	p_layout &SubresourceLayout2KHR) {
@@ -11683,158 +11643,9 @@ pub const khr_ray_tracing_position_fetch_extension_name = 'VK_KHR_ray_tracing_po
 
 pub struct PhysicalDeviceRayTracingPositionFetchFeaturesKHR {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_physical_device_ray_tracing_position_fetch_features_khr
 	p_next                     voidptr
 	ray_tracing_position_fetch Bool32
-}
-
-pub type C.PipelineBinaryKHR = voidptr
-
-pub const max_pipeline_binary_key_size_khr = u32(32)
-pub const khr_pipeline_binary_spec_version = 1
-pub const khr_pipeline_binary_extension_name = 'VK_KHR_pipeline_binary'
-
-pub struct PhysicalDevicePipelineBinaryFeaturesKHR {
-pub mut:
-	s_type            StructureType
-	p_next            voidptr
-	pipeline_binaries Bool32
-}
-
-pub struct PhysicalDevicePipelineBinaryPropertiesKHR {
-pub mut:
-	s_type                                     StructureType
-	p_next                                     voidptr
-	pipeline_binary_internal_cache             Bool32
-	pipeline_binary_internal_cache_control     Bool32
-	pipeline_binary_prefers_internal_cache     Bool32
-	pipeline_binary_precompiled_internal_cache Bool32
-	pipeline_binary_compressed_data            Bool32
-}
-
-pub struct DevicePipelineBinaryInternalCacheControlKHR {
-pub mut:
-	s_type                 StructureType
-	p_next                 voidptr
-	disable_internal_cache Bool32
-}
-
-pub struct PipelineBinaryKeyKHR {
-pub mut:
-	s_type   StructureType
-	p_next   voidptr
-	key_size u32
-	key      [max_pipeline_binary_key_size_khr]u8
-}
-
-pub struct PipelineBinaryDataKHR {
-pub mut:
-	data_size usize
-	p_data    voidptr
-}
-
-pub struct PipelineBinaryKeysAndDataKHR {
-pub mut:
-	binary_count           u32
-	p_pipeline_binary_keys &PipelineBinaryKeyKHR
-	p_pipeline_binary_data &PipelineBinaryDataKHR
-}
-
-pub struct PipelineCreateInfoKHR {
-pub mut:
-	s_type StructureType
-	p_next voidptr
-}
-
-pub struct PipelineBinaryCreateInfoKHR {
-pub mut:
-	s_type                 StructureType
-	p_next                 voidptr
-	p_keys_and_data_info   &PipelineBinaryKeysAndDataKHR
-	pipeline               C.Pipeline
-	p_pipeline_create_info &PipelineCreateInfoKHR
-}
-
-pub struct PipelineBinaryInfoKHR {
-pub mut:
-	s_type              StructureType
-	p_next              voidptr
-	binary_count        u32
-	p_pipeline_binaries &C.PipelineBinaryKHR
-}
-
-pub struct ReleaseCapturedPipelineDataInfoKHR {
-pub mut:
-	s_type   StructureType
-	p_next   voidptr
-	pipeline C.Pipeline
-}
-
-pub struct PipelineBinaryDataInfoKHR {
-pub mut:
-	s_type          StructureType
-	p_next          voidptr
-	pipeline_binary C.PipelineBinaryKHR
-}
-
-pub struct PipelineBinaryHandlesInfoKHR {
-pub mut:
-	s_type                StructureType
-	p_next                voidptr
-	pipeline_binary_count u32
-	p_pipeline_binaries   &C.PipelineBinaryKHR
-}
-
-fn C.vkCreatePipelineBinariesKHR(C.Device,
-	&PipelineBinaryCreateInfoKHR,
-	&AllocationCallbacks,
-	&PipelineBinaryHandlesInfoKHR) Result
-pub fn create_pipeline_binaries_khr(device C.Device,
-	p_create_info &PipelineBinaryCreateInfoKHR,
-	p_allocator &AllocationCallbacks,
-	p_binaries &PipelineBinaryHandlesInfoKHR) Result {
-	return C.vkCreatePipelineBinariesKHR(device, p_create_info, p_allocator, p_binaries)
-}
-
-fn C.vkDestroyPipelineBinaryKHR(C.Device,
-	C.PipelineBinaryKHR,
-	&AllocationCallbacks)
-pub fn destroy_pipeline_binary_khr(device C.Device,
-	pipeline_binary C.PipelineBinaryKHR,
-	p_allocator &AllocationCallbacks) {
-	C.vkDestroyPipelineBinaryKHR(device, pipeline_binary, p_allocator)
-}
-
-fn C.vkGetPipelineKeyKHR(C.Device,
-	&PipelineCreateInfoKHR,
-	&PipelineBinaryKeyKHR) Result
-pub fn get_pipeline_key_khr(device C.Device,
-	p_pipeline_create_info &PipelineCreateInfoKHR,
-	p_pipeline_key &PipelineBinaryKeyKHR) Result {
-	return C.vkGetPipelineKeyKHR(device, p_pipeline_create_info, p_pipeline_key)
-}
-
-fn C.vkGetPipelineBinaryDataKHR(C.Device,
-	&PipelineBinaryDataInfoKHR,
-	&PipelineBinaryKeyKHR,
-	&usize,
-	voidptr) Result
-pub fn get_pipeline_binary_data_khr(device C.Device,
-	p_info &PipelineBinaryDataInfoKHR,
-	p_pipeline_binary_key &PipelineBinaryKeyKHR,
-	p_pipeline_binary_data_size &usize,
-	p_pipeline_binary_data voidptr) Result {
-	return C.vkGetPipelineBinaryDataKHR(device, p_info, p_pipeline_binary_key, p_pipeline_binary_data_size,
-		p_pipeline_binary_data)
-}
-
-fn C.vkReleaseCapturedPipelineDataKHR(C.Device,
-	&ReleaseCapturedPipelineDataInfoKHR,
-	&AllocationCallbacks) Result
-pub fn release_captured_pipeline_data_khr(device C.Device,
-	p_info &ReleaseCapturedPipelineDataInfoKHR,
-	p_allocator &AllocationCallbacks) Result {
-	return C.vkReleaseCapturedPipelineDataKHR(device, p_info, p_allocator)
 }
 
 pub const khr_cooperative_matrix_spec_version = 2
@@ -11865,7 +11676,7 @@ pub enum ScopeKHR {
 
 pub struct CooperativeMatrixPropertiesKHR {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_cooperative_matrix_properties_khr
 	p_next                  voidptr
 	m_size                  u32
 	n_size                  u32
@@ -11880,7 +11691,7 @@ pub mut:
 
 pub struct PhysicalDeviceCooperativeMatrixFeaturesKHR {
 pub mut:
-	s_type                                  StructureType
+	s_type                                  StructureType = StructureType.structure_type_physical_device_cooperative_matrix_features_khr
 	p_next                                  voidptr
 	cooperative_matrix                      Bool32
 	cooperative_matrix_robust_buffer_access Bool32
@@ -11888,7 +11699,7 @@ pub mut:
 
 pub struct PhysicalDeviceCooperativeMatrixPropertiesKHR {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_physical_device_cooperative_matrix_properties_khr
 	p_next                              voidptr
 	cooperative_matrix_supported_stages ShaderStageFlags
 }
@@ -11903,24 +11714,6 @@ pub fn get_physical_device_cooperative_matrix_properties_khr(physical_device C.P
 		p_properties)
 }
 
-pub const khr_compute_shader_derivatives_spec_version = 1
-pub const khr_compute_shader_derivatives_extension_name = 'VK_KHR_compute_shader_derivatives'
-
-pub struct PhysicalDeviceComputeShaderDerivativesFeaturesKHR {
-pub mut:
-	s_type                          StructureType
-	p_next                          voidptr
-	compute_derivative_group_quads  Bool32
-	compute_derivative_group_linear Bool32
-}
-
-pub struct PhysicalDeviceComputeShaderDerivativesPropertiesKHR {
-pub mut:
-	s_type                           StructureType
-	p_next                           voidptr
-	mesh_and_task_shader_derivatives Bool32
-}
-
 #include "vk_video/vulkan_video_codec_av1std.h"
 #include "vk_video/vulkan_video_codec_av1std_decode.h"
 
@@ -11930,7 +11723,7 @@ pub const khr_video_decode_av1_extension_name = 'VK_KHR_video_decode_av1'
 
 pub struct VideoDecodeAV1ProfileInfoKHR {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_video_decode_av1_profile_info_khr
 	p_next             voidptr
 	std_profile        u32
 	film_grain_support Bool32
@@ -11938,21 +11731,21 @@ pub mut:
 
 pub struct VideoDecodeAV1CapabilitiesKHR {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_video_decode_av1_capabilities_khr
 	p_next    voidptr
 	max_level u32
 }
 
 pub struct VideoDecodeAV1SessionParametersCreateInfoKHR {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_video_decode_av1_session_parameters_create_info_khr
 	p_next                voidptr
 	p_std_sequence_header &voidptr
 }
 
 pub struct VideoDecodeAV1PictureInfoKHR {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_video_decode_av1_picture_info_khr
 	p_next                      voidptr
 	p_std_picture_info          &voidptr
 	reference_name_slot_indices [max_video_av1_references_per_frame_khr]i32
@@ -11964,7 +11757,7 @@ pub mut:
 
 pub struct VideoDecodeAV1DpbSlotInfoKHR {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_video_decode_av1_dpb_slot_info_khr
 	p_next               voidptr
 	p_std_reference_info &voidptr
 }
@@ -11974,14 +11767,14 @@ pub const khr_video_maintenance_1_extension_name = 'VK_KHR_video_maintenance1'
 
 pub struct PhysicalDeviceVideoMaintenance1FeaturesKHR {
 pub mut:
-	s_type             StructureType
-	p_next             voidptr
-	video_maintenance1 Bool32
+	s_type              StructureType = StructureType.structure_type_physical_device_video_maintenance_1_features_khr
+	p_next              voidptr
+	video_maintenance_1 Bool32
 }
 
 pub struct VideoInlineQueryInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_video_inline_query_info_khr
 	p_next      voidptr
 	query_pool  C.QueryPool
 	first_query u32
@@ -11993,7 +11786,7 @@ pub const khr_vertex_attribute_divisor_extension_name = 'VK_KHR_vertex_attribute
 
 pub struct PhysicalDeviceVertexAttributeDivisorPropertiesKHR {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_vertex_attribute_divisor_properties_khr
 	p_next                           voidptr
 	max_vertex_attrib_divisor        u32
 	supports_non_zero_first_instance Bool32
@@ -12007,7 +11800,7 @@ pub mut:
 
 pub struct PipelineVertexInputDivisorStateCreateInfoKHR {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_pipeline_vertex_input_divisor_state_create_info_khr
 	p_next                       voidptr
 	vertex_binding_divisor_count u32
 	p_vertex_binding_divisors    &VertexInputBindingDivisorDescriptionKHR
@@ -12015,7 +11808,7 @@ pub mut:
 
 pub struct PhysicalDeviceVertexAttributeDivisorFeaturesKHR {
 pub mut:
-	s_type                                      StructureType
+	s_type                                      StructureType = StructureType.structure_type_physical_device_vertex_attribute_divisor_features_khr
 	p_next                                      voidptr
 	vertex_attribute_instance_rate_divisor      Bool32
 	vertex_attribute_instance_rate_zero_divisor Bool32
@@ -12029,9 +11822,9 @@ pub const khr_shader_float_controls_2_extension_name = 'VK_KHR_shader_float_cont
 
 pub struct PhysicalDeviceShaderFloatControls2FeaturesKHR {
 pub mut:
-	s_type                 StructureType
-	p_next                 voidptr
-	shader_float_controls2 Bool32
+	s_type                  StructureType = StructureType.structure_type_physical_device_shader_float_controls_2_features_khr
+	p_next                  voidptr
+	shader_float_controls_2 Bool32
 }
 
 pub const khr_index_type_uint8_spec_version = 1
@@ -12039,9 +11832,9 @@ pub const khr_index_type_uint8_extension_name = 'VK_KHR_index_type_uint8'
 
 pub struct PhysicalDeviceIndexTypeUint8FeaturesKHR {
 pub mut:
-	s_type           StructureType
-	p_next           voidptr
-	index_type_uint8 Bool32
+	s_type            StructureType
+	p_next            voidptr
+	index_type_uint_8 Bool32
 }
 
 pub const khr_line_rasterization_spec_version = 1
@@ -12057,7 +11850,7 @@ pub enum LineRasterizationModeKHR {
 
 pub struct PhysicalDeviceLineRasterizationFeaturesKHR {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_physical_device_line_rasterization_features_khr
 	p_next                     voidptr
 	rectangular_lines          Bool32
 	bresenham_lines            Bool32
@@ -12069,14 +11862,14 @@ pub mut:
 
 pub struct PhysicalDeviceLineRasterizationPropertiesKHR {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_physical_device_line_rasterization_properties_khr
 	p_next                        voidptr
 	line_sub_pixel_precision_bits u32
 }
 
 pub struct PipelineRasterizationLineStateCreateInfoKHR {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_pipeline_rasterization_line_state_create_info_khr
 	p_next                  voidptr
 	line_rasterization_mode LineRasterizationModeKHR
 	stippled_line_enable    Bool32
@@ -12106,7 +11899,7 @@ pub enum TimeDomainKHR {
 
 pub struct CalibratedTimestampInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_calibrated_timestamp_info_khr
 	p_next      voidptr
 	time_domain TimeDomainKHR
 }
@@ -12140,7 +11933,7 @@ pub const khr_shader_expect_assume_extension_name = 'VK_KHR_shader_expect_assume
 
 pub struct PhysicalDeviceShaderExpectAssumeFeaturesKHR {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_physical_device_shader_expect_assume_features_khr
 	p_next               voidptr
 	shader_expect_assume Bool32
 }
@@ -12150,14 +11943,14 @@ pub const khr_maintenance_6_extension_name = 'VK_KHR_maintenance6'
 
 pub struct PhysicalDeviceMaintenance6FeaturesKHR {
 pub mut:
-	s_type       StructureType
-	p_next       voidptr
-	maintenance6 Bool32
+	s_type        StructureType = StructureType.structure_type_physical_device_maintenance_6_features_khr
+	p_next        voidptr
+	maintenance_6 Bool32
 }
 
 pub struct PhysicalDeviceMaintenance6PropertiesKHR {
 pub mut:
-	s_type                                      StructureType
+	s_type                                      StructureType = StructureType.structure_type_physical_device_maintenance_6_properties_khr
 	p_next                                      voidptr
 	block_texel_view_compatible_multiple_layers Bool32
 	max_combined_image_sampler_descriptor_count u32
@@ -12166,14 +11959,14 @@ pub mut:
 
 pub struct BindMemoryStatusKHR {
 pub mut:
-	s_type   StructureType
+	s_type   StructureType = StructureType.structure_type_bind_memory_status_khr
 	p_next   voidptr
 	p_result &Result
 }
 
 pub struct BindDescriptorSetsInfoKHR {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_bind_descriptor_sets_info_khr
 	p_next               voidptr
 	stage_flags          ShaderStageFlags
 	layout               C.PipelineLayout
@@ -12186,7 +11979,7 @@ pub mut:
 
 pub struct PushConstantsInfoKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_push_constants_info_khr
 	p_next      voidptr
 	layout      C.PipelineLayout
 	stage_flags ShaderStageFlags
@@ -12197,7 +11990,7 @@ pub mut:
 
 pub struct PushDescriptorSetInfoKHR {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_push_descriptor_set_info_khr
 	p_next                 voidptr
 	stage_flags            ShaderStageFlags
 	layout                 C.PipelineLayout
@@ -12208,7 +12001,7 @@ pub mut:
 
 pub struct PushDescriptorSetWithTemplateInfoKHR {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_push_descriptor_set_with_template_info_khr
 	p_next                     voidptr
 	descriptor_update_template C.DescriptorUpdateTemplate
 	layout                     C.PipelineLayout
@@ -12218,7 +12011,7 @@ pub mut:
 
 pub struct SetDescriptorBufferOffsetsInfoEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_set_descriptor_buffer_offsets_info_ext
 	p_next           voidptr
 	stage_flags      ShaderStageFlags
 	layout           C.PipelineLayout
@@ -12230,7 +12023,7 @@ pub mut:
 
 pub struct BindDescriptorBufferEmbeddedSamplersInfoEXT {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_bind_descriptor_buffer_embedded_samplers_info_ext
 	p_next      voidptr
 	stage_flags ShaderStageFlags
 	layout      C.PipelineLayout
@@ -12239,42 +12032,42 @@ pub mut:
 
 fn C.vkCmdBindDescriptorSets2KHR(C.CommandBuffer,
 	&BindDescriptorSetsInfoKHR)
-pub fn cmd_bind_descriptor_sets2_khr(command_buffer C.CommandBuffer,
+pub fn cmd_bind_descriptor_sets_2_khr(command_buffer C.CommandBuffer,
 	p_bind_descriptor_sets_info &BindDescriptorSetsInfoKHR) {
 	C.vkCmdBindDescriptorSets2KHR(command_buffer, p_bind_descriptor_sets_info)
 }
 
 fn C.vkCmdPushConstants2KHR(C.CommandBuffer,
 	&PushConstantsInfoKHR)
-pub fn cmd_push_constants2_khr(command_buffer C.CommandBuffer,
+pub fn cmd_push_constants_2_khr(command_buffer C.CommandBuffer,
 	p_push_constants_info &PushConstantsInfoKHR) {
 	C.vkCmdPushConstants2KHR(command_buffer, p_push_constants_info)
 }
 
 fn C.vkCmdPushDescriptorSet2KHR(C.CommandBuffer,
 	&PushDescriptorSetInfoKHR)
-pub fn cmd_push_descriptor_set2_khr(command_buffer C.CommandBuffer,
+pub fn cmd_push_descriptor_set_2_khr(command_buffer C.CommandBuffer,
 	p_push_descriptor_set_info &PushDescriptorSetInfoKHR) {
 	C.vkCmdPushDescriptorSet2KHR(command_buffer, p_push_descriptor_set_info)
 }
 
 fn C.vkCmdPushDescriptorSetWithTemplate2KHR(C.CommandBuffer,
 	&PushDescriptorSetWithTemplateInfoKHR)
-pub fn cmd_push_descriptor_set_with_template2_khr(command_buffer C.CommandBuffer,
+pub fn cmd_push_descriptor_set_with_template_2_khr(command_buffer C.CommandBuffer,
 	p_push_descriptor_set_with_template_info &PushDescriptorSetWithTemplateInfoKHR) {
 	C.vkCmdPushDescriptorSetWithTemplate2KHR(command_buffer, p_push_descriptor_set_with_template_info)
 }
 
 fn C.vkCmdSetDescriptorBufferOffsets2EXT(C.CommandBuffer,
 	&SetDescriptorBufferOffsetsInfoEXT)
-pub fn cmd_set_descriptor_buffer_offsets2_ext(command_buffer C.CommandBuffer,
+pub fn cmd_set_descriptor_buffer_offsets_2_ext(command_buffer C.CommandBuffer,
 	p_set_descriptor_buffer_offsets_info &SetDescriptorBufferOffsetsInfoEXT) {
 	C.vkCmdSetDescriptorBufferOffsets2EXT(command_buffer, p_set_descriptor_buffer_offsets_info)
 }
 
 fn C.vkCmdBindDescriptorBufferEmbeddedSamplers2EXT(C.CommandBuffer,
 	&BindDescriptorBufferEmbeddedSamplersInfoEXT)
-pub fn cmd_bind_descriptor_buffer_embedded_samplers2_ext(command_buffer C.CommandBuffer,
+pub fn cmd_bind_descriptor_buffer_embedded_samplers_2_ext(command_buffer C.CommandBuffer,
 	p_bind_descriptor_buffer_embedded_samplers_info &BindDescriptorBufferEmbeddedSamplersInfoEXT) {
 	C.vkCmdBindDescriptorBufferEmbeddedSamplers2EXT(command_buffer, p_bind_descriptor_buffer_embedded_samplers_info)
 }
@@ -12284,7 +12077,7 @@ pub const khr_shader_relaxed_extended_instruction_extension_name = 'VK_KHR_shade
 
 pub struct PhysicalDeviceShaderRelaxedExtendedInstructionFeaturesKHR {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_physical_device_shader_relaxed_extended_instruction_features_khr
 	p_next                              voidptr
 	shader_relaxed_extended_instruction Bool32
 }
@@ -12303,14 +12096,14 @@ pub enum PhysicalDeviceLayeredApiKHR {
 
 pub struct PhysicalDeviceMaintenance7FeaturesKHR {
 pub mut:
-	s_type       StructureType
-	p_next       voidptr
-	maintenance7 Bool32
+	s_type        StructureType = StructureType.structure_type_physical_device_maintenance_7_features_khr
+	p_next        voidptr
+	maintenance_7 Bool32
 }
 
 pub struct PhysicalDeviceMaintenance7PropertiesKHR {
 pub mut:
-	s_type                                                             StructureType
+	s_type                                                             StructureType = StructureType.structure_type_physical_device_maintenance_7_properties_khr
 	p_next                                                             voidptr
 	robust_fragment_shading_rate_attachment_access                     Bool32
 	separate_depth_stencil_attachment_access                           Bool32
@@ -12324,7 +12117,7 @@ pub mut:
 
 pub struct PhysicalDeviceLayeredApiPropertiesKHR {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_physical_device_layered_api_properties_khr
 	p_next      voidptr
 	vendor_id   u32
 	device_id   u32
@@ -12334,7 +12127,7 @@ pub mut:
 
 pub struct PhysicalDeviceLayeredApiPropertiesListKHR {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_physical_device_layered_api_properties_list_khr
 	p_next            voidptr
 	layered_api_count u32
 	p_layered_apis    &PhysicalDeviceLayeredApiPropertiesKHR
@@ -12342,7 +12135,7 @@ pub mut:
 
 pub struct PhysicalDeviceLayeredApiVulkanPropertiesKHR {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_physical_device_layered_api_vulkan_properties_khr
 	p_next     voidptr
 	properties PhysicalDeviceProperties2
 }
@@ -12411,7 +12204,7 @@ pub type PFN_vkDebugReportCallbackEXT = fn (flags DebugReportFlagsEXT, objectTyp
 
 pub struct DebugReportCallbackCreateInfoEXT {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_debug_report_callback_create_info_ext
 	p_next       voidptr
 	flags        DebugReportFlagsEXT
 	pfn_callback PFN_vkDebugReportCallbackEXT = unsafe { nil }
@@ -12478,7 +12271,7 @@ pub enum RasterizationOrderAMD {
 
 pub struct PipelineRasterizationStateRasterizationOrderAMD {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_pipeline_rasterization_state_rasterization_order_amd
 	p_next              voidptr
 	rasterization_order RasterizationOrderAMD
 }
@@ -12494,7 +12287,7 @@ pub const ext_debug_marker_extension_name = 'VK_EXT_debug_marker'
 
 pub struct DebugMarkerObjectNameInfoEXT {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_debug_marker_object_name_info_ext
 	p_next        voidptr
 	object_type   DebugReportObjectTypeEXT
 	object        u64
@@ -12503,7 +12296,7 @@ pub mut:
 
 pub struct DebugMarkerObjectTagInfoEXT {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_debug_marker_object_tag_info_ext
 	p_next      voidptr
 	object_type DebugReportObjectTypeEXT
 	object      u64
@@ -12514,7 +12307,7 @@ pub mut:
 
 pub struct DebugMarkerMarkerInfoEXT {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_debug_marker_marker_info_ext
 	p_next        voidptr
 	p_marker_name &char
 	color         [4]f32
@@ -12561,21 +12354,21 @@ pub const nv_dedicated_allocation_extension_name = 'VK_NV_dedicated_allocation'
 
 pub struct DedicatedAllocationImageCreateInfoNV {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_dedicated_allocation_image_create_info_nv
 	p_next               voidptr
 	dedicated_allocation Bool32
 }
 
 pub struct DedicatedAllocationBufferCreateInfoNV {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_dedicated_allocation_buffer_create_info_nv
 	p_next               voidptr
 	dedicated_allocation Bool32
 }
 
 pub struct DedicatedAllocationMemoryAllocateInfoNV {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_dedicated_allocation_memory_allocate_info_nv
 	p_next voidptr
 	image  C.Image
 	buffer C.Buffer
@@ -12588,7 +12381,7 @@ pub type PipelineRasterizationStateStreamCreateFlagsEXT = u32
 
 pub struct PhysicalDeviceTransformFeedbackFeaturesEXT {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_physical_device_transform_feedback_features_ext
 	p_next             voidptr
 	transform_feedback Bool32
 	geometry_streams   Bool32
@@ -12596,7 +12389,7 @@ pub mut:
 
 pub struct PhysicalDeviceTransformFeedbackPropertiesEXT {
 pub mut:
-	s_type                                         StructureType
+	s_type                                         StructureType = StructureType.structure_type_physical_device_transform_feedback_properties_ext
 	p_next                                         voidptr
 	max_transform_feedback_streams                 u32
 	max_transform_feedback_buffers                 u32
@@ -12612,7 +12405,7 @@ pub mut:
 
 pub struct PipelineRasterizationStateStreamCreateInfoEXT {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_pipeline_rasterization_state_stream_create_info_ext
 	p_next               voidptr
 	flags                PipelineRasterizationStateStreamCreateFlagsEXT
 	rasterization_stream u32
@@ -12712,7 +12505,7 @@ pub const nvx_binary_import_extension_name = 'VK_NVX_binary_import'
 
 pub struct CuModuleCreateInfoNVX {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_cu_module_create_info_nvx
 	p_next    voidptr
 	data_size usize
 	p_data    voidptr
@@ -12720,7 +12513,7 @@ pub mut:
 
 pub struct CuFunctionCreateInfoNVX {
 pub mut:
-	s_type   StructureType
+	s_type   StructureType = StructureType.structure_type_cu_function_create_info_nvx
 	p_next   voidptr
 	vkmodule C.CuModuleNVX
 	p_name   &char
@@ -12728,7 +12521,7 @@ pub mut:
 
 pub struct CuLaunchInfoNVX {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_cu_launch_info_nvx
 	p_next           voidptr
 	function         C.CuFunctionNVX
 	grid_dim_x       u32
@@ -12796,7 +12589,7 @@ pub const nvx_image_view_handle_extension_name = 'VK_NVX_image_view_handle'
 
 pub struct ImageViewHandleInfoNVX {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_image_view_handle_info_nvx
 	p_next          voidptr
 	image_view      C.ImageView
 	descriptor_type DescriptorType
@@ -12805,7 +12598,7 @@ pub mut:
 
 pub struct ImageViewAddressPropertiesNVX {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_image_view_address_properties_nvx
 	p_next         voidptr
 	device_address DeviceAddress
 	size           DeviceSize
@@ -12844,7 +12637,7 @@ pub const amd_texture_gather_bias_lod_extension_name = 'VK_AMD_texture_gather_bi
 
 pub struct TextureLODGatherFormatPropertiesAMD {
 pub mut:
-	s_type                               StructureType
+	s_type                               StructureType = StructureType.structure_type_texture_lod_gather_format_properties_amd
 	p_next                               voidptr
 	supports_texture_gather_lod_bias_amd Bool32
 }
@@ -12903,7 +12696,7 @@ pub const nv_corner_sampled_image_extension_name = 'VK_NV_corner_sampled_image'
 
 pub struct PhysicalDeviceCornerSampledImageFeaturesNV {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_physical_device_corner_sampled_image_features_nv
 	p_next               voidptr
 	corner_sampled_image Bool32
 }
@@ -12966,14 +12759,14 @@ pub const nv_external_memory_extension_name = 'VK_NV_external_memory'
 
 pub struct ExternalMemoryImageCreateInfoNV {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_external_memory_image_create_info_nv
 	p_next       voidptr
 	handle_types ExternalMemoryHandleTypeFlagsNV
 }
 
 pub struct ExportMemoryAllocateInfoNV {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_export_memory_allocate_info_nv
 	p_next       voidptr
 	handle_types ExternalMemoryHandleTypeFlagsNV
 }
@@ -12989,7 +12782,7 @@ pub enum ValidationCheckEXT {
 
 pub struct ValidationFlagsEXT {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_validation_flags_ext
 	p_next                          voidptr
 	disabled_validation_check_count u32
 	p_disabled_validation_checks    &ValidationCheckEXT
@@ -13011,14 +12804,14 @@ pub const ext_astc_decode_mode_extension_name = 'VK_EXT_astc_decode_mode'
 
 pub struct ImageViewASTCDecodeModeEXT {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_image_view_astc_decode_mode_ext
 	p_next      voidptr
 	decode_mode Format
 }
 
 pub struct PhysicalDeviceASTCDecodeFeaturesEXT {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_physical_device_astc_decode_features_ext
 	p_next                      voidptr
 	decode_mode_shared_exponent Bool32
 }
@@ -13044,14 +12837,14 @@ pub enum PipelineRobustnessImageBehaviorEXT {
 
 pub struct PhysicalDevicePipelineRobustnessFeaturesEXT {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_physical_device_pipeline_robustness_features_ext
 	p_next              voidptr
 	pipeline_robustness Bool32
 }
 
 pub struct PhysicalDevicePipelineRobustnessPropertiesEXT {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_physical_device_pipeline_robustness_properties_ext
 	p_next                             voidptr
 	default_robustness_storage_buffers PipelineRobustnessBufferBehaviorEXT
 	default_robustness_uniform_buffers PipelineRobustnessBufferBehaviorEXT
@@ -13061,7 +12854,7 @@ pub mut:
 
 pub struct PipelineRobustnessCreateInfoEXT {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_pipeline_robustness_create_info_ext
 	p_next          voidptr
 	storage_buffers PipelineRobustnessBufferBehaviorEXT
 	uniform_buffers PipelineRobustnessBufferBehaviorEXT
@@ -13081,7 +12874,7 @@ pub type ConditionalRenderingFlagsEXT = u32
 
 pub struct ConditionalRenderingBeginInfoEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_conditional_rendering_begin_info_ext
 	p_next voidptr
 	buffer C.Buffer
 	offset DeviceSize
@@ -13090,7 +12883,7 @@ pub mut:
 
 pub struct PhysicalDeviceConditionalRenderingFeaturesEXT {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_physical_device_conditional_rendering_features_ext
 	p_next                          voidptr
 	conditional_rendering           Bool32
 	inherited_conditional_rendering Bool32
@@ -13098,7 +12891,7 @@ pub mut:
 
 pub struct CommandBufferInheritanceConditionalRenderingInfoEXT {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_command_buffer_inheritance_conditional_rendering_info_ext
 	p_next                       voidptr
 	conditional_rendering_enable Bool32
 }
@@ -13126,7 +12919,7 @@ pub mut:
 
 pub struct PipelineViewportWScalingStateCreateInfoNV {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_pipeline_viewport_w_scaling_state_create_info_nv
 	p_next                    voidptr
 	viewport_w_scaling_enable Bool32
 	viewport_count            u32
@@ -13166,7 +12959,7 @@ pub type SurfaceCounterFlagsEXT = u32
 
 pub struct SurfaceCapabilities2EXT {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_surface_capabilities_2_ext
 	p_next                     voidptr
 	min_image_count            u32
 	max_image_count            u32
@@ -13184,7 +12977,7 @@ pub mut:
 fn C.vkGetPhysicalDeviceSurfaceCapabilities2EXT(C.PhysicalDevice,
 	C.SurfaceKHR,
 	&SurfaceCapabilities2EXT) Result
-pub fn get_physical_device_surface_capabilities2_ext(physical_device C.PhysicalDevice,
+pub fn get_physical_device_surface_capabilities_2_ext(physical_device C.PhysicalDevice,
 	surface C.SurfaceKHR,
 	p_surface_capabilities &SurfaceCapabilities2EXT) Result {
 	return C.vkGetPhysicalDeviceSurfaceCapabilities2EXT(physical_device, surface, p_surface_capabilities)
@@ -13212,28 +13005,28 @@ pub enum DisplayEventTypeEXT {
 
 pub struct DisplayPowerInfoEXT {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_display_power_info_ext
 	p_next      voidptr
 	power_state DisplayPowerStateEXT
 }
 
 pub struct DeviceEventInfoEXT {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_device_event_info_ext
 	p_next       voidptr
 	device_event DeviceEventTypeEXT
 }
 
 pub struct DisplayEventInfoEXT {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_display_event_info_ext
 	p_next        voidptr
 	display_event DisplayEventTypeEXT
 }
 
 pub struct SwapchainCounterCreateInfoEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_swapchain_counter_create_info_ext
 	p_next           voidptr
 	surface_counters SurfaceCounterFlagsEXT
 }
@@ -13308,7 +13101,7 @@ pub mut:
 
 pub struct PresentTimesInfoGOOGLE {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_present_times_info_google
 	p_next          voidptr
 	swapchain_count u32
 	p_times         &PresentTimeGOOGLE
@@ -13353,7 +13146,7 @@ pub const nvx_multiview_per_view_attributes_extension_name = 'VK_NVX_multiview_p
 
 pub struct PhysicalDeviceMultiviewPerViewAttributesPropertiesNVX {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_multiview_per_view_attributes_properties_nvx
 	p_next                           voidptr
 	per_view_position_all_components Bool32
 }
@@ -13385,7 +13178,7 @@ pub mut:
 
 pub struct PipelineViewportSwizzleStateCreateInfoNV {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_pipeline_viewport_swizzle_state_create_info_nv
 	p_next              voidptr
 	flags               PipelineViewportSwizzleStateCreateFlagsNV
 	viewport_count      u32
@@ -13405,14 +13198,14 @@ pub type PipelineDiscardRectangleStateCreateFlagsEXT = u32
 
 pub struct PhysicalDeviceDiscardRectanglePropertiesEXT {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_physical_device_discard_rectangle_properties_ext
 	p_next                 voidptr
 	max_discard_rectangles u32
 }
 
 pub struct PipelineDiscardRectangleStateCreateInfoEXT {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_pipeline_discard_rectangle_state_create_info_ext
 	p_next                  voidptr
 	flags                   PipelineDiscardRectangleStateCreateFlagsEXT
 	discard_rectangle_mode  DiscardRectangleModeEXT
@@ -13460,7 +13253,7 @@ pub type PipelineRasterizationConservativeStateCreateFlagsEXT = u32
 
 pub struct PhysicalDeviceConservativeRasterizationPropertiesEXT {
 pub mut:
-	s_type                                          StructureType
+	s_type                                          StructureType = StructureType.structure_type_physical_device_conservative_rasterization_properties_ext
 	p_next                                          voidptr
 	primitive_overestimation_size                   f32
 	max_extra_primitive_overestimation_size         f32
@@ -13475,7 +13268,7 @@ pub mut:
 
 pub struct PipelineRasterizationConservativeStateCreateInfoEXT {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_pipeline_rasterization_conservative_state_create_info_ext
 	p_next                              voidptr
 	flags                               PipelineRasterizationConservativeStateCreateFlagsEXT
 	conservative_rasterization_mode     ConservativeRasterizationModeEXT
@@ -13489,14 +13282,14 @@ pub type PipelineRasterizationDepthClipStateCreateFlagsEXT = u32
 
 pub struct PhysicalDeviceDepthClipEnableFeaturesEXT {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_physical_device_depth_clip_enable_features_ext
 	p_next            voidptr
 	depth_clip_enable Bool32
 }
 
 pub struct PipelineRasterizationDepthClipStateCreateInfoEXT {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_pipeline_rasterization_depth_clip_state_create_info_ext
 	p_next            voidptr
 	flags             PipelineRasterizationDepthClipStateCreateFlagsEXT
 	depth_clip_enable Bool32
@@ -13516,7 +13309,7 @@ pub mut:
 
 pub struct HdrMetadataEXT {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_hdr_metadata_ext
 	p_next                        voidptr
 	display_primary_red           XYColorEXT
 	display_primary_green         XYColorEXT
@@ -13544,7 +13337,7 @@ pub const img_relaxed_line_rasterization_extension_name = 'VK_IMG_relaxed_line_r
 
 pub struct PhysicalDeviceRelaxedLineRasterizationFeaturesIMG {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_physical_device_relaxed_line_rasterization_features_img
 	p_next                     voidptr
 	relaxed_line_rasterization Bool32
 }
@@ -13585,7 +13378,7 @@ pub type DebugUtilsMessengerCreateFlagsEXT = u32
 
 pub struct DebugUtilsLabelEXT {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_debug_utils_label_ext
 	p_next       voidptr
 	p_label_name &char
 	color        [4]f32
@@ -13593,7 +13386,7 @@ pub mut:
 
 pub struct DebugUtilsObjectNameInfoEXT {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_debug_utils_object_name_info_ext
 	p_next        voidptr
 	object_type   ObjectType
 	object_handle u64
@@ -13602,7 +13395,7 @@ pub mut:
 
 pub struct DebugUtilsMessengerCallbackDataEXT {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_debug_utils_messenger_callback_data_ext
 	p_next              voidptr
 	flags               DebugUtilsMessengerCallbackDataFlagsEXT
 	p_message_id_name   &char
@@ -13620,7 +13413,7 @@ pub type PFN_vkDebugUtilsMessengerCallbackEXT = fn (messageSeverity DebugUtilsMe
 
 pub struct DebugUtilsMessengerCreateInfoEXT {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_debug_utils_messenger_create_info_ext
 	p_next            voidptr
 	flags             DebugUtilsMessengerCreateFlagsEXT
 	message_severity  DebugUtilsMessageSeverityFlagsEXT
@@ -13631,7 +13424,7 @@ pub mut:
 
 pub struct DebugUtilsObjectTagInfoEXT {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_debug_utils_object_tag_info_ext
 	p_next        voidptr
 	object_type   ObjectType
 	object_handle u64
@@ -13766,7 +13559,7 @@ pub mut:
 
 pub struct SampleLocationsInfoEXT {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_sample_locations_info_ext
 	p_next                     voidptr
 	sample_locations_per_pixel SampleCountFlagBits
 	sample_location_grid_size  Extent2D
@@ -13788,7 +13581,7 @@ pub mut:
 
 pub struct RenderPassSampleLocationsBeginInfoEXT {
 pub mut:
-	s_type                                    StructureType
+	s_type                                    StructureType = StructureType.structure_type_render_pass_sample_locations_begin_info_ext
 	p_next                                    voidptr
 	attachment_initial_sample_locations_count u32
 	p_attachment_initial_sample_locations     &AttachmentSampleLocationsEXT
@@ -13798,7 +13591,7 @@ pub mut:
 
 pub struct PipelineSampleLocationsStateCreateInfoEXT {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_pipeline_sample_locations_state_create_info_ext
 	p_next                  voidptr
 	sample_locations_enable Bool32
 	sample_locations_info   SampleLocationsInfoEXT
@@ -13806,7 +13599,7 @@ pub mut:
 
 pub struct PhysicalDeviceSampleLocationsPropertiesEXT {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_sample_locations_properties_ext
 	p_next                           voidptr
 	sample_location_sample_counts    SampleCountFlags
 	max_sample_location_grid_size    Extent2D
@@ -13817,7 +13610,7 @@ pub mut:
 
 pub struct MultisamplePropertiesEXT {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_multisample_properties_ext
 	p_next                        voidptr
 	max_sample_location_grid_size Extent2D
 }
@@ -13850,14 +13643,14 @@ pub enum BlendOverlapEXT {
 
 pub struct PhysicalDeviceBlendOperationAdvancedFeaturesEXT {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_physical_device_blend_operation_advanced_features_ext
 	p_next                             voidptr
 	advanced_blend_coherent_operations Bool32
 }
 
 pub struct PhysicalDeviceBlendOperationAdvancedPropertiesEXT {
 pub mut:
-	s_type                                     StructureType
+	s_type                                     StructureType = StructureType.structure_type_physical_device_blend_operation_advanced_properties_ext
 	p_next                                     voidptr
 	advanced_blend_max_color_attachments       u32
 	advanced_blend_independent_blend           Bool32
@@ -13869,7 +13662,7 @@ pub mut:
 
 pub struct PipelineColorBlendAdvancedStateCreateInfoEXT {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_pipeline_color_blend_advanced_state_create_info_ext
 	p_next            voidptr
 	src_premultiplied Bool32
 	dst_premultiplied Bool32
@@ -13883,7 +13676,7 @@ pub type PipelineCoverageToColorStateCreateFlagsNV = u32
 
 pub struct PipelineCoverageToColorStateCreateInfoNV {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_pipeline_coverage_to_color_state_create_info_nv
 	p_next                     voidptr
 	flags                      PipelineCoverageToColorStateCreateFlagsNV
 	coverage_to_color_enable   Bool32
@@ -13905,7 +13698,7 @@ pub type PipelineCoverageModulationStateCreateFlagsNV = u32
 
 pub struct PipelineCoverageModulationStateCreateInfoNV {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_pipeline_coverage_modulation_state_create_info_nv
 	p_next                           voidptr
 	flags                            PipelineCoverageModulationStateCreateFlagsNV
 	coverage_modulation_mode         CoverageModulationModeNV
@@ -13922,7 +13715,7 @@ pub const nv_shader_sm_builtins_extension_name = 'VK_NV_shader_sm_builtins'
 
 pub struct PhysicalDeviceShaderSMBuiltinsPropertiesNV {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_physical_device_shader_sm_builtins_properties_nv
 	p_next              voidptr
 	shader_sm_count     u32
 	shader_warps_per_sm u32
@@ -13930,7 +13723,7 @@ pub mut:
 
 pub struct PhysicalDeviceShaderSMBuiltinsFeaturesNV {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_physical_device_shader_sm_builtins_features_nv
 	p_next             voidptr
 	shader_sm_builtins Bool32
 }
@@ -13950,7 +13743,7 @@ pub mut:
 
 pub struct DrmFormatModifierPropertiesListEXT {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_drm_format_modifier_properties_list_ext
 	p_next                           voidptr
 	drm_format_modifier_count        u32
 	p_drm_format_modifier_properties &DrmFormatModifierPropertiesEXT
@@ -13958,7 +13751,7 @@ pub mut:
 
 pub struct PhysicalDeviceImageDrmFormatModifierInfoEXT {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_physical_device_image_drm_format_modifier_info_ext
 	p_next                   voidptr
 	drm_format_modifier      u64
 	sharing_mode             SharingMode
@@ -13968,7 +13761,7 @@ pub mut:
 
 pub struct ImageDrmFormatModifierListCreateInfoEXT {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_image_drm_format_modifier_list_create_info_ext
 	p_next                    voidptr
 	drm_format_modifier_count u32
 	p_drm_format_modifiers    &u64
@@ -13976,7 +13769,7 @@ pub mut:
 
 pub struct ImageDrmFormatModifierExplicitCreateInfoEXT {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_image_drm_format_modifier_explicit_create_info_ext
 	p_next                          voidptr
 	drm_format_modifier             u64
 	drm_format_modifier_plane_count u32
@@ -13985,7 +13778,7 @@ pub mut:
 
 pub struct ImageDrmFormatModifierPropertiesEXT {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_image_drm_format_modifier_properties_ext
 	p_next              voidptr
 	drm_format_modifier u64
 }
@@ -13999,7 +13792,7 @@ pub mut:
 
 pub struct DrmFormatModifierPropertiesList2EXT {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_drm_format_modifier_properties_list_2_ext
 	p_next                           voidptr
 	drm_format_modifier_count        u32
 	p_drm_format_modifier_properties &DrmFormatModifierProperties2EXT
@@ -14028,7 +13821,7 @@ pub type ValidationCacheCreateFlagsEXT = u32
 
 pub struct ValidationCacheCreateInfoEXT {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_validation_cache_create_info_ext
 	p_next            voidptr
 	flags             ValidationCacheCreateFlagsEXT
 	initial_data_size usize
@@ -14037,7 +13830,7 @@ pub mut:
 
 pub struct ShaderModuleValidationCacheCreateInfoEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_shader_module_validation_cache_create_info_ext
 	p_next           voidptr
 	validation_cache C.ValidationCacheEXT
 }
@@ -14138,7 +13931,7 @@ pub mut:
 
 pub struct PipelineViewportShadingRateImageStateCreateInfoNV {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_pipeline_viewport_shading_rate_image_state_create_info_nv
 	p_next                    voidptr
 	shading_rate_image_enable Bool32
 	viewport_count            u32
@@ -14147,7 +13940,7 @@ pub mut:
 
 pub struct PhysicalDeviceShadingRateImageFeaturesNV {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_shading_rate_image_features_nv
 	p_next                           voidptr
 	shading_rate_image               Bool32
 	shading_rate_coarse_sample_order Bool32
@@ -14155,7 +13948,7 @@ pub mut:
 
 pub struct PhysicalDeviceShadingRateImagePropertiesNV {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_physical_device_shading_rate_image_properties_nv
 	p_next                          voidptr
 	shading_rate_texel_size         Extent2D
 	shading_rate_palette_size       u32
@@ -14179,7 +13972,7 @@ pub mut:
 
 pub struct PipelineViewportCoarseSampleOrderStateCreateInfoNV {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_pipeline_viewport_coarse_sample_order_state_create_info_nv
 	p_next                    voidptr
 	sample_order_type         CoarseSampleOrderTypeNV
 	custom_sample_order_count u32
@@ -14314,7 +14107,7 @@ pub type BuildAccelerationStructureFlagBitsNV = BuildAccelerationStructureFlagBi
 
 pub struct RayTracingShaderGroupCreateInfoNV {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_ray_tracing_shader_group_create_info_nv
 	p_next              voidptr
 	vktype              RayTracingShaderGroupTypeKHR
 	general_shader      u32
@@ -14325,7 +14118,7 @@ pub mut:
 
 pub struct RayTracingPipelineCreateInfoNV {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_ray_tracing_pipeline_create_info_nv
 	p_next               voidptr
 	flags                PipelineCreateFlags
 	stage_count          u32
@@ -14340,7 +14133,7 @@ pub mut:
 
 pub struct GeometryTrianglesNV {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_geometry_triangles_nv
 	p_next           voidptr
 	vertex_data      C.Buffer
 	vertex_offset    DeviceSize
@@ -14373,7 +14166,7 @@ pub mut:
 
 pub struct GeometryNV {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_geometry_nv
 	p_next        voidptr
 	geometry_type GeometryTypeKHR
 	geometry      GeometryDataNV
@@ -14382,7 +14175,7 @@ pub mut:
 
 pub struct AccelerationStructureInfoNV {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_acceleration_structure_info_nv
 	p_next         voidptr
 	vktype         AccelerationStructureTypeNV
 	flags          u32
@@ -14393,7 +14186,7 @@ pub mut:
 
 pub struct AccelerationStructureCreateInfoNV {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_acceleration_structure_create_info_nv
 	p_next         voidptr
 	compacted_size DeviceSize
 	info           AccelerationStructureInfoNV
@@ -14401,7 +14194,7 @@ pub mut:
 
 pub struct BindAccelerationStructureMemoryInfoNV {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_bind_acceleration_structure_memory_info_nv
 	p_next                 voidptr
 	acceleration_structure C.AccelerationStructureNV
 	memory                 C.DeviceMemory
@@ -14412,7 +14205,7 @@ pub mut:
 
 pub struct WriteDescriptorSetAccelerationStructureNV {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_write_descriptor_set_acceleration_structure_nv
 	p_next                       voidptr
 	acceleration_structure_count u32
 	p_acceleration_structures    &C.AccelerationStructureNV
@@ -14420,7 +14213,7 @@ pub mut:
 
 pub struct AccelerationStructureMemoryRequirementsInfoNV {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_acceleration_structure_memory_requirements_info_nv
 	p_next                 voidptr
 	vktype                 AccelerationStructureMemoryRequirementsTypeNV
 	acceleration_structure C.AccelerationStructureNV
@@ -14428,7 +14221,7 @@ pub mut:
 
 pub struct PhysicalDeviceRayTracingPropertiesNV {
 pub mut:
-	s_type                                     StructureType
+	s_type                                     StructureType = StructureType.structure_type_physical_device_ray_tracing_properties_nv
 	p_next                                     voidptr
 	shader_group_handle_size                   u32
 	max_recursion_depth                        u32
@@ -14653,14 +14446,14 @@ pub const nv_representative_fragment_test_extension_name = 'VK_NV_representative
 
 pub struct PhysicalDeviceRepresentativeFragmentTestFeaturesNV {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_physical_device_representative_fragment_test_features_nv
 	p_next                       voidptr
 	representative_fragment_test Bool32
 }
 
 pub struct PipelineRepresentativeFragmentTestStateCreateInfoNV {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_pipeline_representative_fragment_test_state_create_info_nv
 	p_next                              voidptr
 	representative_fragment_test_enable Bool32
 }
@@ -14670,14 +14463,14 @@ pub const ext_filter_cubic_extension_name = 'VK_EXT_filter_cubic'
 
 pub struct PhysicalDeviceImageViewImageFormatInfoEXT {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_image_view_image_format_info_ext
 	p_next          voidptr
 	image_view_type ImageViewType
 }
 
 pub struct FilterCubicImageViewImageFormatPropertiesEXT {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_filter_cubic_image_view_image_format_properties_ext
 	p_next              voidptr
 	filter_cubic        Bool32
 	filter_cubic_minmax Bool32
@@ -14698,7 +14491,7 @@ pub const ext_external_memory_host_extension_name = 'VK_EXT_external_memory_host
 
 pub struct ImportMemoryHostPointerInfoEXT {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_import_memory_host_pointer_info_ext
 	p_next         voidptr
 	handle_type    ExternalMemoryHandleTypeFlagBits
 	p_host_pointer voidptr
@@ -14706,14 +14499,14 @@ pub mut:
 
 pub struct MemoryHostPointerPropertiesEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_memory_host_pointer_properties_ext
 	p_next           voidptr
 	memory_type_bits u32
 }
 
 pub struct PhysicalDeviceExternalMemoryHostPropertiesEXT {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_physical_device_external_memory_host_properties_ext
 	p_next                              voidptr
 	min_imported_host_pointer_alignment DeviceSize
 }
@@ -14758,7 +14551,7 @@ pub type PipelineCompilerControlFlagsAMD = u32
 
 pub struct PipelineCompilerControlCreateInfoAMD {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_pipeline_compiler_control_create_info_amd
 	p_next                 voidptr
 	compiler_control_flags PipelineCompilerControlFlagsAMD
 }
@@ -14775,7 +14568,7 @@ pub const amd_shader_core_properties_extension_name = 'VK_AMD_shader_core_proper
 
 pub struct PhysicalDeviceShaderCorePropertiesAMD {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_physical_device_shader_core_properties_amd
 	p_next                         voidptr
 	shader_engine_count            u32
 	shader_arrays_per_engine_count u32
@@ -14805,7 +14598,7 @@ pub enum MemoryOverallocationBehaviorAMD {
 
 pub struct DeviceMemoryOverallocationCreateInfoAMD {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_device_memory_overallocation_create_info_amd
 	p_next                  voidptr
 	overallocation_behavior MemoryOverallocationBehaviorAMD
 }
@@ -14815,7 +14608,7 @@ pub const ext_vertex_attribute_divisor_extension_name = 'VK_EXT_vertex_attribute
 
 pub struct PhysicalDeviceVertexAttributeDivisorPropertiesEXT {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_physical_device_vertex_attribute_divisor_properties_ext
 	p_next                    voidptr
 	max_vertex_attrib_divisor u32
 }
@@ -14842,14 +14635,20 @@ pub const nv_shader_subgroup_partitioned_extension_name = 'VK_NV_shader_subgroup
 pub const nv_compute_shader_derivatives_spec_version = 1
 pub const nv_compute_shader_derivatives_extension_name = 'VK_NV_compute_shader_derivatives'
 
-pub type PhysicalDeviceComputeShaderDerivativesFeaturesNV = PhysicalDeviceComputeShaderDerivativesFeaturesKHR
+pub struct PhysicalDeviceComputeShaderDerivativesFeaturesNV {
+pub mut:
+	s_type                          StructureType = StructureType.structure_type_physical_device_compute_shader_derivatives_features_nv
+	p_next                          voidptr
+	compute_derivative_group_quads  Bool32
+	compute_derivative_group_linear Bool32
+}
 
 pub const nv_mesh_shader_spec_version = 1
 pub const nv_mesh_shader_extension_name = 'VK_NV_mesh_shader'
 
 pub struct PhysicalDeviceMeshShaderFeaturesNV {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_physical_device_mesh_shader_features_nv
 	p_next      voidptr
 	task_shader Bool32
 	mesh_shader Bool32
@@ -14857,7 +14656,7 @@ pub mut:
 
 pub struct PhysicalDeviceMeshShaderPropertiesNV {
 pub mut:
-	s_type                                StructureType
+	s_type                                StructureType = StructureType.structure_type_physical_device_mesh_shader_properties_nv
 	p_next                                voidptr
 	max_draw_mesh_tasks_count             u32
 	max_task_work_group_invocations       u32
@@ -14930,7 +14729,7 @@ pub const nv_shader_image_footprint_extension_name = 'VK_NV_shader_image_footpri
 
 pub struct PhysicalDeviceShaderImageFootprintFeaturesNV {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_shader_image_footprint_features_nv
 	p_next          voidptr
 	image_footprint Bool32
 }
@@ -14940,7 +14739,7 @@ pub const nv_scissor_exclusive_extension_name = 'VK_NV_scissor_exclusive'
 
 pub struct PipelineViewportExclusiveScissorStateCreateInfoNV {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_pipeline_viewport_exclusive_scissor_state_create_info_nv
 	p_next                  voidptr
 	exclusive_scissor_count u32
 	p_exclusive_scissors    &Rect2D
@@ -14948,7 +14747,7 @@ pub mut:
 
 pub struct PhysicalDeviceExclusiveScissorFeaturesNV {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_physical_device_exclusive_scissor_features_nv
 	p_next            voidptr
 	exclusive_scissor Bool32
 }
@@ -14982,14 +14781,14 @@ pub const nv_device_diagnostic_checkpoints_extension_name = 'VK_NV_device_diagno
 
 pub struct QueueFamilyCheckpointPropertiesNV {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_queue_family_checkpoint_properties_nv
 	p_next                          voidptr
 	checkpoint_execution_stage_mask PipelineStageFlags
 }
 
 pub struct CheckpointDataNV {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_checkpoint_data_nv
 	p_next              voidptr
 	stage               PipelineStageFlagBits
 	p_checkpoint_marker voidptr
@@ -15016,9 +14815,9 @@ pub const intel_shader_integer_functions_2_extension_name = 'VK_INTE_shader_inte
 
 pub struct PhysicalDeviceShaderIntegerFunctions2FeaturesINTEL {
 pub mut:
-	s_type                    StructureType
-	p_next                    voidptr
-	shader_integer_functions2 Bool32
+	s_type                     StructureType = StructureType.structure_type_physical_device_shader_integer_functions_2_features_intel
+	p_next                     voidptr
+	shader_integer_functions_2 Bool32
 }
 
 pub type C.PerformanceConfigurationINTEL = voidptr
@@ -15059,8 +14858,8 @@ pub enum PerformanceValueTypeINTEL {
 
 pub union PerformanceValueDataINTEL {
 pub mut:
-	value32      u32
-	value64      u64
+	value_3_2    u32
+	value_6_4    u64
 	value_float  f32
 	value_bool   Bool32
 	value_string &char
@@ -15074,14 +14873,14 @@ pub mut:
 
 pub struct InitializePerformanceApiInfoINTEL {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_initialize_performance_api_info_intel
 	p_next      voidptr
 	p_user_data voidptr
 }
 
 pub struct QueryPoolPerformanceQueryCreateInfoINTEL {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_query_pool_performance_query_create_info_intel
 	p_next                        voidptr
 	performance_counters_sampling QueryPoolSamplingModeINTEL
 }
@@ -15090,21 +14889,21 @@ pub type QueryPoolCreateInfoINTEL = QueryPoolPerformanceQueryCreateInfoINTEL
 
 pub struct PerformanceMarkerInfoINTEL {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_performance_marker_info_intel
 	p_next voidptr
 	marker u64
 }
 
 pub struct PerformanceStreamMarkerInfoINTEL {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_performance_stream_marker_info_intel
 	p_next voidptr
 	marker u32
 }
 
 pub struct PerformanceOverrideInfoINTEL {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_performance_override_info_intel
 	p_next    voidptr
 	vktype    PerformanceOverrideTypeINTEL
 	enable    Bool32
@@ -15113,7 +14912,7 @@ pub mut:
 
 pub struct PerformanceConfigurationAcquireInfoINTEL {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_performance_configuration_acquire_info_intel
 	p_next voidptr
 	vktype PerformanceConfigurationTypeINTEL
 }
@@ -15188,7 +14987,7 @@ pub const ext_pci_bus_info_extension_name = 'VK_EXT_pci_bus_info'
 
 pub struct PhysicalDevicePCIBusInfoPropertiesEXT {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_physical_device_pci_bus_info_properties_ext
 	p_next       voidptr
 	pci_domain   u32
 	pci_bus      u32
@@ -15201,14 +15000,14 @@ pub const amd_display_native_hdr_extension_name = 'VK_AMD_display_native_hdr'
 
 pub struct DisplayNativeHdrSurfaceCapabilitiesAMD {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_display_native_hdr_surface_capabilities_amd
 	p_next                voidptr
 	local_dimming_support Bool32
 }
 
 pub struct SwapchainDisplayNativeHdrCreateInfoAMD {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_swapchain_display_native_hdr_create_info_amd
 	p_next               voidptr
 	local_dimming_enable Bool32
 }
@@ -15227,7 +15026,7 @@ pub const ext_fragment_density_map_extension_name = 'VK_EXT_fragment_density_map
 
 pub struct PhysicalDeviceFragmentDensityMapFeaturesEXT {
 pub mut:
-	s_type                                     StructureType
+	s_type                                     StructureType = StructureType.structure_type_physical_device_fragment_density_map_features_ext
 	p_next                                     voidptr
 	fragment_density_map                       Bool32
 	fragment_density_map_dynamic               Bool32
@@ -15236,7 +15035,7 @@ pub mut:
 
 pub struct PhysicalDeviceFragmentDensityMapPropertiesEXT {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_physical_device_fragment_density_map_properties_ext
 	p_next                          voidptr
 	min_fragment_density_texel_size Extent2D
 	max_fragment_density_texel_size Extent2D
@@ -15245,7 +15044,7 @@ pub mut:
 
 pub struct RenderPassFragmentDensityMapCreateInfoEXT {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_render_pass_fragment_density_map_create_info_ext
 	p_next                          voidptr
 	fragment_density_map_attachment AttachmentReference
 }
@@ -15285,7 +15084,7 @@ pub type ShaderCorePropertiesFlagsAMD = u32
 
 pub struct PhysicalDeviceShaderCoreProperties2AMD {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_physical_device_shader_core_properties_2_amd
 	p_next                    voidptr
 	shader_core_features      ShaderCorePropertiesFlagsAMD
 	active_compute_unit_count u32
@@ -15296,7 +15095,7 @@ pub const amd_device_coherent_memory_extension_name = 'VK_AMD_device_coherent_me
 
 pub struct PhysicalDeviceCoherentMemoryFeaturesAMD {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_physical_device_coherent_memory_features_amd
 	p_next                 voidptr
 	device_coherent_memory Bool32
 }
@@ -15306,10 +15105,10 @@ pub const ext_shader_image_atomic_int64_extension_name = 'VK_EXT_shader_image_at
 
 pub struct PhysicalDeviceShaderImageAtomicInt64FeaturesEXT {
 pub mut:
-	s_type                     StructureType
-	p_next                     voidptr
-	shader_image_int64_atomics Bool32
-	sparse_image_int64_atomics Bool32
+	s_type                       StructureType
+	p_next                       voidptr
+	shader_image_int_6_4_atomics Bool32
+	sparse_image_int_6_4_atomics Bool32
 }
 
 pub const ext_memory_budget_spec_version = 1
@@ -15317,7 +15116,7 @@ pub const ext_memory_budget_extension_name = 'VK_EXT_memory_budget'
 
 pub struct PhysicalDeviceMemoryBudgetPropertiesEXT {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_physical_device_memory_budget_properties_ext
 	p_next      voidptr
 	heap_budget [max_memory_heaps]DeviceSize
 	heap_usage  [max_memory_heaps]DeviceSize
@@ -15328,14 +15127,14 @@ pub const ext_memory_priority_extension_name = 'VK_EXT_memory_priority'
 
 pub struct PhysicalDeviceMemoryPriorityFeaturesEXT {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_memory_priority_features_ext
 	p_next          voidptr
 	memory_priority Bool32
 }
 
 pub struct MemoryPriorityAllocateInfoEXT {
 pub mut:
-	s_type   StructureType
+	s_type   StructureType = StructureType.structure_type_memory_priority_allocate_info_ext
 	p_next   voidptr
 	priority f32
 }
@@ -15345,7 +15144,7 @@ pub const nv_dedicated_allocation_image_aliasing_extension_name = 'VK_NV_dedicat
 
 pub struct PhysicalDeviceDedicatedAllocationImageAliasingFeaturesNV {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_physical_device_dedicated_allocation_image_aliasing_features_nv
 	p_next                              voidptr
 	dedicated_allocation_image_aliasing Bool32
 }
@@ -15355,7 +15154,7 @@ pub const ext_buffer_device_address_extension_name = 'VK_EXT_buffer_device_addre
 
 pub struct PhysicalDeviceBufferDeviceAddressFeaturesEXT {
 pub mut:
-	s_type                               StructureType
+	s_type                               StructureType = StructureType.structure_type_physical_device_buffer_device_address_features_ext
 	p_next                               voidptr
 	buffer_device_address                Bool32
 	buffer_device_address_capture_replay Bool32
@@ -15368,7 +15167,7 @@ pub type BufferDeviceAddressInfoEXT = BufferDeviceAddressInfo
 
 pub struct BufferDeviceAddressCreateInfoEXT {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_buffer_device_address_create_info_ext
 	p_next         voidptr
 	device_address DeviceAddress
 }
@@ -15412,7 +15211,7 @@ pub enum ValidationFeatureDisableEXT {
 
 pub struct ValidationFeaturesEXT {
 pub mut:
-	s_type                            StructureType
+	s_type                            StructureType = StructureType.structure_type_validation_features_ext
 	p_next                            voidptr
 	enabled_validation_feature_count  u32
 	p_enabled_validation_features     &ValidationFeatureEnableEXT
@@ -15429,7 +15228,7 @@ pub type ScopeNV = ScopeKHR
 
 pub struct CooperativeMatrixPropertiesNV {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_cooperative_matrix_properties_nv
 	p_next voidptr
 	m_size u32
 	n_size u32
@@ -15443,7 +15242,7 @@ pub mut:
 
 pub struct PhysicalDeviceCooperativeMatrixFeaturesNV {
 pub mut:
-	s_type                                  StructureType
+	s_type                                  StructureType = StructureType.structure_type_physical_device_cooperative_matrix_features_nv
 	p_next                                  voidptr
 	cooperative_matrix                      Bool32
 	cooperative_matrix_robust_buffer_access Bool32
@@ -15451,7 +15250,7 @@ pub mut:
 
 pub struct PhysicalDeviceCooperativeMatrixPropertiesNV {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_physical_device_cooperative_matrix_properties_nv
 	p_next                              voidptr
 	cooperative_matrix_supported_stages ShaderStageFlags
 }
@@ -15479,14 +15278,14 @@ pub type PipelineCoverageReductionStateCreateFlagsNV = u32
 
 pub struct PhysicalDeviceCoverageReductionModeFeaturesNV {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_physical_device_coverage_reduction_mode_features_nv
 	p_next                  voidptr
 	coverage_reduction_mode Bool32
 }
 
 pub struct PipelineCoverageReductionStateCreateInfoNV {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_pipeline_coverage_reduction_state_create_info_nv
 	p_next                  voidptr
 	flags                   PipelineCoverageReductionStateCreateFlagsNV
 	coverage_reduction_mode CoverageReductionModeNV
@@ -15494,7 +15293,7 @@ pub mut:
 
 pub struct FramebufferMixedSamplesCombinationNV {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_framebuffer_mixed_samples_combination_nv
 	p_next                  voidptr
 	coverage_reduction_mode CoverageReductionModeNV
 	rasterization_samples   SampleCountFlagBits
@@ -15517,7 +15316,7 @@ pub const ext_fragment_shader_interlock_extension_name = 'VK_EXT_fragment_shader
 
 pub struct PhysicalDeviceFragmentShaderInterlockFeaturesEXT {
 pub mut:
-	s_type                                 StructureType
+	s_type                                 StructureType = StructureType.structure_type_physical_device_fragment_shader_interlock_features_ext
 	p_next                                 voidptr
 	fragment_shader_sample_interlock       Bool32
 	fragment_shader_pixel_interlock        Bool32
@@ -15529,7 +15328,7 @@ pub const ext_ycbcr_image_arrays_extension_name = 'VK_EXT_ycbcr_image_arrays'
 
 pub struct PhysicalDeviceYcbcrImageArraysFeaturesEXT {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_physical_device_ycbcr_image_arrays_features_ext
 	p_next             voidptr
 	ycbcr_image_arrays Bool32
 }
@@ -15545,7 +15344,7 @@ pub enum ProvokingVertexModeEXT {
 
 pub struct PhysicalDeviceProvokingVertexFeaturesEXT {
 pub mut:
-	s_type                                        StructureType
+	s_type                                        StructureType = StructureType.structure_type_physical_device_provoking_vertex_features_ext
 	p_next                                        voidptr
 	provoking_vertex_last                         Bool32
 	transform_feedback_preserves_provoking_vertex Bool32
@@ -15553,7 +15352,7 @@ pub mut:
 
 pub struct PhysicalDeviceProvokingVertexPropertiesEXT {
 pub mut:
-	s_type                                                     StructureType
+	s_type                                                     StructureType = StructureType.structure_type_physical_device_provoking_vertex_properties_ext
 	p_next                                                     voidptr
 	provoking_vertex_mode_per_pipeline                         Bool32
 	transform_feedback_preserves_triangle_fan_provoking_vertex Bool32
@@ -15561,7 +15360,7 @@ pub mut:
 
 pub struct PipelineRasterizationProvokingVertexStateCreateInfoEXT {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_pipeline_rasterization_provoking_vertex_state_create_info_ext
 	p_next                voidptr
 	provoking_vertex_mode ProvokingVertexModeEXT
 }
@@ -15573,7 +15372,7 @@ pub type HeadlessSurfaceCreateFlagsEXT = u32
 
 pub struct HeadlessSurfaceCreateInfoEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_headless_surface_create_info_ext
 	p_next voidptr
 	flags  HeadlessSurfaceCreateFlagsEXT
 }
@@ -15605,20 +15404,20 @@ pub const ext_shader_atomic_float_extension_name = 'VK_EXT_shader_atomic_float'
 
 pub struct PhysicalDeviceShaderAtomicFloatFeaturesEXT {
 pub mut:
-	s_type                           StructureType
-	p_next                           voidptr
-	shader_buffer_float32_atomics    Bool32
-	shader_buffer_float32_atomic_add Bool32
-	shader_buffer_float64_atomics    Bool32
-	shader_buffer_float64_atomic_add Bool32
-	shader_shared_float32_atomics    Bool32
-	shader_shared_float32_atomic_add Bool32
-	shader_shared_float64_atomics    Bool32
-	shader_shared_float64_atomic_add Bool32
-	shader_image_float32_atomics     Bool32
-	shader_image_float32_atomic_add  Bool32
-	sparse_image_float32_atomics     Bool32
-	sparse_image_float32_atomic_add  Bool32
+	s_type                             StructureType = StructureType.structure_type_physical_device_shader_atomic_float_features_ext
+	p_next                             voidptr
+	shader_buffer_float_3_2_atomics    Bool32
+	shader_buffer_float_3_2_atomic_add Bool32
+	shader_buffer_float_6_4_atomics    Bool32
+	shader_buffer_float_6_4_atomic_add Bool32
+	shader_shared_float_3_2_atomics    Bool32
+	shader_shared_float_3_2_atomic_add Bool32
+	shader_shared_float_6_4_atomics    Bool32
+	shader_shared_float_6_4_atomic_add Bool32
+	shader_image_float_3_2_atomics     Bool32
+	shader_image_float_3_2_atomic_add  Bool32
+	sparse_image_float_3_2_atomics     Bool32
+	sparse_image_float_3_2_atomic_add  Bool32
 }
 
 pub const ext_host_query_reset_spec_version = 1
@@ -15636,7 +15435,7 @@ pub const ext_extended_dynamic_state_extension_name = 'VK_EXT_extended_dynamic_s
 
 pub struct PhysicalDeviceExtendedDynamicStateFeaturesEXT {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_physical_device_extended_dynamic_state_features_ext
 	p_next                 voidptr
 	extended_dynamic_state Bool32
 }
@@ -15653,14 +15452,14 @@ pub type HostImageCopyFlagsEXT = u32
 
 pub struct PhysicalDeviceHostImageCopyFeaturesEXT {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_host_image_copy_features_ext
 	p_next          voidptr
 	host_image_copy Bool32
 }
 
 pub struct PhysicalDeviceHostImageCopyPropertiesEXT {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_physical_device_host_image_copy_properties_ext
 	p_next                             voidptr
 	copy_src_layout_count              u32
 	p_copy_src_layouts                 &ImageLayout
@@ -15672,7 +15471,7 @@ pub mut:
 
 pub struct MemoryToImageCopyEXT {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_memory_to_image_copy_ext
 	p_next              voidptr
 	p_host_pointer      voidptr
 	memory_row_length   u32
@@ -15684,7 +15483,7 @@ pub mut:
 
 pub struct ImageToMemoryCopyEXT {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_image_to_memory_copy_ext
 	p_next              voidptr
 	p_host_pointer      voidptr
 	memory_row_length   u32
@@ -15696,7 +15495,7 @@ pub mut:
 
 pub struct CopyMemoryToImageInfoEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_copy_memory_to_image_info_ext
 	p_next           voidptr
 	flags            HostImageCopyFlagsEXT
 	dst_image        C.Image
@@ -15707,7 +15506,7 @@ pub mut:
 
 pub struct CopyImageToMemoryInfoEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_copy_image_to_memory_info_ext
 	p_next           voidptr
 	flags            HostImageCopyFlagsEXT
 	src_image        C.Image
@@ -15718,7 +15517,7 @@ pub mut:
 
 pub struct CopyImageToImageInfoEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_copy_image_to_image_info_ext
 	p_next           voidptr
 	flags            HostImageCopyFlagsEXT
 	src_image        C.Image
@@ -15731,7 +15530,7 @@ pub mut:
 
 pub struct HostImageLayoutTransitionInfoEXT {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_host_image_layout_transition_info_ext
 	p_next            voidptr
 	image             C.Image
 	old_layout        ImageLayout
@@ -15741,14 +15540,14 @@ pub mut:
 
 pub struct SubresourceHostMemcpySizeEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_subresource_host_memcpy_size_ext
 	p_next voidptr
 	size   DeviceSize
 }
 
 pub struct HostImageCopyDevicePerformanceQueryEXT {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_host_image_copy_device_performance_query_ext
 	p_next                  voidptr
 	optimal_device_access   Bool32
 	identical_memory_layout Bool32
@@ -15793,7 +15592,7 @@ pub const ext_map_memory_placed_extension_name = 'VK_EXT_map_memory_placed'
 
 pub struct PhysicalDeviceMapMemoryPlacedFeaturesEXT {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_physical_device_map_memory_placed_features_ext
 	p_next                  voidptr
 	memory_map_placed       Bool32
 	memory_map_range_placed Bool32
@@ -15802,14 +15601,14 @@ pub mut:
 
 pub struct PhysicalDeviceMapMemoryPlacedPropertiesEXT {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_physical_device_map_memory_placed_properties_ext
 	p_next                          voidptr
 	min_placed_memory_map_alignment DeviceSize
 }
 
 pub struct MemoryMapPlacedInfoEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_memory_map_placed_info_ext
 	p_next           voidptr
 	p_placed_address voidptr
 }
@@ -15819,20 +15618,20 @@ pub const ext_shader_atomic_float_2_extension_name = 'VK_EXT_shader_atomic_float
 
 pub struct PhysicalDeviceShaderAtomicFloat2FeaturesEXT {
 pub mut:
-	s_type                               StructureType
-	p_next                               voidptr
-	shader_buffer_float16_atomics        Bool32
-	shader_buffer_float16_atomic_add     Bool32
-	shader_buffer_float16_atomic_min_max Bool32
-	shader_buffer_float32_atomic_min_max Bool32
-	shader_buffer_float64_atomic_min_max Bool32
-	shader_shared_float16_atomics        Bool32
-	shader_shared_float16_atomic_add     Bool32
-	shader_shared_float16_atomic_min_max Bool32
-	shader_shared_float32_atomic_min_max Bool32
-	shader_shared_float64_atomic_min_max Bool32
-	shader_image_float32_atomic_min_max  Bool32
-	sparse_image_float32_atomic_min_max  Bool32
+	s_type                                 StructureType = StructureType.structure_type_physical_device_shader_atomic_float_2_features_ext
+	p_next                                 voidptr
+	shader_buffer_float_1_6_atomics        Bool32
+	shader_buffer_float_1_6_atomic_add     Bool32
+	shader_buffer_float_1_6_atomic_min_max Bool32
+	shader_buffer_float_3_2_atomic_min_max Bool32
+	shader_buffer_float_6_4_atomic_min_max Bool32
+	shader_shared_float_1_6_atomics        Bool32
+	shader_shared_float_1_6_atomic_add     Bool32
+	shader_shared_float_1_6_atomic_min_max Bool32
+	shader_shared_float_3_2_atomic_min_max Bool32
+	shader_shared_float_6_4_atomic_min_max Bool32
+	shader_image_float_3_2_atomic_min_max  Bool32
+	sparse_image_float_3_2_atomic_min_max  Bool32
 }
 
 pub const ext_surface_maintenance_1_spec_version = 1
@@ -15858,14 +15657,14 @@ pub type PresentGravityFlagsEXT = u32
 
 pub struct SurfacePresentModeEXT {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_surface_present_mode_ext
 	p_next       voidptr
 	present_mode PresentModeKHR
 }
 
 pub struct SurfacePresentScalingCapabilitiesEXT {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_surface_present_scaling_capabilities_ext
 	p_next                      voidptr
 	supported_present_scaling   PresentScalingFlagsEXT
 	supported_present_gravity_x PresentGravityFlagsEXT
@@ -15876,7 +15675,7 @@ pub mut:
 
 pub struct SurfacePresentModeCompatibilityEXT {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_surface_present_mode_compatibility_ext
 	p_next             voidptr
 	present_mode_count u32
 	p_present_modes    &PresentModeKHR
@@ -15887,14 +15686,14 @@ pub const ext_swapchain_maintenance_1_extension_name = 'VK_EXT_swapchain_mainten
 
 pub struct PhysicalDeviceSwapchainMaintenance1FeaturesEXT {
 pub mut:
-	s_type                 StructureType
-	p_next                 voidptr
-	swapchain_maintenance1 Bool32
+	s_type                  StructureType = StructureType.structure_type_physical_device_swapchain_maintenance_1_features_ext
+	p_next                  voidptr
+	swapchain_maintenance_1 Bool32
 }
 
 pub struct SwapchainPresentFenceInfoEXT {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_swapchain_present_fence_info_ext
 	p_next          voidptr
 	swapchain_count u32
 	p_fences        &C.Fence
@@ -15902,7 +15701,7 @@ pub mut:
 
 pub struct SwapchainPresentModesCreateInfoEXT {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_swapchain_present_modes_create_info_ext
 	p_next             voidptr
 	present_mode_count u32
 	p_present_modes    &PresentModeKHR
@@ -15910,7 +15709,7 @@ pub mut:
 
 pub struct SwapchainPresentModeInfoEXT {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_swapchain_present_mode_info_ext
 	p_next          voidptr
 	swapchain_count u32
 	p_present_modes &PresentModeKHR
@@ -15918,7 +15717,7 @@ pub mut:
 
 pub struct SwapchainPresentScalingCreateInfoEXT {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_swapchain_present_scaling_create_info_ext
 	p_next            voidptr
 	scaling_behavior  PresentScalingFlagsEXT
 	present_gravity_x PresentGravityFlagsEXT
@@ -15927,7 +15726,7 @@ pub mut:
 
 pub struct ReleaseSwapchainImagesInfoEXT {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_release_swapchain_images_info_ext
 	p_next            voidptr
 	swapchain         C.SwapchainKHR
 	image_index_count u32
@@ -15984,7 +15783,7 @@ pub type IndirectCommandsLayoutUsageFlagsNV = u32
 
 pub struct PhysicalDeviceDeviceGeneratedCommandsPropertiesNV {
 pub mut:
-	s_type                                        StructureType
+	s_type                                        StructureType = StructureType.structure_type_physical_device_device_generated_commands_properties_nv
 	p_next                                        voidptr
 	max_graphics_shader_group_count               u32
 	max_indirect_sequence_count                   u32
@@ -15999,14 +15798,14 @@ pub mut:
 
 pub struct PhysicalDeviceDeviceGeneratedCommandsFeaturesNV {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_physical_device_device_generated_commands_features_nv
 	p_next                    voidptr
 	device_generated_commands Bool32
 }
 
 pub struct GraphicsShaderGroupCreateInfoNV {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_graphics_shader_group_create_info_nv
 	p_next               voidptr
 	stage_count          u32
 	p_stages             &PipelineShaderStageCreateInfo
@@ -16016,7 +15815,7 @@ pub mut:
 
 pub struct GraphicsPipelineShaderGroupsCreateInfoNV {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_graphics_pipeline_shader_groups_create_info_nv
 	p_next         voidptr
 	group_count    u32
 	p_groups       &GraphicsShaderGroupCreateInfoNV
@@ -16056,7 +15855,7 @@ pub mut:
 
 pub struct IndirectCommandsLayoutTokenNV {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_indirect_commands_layout_token_nv
 	p_next                          voidptr
 	token_type                      IndirectCommandsTokenTypeNV
 	stream                          u32
@@ -16075,7 +15874,7 @@ pub mut:
 
 pub struct IndirectCommandsLayoutCreateInfoNV {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_indirect_commands_layout_create_info_nv
 	p_next              voidptr
 	flags               IndirectCommandsLayoutUsageFlagsNV
 	pipeline_bind_point PipelineBindPoint
@@ -16087,7 +15886,7 @@ pub mut:
 
 pub struct GeneratedCommandsInfoNV {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_generated_commands_info_nv
 	p_next                   voidptr
 	pipeline_bind_point      PipelineBindPoint
 	pipeline                 C.Pipeline
@@ -16106,7 +15905,7 @@ pub mut:
 
 pub struct GeneratedCommandsMemoryRequirementsInfoNV {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_generated_commands_memory_requirements_info_nv
 	p_next                   voidptr
 	pipeline_bind_point      PipelineBindPoint
 	pipeline                 C.Pipeline
@@ -16175,16 +15974,16 @@ pub const nv_inherited_viewport_scissor_extension_name = 'VK_NV_inherited_viewpo
 
 pub struct PhysicalDeviceInheritedViewportScissorFeaturesNV {
 pub mut:
-	s_type                        StructureType
-	p_next                        voidptr
-	inherited_viewport_scissor2_d Bool32
+	s_type                         StructureType = StructureType.structure_type_physical_device_inherited_viewport_scissor_features_nv
+	p_next                         voidptr
+	inherited_viewport_scissor_2_d Bool32
 }
 
 pub struct CommandBufferInheritanceViewportScissorInfoNV {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_command_buffer_inheritance_viewport_scissor_info_nv
 	p_next               voidptr
-	viewport_scissor2_d  Bool32
+	viewport_scissor_2_d Bool32
 	viewport_depth_count u32
 	p_viewport_depths    &Viewport
 }
@@ -16194,7 +15993,7 @@ pub const ext_texel_buffer_alignment_extension_name = 'VK_EXT_texel_buffer_align
 
 pub struct PhysicalDeviceTexelBufferAlignmentFeaturesEXT {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_physical_device_texel_buffer_alignment_features_ext
 	p_next                 voidptr
 	texel_buffer_alignment Bool32
 }
@@ -16206,14 +16005,14 @@ pub const qcom_render_pass_transform_extension_name = 'VK_QCOM_render_pass_trans
 
 pub struct RenderPassTransformBeginInfoQCOM {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_render_pass_transform_begin_info_qcom
 	p_next    voidptr
 	transform SurfaceTransformFlagBitsKHR
 }
 
 pub struct CommandBufferInheritanceRenderPassTransformInfoQCOM {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_command_buffer_inheritance_render_pass_transform_info_qcom
 	p_next      voidptr
 	transform   SurfaceTransformFlagBitsKHR
 	render_area Rect2D
@@ -16231,7 +16030,7 @@ pub enum DepthBiasRepresentationEXT {
 
 pub struct PhysicalDeviceDepthBiasControlFeaturesEXT {
 pub mut:
-	s_type                                               StructureType
+	s_type                                               StructureType = StructureType.structure_type_physical_device_depth_bias_control_features_ext
 	p_next                                               voidptr
 	depth_bias_control                                   Bool32
 	least_representable_value_force_unorm_representation Bool32
@@ -16241,7 +16040,7 @@ pub mut:
 
 pub struct DepthBiasInfoEXT {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_depth_bias_info_ext
 	p_next                     voidptr
 	depth_bias_constant_factor f32
 	depth_bias_clamp           f32
@@ -16250,7 +16049,7 @@ pub mut:
 
 pub struct DepthBiasRepresentationInfoEXT {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_depth_bias_representation_info_ext
 	p_next                    voidptr
 	depth_bias_representation DepthBiasRepresentationEXT
 	depth_bias_exact          Bool32
@@ -16258,7 +16057,7 @@ pub mut:
 
 fn C.vkCmdSetDepthBias2EXT(C.CommandBuffer,
 	&DepthBiasInfoEXT)
-pub fn cmd_set_depth_bias2_ext(command_buffer C.CommandBuffer,
+pub fn cmd_set_depth_bias_2_ext(command_buffer C.CommandBuffer,
 	p_depth_bias_info &DepthBiasInfoEXT) {
 	C.vkCmdSetDepthBias2EXT(command_buffer, p_depth_bias_info)
 }
@@ -16279,14 +16078,14 @@ pub type DeviceMemoryReportFlagsEXT = u32
 
 pub struct PhysicalDeviceDeviceMemoryReportFeaturesEXT {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_physical_device_device_memory_report_features_ext
 	p_next               voidptr
 	device_memory_report Bool32
 }
 
 pub struct DeviceMemoryReportCallbackDataEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_device_memory_report_callback_data_ext
 	p_next           voidptr
 	flags            DeviceMemoryReportFlagsEXT
 	vktype           DeviceMemoryReportEventTypeEXT
@@ -16301,7 +16100,7 @@ pub type PFN_vkDeviceMemoryReportCallbackEXT = fn (pCallbackData &DeviceMemoryRe
 
 pub struct DeviceDeviceMemoryReportCreateInfoEXT {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_device_device_memory_report_create_info_ext
 	p_next            voidptr
 	flags             DeviceMemoryReportFlagsEXT
 	pfn_user_callback PFN_vkDeviceMemoryReportCallbackEXT = unsafe { nil }
@@ -16336,16 +16135,16 @@ pub const ext_robustness_2_extension_name = 'VK_EXT_robustness2'
 
 pub struct PhysicalDeviceRobustness2FeaturesEXT {
 pub mut:
-	s_type                StructureType
-	p_next                voidptr
-	robust_buffer_access2 Bool32
-	robust_image_access2  Bool32
-	null_descriptor       Bool32
+	s_type                 StructureType = StructureType.structure_type_physical_device_robustness_2_features_ext
+	p_next                 voidptr
+	robust_buffer_access_2 Bool32
+	robust_image_access_2  Bool32
+	null_descriptor        Bool32
 }
 
 pub struct PhysicalDeviceRobustness2PropertiesEXT {
 pub mut:
-	s_type                                      StructureType
+	s_type                                      StructureType = StructureType.structure_type_physical_device_robustness_2_properties_ext
 	p_next                                      voidptr
 	robust_storage_buffer_access_size_alignment DeviceSize
 	robust_uniform_buffer_access_size_alignment DeviceSize
@@ -16356,7 +16155,7 @@ pub const ext_custom_border_color_extension_name = 'VK_EXT_custom_border_color'
 
 pub struct SamplerCustomBorderColorCreateInfoEXT {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_sampler_custom_border_color_create_info_ext
 	p_next              voidptr
 	custom_border_color ClearColorValue
 	format              Format
@@ -16364,14 +16163,14 @@ pub mut:
 
 pub struct PhysicalDeviceCustomBorderColorPropertiesEXT {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_custom_border_color_properties_ext
 	p_next                           voidptr
 	max_custom_border_color_samplers u32
 }
 
 pub struct PhysicalDeviceCustomBorderColorFeaturesEXT {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_physical_device_custom_border_color_features_ext
 	p_next                             voidptr
 	custom_border_colors               Bool32
 	custom_border_color_without_format Bool32
@@ -16385,21 +16184,21 @@ pub const nv_present_barrier_extension_name = 'VK_NV_present_barrier'
 
 pub struct PhysicalDevicePresentBarrierFeaturesNV {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_present_barrier_features_nv
 	p_next          voidptr
 	present_barrier Bool32
 }
 
 pub struct SurfaceCapabilitiesPresentBarrierNV {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_surface_capabilities_present_barrier_nv
 	p_next                    voidptr
 	present_barrier_supported Bool32
 }
 
 pub struct SwapchainPresentBarrierCreateInfoNV {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_swapchain_present_barrier_create_info_nv
 	p_next                 voidptr
 	present_barrier_enable Bool32
 }
@@ -16436,14 +16235,14 @@ pub type DeviceDiagnosticsConfigFlagsNV = u32
 
 pub struct PhysicalDeviceDiagnosticsConfigFeaturesNV {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_physical_device_diagnostics_config_features_nv
 	p_next             voidptr
 	diagnostics_config Bool32
 }
 
 pub struct DeviceDiagnosticsConfigCreateInfoNV {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_device_diagnostics_config_create_info_nv
 	p_next voidptr
 	flags  DeviceDiagnosticsConfigFlagsNV
 }
@@ -16459,7 +16258,7 @@ pub const nv_cuda_kernel_launch_extension_name = 'VK_NV_cuda_kernel_launch'
 
 pub struct CudaModuleCreateInfoNV {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_cuda_module_create_info_nv
 	p_next    voidptr
 	data_size usize
 	p_data    voidptr
@@ -16467,7 +16266,7 @@ pub mut:
 
 pub struct CudaFunctionCreateInfoNV {
 pub mut:
-	s_type   StructureType
+	s_type   StructureType = StructureType.structure_type_cuda_function_create_info_nv
 	p_next   voidptr
 	vkmodule C.CudaModuleNV
 	p_name   &char
@@ -16475,7 +16274,7 @@ pub mut:
 
 pub struct CudaLaunchInfoNV {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_cuda_launch_info_nv
 	p_next           voidptr
 	function         C.CudaFunctionNV
 	grid_dim_x       u32
@@ -16493,14 +16292,14 @@ pub mut:
 
 pub struct PhysicalDeviceCudaKernelLaunchFeaturesNV {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_physical_device_cuda_kernel_launch_features_nv
 	p_next                      voidptr
 	cuda_kernel_launch_features Bool32
 }
 
 pub struct PhysicalDeviceCudaKernelLaunchPropertiesNV {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_physical_device_cuda_kernel_launch_properties_nv
 	p_next                   voidptr
 	compute_capability_minor u32
 	compute_capability_major u32
@@ -16569,7 +16368,7 @@ pub const nv_low_latency_extension_name = 'VK_NV_low_latency'
 
 pub struct QueryLowLatencySupportNV {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_query_low_latency_support_nv
 	p_next                     voidptr
 	p_queried_low_latency_data voidptr
 }
@@ -16581,7 +16380,7 @@ pub const ext_descriptor_buffer_extension_name = 'VK_EXT_descriptor_buffer'
 
 pub struct PhysicalDeviceDescriptorBufferPropertiesEXT {
 pub mut:
-	s_type                                                     StructureType
+	s_type                                                     StructureType = StructureType.structure_type_physical_device_descriptor_buffer_properties_ext
 	p_next                                                     voidptr
 	combined_image_sampler_descriptor_single_array             Bool32
 	bufferless_push_descriptors                                Bool32
@@ -16620,14 +16419,14 @@ pub mut:
 
 pub struct PhysicalDeviceDescriptorBufferDensityMapPropertiesEXT {
 pub mut:
-	s_type                                             StructureType
+	s_type                                             StructureType = StructureType.structure_type_physical_device_descriptor_buffer_density_map_properties_ext
 	p_next                                             voidptr
 	combined_image_sampler_density_map_descriptor_size usize
 }
 
 pub struct PhysicalDeviceDescriptorBufferFeaturesEXT {
 pub mut:
-	s_type                                 StructureType
+	s_type                                 StructureType = StructureType.structure_type_physical_device_descriptor_buffer_features_ext
 	p_next                                 voidptr
 	descriptor_buffer                      Bool32
 	descriptor_buffer_capture_replay       Bool32
@@ -16637,7 +16436,7 @@ pub mut:
 
 pub struct DescriptorAddressInfoEXT {
 pub mut:
-	s_type  StructureType
+	s_type  StructureType = StructureType.structure_type_descriptor_address_info_ext
 	p_next  voidptr
 	address DeviceAddress
 	range   DeviceSize
@@ -16646,7 +16445,7 @@ pub mut:
 
 pub struct DescriptorBufferBindingInfoEXT {
 pub mut:
-	s_type  StructureType
+	s_type  StructureType = StructureType.structure_type_descriptor_buffer_binding_info_ext
 	p_next  voidptr
 	address DeviceAddress
 	usage   BufferUsageFlags
@@ -16654,7 +16453,7 @@ pub mut:
 
 pub struct DescriptorBufferBindingPushDescriptorBufferHandleEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_descriptor_buffer_binding_push_descriptor_buffer_handle_ext
 	p_next voidptr
 	buffer C.Buffer
 }
@@ -16675,7 +16474,7 @@ pub mut:
 
 pub struct DescriptorGetInfoEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_descriptor_get_info_ext
 	p_next voidptr
 	vktype DescriptorType
 	data   DescriptorDataEXT
@@ -16683,42 +16482,42 @@ pub mut:
 
 pub struct BufferCaptureDescriptorDataInfoEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_buffer_capture_descriptor_data_info_ext
 	p_next voidptr
 	buffer C.Buffer
 }
 
 pub struct ImageCaptureDescriptorDataInfoEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_image_capture_descriptor_data_info_ext
 	p_next voidptr
 	image  C.Image
 }
 
 pub struct ImageViewCaptureDescriptorDataInfoEXT {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_image_view_capture_descriptor_data_info_ext
 	p_next     voidptr
 	image_view C.ImageView
 }
 
 pub struct SamplerCaptureDescriptorDataInfoEXT {
 pub mut:
-	s_type  StructureType
+	s_type  StructureType = StructureType.structure_type_sampler_capture_descriptor_data_info_ext
 	p_next  voidptr
 	sampler C.Sampler
 }
 
 pub struct OpaqueCaptureDescriptorDataCreateInfoEXT {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_opaque_capture_descriptor_data_create_info_ext
 	p_next                         voidptr
 	opaque_capture_descriptor_data voidptr
 }
 
 pub struct AccelerationStructureCaptureDescriptorDataInfoEXT {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_acceleration_structure_capture_descriptor_data_info_ext
 	p_next                    voidptr
 	acceleration_structure    C.AccelerationStructureKHR
 	acceleration_structure_nv C.AccelerationStructureNV
@@ -16855,14 +16654,14 @@ pub type GraphicsPipelineLibraryFlagsEXT = u32
 
 pub struct PhysicalDeviceGraphicsPipelineLibraryFeaturesEXT {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_physical_device_graphics_pipeline_library_features_ext
 	p_next                    voidptr
 	graphics_pipeline_library Bool32
 }
 
 pub struct PhysicalDeviceGraphicsPipelineLibraryPropertiesEXT {
 pub mut:
-	s_type                                                         StructureType
+	s_type                                                         StructureType = StructureType.structure_type_physical_device_graphics_pipeline_library_properties_ext
 	p_next                                                         voidptr
 	graphics_pipeline_library_fast_linking                         Bool32
 	graphics_pipeline_library_independent_interpolation_decoration Bool32
@@ -16870,7 +16669,7 @@ pub mut:
 
 pub struct GraphicsPipelineLibraryCreateInfoEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_graphics_pipeline_library_create_info_ext
 	p_next voidptr
 	flags  GraphicsPipelineLibraryFlagsEXT
 }
@@ -16880,7 +16679,7 @@ pub const amd_shader_early_and_late_fragment_tests_extension_name = 'VK_AMD_shad
 
 pub struct PhysicalDeviceShaderEarlyAndLateFragmentTestsFeaturesAMD {
 pub mut:
-	s_type                               StructureType
+	s_type                               StructureType = StructureType.structure_type_physical_device_shader_early_and_late_fragment_tests_features_amd
 	p_next                               voidptr
 	shader_early_and_late_fragment_tests Bool32
 }
@@ -16912,7 +16711,7 @@ pub enum FragmentShadingRateNV {
 
 pub struct PhysicalDeviceFragmentShadingRateEnumsFeaturesNV {
 pub mut:
-	s_type                               StructureType
+	s_type                               StructureType = StructureType.structure_type_physical_device_fragment_shading_rate_enums_features_nv
 	p_next                               voidptr
 	fragment_shading_rate_enums          Bool32
 	supersample_fragment_shading_rates   Bool32
@@ -16921,14 +16720,14 @@ pub mut:
 
 pub struct PhysicalDeviceFragmentShadingRateEnumsPropertiesNV {
 pub mut:
-	s_type                                     StructureType
+	s_type                                     StructureType = StructureType.structure_type_physical_device_fragment_shading_rate_enums_properties_nv
 	p_next                                     voidptr
 	max_fragment_shading_rate_invocation_count SampleCountFlagBits
 }
 
 pub struct PipelineFragmentShadingRateEnumStateCreateInfoNV {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_pipeline_fragment_shading_rate_enum_state_create_info_nv
 	p_next            voidptr
 	shading_rate_type FragmentShadingRateTypeNV
 	shading_rate      FragmentShadingRateNV
@@ -16965,14 +16764,14 @@ pub mut:
 
 pub struct AccelerationStructureGeometryMotionTrianglesDataNV {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_acceleration_structure_geometry_motion_triangles_data_nv
 	p_next      voidptr
 	vertex_data DeviceOrHostAddressConstKHR
 }
 
 pub struct AccelerationStructureMotionInfoNV {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_acceleration_structure_motion_info_nv
 	p_next        voidptr
 	max_instances u32
 	flags         AccelerationStructureMotionInfoFlagsNV
@@ -17036,7 +16835,7 @@ pub mut:
 
 pub struct PhysicalDeviceRayTracingMotionBlurFeaturesNV {
 pub mut:
-	s_type                                               StructureType
+	s_type                                               StructureType = StructureType.structure_type_physical_device_ray_tracing_motion_blur_features_nv
 	p_next                                               voidptr
 	ray_tracing_motion_blur                              Bool32
 	ray_tracing_motion_blur_pipeline_trace_rays_indirect Bool32
@@ -17047,9 +16846,9 @@ pub const ext_ycbcr_2plane_444_formats_extension_name = 'VK_EXT_ycbcr_2plane_444
 
 pub struct PhysicalDeviceYcbcr2Plane444FormatsFeaturesEXT {
 pub mut:
-	s_type                 StructureType
-	p_next                 voidptr
-	ycbcr2plane444_formats Bool32
+	s_type                     StructureType
+	p_next                     voidptr
+	ycbcr_2plane_4_4_4_formats Bool32
 }
 
 pub const ext_fragment_density_map_2_spec_version = 1
@@ -17057,14 +16856,14 @@ pub const ext_fragment_density_map_2_extension_name = 'VK_EXT_fragment_density_m
 
 pub struct PhysicalDeviceFragmentDensityMap2FeaturesEXT {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_physical_device_fragment_density_map_2_features_ext
 	p_next                        voidptr
 	fragment_density_map_deferred Bool32
 }
 
 pub struct PhysicalDeviceFragmentDensityMap2PropertiesEXT {
 pub mut:
-	s_type                                        StructureType
+	s_type                                        StructureType = StructureType.structure_type_physical_device_fragment_density_map_2_properties_ext
 	p_next                                        voidptr
 	subsampled_loads                              Bool32
 	subsampled_coarse_reconstruction_early_access Bool32
@@ -17077,7 +16876,7 @@ pub const qcom_rotated_copy_commands_extension_name = 'VK_QCOM_rotated_copy_comm
 
 pub struct CopyCommandTransformInfoQCOM {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_copy_command_transform_info_qcom
 	p_next    voidptr
 	transform SurfaceTransformFlagBitsKHR
 }
@@ -17133,14 +16932,14 @@ pub type ImageCompressionFixedRateFlagsEXT = u32
 
 pub struct PhysicalDeviceImageCompressionControlFeaturesEXT {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_physical_device_image_compression_control_features_ext
 	p_next                    voidptr
 	image_compression_control Bool32
 }
 
 pub struct ImageCompressionControlEXT {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_image_compression_control_ext
 	p_next                          voidptr
 	flags                           ImageCompressionFlagsEXT
 	compression_control_plane_count u32
@@ -17149,7 +16948,7 @@ pub mut:
 
 pub struct ImageCompressionPropertiesEXT {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_image_compression_properties_ext
 	p_next                             voidptr
 	image_compression_flags            ImageCompressionFlagsEXT
 	image_compression_fixed_rate_flags ImageCompressionFixedRateFlagsEXT
@@ -17160,7 +16959,7 @@ pub const ext_attachment_feedback_loop_layout_extension_name = 'VK_EXT_attachmen
 
 pub struct PhysicalDeviceAttachmentFeedbackLoopLayoutFeaturesEXT {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_physical_device_attachment_feedback_loop_layout_features_ext
 	p_next                          voidptr
 	attachment_feedback_loop_layout Bool32
 }
@@ -17197,7 +16996,7 @@ pub enum DeviceFaultVendorBinaryHeaderVersionEXT {
 
 pub struct PhysicalDeviceFaultFeaturesEXT {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_physical_device_fault_features_ext
 	p_next                     voidptr
 	device_fault               Bool32
 	device_fault_vendor_binary Bool32
@@ -17205,7 +17004,7 @@ pub mut:
 
 pub struct DeviceFaultCountsEXT {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_device_fault_counts_ext
 	p_next             voidptr
 	address_info_count u32
 	vendor_info_count  u32
@@ -17228,7 +17027,7 @@ pub mut:
 
 pub struct DeviceFaultInfoEXT {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_device_fault_info_ext
 	p_next               voidptr
 	description          [max_description_size]char
 	p_address_infos      &DeviceFaultAddressInfoEXT
@@ -17265,7 +17064,7 @@ pub const arm_rasterization_order_attachment_access_extension_name = 'VK_ARM_ras
 
 pub struct PhysicalDeviceRasterizationOrderAttachmentAccessFeaturesEXT {
 pub mut:
-	s_type                                        StructureType
+	s_type                                        StructureType = StructureType.structure_type_physical_device_rasterization_order_attachment_access_features_ext
 	p_next                                        voidptr
 	rasterization_order_color_attachment_access   Bool32
 	rasterization_order_depth_attachment_access   Bool32
@@ -17279,9 +17078,9 @@ pub const ext_rgba10x6_formats_extension_name = 'VK_EXT_rgba10x6_formats'
 
 pub struct PhysicalDeviceRGBA10X6FormatsFeaturesEXT {
 pub mut:
-	s_type                                  StructureType
-	p_next                                  voidptr
-	format_rgba10x6_without_y_cb_cr_sampler Bool32
+	s_type                                     StructureType
+	p_next                                     voidptr
+	format_rgba_1_0x_6_without_y_cb_cr_sampler Bool32
 }
 
 pub const valve_mutable_descriptor_type_spec_version = 1
@@ -17289,7 +17088,7 @@ pub const valve_mutable_descriptor_type_extension_name = 'VK_VAVE_mutable_descri
 
 pub struct PhysicalDeviceMutableDescriptorTypeFeaturesEXT {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_physical_device_mutable_descriptor_type_features_ext
 	p_next                  voidptr
 	mutable_descriptor_type Bool32
 }
@@ -17306,7 +17105,7 @@ pub type MutableDescriptorTypeListVALVE = MutableDescriptorTypeListEXT
 
 pub struct MutableDescriptorTypeCreateInfoEXT {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_mutable_descriptor_type_create_info_ext
 	p_next                             voidptr
 	mutable_descriptor_type_list_count u32
 	p_mutable_descriptor_type_lists    &MutableDescriptorTypeListEXT
@@ -17319,14 +17118,14 @@ pub const ext_vertex_input_dynamic_state_extension_name = 'VK_EXT_vertex_input_d
 
 pub struct PhysicalDeviceVertexInputDynamicStateFeaturesEXT {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_physical_device_vertex_input_dynamic_state_features_ext
 	p_next                     voidptr
 	vertex_input_dynamic_state Bool32
 }
 
 pub struct VertexInputBindingDescription2EXT {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_vertex_input_binding_description_2_ext
 	p_next     voidptr
 	binding    u32
 	stride     u32
@@ -17336,7 +17135,7 @@ pub mut:
 
 pub struct VertexInputAttributeDescription2EXT {
 pub mut:
-	s_type   StructureType
+	s_type   StructureType = StructureType.structure_type_vertex_input_attribute_description_2_ext
 	p_next   voidptr
 	location u32
 	binding  u32
@@ -17363,7 +17162,7 @@ pub const ext_physical_device_drm_extension_name = 'VK_EXT_physical_device_drm'
 
 pub struct PhysicalDeviceDrmPropertiesEXT {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_physical_device_drm_properties_ext
 	p_next        voidptr
 	has_primary   Bool32
 	has_render    Bool32
@@ -17391,14 +17190,14 @@ pub type DeviceAddressBindingFlagsEXT = u32
 
 pub struct PhysicalDeviceAddressBindingReportFeaturesEXT {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_physical_device_address_binding_report_features_ext
 	p_next                 voidptr
 	report_address_binding Bool32
 }
 
 pub struct DeviceAddressBindingCallbackDataEXT {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_device_address_binding_callback_data_ext
 	p_next       voidptr
 	flags        DeviceAddressBindingFlagsEXT
 	base_address DeviceAddress
@@ -17411,14 +17210,14 @@ pub const ext_depth_clip_control_extension_name = 'VK_EXT_depth_clip_control'
 
 pub struct PhysicalDeviceDepthClipControlFeaturesEXT {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_physical_device_depth_clip_control_features_ext
 	p_next             voidptr
 	depth_clip_control Bool32
 }
 
 pub struct PipelineViewportDepthClipControlCreateInfoEXT {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_pipeline_viewport_depth_clip_control_create_info_ext
 	p_next              voidptr
 	negative_one_to_one Bool32
 }
@@ -17428,7 +17227,7 @@ pub const ext_primitive_topology_list_restart_extension_name = 'VK_EXT_primitive
 
 pub struct PhysicalDevicePrimitiveTopologyListRestartFeaturesEXT {
 pub mut:
-	s_type                                StructureType
+	s_type                                StructureType = StructureType.structure_type_physical_device_primitive_topology_list_restart_features_ext
 	p_next                                voidptr
 	primitive_topology_list_restart       Bool32
 	primitive_topology_patch_list_restart Bool32
@@ -17439,7 +17238,7 @@ pub const huawei_subpass_shading_extension_name = 'VK_HAWEI_subpass_shading'
 
 pub struct SubpassShadingPipelineCreateInfoHUAWEI {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_subpass_shading_pipeline_create_info_huawei
 	p_next      voidptr
 	render_pass C.RenderPass
 	subpass     u32
@@ -17447,14 +17246,14 @@ pub mut:
 
 pub struct PhysicalDeviceSubpassShadingFeaturesHUAWEI {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_subpass_shading_features_huawei
 	p_next          voidptr
 	subpass_shading Bool32
 }
 
 pub struct PhysicalDeviceSubpassShadingPropertiesHUAWEI {
 pub mut:
-	s_type                                          StructureType
+	s_type                                          StructureType = StructureType.structure_type_physical_device_subpass_shading_properties_huawei
 	p_next                                          voidptr
 	max_subpass_shading_workgroup_size_aspect_ratio u32
 }
@@ -17478,7 +17277,7 @@ pub const huawei_invocation_mask_extension_name = 'VK_HAWEI_invocation_mask'
 
 pub struct PhysicalDeviceInvocationMaskFeaturesHUAWEI {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_invocation_mask_features_huawei
 	p_next          voidptr
 	invocation_mask Bool32
 }
@@ -17499,7 +17298,7 @@ pub const nv_external_memory_rdma_extension_name = 'VK_NV_external_memory_rdma'
 
 pub struct MemoryGetRemoteAddressInfoNV {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_memory_get_remote_address_info_nv
 	p_next      voidptr
 	memory      C.DeviceMemory
 	handle_type ExternalMemoryHandleTypeFlagBits
@@ -17507,7 +17306,7 @@ pub mut:
 
 pub struct PhysicalDeviceExternalMemoryRDMAFeaturesNV {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_physical_device_external_memory_rdma_features_nv
 	p_next               voidptr
 	external_memory_rdma Bool32
 }
@@ -17528,14 +17327,14 @@ pub type PipelineInfoEXT = PipelineInfoKHR
 
 pub struct PipelinePropertiesIdentifierEXT {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_pipeline_properties_identifier_ext
 	p_next              voidptr
 	pipeline_identifier [uuid_size]u8
 }
 
 pub struct PhysicalDevicePipelinePropertiesFeaturesEXT {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_physical_device_pipeline_properties_features_ext
 	p_next                         voidptr
 	pipeline_properties_identifier Bool32
 }
@@ -17561,14 +17360,14 @@ pub type FrameBoundaryFlagsEXT = u32
 
 pub struct PhysicalDeviceFrameBoundaryFeaturesEXT {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_physical_device_frame_boundary_features_ext
 	p_next         voidptr
 	frame_boundary Bool32
 }
 
 pub struct FrameBoundaryEXT {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_frame_boundary_ext
 	p_next       voidptr
 	flags        FrameBoundaryFlagsEXT
 	frame_id     u64
@@ -17586,21 +17385,21 @@ pub const ext_multisampled_render_to_single_sampled_extension_name = 'VK_EXT_mul
 
 pub struct PhysicalDeviceMultisampledRenderToSingleSampledFeaturesEXT {
 pub mut:
-	s_type                                StructureType
+	s_type                                StructureType = StructureType.structure_type_physical_device_multisampled_render_to_single_sampled_features_ext
 	p_next                                voidptr
 	multisampled_render_to_single_sampled Bool32
 }
 
 pub struct SubpassResolvePerformanceQueryEXT {
 pub mut:
-	s_type  StructureType
+	s_type  StructureType = StructureType.structure_type_subpass_resolve_performance_query_ext
 	p_next  voidptr
 	optimal Bool32
 }
 
 pub struct MultisampledRenderToSingleSampledInfoEXT {
 pub mut:
-	s_type                                       StructureType
+	s_type                                       StructureType = StructureType.structure_type_multisampled_render_to_single_sampled_info_ext
 	p_next                                       voidptr
 	multisampled_render_to_single_sampled_enable Bool32
 	rasterization_samples                        SampleCountFlagBits
@@ -17611,11 +17410,11 @@ pub const ext_extended_dynamic_state_2_extension_name = 'VK_EXT_extended_dynamic
 
 pub struct PhysicalDeviceExtendedDynamicState2FeaturesEXT {
 pub mut:
-	s_type                                       StructureType
-	p_next                                       voidptr
-	extended_dynamic_state2                      Bool32
-	extended_dynamic_state2_logic_op             Bool32
-	extended_dynamic_state2_patch_control_points Bool32
+	s_type                                        StructureType = StructureType.structure_type_physical_device_extended_dynamic_state_2_features_ext
+	p_next                                        voidptr
+	extended_dynamic_state_2                      Bool32
+	extended_dynamic_state_2_logic_op             Bool32
+	extended_dynamic_state_2_patch_control_points Bool32
 }
 
 fn C.vkCmdSetPatchControlPointsEXT(C.CommandBuffer,
@@ -17637,14 +17436,14 @@ pub const ext_color_write_enable_extension_name = 'VK_EXT_color_write_enable'
 
 pub struct PhysicalDeviceColorWriteEnableFeaturesEXT {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_physical_device_color_write_enable_features_ext
 	p_next             voidptr
 	color_write_enable Bool32
 }
 
 pub struct PipelineColorWriteCreateInfoEXT {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_pipeline_color_write_create_info_ext
 	p_next                voidptr
 	attachment_count      u32
 	p_color_write_enables &Bool32
@@ -17664,7 +17463,7 @@ pub const ext_primitives_generated_query_extension_name = 'VK_EXT_primitives_gen
 
 pub struct PhysicalDevicePrimitivesGeneratedQueryFeaturesEXT {
 pub mut:
-	s_type                                             StructureType
+	s_type                                             StructureType = StructureType.structure_type_physical_device_primitives_generated_query_features_ext
 	p_next                                             voidptr
 	primitives_generated_query                         Bool32
 	primitives_generated_query_with_rasterizer_discard Bool32
@@ -17684,14 +17483,14 @@ pub const ext_image_view_min_lod_extension_name = 'VK_EXT_image_view_min_lod'
 
 pub struct PhysicalDeviceImageViewMinLodFeaturesEXT {
 pub mut:
-	s_type  StructureType
+	s_type  StructureType = StructureType.structure_type_physical_device_image_view_min_lod_features_ext
 	p_next  voidptr
 	min_lod Bool32
 }
 
 pub struct ImageViewMinLodCreateInfoEXT {
 pub mut:
-	s_type  StructureType
+	s_type  StructureType = StructureType.structure_type_image_view_min_lod_create_info_ext
 	p_next  voidptr
 	min_lod f32
 }
@@ -17701,14 +17500,14 @@ pub const ext_multi_draw_extension_name = 'VK_EXT_multi_draw'
 
 pub struct PhysicalDeviceMultiDrawFeaturesEXT {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_physical_device_multi_draw_features_ext
 	p_next     voidptr
 	multi_draw Bool32
 }
 
 pub struct PhysicalDeviceMultiDrawPropertiesEXT {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_physical_device_multi_draw_properties_ext
 	p_next               voidptr
 	max_multi_draw_count u32
 }
@@ -17765,10 +17564,10 @@ pub const ext_image_2d_view_of_3d_extension_name = 'VK_EXT_image_2d_view_of_3d'
 
 pub struct PhysicalDeviceImage2DViewOf3DFeaturesEXT {
 pub mut:
-	s_type                StructureType
-	p_next                voidptr
-	image2_d_view_of3_d   Bool32
-	sampler2_d_view_of3_d Bool32
+	s_type                  StructureType
+	p_next                  voidptr
+	image_2_d_view_of_3_d   Bool32
+	sampler_2_d_view_of_3_d Bool32
 }
 
 pub const ext_shader_tile_image_spec_version = 1
@@ -17776,7 +17575,7 @@ pub const ext_shader_tile_image_extension_name = 'VK_EXT_shader_tile_image'
 
 pub struct PhysicalDeviceShaderTileImageFeaturesEXT {
 pub mut:
-	s_type                                StructureType
+	s_type                                StructureType = StructureType.structure_type_physical_device_shader_tile_image_features_ext
 	p_next                                voidptr
 	shader_tile_image_color_read_access   Bool32
 	shader_tile_image_depth_read_access   Bool32
@@ -17785,7 +17584,7 @@ pub mut:
 
 pub struct PhysicalDeviceShaderTileImagePropertiesEXT {
 pub mut:
-	s_type                                                   StructureType
+	s_type                                                   StructureType = StructureType.structure_type_physical_device_shader_tile_image_properties_ext
 	p_next                                                   voidptr
 	shader_tile_image_coherent_read_accelerated              Bool32
 	shader_tile_image_read_sample_from_pixel_rate_invocation Bool32
@@ -17873,7 +17672,7 @@ pub mut:
 
 pub struct MicromapBuildInfoEXT {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_micromap_build_info_ext
 	p_next                voidptr
 	vktype                MicromapTypeEXT
 	flags                 BuildMicromapFlagsEXT
@@ -17890,7 +17689,7 @@ pub mut:
 
 pub struct MicromapCreateInfoEXT {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_micromap_create_info_ext
 	p_next         voidptr
 	create_flags   MicromapCreateFlagsEXT
 	buffer         C.Buffer
@@ -17902,7 +17701,7 @@ pub mut:
 
 pub struct PhysicalDeviceOpacityMicromapFeaturesEXT {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_physical_device_opacity_micromap_features_ext
 	p_next                  voidptr
 	micromap                Bool32
 	micromap_capture_replay Bool32
@@ -17911,22 +17710,22 @@ pub mut:
 
 pub struct PhysicalDeviceOpacityMicromapPropertiesEXT {
 pub mut:
-	s_type                               StructureType
-	p_next                               voidptr
-	max_opacity2_state_subdivision_level u32
-	max_opacity4_state_subdivision_level u32
+	s_type                                StructureType = StructureType.structure_type_physical_device_opacity_micromap_properties_ext
+	p_next                                voidptr
+	max_opacity_2_state_subdivision_level u32
+	max_opacity_4_state_subdivision_level u32
 }
 
 pub struct MicromapVersionInfoEXT {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_micromap_version_info_ext
 	p_next         voidptr
 	p_version_data &u8
 }
 
 pub struct CopyMicromapToMemoryInfoEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_copy_micromap_to_memory_info_ext
 	p_next voidptr
 	src    C.MicromapEXT
 	dst    DeviceOrHostAddressKHR
@@ -17935,7 +17734,7 @@ pub mut:
 
 pub struct CopyMemoryToMicromapInfoEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_copy_memory_to_micromap_info_ext
 	p_next voidptr
 	src    DeviceOrHostAddressConstKHR
 	dst    C.MicromapEXT
@@ -17944,7 +17743,7 @@ pub mut:
 
 pub struct CopyMicromapInfoEXT {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_copy_micromap_info_ext
 	p_next voidptr
 	src    C.MicromapEXT
 	dst    C.MicromapEXT
@@ -17953,7 +17752,7 @@ pub mut:
 
 pub struct MicromapBuildSizesInfoEXT {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_micromap_build_sizes_info_ext
 	p_next             voidptr
 	micromap_size      DeviceSize
 	build_scratch_size DeviceSize
@@ -17962,7 +17761,7 @@ pub mut:
 
 pub struct AccelerationStructureTrianglesOpacityMicromapEXT {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_acceleration_structure_triangles_opacity_micromap_ext
 	p_next             voidptr
 	index_type         IndexType
 	index_buffer       DeviceOrHostAddressConstKHR
@@ -18131,7 +17930,7 @@ pub const huawei_cluster_culling_shader_extension_name = 'VK_HAWEI_cluster_culli
 
 pub struct PhysicalDeviceClusterCullingShaderFeaturesHUAWEI {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_cluster_culling_shader_features_huawei
 	p_next                           voidptr
 	clusterculling_shader            Bool32
 	multiview_cluster_culling_shader Bool32
@@ -18139,7 +17938,7 @@ pub mut:
 
 pub struct PhysicalDeviceClusterCullingShaderPropertiesHUAWEI {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_cluster_culling_shader_properties_huawei
 	p_next                           voidptr
 	max_work_group_count             [3]u32
 	max_work_group_size              [3]u32
@@ -18149,7 +17948,7 @@ pub mut:
 
 pub struct PhysicalDeviceClusterCullingShaderVrsFeaturesHUAWEI {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_physical_device_cluster_culling_shader_vrs_features_huawei
 	p_next               voidptr
 	cluster_shading_rate Bool32
 }
@@ -18179,7 +17978,7 @@ pub const ext_border_color_swizzle_extension_name = 'VK_EXT_border_color_swizzle
 
 pub struct PhysicalDeviceBorderColorSwizzleFeaturesEXT {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_physical_device_border_color_swizzle_features_ext
 	p_next                          voidptr
 	border_color_swizzle            Bool32
 	border_color_swizzle_from_image Bool32
@@ -18187,7 +17986,7 @@ pub mut:
 
 pub struct SamplerBorderColorComponentMappingCreateInfoEXT {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_sampler_border_color_component_mapping_create_info_ext
 	p_next     voidptr
 	components ComponentMapping
 	srgb       Bool32
@@ -18198,7 +17997,7 @@ pub const ext_pageable_device_local_memory_extension_name = 'VK_EXT_pageable_dev
 
 pub struct PhysicalDevicePageableDeviceLocalMemoryFeaturesEXT {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_physical_device_pageable_device_local_memory_features_ext
 	p_next                       voidptr
 	pageable_device_local_memory Bool32
 }
@@ -18217,7 +18016,7 @@ pub const arm_shader_core_properties_extension_name = 'VK_ARM_shader_core_proper
 
 pub struct PhysicalDeviceShaderCorePropertiesARM {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_physical_device_shader_core_properties_arm
 	p_next     voidptr
 	pixel_rate u32
 	texel_rate u32
@@ -18236,21 +18035,21 @@ pub const physical_device_scheduling_controls_shader_core_count_arm = u64(0x0000
 
 pub struct DeviceQueueShaderCoreControlCreateInfoARM {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_device_queue_shader_core_control_create_info_arm
 	p_next            voidptr
 	shader_core_count u32
 }
 
 pub struct PhysicalDeviceSchedulingControlsFeaturesARM {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_physical_device_scheduling_controls_features_arm
 	p_next              voidptr
 	scheduling_controls Bool32
 }
 
 pub struct PhysicalDeviceSchedulingControlsPropertiesARM {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_physical_device_scheduling_controls_properties_arm
 	p_next                    voidptr
 	scheduling_controls_flags PhysicalDeviceSchedulingControlsFlagsARM
 }
@@ -18261,14 +18060,14 @@ pub const remaining_3d_slices_ext = ~u32(0)
 
 pub struct PhysicalDeviceImageSlicedViewOf3DFeaturesEXT {
 pub mut:
-	s_type                  StructureType
-	p_next                  voidptr
-	image_sliced_view_of3_d Bool32
+	s_type                   StructureType
+	p_next                   voidptr
+	image_sliced_view_of_3_d Bool32
 }
 
 pub struct ImageViewSlicedCreateInfoEXT {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_image_view_sliced_create_info_ext
 	p_next       voidptr
 	slice_offset u32
 	slice_count  u32
@@ -18279,14 +18078,14 @@ pub const valve_descriptor_set_host_mapping_extension_name = 'VK_VAVE_descriptor
 
 pub struct PhysicalDeviceDescriptorSetHostMappingFeaturesVALVE {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_physical_device_descriptor_set_host_mapping_features_valve
 	p_next                      voidptr
 	descriptor_set_host_mapping Bool32
 }
 
 pub struct DescriptorSetBindingReferenceVALVE {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_descriptor_set_binding_reference_valve
 	p_next                voidptr
 	descriptor_set_layout C.DescriptorSetLayout
 	binding               u32
@@ -18294,7 +18093,7 @@ pub mut:
 
 pub struct DescriptorSetLayoutHostMappingInfoVALVE {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_descriptor_set_layout_host_mapping_info_valve
 	p_next            voidptr
 	descriptor_offset usize
 	descriptor_size   u32
@@ -18323,7 +18122,7 @@ pub const ext_depth_clamp_zero_one_extension_name = 'VK_EXT_depth_clamp_zero_one
 
 pub struct PhysicalDeviceDepthClampZeroOneFeaturesEXT {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_physical_device_depth_clamp_zero_one_features_ext
 	p_next               voidptr
 	depth_clamp_zero_one Bool32
 }
@@ -18333,7 +18132,7 @@ pub const ext_non_seamless_cube_map_extension_name = 'VK_EXT_non_seamless_cube_m
 
 pub struct PhysicalDeviceNonSeamlessCubeMapFeaturesEXT {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_physical_device_non_seamless_cube_map_features_ext
 	p_next                voidptr
 	non_seamless_cube_map Bool32
 }
@@ -18343,14 +18142,14 @@ pub const arm_render_pass_striped_extension_name = 'VK_ARM_render_pass_striped'
 
 pub struct PhysicalDeviceRenderPassStripedFeaturesARM {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_physical_device_render_pass_striped_features_arm
 	p_next              voidptr
 	render_pass_striped Bool32
 }
 
 pub struct PhysicalDeviceRenderPassStripedPropertiesARM {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_physical_device_render_pass_striped_properties_arm
 	p_next                         voidptr
 	render_pass_stripe_granularity Extent2D
 	max_render_pass_stripes        u32
@@ -18358,14 +18157,14 @@ pub mut:
 
 pub struct RenderPassStripeInfoARM {
 pub mut:
-	s_type      StructureType
+	s_type      StructureType = StructureType.structure_type_render_pass_stripe_info_arm
 	p_next      voidptr
 	stripe_area Rect2D
 }
 
 pub struct RenderPassStripeBeginInfoARM {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_render_pass_stripe_begin_info_arm
 	p_next            voidptr
 	stripe_info_count u32
 	p_stripe_infos    &RenderPassStripeInfoARM
@@ -18373,7 +18172,7 @@ pub mut:
 
 pub struct RenderPassStripeSubmitInfoARM {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_render_pass_stripe_submit_info_arm
 	p_next                      voidptr
 	stripe_semaphore_info_count u32
 	p_stripe_semaphore_infos    &SemaphoreSubmitInfo
@@ -18384,21 +18183,21 @@ pub const qcom_fragment_density_map_offset_extension_name = 'VK_QCOM_fragment_de
 
 pub struct PhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_physical_device_fragment_density_map_offset_features_qcom
 	p_next                      voidptr
 	fragment_density_map_offset Bool32
 }
 
 pub struct PhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_physical_device_fragment_density_map_offset_properties_qcom
 	p_next                              voidptr
 	fragment_density_offset_granularity Extent2D
 }
 
 pub struct SubpassFragmentDensityMapOffsetEndInfoQCOM {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_subpass_fragment_density_map_offset_end_info_qcom
 	p_next                        voidptr
 	fragment_density_offset_count u32
 	p_fragment_density_offsets    &Offset2D
@@ -18426,14 +18225,14 @@ pub mut:
 
 pub struct PhysicalDeviceCopyMemoryIndirectFeaturesNV {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_physical_device_copy_memory_indirect_features_nv
 	p_next        voidptr
 	indirect_copy Bool32
 }
 
 pub struct PhysicalDeviceCopyMemoryIndirectPropertiesNV {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_physical_device_copy_memory_indirect_properties_nv
 	p_next           voidptr
 	supported_queues QueueFlags
 }
@@ -18488,14 +18287,14 @@ pub mut:
 
 pub struct PhysicalDeviceMemoryDecompressionFeaturesNV {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_physical_device_memory_decompression_features_nv
 	p_next               voidptr
 	memory_decompression Bool32
 }
 
 pub struct PhysicalDeviceMemoryDecompressionPropertiesNV {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_memory_decompression_properties_nv
 	p_next                           voidptr
 	decompression_methods            MemoryDecompressionMethodFlagsNV
 	max_decompression_indirect_count u64
@@ -18527,7 +18326,7 @@ pub const nv_device_generated_commands_compute_extension_name = 'VK_NV_device_ge
 
 pub struct PhysicalDeviceDeviceGeneratedCommandsComputeFeaturesNV {
 pub mut:
-	s_type                                  StructureType
+	s_type                                  StructureType = StructureType.structure_type_physical_device_device_generated_commands_compute_features_nv
 	p_next                                  voidptr
 	device_generated_compute                Bool32
 	device_generated_compute_pipelines      Bool32
@@ -18536,7 +18335,7 @@ pub mut:
 
 pub struct ComputePipelineIndirectBufferInfoNV {
 pub mut:
-	s_type                                 StructureType
+	s_type                                 StructureType = StructureType.structure_type_compute_pipeline_indirect_buffer_info_nv
 	p_next                                 voidptr
 	device_address                         DeviceAddress
 	size                                   DeviceSize
@@ -18545,7 +18344,7 @@ pub mut:
 
 pub struct PipelineIndirectDeviceAddressInfoNV {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_pipeline_indirect_device_address_info_nv
 	p_next              voidptr
 	pipeline_bind_point PipelineBindPoint
 	pipeline            C.Pipeline
@@ -18586,7 +18385,7 @@ pub const nv_linear_color_attachment_extension_name = 'VK_NV_linear_color_attach
 
 pub struct PhysicalDeviceLinearColorAttachmentFeaturesNV {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_physical_device_linear_color_attachment_features_nv
 	p_next                  voidptr
 	linear_color_attachment Bool32
 }
@@ -18599,7 +18398,7 @@ pub const ext_image_compression_control_swapchain_extension_name = 'VK_EXT_image
 
 pub struct PhysicalDeviceImageCompressionControlSwapchainFeaturesEXT {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_physical_device_image_compression_control_swapchain_features_ext
 	p_next                              voidptr
 	image_compression_control_swapchain Bool32
 }
@@ -18609,7 +18408,7 @@ pub const qcom_image_processing_extension_name = 'VK_QCOM_image_processing'
 
 pub struct ImageViewSampleWeightCreateInfoQCOM {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_image_view_sample_weight_create_info_qcom
 	p_next        voidptr
 	filter_center Offset2D
 	filter_size   Extent2D
@@ -18618,7 +18417,7 @@ pub mut:
 
 pub struct PhysicalDeviceImageProcessingFeaturesQCOM {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_physical_device_image_processing_features_qcom
 	p_next                  voidptr
 	texture_sample_weighted Bool32
 	texture_box_filter      Bool32
@@ -18627,7 +18426,7 @@ pub mut:
 
 pub struct PhysicalDeviceImageProcessingPropertiesQCOM {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_physical_device_image_processing_properties_qcom
 	p_next                      voidptr
 	max_weight_filter_phases    u32
 	max_weight_filter_dimension Extent2D
@@ -18640,7 +18439,7 @@ pub const ext_nested_command_buffer_extension_name = 'VK_EXT_nested_command_buff
 
 pub struct PhysicalDeviceNestedCommandBufferFeaturesEXT {
 pub mut:
-	s_type                                 StructureType
+	s_type                                 StructureType = StructureType.structure_type_physical_device_nested_command_buffer_features_ext
 	p_next                                 voidptr
 	nested_command_buffer                  Bool32
 	nested_command_buffer_rendering        Bool32
@@ -18649,7 +18448,7 @@ pub mut:
 
 pub struct PhysicalDeviceNestedCommandBufferPropertiesEXT {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_physical_device_nested_command_buffer_properties_ext
 	p_next                           voidptr
 	max_command_buffer_nesting_level u32
 }
@@ -18659,7 +18458,7 @@ pub const ext_external_memory_acquire_unmodified_extension_name = 'VK_EXT_extern
 
 pub struct ExternalMemoryAcquireUnmodifiedEXT {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_external_memory_acquire_unmodified_ext
 	p_next                    voidptr
 	acquire_unmodified_memory Bool32
 }
@@ -18669,44 +18468,44 @@ pub const ext_extended_dynamic_state_3_extension_name = 'VK_EXT_extended_dynamic
 
 pub struct PhysicalDeviceExtendedDynamicState3FeaturesEXT {
 pub mut:
-	s_type                                                      StructureType
-	p_next                                                      voidptr
-	extended_dynamic_state3_tessellation_domain_origin          Bool32
-	extended_dynamic_state3_depth_clamp_enable                  Bool32
-	extended_dynamic_state3_polygon_mode                        Bool32
-	extended_dynamic_state3_rasterization_samples               Bool32
-	extended_dynamic_state3_sample_mask                         Bool32
-	extended_dynamic_state3_alpha_to_coverage_enable            Bool32
-	extended_dynamic_state3_alpha_to_one_enable                 Bool32
-	extended_dynamic_state3_logic_op_enable                     Bool32
-	extended_dynamic_state3_color_blend_enable                  Bool32
-	extended_dynamic_state3_color_blend_equation                Bool32
-	extended_dynamic_state3_color_write_mask                    Bool32
-	extended_dynamic_state3_rasterization_stream                Bool32
-	extended_dynamic_state3_conservative_rasterization_mode     Bool32
-	extended_dynamic_state3_extra_primitive_overestimation_size Bool32
-	extended_dynamic_state3_depth_clip_enable                   Bool32
-	extended_dynamic_state3_sample_locations_enable             Bool32
-	extended_dynamic_state3_color_blend_advanced                Bool32
-	extended_dynamic_state3_provoking_vertex_mode               Bool32
-	extended_dynamic_state3_line_rasterization_mode             Bool32
-	extended_dynamic_state3_line_stipple_enable                 Bool32
-	extended_dynamic_state3_depth_clip_negative_one_to_one      Bool32
-	extended_dynamic_state3_viewport_w_scaling_enable           Bool32
-	extended_dynamic_state3_viewport_swizzle                    Bool32
-	extended_dynamic_state3_coverage_to_color_enable            Bool32
-	extended_dynamic_state3_coverage_to_color_location          Bool32
-	extended_dynamic_state3_coverage_modulation_mode            Bool32
-	extended_dynamic_state3_coverage_modulation_table_enable    Bool32
-	extended_dynamic_state3_coverage_modulation_table           Bool32
-	extended_dynamic_state3_coverage_reduction_mode             Bool32
-	extended_dynamic_state3_representative_fragment_test_enable Bool32
-	extended_dynamic_state3_shading_rate_image_enable           Bool32
+	s_type                                                       StructureType = StructureType.structure_type_physical_device_extended_dynamic_state_3_features_ext
+	p_next                                                       voidptr
+	extended_dynamic_state_3_tessellation_domain_origin          Bool32
+	extended_dynamic_state_3_depth_clamp_enable                  Bool32
+	extended_dynamic_state_3_polygon_mode                        Bool32
+	extended_dynamic_state_3_rasterization_samples               Bool32
+	extended_dynamic_state_3_sample_mask                         Bool32
+	extended_dynamic_state_3_alpha_to_coverage_enable            Bool32
+	extended_dynamic_state_3_alpha_to_one_enable                 Bool32
+	extended_dynamic_state_3_logic_op_enable                     Bool32
+	extended_dynamic_state_3_color_blend_enable                  Bool32
+	extended_dynamic_state_3_color_blend_equation                Bool32
+	extended_dynamic_state_3_color_write_mask                    Bool32
+	extended_dynamic_state_3_rasterization_stream                Bool32
+	extended_dynamic_state_3_conservative_rasterization_mode     Bool32
+	extended_dynamic_state_3_extra_primitive_overestimation_size Bool32
+	extended_dynamic_state_3_depth_clip_enable                   Bool32
+	extended_dynamic_state_3_sample_locations_enable             Bool32
+	extended_dynamic_state_3_color_blend_advanced                Bool32
+	extended_dynamic_state_3_provoking_vertex_mode               Bool32
+	extended_dynamic_state_3_line_rasterization_mode             Bool32
+	extended_dynamic_state_3_line_stipple_enable                 Bool32
+	extended_dynamic_state_3_depth_clip_negative_one_to_one      Bool32
+	extended_dynamic_state_3_viewport_w_scaling_enable           Bool32
+	extended_dynamic_state_3_viewport_swizzle                    Bool32
+	extended_dynamic_state_3_coverage_to_color_enable            Bool32
+	extended_dynamic_state_3_coverage_to_color_location          Bool32
+	extended_dynamic_state_3_coverage_modulation_mode            Bool32
+	extended_dynamic_state_3_coverage_modulation_table_enable    Bool32
+	extended_dynamic_state_3_coverage_modulation_table           Bool32
+	extended_dynamic_state_3_coverage_reduction_mode             Bool32
+	extended_dynamic_state_3_representative_fragment_test_enable Bool32
+	extended_dynamic_state_3_shading_rate_image_enable           Bool32
 }
 
 pub struct PhysicalDeviceExtendedDynamicState3PropertiesEXT {
 pub mut:
-	s_type                                  StructureType
+	s_type                                  StructureType = StructureType.structure_type_physical_device_extended_dynamic_state_3_properties_ext
 	p_next                                  voidptr
 	dynamic_primitive_topology_unrestricted Bool32
 }
@@ -18998,14 +18797,14 @@ pub enum SubpassMergeStatusEXT {
 
 pub struct PhysicalDeviceSubpassMergeFeedbackFeaturesEXT {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_physical_device_subpass_merge_feedback_features_ext
 	p_next                 voidptr
 	subpass_merge_feedback Bool32
 }
 
 pub struct RenderPassCreationControlEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_render_pass_creation_control_ext
 	p_next           voidptr
 	disallow_merging Bool32
 }
@@ -19017,7 +18816,7 @@ pub mut:
 
 pub struct RenderPassCreationFeedbackCreateInfoEXT {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_render_pass_creation_feedback_create_info_ext
 	p_next                 voidptr
 	p_render_pass_feedback &RenderPassCreationFeedbackInfoEXT
 }
@@ -19031,7 +18830,7 @@ pub mut:
 
 pub struct RenderPassSubpassFeedbackCreateInfoEXT {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_render_pass_subpass_feedback_create_info_ext
 	p_next             voidptr
 	p_subpass_feedback &RenderPassSubpassFeedbackInfoEXT
 }
@@ -19050,7 +18849,7 @@ pub type PFN_vkGetInstanceProcAddrLUNARG = fn (instanceconst C.Instance, pName &
 
 pub struct DirectDriverLoadingInfoLUNARG {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_direct_driver_loading_info_lunarg
 	p_next                     voidptr
 	flags                      DirectDriverLoadingFlagsLUNARG
 	pfn_get_instance_proc_addr PFN_vkGetInstanceProcAddrLUNARG = unsafe { nil }
@@ -19058,7 +18857,7 @@ pub mut:
 
 pub struct DirectDriverLoadingListLUNARG {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_direct_driver_loading_list_lunarg
 	p_next       voidptr
 	mode         DirectDriverLoadingModeLUNARG
 	driver_count u32
@@ -19071,21 +18870,21 @@ pub const ext_shader_module_identifier_extension_name = 'VK_EXT_shader_module_id
 
 pub struct PhysicalDeviceShaderModuleIdentifierFeaturesEXT {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_physical_device_shader_module_identifier_features_ext
 	p_next                   voidptr
 	shader_module_identifier Bool32
 }
 
 pub struct PhysicalDeviceShaderModuleIdentifierPropertiesEXT {
 pub mut:
-	s_type                                  StructureType
+	s_type                                  StructureType = StructureType.structure_type_physical_device_shader_module_identifier_properties_ext
 	p_next                                  voidptr
 	shader_module_identifier_algorithm_uuid [uuid_size]u8
 }
 
 pub struct PipelineShaderStageModuleIdentifierCreateInfoEXT {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_pipeline_shader_stage_module_identifier_create_info_ext
 	p_next          voidptr
 	identifier_size u32
 	p_identifier    &u8
@@ -19093,7 +18892,7 @@ pub mut:
 
 pub struct ShaderModuleIdentifierEXT {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_shader_module_identifier_ext
 	p_next          voidptr
 	identifier_size u32
 	identifier      [max_shader_module_identifier_size_ext]u8
@@ -19189,14 +18988,14 @@ pub type OpticalFlowExecuteFlagsNV = u32
 
 pub struct PhysicalDeviceOpticalFlowFeaturesNV {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_physical_device_optical_flow_features_nv
 	p_next       voidptr
 	optical_flow Bool32
 }
 
 pub struct PhysicalDeviceOpticalFlowPropertiesNV {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_physical_device_optical_flow_properties_nv
 	p_next                       voidptr
 	supported_output_grid_sizes  OpticalFlowGridSizeFlagsNV
 	supported_hint_grid_sizes    OpticalFlowGridSizeFlagsNV
@@ -19213,21 +19012,21 @@ pub mut:
 
 pub struct OpticalFlowImageFormatInfoNV {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_optical_flow_image_format_info_nv
 	p_next voidptr
 	usage  OpticalFlowUsageFlagsNV
 }
 
 pub struct OpticalFlowImageFormatPropertiesNV {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_optical_flow_image_format_properties_nv
 	p_next voidptr
 	format Format
 }
 
 pub struct OpticalFlowSessionCreateInfoNV {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_optical_flow_session_create_info_nv
 	p_next             voidptr
 	width              u32
 	height             u32
@@ -19242,7 +19041,7 @@ pub mut:
 
 pub struct OpticalFlowSessionCreatePrivateDataInfoNV {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_optical_flow_session_create_private_data_info_nv
 	p_next         voidptr
 	id             u32
 	size           u32
@@ -19251,7 +19050,7 @@ pub mut:
 
 pub struct OpticalFlowExecuteInfoNV {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_optical_flow_execute_info_nv
 	p_next       voidptr
 	flags        OpticalFlowExecuteFlagsNV
 	region_count u32
@@ -19317,7 +19116,7 @@ pub const ext_legacy_dithering_extension_name = 'VK_EXT_legacy_dithering'
 
 pub struct PhysicalDeviceLegacyDitheringFeaturesEXT {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_physical_device_legacy_dithering_features_ext
 	p_next           voidptr
 	legacy_dithering Bool32
 }
@@ -19327,56 +19126,9 @@ pub const ext_pipeline_protected_access_extension_name = 'VK_EXT_pipeline_protec
 
 pub struct PhysicalDevicePipelineProtectedAccessFeaturesEXT {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_physical_device_pipeline_protected_access_features_ext
 	p_next                    voidptr
 	pipeline_protected_access Bool32
-}
-
-pub const amd_anti_lag_spec_version = 1
-pub const amd_anti_lag_extension_name = 'VK_AMD_anti_lag'
-
-pub enum AntiLagModeAMD {
-	anti_lag_mode_driver_control_amd = int(0)
-	anti_lag_mode_on_amd             = int(1)
-	anti_lag_mode_off_amd            = int(2)
-	anti_lag_mode_max_enum_amd       = int(0x7FFFFFFF)
-}
-
-pub enum AntiLagStageAMD {
-	anti_lag_stage_input_amd    = int(0)
-	anti_lag_stage_present_amd  = int(1)
-	anti_lag_stage_max_enum_amd = int(0x7FFFFFFF)
-}
-
-pub struct PhysicalDeviceAntiLagFeaturesAMD {
-pub mut:
-	s_type   StructureType
-	p_next   voidptr
-	anti_lag Bool32
-}
-
-pub struct AntiLagPresentationInfoAMD {
-pub mut:
-	s_type      StructureType
-	p_next      voidptr
-	stage       AntiLagStageAMD
-	frame_index u64
-}
-
-pub struct AntiLagDataAMD {
-pub mut:
-	s_type              StructureType
-	p_next              voidptr
-	mode                AntiLagModeAMD
-	max_fps             u32
-	p_presentation_info &AntiLagPresentationInfoAMD
-}
-
-fn C.vkAntiLagUpdateAMD(C.Device,
-	&AntiLagDataAMD)
-pub fn anti_lag_update_amd(device C.Device,
-	p_data &AntiLagDataAMD) {
-	C.vkAntiLagUpdateAMD(device, p_data)
 }
 
 pub type C.ShaderEXT = voidptr
@@ -19390,12 +19142,6 @@ pub enum ShaderCodeTypeEXT {
 	shader_code_type_max_enum_ext = int(0x7FFFFFFF)
 }
 
-pub enum DepthClampModeEXT {
-	depth_clamp_mode_viewport_range_ext     = int(0)
-	depth_clamp_mode_user_defined_range_ext = int(1)
-	depth_clamp_mode_max_enum_ext           = int(0x7FFFFFFF)
-}
-
 pub enum ShaderCreateFlagBitsEXT {
 	shader_create_link_stage_bit_ext                       = int(0x00000001)
 	shader_create_allow_varying_subgroup_size_bit_ext      = int(0x00000002)
@@ -19404,7 +19150,6 @@ pub enum ShaderCreateFlagBitsEXT {
 	shader_create_dispatch_base_bit_ext                    = int(0x00000010)
 	shader_create_fragment_shading_rate_attachment_bit_ext = int(0x00000020)
 	shader_create_fragment_density_map_attachment_bit_ext  = int(0x00000040)
-	shader_create_indirect_bindable_bit_ext                = int(0x00000080)
 	shader_create_flag_bits_max_enum_ext                   = int(0x7FFFFFFF)
 }
 
@@ -19412,14 +19157,14 @@ pub type ShaderCreateFlagsEXT = u32
 
 pub struct PhysicalDeviceShaderObjectFeaturesEXT {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_physical_device_shader_object_features_ext
 	p_next        voidptr
 	shader_object Bool32
 }
 
 pub struct PhysicalDeviceShaderObjectPropertiesEXT {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_physical_device_shader_object_properties_ext
 	p_next                voidptr
 	shader_binary_uuid    [uuid_size]u8
 	shader_binary_version u32
@@ -19427,7 +19172,7 @@ pub mut:
 
 pub struct ShaderCreateInfoEXT {
 pub mut:
-	s_type                    StructureType
+	s_type                    StructureType = StructureType.structure_type_shader_create_info_ext
 	p_next                    voidptr
 	flags                     ShaderCreateFlagsEXT
 	stage                     ShaderStageFlagBits
@@ -19444,12 +19189,6 @@ pub mut:
 }
 
 pub type ShaderRequiredSubgroupSizeCreateInfoEXT = PipelineShaderStageRequiredSubgroupSizeCreateInfo
-
-pub struct DepthClampRangeEXT {
-pub mut:
-	min_depth_clamp f32
-	max_depth_clamp f32
-}
 
 fn C.vkCreateShadersEXT(C.Device,
 	u32,
@@ -19496,28 +19235,19 @@ pub fn cmd_bind_shaders_ext(command_buffer C.CommandBuffer,
 	C.vkCmdBindShadersEXT(command_buffer, stage_count, p_stages, p_shaders)
 }
 
-fn C.vkCmdSetDepthClampRangeEXT(C.CommandBuffer,
-	DepthClampModeEXT,
-	&DepthClampRangeEXT)
-pub fn cmd_set_depth_clamp_range_ext(command_buffer C.CommandBuffer,
-	depth_clamp_mode DepthClampModeEXT,
-	p_depth_clamp_range &DepthClampRangeEXT) {
-	C.vkCmdSetDepthClampRangeEXT(command_buffer, depth_clamp_mode, p_depth_clamp_range)
-}
-
 pub const qcom_tile_properties_spec_version = 1
 pub const qcom_tile_properties_extension_name = 'VK_QCOM_tile_properties'
 
 pub struct PhysicalDeviceTilePropertiesFeaturesQCOM {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_tile_properties_features_qcom
 	p_next          voidptr
 	tile_properties Bool32
 }
 
 pub struct TilePropertiesQCOM {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_tile_properties_qcom
 	p_next     voidptr
 	tile_size  Extent3D
 	apron_size Extent2D
@@ -19550,14 +19280,14 @@ pub const sec_amigo_profiling_extension_name = 'VK_SEC_amigo_profiling'
 
 pub struct PhysicalDeviceAmigoProfilingFeaturesSEC {
 pub mut:
-	s_type          StructureType
+	s_type          StructureType = StructureType.structure_type_physical_device_amigo_profiling_features_sec
 	p_next          voidptr
 	amigo_profiling Bool32
 }
 
 pub struct AmigoProfilingSubmitInfoSEC {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_amigo_profiling_submit_info_sec
 	p_next                voidptr
 	first_draw_timestamp  u64
 	swap_buffer_timestamp u64
@@ -19568,7 +19298,7 @@ pub const qcom_multiview_per_view_viewports_extension_name = 'VK_QCOM_multiview_
 
 pub struct PhysicalDeviceMultiviewPerViewViewportsFeaturesQCOM {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_physical_device_multiview_per_view_viewports_features_qcom
 	p_next                       voidptr
 	multiview_per_view_viewports Bool32
 }
@@ -19584,14 +19314,14 @@ pub enum RayTracingInvocationReorderModeNV {
 
 pub struct PhysicalDeviceRayTracingInvocationReorderPropertiesNV {
 pub mut:
-	s_type                                         StructureType
+	s_type                                         StructureType = StructureType.structure_type_physical_device_ray_tracing_invocation_reorder_properties_nv
 	p_next                                         voidptr
 	ray_tracing_invocation_reorder_reordering_hint RayTracingInvocationReorderModeNV
 }
 
 pub struct PhysicalDeviceRayTracingInvocationReorderFeaturesNV {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_physical_device_ray_tracing_invocation_reorder_features_nv
 	p_next                         voidptr
 	ray_tracing_invocation_reorder Bool32
 }
@@ -19601,14 +19331,14 @@ pub const nv_extended_sparse_address_space_extension_name = 'VK_NV_extended_spar
 
 pub struct PhysicalDeviceExtendedSparseAddressSpaceFeaturesNV {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_physical_device_extended_sparse_address_space_features_nv
 	p_next                        voidptr
 	extended_sparse_address_space Bool32
 }
 
 pub struct PhysicalDeviceExtendedSparseAddressSpacePropertiesNV {
 pub mut:
-	s_type                             StructureType
+	s_type                             StructureType = StructureType.structure_type_physical_device_extended_sparse_address_space_properties_nv
 	p_next                             voidptr
 	extended_sparse_address_space_size DeviceSize
 	extended_sparse_image_usage_flags  ImageUsageFlags
@@ -19623,14 +19353,14 @@ pub const ext_legacy_vertex_attributes_extension_name = 'VK_EXT_legacy_vertex_at
 
 pub struct PhysicalDeviceLegacyVertexAttributesFeaturesEXT {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_physical_device_legacy_vertex_attributes_features_ext
 	p_next                   voidptr
 	legacy_vertex_attributes Bool32
 }
 
 pub struct PhysicalDeviceLegacyVertexAttributesPropertiesEXT {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_physical_device_legacy_vertex_attributes_properties_ext
 	p_next                       voidptr
 	native_unaligned_performance Bool32
 }
@@ -19661,7 +19391,7 @@ pub mut:
 
 pub struct LayerSettingsCreateInfoEXT {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_layer_settings_create_info_ext
 	p_next        voidptr
 	setting_count u32
 	p_settings    &LayerSettingEXT
@@ -19672,14 +19402,14 @@ pub const arm_shader_core_builtins_extension_name = 'VK_ARM_shader_core_builtins
 
 pub struct PhysicalDeviceShaderCoreBuiltinsFeaturesARM {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_physical_device_shader_core_builtins_features_arm
 	p_next               voidptr
 	shader_core_builtins Bool32
 }
 
 pub struct PhysicalDeviceShaderCoreBuiltinsPropertiesARM {
 pub mut:
-	s_type                StructureType
+	s_type                StructureType = StructureType.structure_type_physical_device_shader_core_builtins_properties_arm
 	p_next                voidptr
 	shader_core_mask      u64
 	shader_core_count     u32
@@ -19691,7 +19421,7 @@ pub const ext_pipeline_library_group_handles_extension_name = 'VK_EXT_pipeline_l
 
 pub struct PhysicalDevicePipelineLibraryGroupHandlesFeaturesEXT {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_physical_device_pipeline_library_group_handles_features_ext
 	p_next                         voidptr
 	pipeline_library_group_handles Bool32
 }
@@ -19701,7 +19431,7 @@ pub const ext_dynamic_rendering_unused_attachments_extension_name = 'VK_EXT_dyna
 
 pub struct PhysicalDeviceDynamicRenderingUnusedAttachmentsFeaturesEXT {
 pub mut:
-	s_type                               StructureType
+	s_type                               StructureType = StructureType.structure_type_physical_device_dynamic_rendering_unused_attachments_features_ext
 	p_next                               voidptr
 	dynamic_rendering_unused_attachments Bool32
 }
@@ -19733,7 +19463,7 @@ pub enum OutOfBandQueueTypeNV {
 
 pub struct LatencySleepModeInfoNV {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_latency_sleep_mode_info_nv
 	p_next              voidptr
 	low_latency_mode    Bool32
 	low_latency_boost   Bool32
@@ -19742,7 +19472,7 @@ pub mut:
 
 pub struct LatencySleepInfoNV {
 pub mut:
-	s_type           StructureType
+	s_type           StructureType = StructureType.structure_type_latency_sleep_info_nv
 	p_next           voidptr
 	signal_semaphore C.Semaphore
 	value            u64
@@ -19750,7 +19480,7 @@ pub mut:
 
 pub struct SetLatencyMarkerInfoNV {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_set_latency_marker_info_nv
 	p_next     voidptr
 	present_id u64
 	marker     LatencyMarkerNV
@@ -19758,7 +19488,7 @@ pub mut:
 
 pub struct LatencyTimingsFrameReportNV {
 pub mut:
-	s_type                        StructureType
+	s_type                        StructureType = StructureType.structure_type_latency_timings_frame_report_nv
 	p_next                        voidptr
 	present_id                    u64
 	input_sample_time_us          u64
@@ -19778,7 +19508,7 @@ pub mut:
 
 pub struct GetLatencyMarkerInfoNV {
 pub mut:
-	s_type       StructureType
+	s_type       StructureType = StructureType.structure_type_get_latency_marker_info_nv
 	p_next       voidptr
 	timing_count u32
 	p_timings    &LatencyTimingsFrameReportNV
@@ -19786,28 +19516,28 @@ pub mut:
 
 pub struct LatencySubmissionPresentIdNV {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_latency_submission_present_id_nv
 	p_next     voidptr
 	present_id u64
 }
 
 pub struct SwapchainLatencyCreateInfoNV {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_swapchain_latency_create_info_nv
 	p_next              voidptr
 	latency_mode_enable Bool32
 }
 
 pub struct OutOfBandQueueTypeInfoNV {
 pub mut:
-	s_type     StructureType
+	s_type     StructureType = StructureType.structure_type_out_of_band_queue_type_info_nv
 	p_next     voidptr
 	queue_type OutOfBandQueueTypeNV
 }
 
 pub struct LatencySurfaceCapabilitiesNV {
 pub mut:
-	s_type             StructureType
+	s_type             StructureType = StructureType.structure_type_latency_surface_capabilities_nv
 	p_next             voidptr
 	present_mode_count u32
 	p_present_modes    &PresentModeKHR
@@ -19861,14 +19591,14 @@ pub const qcom_multiview_per_view_render_areas_extension_name = 'VK_QCOM_multivi
 
 pub struct PhysicalDeviceMultiviewPerViewRenderAreasFeaturesQCOM {
 pub mut:
-	s_type                          StructureType
+	s_type                          StructureType = StructureType.structure_type_physical_device_multiview_per_view_render_areas_features_qcom
 	p_next                          voidptr
 	multiview_per_view_render_areas Bool32
 }
 
 pub struct MultiviewPerViewRenderAreasRenderPassBeginInfoQCOM {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_multiview_per_view_render_areas_render_pass_begin_info_qcom
 	p_next                     voidptr
 	per_view_render_area_count u32
 	p_per_view_render_areas    &Rect2D
@@ -19879,7 +19609,7 @@ pub const nv_per_stage_descriptor_set_extension_name = 'VK_NV_per_stage_descript
 
 pub struct PhysicalDevicePerStageDescriptorSetFeaturesNV {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_physical_device_per_stage_descriptor_set_features_nv
 	p_next                   voidptr
 	per_stage_descriptor_set Bool32
 	dynamic_pipeline_layout  Bool32
@@ -19896,21 +19626,21 @@ pub enum BlockMatchWindowCompareModeQCOM {
 
 pub struct PhysicalDeviceImageProcessing2FeaturesQCOM {
 pub mut:
-	s_type               StructureType
-	p_next               voidptr
-	texture_block_match2 Bool32
+	s_type                StructureType = StructureType.structure_type_physical_device_image_processing_2_features_qcom
+	p_next                voidptr
+	texture_block_match_2 Bool32
 }
 
 pub struct PhysicalDeviceImageProcessing2PropertiesQCOM {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_physical_device_image_processing_2_properties_qcom
 	p_next                 voidptr
 	max_block_match_window Extent2D
 }
 
 pub struct SamplerBlockMatchWindowCreateInfoQCOM {
 pub mut:
-	s_type              StructureType
+	s_type              StructureType = StructureType.structure_type_sampler_block_match_window_create_info_qcom
 	p_next              voidptr
 	window_extent       Extent2D
 	window_compare_mode BlockMatchWindowCompareModeQCOM
@@ -19929,21 +19659,21 @@ pub enum CubicFilterWeightsQCOM {
 
 pub struct PhysicalDeviceCubicWeightsFeaturesQCOM {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_physical_device_cubic_weights_features_qcom
 	p_next                   voidptr
 	selectable_cubic_weights Bool32
 }
 
 pub struct SamplerCubicWeightsCreateInfoQCOM {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_sampler_cubic_weights_create_info_qcom
 	p_next        voidptr
 	cubic_weights CubicFilterWeightsQCOM
 }
 
 pub struct BlitImageCubicWeightsInfoQCOM {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_blit_image_cubic_weights_info_qcom
 	p_next        voidptr
 	cubic_weights CubicFilterWeightsQCOM
 }
@@ -19953,14 +19683,14 @@ pub const qcom_ycbcr_degamma_extension_name = 'VK_QCOM_ycbcr_degamma'
 
 pub struct PhysicalDeviceYcbcrDegammaFeaturesQCOM {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_physical_device_ycbcr_degamma_features_qcom
 	p_next        voidptr
 	ycbcr_degamma Bool32
 }
 
 pub struct SamplerYcbcrConversionYcbcrDegammaCreateInfoQCOM {
 pub mut:
-	s_type               StructureType
+	s_type               StructureType = StructureType.structure_type_sampler_ycbcr_conversion_ycbcr_degamma_create_info_qcom
 	p_next               voidptr
 	enable_y_degamma     Bool32
 	enable_cb_cr_degamma Bool32
@@ -19971,7 +19701,7 @@ pub const qcom_filter_cubic_clamp_extension_name = 'VK_QCOM_filter_cubic_clamp'
 
 pub struct PhysicalDeviceCubicClampFeaturesQCOM {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_physical_device_cubic_clamp_features_qcom
 	p_next            voidptr
 	cubic_range_clamp Bool32
 }
@@ -19981,7 +19711,7 @@ pub const ext_attachment_feedback_loop_dynamic_state_extension_name = 'VK_EXT_at
 
 pub struct PhysicalDeviceAttachmentFeedbackLoopDynamicStateFeaturesEXT {
 pub mut:
-	s_type                                 StructureType
+	s_type                                 StructureType = StructureType.structure_type_physical_device_attachment_feedback_loop_dynamic_state_features_ext
 	p_next                                 voidptr
 	attachment_feedback_loop_dynamic_state Bool32
 }
@@ -20004,7 +19734,7 @@ pub enum LayeredDriverUnderlyingApiMSFT {
 
 pub struct PhysicalDeviceLayeredDriverPropertiesMSFT {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_physical_device_layered_driver_properties_msft
 	p_next         voidptr
 	underlying_api LayeredDriverUnderlyingApiMSFT
 }
@@ -20014,7 +19744,7 @@ pub const nv_descriptor_pool_overallocation_extension_name = 'VK_NV_descriptor_p
 
 pub struct PhysicalDeviceDescriptorPoolOverallocationFeaturesNV {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_physical_device_descriptor_pool_overallocation_features_nv
 	p_next                         voidptr
 	descriptor_pool_overallocation Bool32
 }
@@ -20024,19 +19754,9 @@ pub const nv_raw_access_chains_extension_name = 'VK_NV_raw_access_chains'
 
 pub struct PhysicalDeviceRawAccessChainsFeaturesNV {
 pub mut:
-	s_type                   StructureType
+	s_type                   StructureType = StructureType.structure_type_physical_device_raw_access_chains_features_nv
 	p_next                   voidptr
 	shader_raw_access_chains Bool32
-}
-
-pub const nv_command_buffer_inheritance_spec_version = 1
-pub const nv_command_buffer_inheritance_extension_name = 'VK_NV_command_buffer_inheritance'
-
-pub struct PhysicalDeviceCommandBufferInheritanceFeaturesNV {
-pub mut:
-	s_type                     StructureType
-	p_next                     voidptr
-	command_buffer_inheritance Bool32
 }
 
 pub const nv_shader_atomic_float16_vector_spec_version = 1
@@ -20044,9 +19764,9 @@ pub const nv_shader_atomic_float16_vector_extension_name = 'VK_NV_shader_atomic_
 
 pub struct PhysicalDeviceShaderAtomicFloat16VectorFeaturesNV {
 pub mut:
-	s_type                        StructureType
-	p_next                        voidptr
-	shader_float16_vector_atomics Bool32
+	s_type                          StructureType
+	p_next                          voidptr
+	shader_float_1_6_vector_atomics Bool32
 }
 
 pub const ext_shader_replicated_composites_spec_version = 1
@@ -20054,7 +19774,7 @@ pub const ext_shader_replicated_composites_extension_name = 'VK_EXT_shader_repli
 
 pub struct PhysicalDeviceShaderReplicatedCompositesFeaturesEXT {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_physical_device_shader_replicated_composites_features_ext
 	p_next                       voidptr
 	shader_replicated_composites Bool32
 }
@@ -20064,343 +19784,9 @@ pub const nv_ray_tracing_validation_extension_name = 'VK_NV_ray_tracing_validati
 
 pub struct PhysicalDeviceRayTracingValidationFeaturesNV {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_physical_device_ray_tracing_validation_features_nv
 	p_next                 voidptr
 	ray_tracing_validation Bool32
-}
-
-pub type C.IndirectExecutionSetEXT = voidptr
-pub type C.IndirectCommandsLayoutEXT = voidptr
-
-pub const ext_device_generated_commands_spec_version = 1
-pub const ext_device_generated_commands_extension_name = 'VK_EXT_device_generated_commands'
-
-pub enum IndirectExecutionSetInfoTypeEXT {
-	indirect_execution_set_info_type_pipelines_ext      = int(0)
-	indirect_execution_set_info_type_shader_objects_ext = int(1)
-	indirect_execution_set_info_type_max_enum_ext       = int(0x7FFFFFFF)
-}
-
-pub enum IndirectCommandsTokenTypeEXT {
-	indirect_commands_token_type_execution_set_ext            = int(0)
-	indirect_commands_token_type_push_constant_ext            = int(1)
-	indirect_commands_token_type_sequence_index_ext           = int(2)
-	indirect_commands_token_type_index_buffer_ext             = int(3)
-	indirect_commands_token_type_vertex_buffer_ext            = int(4)
-	indirect_commands_token_type_draw_indexed_ext             = int(5)
-	indirect_commands_token_type_draw_ext                     = int(6)
-	indirect_commands_token_type_draw_indexed_count_ext       = int(7)
-	indirect_commands_token_type_draw_count_ext               = int(8)
-	indirect_commands_token_type_dispatch_ext                 = int(9)
-	indirect_commands_token_type_draw_mesh_tasks_nv_ext       = int(1000202002)
-	indirect_commands_token_type_draw_mesh_tasks_count_nv_ext = int(1000202003)
-	indirect_commands_token_type_draw_mesh_tasks_ext          = int(1000328000)
-	indirect_commands_token_type_draw_mesh_tasks_count_ext    = int(1000328001)
-	indirect_commands_token_type_trace_rays2_ext              = int(1000386004)
-	indirect_commands_token_type_max_enum_ext                 = int(0x7FFFFFFF)
-}
-
-pub enum IndirectCommandsInputModeFlagBitsEXT {
-	indirect_commands_input_mode_vulkan_index_buffer_ext = int(0x00000001)
-	indirect_commands_input_mode_dxgi_index_buffer_ext   = int(0x00000002)
-	indirect_commands_input_mode_flag_bits_max_enum_ext  = int(0x7FFFFFFF)
-}
-
-pub type IndirectCommandsInputModeFlagsEXT = u32
-
-pub enum IndirectCommandsLayoutUsageFlagBitsEXT {
-	indirect_commands_layout_usage_explicit_preprocess_bit_ext = int(0x00000001)
-	indirect_commands_layout_usage_unordered_sequences_bit_ext = int(0x00000002)
-	indirect_commands_layout_usage_flag_bits_max_enum_ext      = int(0x7FFFFFFF)
-}
-
-pub type IndirectCommandsLayoutUsageFlagsEXT = u32
-
-pub struct PhysicalDeviceDeviceGeneratedCommandsFeaturesEXT {
-pub mut:
-	s_type                            StructureType
-	p_next                            voidptr
-	device_generated_commands         Bool32
-	dynamic_generated_pipeline_layout Bool32
-}
-
-pub struct PhysicalDeviceDeviceGeneratedCommandsPropertiesEXT {
-pub mut:
-	s_type                                                     StructureType
-	p_next                                                     voidptr
-	max_indirect_pipeline_count                                u32
-	max_indirect_shader_object_count                           u32
-	max_indirect_sequence_count                                u32
-	max_indirect_commands_token_count                          u32
-	max_indirect_commands_token_offset                         u32
-	max_indirect_commands_indirect_stride                      u32
-	supported_indirect_commands_input_modes                    IndirectCommandsInputModeFlagsEXT
-	supported_indirect_commands_shader_stages                  ShaderStageFlags
-	supported_indirect_commands_shader_stages_pipeline_binding ShaderStageFlags
-	supported_indirect_commands_shader_stages_shader_binding   ShaderStageFlags
-	device_generated_commands_transform_feedback               Bool32
-	device_generated_commands_multi_draw_indirect_count        Bool32
-}
-
-pub struct GeneratedCommandsMemoryRequirementsInfoEXT {
-pub mut:
-	s_type                   StructureType
-	p_next                   voidptr
-	indirect_execution_set   C.IndirectExecutionSetEXT
-	indirect_commands_layout C.IndirectCommandsLayoutEXT
-	max_sequence_count       u32
-	max_draw_count           u32
-}
-
-pub struct IndirectExecutionSetPipelineInfoEXT {
-pub mut:
-	s_type             StructureType
-	p_next             voidptr
-	initial_pipeline   C.Pipeline
-	max_pipeline_count u32
-}
-
-pub struct IndirectExecutionSetShaderLayoutInfoEXT {
-pub mut:
-	s_type           StructureType
-	p_next           voidptr
-	set_layout_count u32
-	p_set_layouts    &C.DescriptorSetLayout
-}
-
-pub struct IndirectExecutionSetShaderInfoEXT {
-pub mut:
-	s_type                    StructureType
-	p_next                    voidptr
-	shader_count              u32
-	p_initial_shaders         &C.ShaderEXT
-	p_set_layout_infos        &IndirectExecutionSetShaderLayoutInfoEXT
-	max_shader_count          u32
-	push_constant_range_count u32
-	p_push_constant_ranges    &PushConstantRange
-}
-
-pub union IndirectExecutionSetInfoEXT {
-pub mut:
-	p_pipeline_info &IndirectExecutionSetPipelineInfoEXT
-	p_shader_info   &IndirectExecutionSetShaderInfoEXT
-}
-
-pub struct IndirectExecutionSetCreateInfoEXT {
-pub mut:
-	s_type StructureType
-	p_next voidptr
-	vktype IndirectExecutionSetInfoTypeEXT
-	info   IndirectExecutionSetInfoEXT
-}
-
-pub struct GeneratedCommandsInfoEXT {
-pub mut:
-	s_type                   StructureType
-	p_next                   voidptr
-	shader_stages            ShaderStageFlags
-	indirect_execution_set   C.IndirectExecutionSetEXT
-	indirect_commands_layout C.IndirectCommandsLayoutEXT
-	indirect_address         DeviceAddress
-	indirect_address_size    DeviceSize
-	preprocess_address       DeviceAddress
-	preprocess_size          DeviceSize
-	max_sequence_count       u32
-	sequence_count_address   DeviceAddress
-	max_draw_count           u32
-}
-
-pub struct WriteIndirectExecutionSetPipelineEXT {
-pub mut:
-	s_type   StructureType
-	p_next   voidptr
-	index    u32
-	pipeline C.Pipeline
-}
-
-pub struct IndirectCommandsPushConstantTokenEXT {
-pub mut:
-	update_range PushConstantRange
-}
-
-pub struct IndirectCommandsVertexBufferTokenEXT {
-pub mut:
-	vertex_binding_unit u32
-}
-
-pub struct IndirectCommandsIndexBufferTokenEXT {
-pub mut:
-	mode IndirectCommandsInputModeFlagBitsEXT
-}
-
-pub struct IndirectCommandsExecutionSetTokenEXT {
-pub mut:
-	vktype        IndirectExecutionSetInfoTypeEXT
-	shader_stages ShaderStageFlags
-}
-
-pub union IndirectCommandsTokenDataEXT {
-pub mut:
-	p_push_constant &IndirectCommandsPushConstantTokenEXT
-	p_vertex_buffer &IndirectCommandsVertexBufferTokenEXT
-	p_index_buffer  &IndirectCommandsIndexBufferTokenEXT
-	p_execution_set &IndirectCommandsExecutionSetTokenEXT
-}
-
-pub struct IndirectCommandsLayoutTokenEXT {
-pub mut:
-	s_type StructureType
-	p_next voidptr
-	vktype IndirectCommandsTokenTypeEXT
-	data   IndirectCommandsTokenDataEXT
-	offset u32
-}
-
-pub struct IndirectCommandsLayoutCreateInfoEXT {
-pub mut:
-	s_type          StructureType
-	p_next          voidptr
-	flags           IndirectCommandsLayoutUsageFlagsEXT
-	shader_stages   ShaderStageFlags
-	indirect_stride u32
-	pipeline_layout C.PipelineLayout
-	token_count     u32
-	p_tokens        &IndirectCommandsLayoutTokenEXT
-}
-
-pub struct DrawIndirectCountIndirectCommandEXT {
-pub mut:
-	buffer_address DeviceAddress
-	stride         u32
-	command_count  u32
-}
-
-pub struct BindVertexBufferIndirectCommandEXT {
-pub mut:
-	buffer_address DeviceAddress
-	size           u32
-	stride         u32
-}
-
-pub struct BindIndexBufferIndirectCommandEXT {
-pub mut:
-	buffer_address DeviceAddress
-	size           u32
-	index_type     IndexType
-}
-
-pub struct GeneratedCommandsPipelineInfoEXT {
-pub mut:
-	s_type   StructureType
-	p_next   voidptr
-	pipeline C.Pipeline
-}
-
-pub struct GeneratedCommandsShaderInfoEXT {
-pub mut:
-	s_type       StructureType
-	p_next       voidptr
-	shader_count u32
-	p_shaders    &C.ShaderEXT
-}
-
-pub struct WriteIndirectExecutionSetShaderEXT {
-pub mut:
-	s_type StructureType
-	p_next voidptr
-	index  u32
-	shader C.ShaderEXT
-}
-
-fn C.vkGetGeneratedCommandsMemoryRequirementsEXT(C.Device,
-	&GeneratedCommandsMemoryRequirementsInfoEXT,
-	&MemoryRequirements2)
-pub fn get_generated_commands_memory_requirements_ext(device C.Device,
-	p_info &GeneratedCommandsMemoryRequirementsInfoEXT,
-	p_memory_requirements &MemoryRequirements2) {
-	C.vkGetGeneratedCommandsMemoryRequirementsEXT(device, p_info, p_memory_requirements)
-}
-
-fn C.vkCmdPreprocessGeneratedCommandsEXT(C.CommandBuffer,
-	&GeneratedCommandsInfoEXT,
-	C.CommandBuffer)
-pub fn cmd_preprocess_generated_commands_ext(command_buffer C.CommandBuffer,
-	p_generated_commands_info &GeneratedCommandsInfoEXT,
-	state_command_buffer C.CommandBuffer) {
-	C.vkCmdPreprocessGeneratedCommandsEXT(command_buffer, p_generated_commands_info, state_command_buffer)
-}
-
-fn C.vkCmdExecuteGeneratedCommandsEXT(C.CommandBuffer,
-	Bool32,
-	&GeneratedCommandsInfoEXT)
-pub fn cmd_execute_generated_commands_ext(command_buffer C.CommandBuffer,
-	is_preprocessed Bool32,
-	p_generated_commands_info &GeneratedCommandsInfoEXT) {
-	C.vkCmdExecuteGeneratedCommandsEXT(command_buffer, is_preprocessed, p_generated_commands_info)
-}
-
-fn C.vkCreateIndirectCommandsLayoutEXT(C.Device,
-	&IndirectCommandsLayoutCreateInfoEXT,
-	&AllocationCallbacks,
-	&C.IndirectCommandsLayoutEXT) Result
-pub fn create_indirect_commands_layout_ext(device C.Device,
-	p_create_info &IndirectCommandsLayoutCreateInfoEXT,
-	p_allocator &AllocationCallbacks,
-	p_indirect_commands_layout &C.IndirectCommandsLayoutEXT) Result {
-	return C.vkCreateIndirectCommandsLayoutEXT(device, p_create_info, p_allocator, p_indirect_commands_layout)
-}
-
-fn C.vkDestroyIndirectCommandsLayoutEXT(C.Device,
-	C.IndirectCommandsLayoutEXT,
-	&AllocationCallbacks)
-pub fn destroy_indirect_commands_layout_ext(device C.Device,
-	indirect_commands_layout C.IndirectCommandsLayoutEXT,
-	p_allocator &AllocationCallbacks) {
-	C.vkDestroyIndirectCommandsLayoutEXT(device, indirect_commands_layout, p_allocator)
-}
-
-fn C.vkCreateIndirectExecutionSetEXT(C.Device,
-	&IndirectExecutionSetCreateInfoEXT,
-	&AllocationCallbacks,
-	&C.IndirectExecutionSetEXT) Result
-pub fn create_indirect_execution_set_ext(device C.Device,
-	p_create_info &IndirectExecutionSetCreateInfoEXT,
-	p_allocator &AllocationCallbacks,
-	p_indirect_execution_set &C.IndirectExecutionSetEXT) Result {
-	return C.vkCreateIndirectExecutionSetEXT(device, p_create_info, p_allocator, p_indirect_execution_set)
-}
-
-fn C.vkDestroyIndirectExecutionSetEXT(C.Device,
-	C.IndirectExecutionSetEXT,
-	&AllocationCallbacks)
-pub fn destroy_indirect_execution_set_ext(device C.Device,
-	indirect_execution_set C.IndirectExecutionSetEXT,
-	p_allocator &AllocationCallbacks) {
-	C.vkDestroyIndirectExecutionSetEXT(device, indirect_execution_set, p_allocator)
-}
-
-fn C.vkUpdateIndirectExecutionSetPipelineEXT(C.Device,
-	C.IndirectExecutionSetEXT,
-	u32,
-	&WriteIndirectExecutionSetPipelineEXT)
-pub fn update_indirect_execution_set_pipeline_ext(device C.Device,
-	indirect_execution_set C.IndirectExecutionSetEXT,
-	execution_set_write_count u32,
-	p_execution_set_writes &WriteIndirectExecutionSetPipelineEXT) {
-	C.vkUpdateIndirectExecutionSetPipelineEXT(device, indirect_execution_set, execution_set_write_count,
-		p_execution_set_writes)
-}
-
-fn C.vkUpdateIndirectExecutionSetShaderEXT(C.Device,
-	C.IndirectExecutionSetEXT,
-	u32,
-	&WriteIndirectExecutionSetShaderEXT)
-pub fn update_indirect_execution_set_shader_ext(device C.Device,
-	indirect_execution_set C.IndirectExecutionSetEXT,
-	execution_set_write_count u32,
-	p_execution_set_writes &WriteIndirectExecutionSetShaderEXT) {
-	C.vkUpdateIndirectExecutionSetShaderEXT(device, indirect_execution_set, execution_set_write_count,
-		p_execution_set_writes)
 }
 
 pub const mesa_image_alignment_control_spec_version = 1
@@ -20408,41 +19794,23 @@ pub const mesa_image_alignment_control_extension_name = 'VK_MESA_image_alignment
 
 pub struct PhysicalDeviceImageAlignmentControlFeaturesMESA {
 pub mut:
-	s_type                  StructureType
+	s_type                  StructureType = StructureType.structure_type_physical_device_image_alignment_control_features_mesa
 	p_next                  voidptr
 	image_alignment_control Bool32
 }
 
 pub struct PhysicalDeviceImageAlignmentControlPropertiesMESA {
 pub mut:
-	s_type                         StructureType
+	s_type                         StructureType = StructureType.structure_type_physical_device_image_alignment_control_properties_mesa
 	p_next                         voidptr
 	supported_image_alignment_mask u32
 }
 
 pub struct ImageAlignmentControlCreateInfoMESA {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_image_alignment_control_create_info_mesa
 	p_next                      voidptr
 	maximum_requested_alignment u32
-}
-
-pub const ext_depth_clamp_control_spec_version = 1
-pub const ext_depth_clamp_control_extension_name = 'VK_EXT_depth_clamp_control'
-
-pub struct PhysicalDeviceDepthClampControlFeaturesEXT {
-pub mut:
-	s_type              StructureType
-	p_next              voidptr
-	depth_clamp_control Bool32
-}
-
-pub struct PipelineViewportDepthClampControlCreateInfoEXT {
-pub mut:
-	s_type              StructureType
-	p_next              voidptr
-	depth_clamp_mode    DepthClampModeEXT
-	p_depth_clamp_range &DepthClampRangeEXT
 }
 
 pub const khr_acceleration_structure_spec_version = 13
@@ -20473,7 +19841,7 @@ pub mut:
 
 pub struct AccelerationStructureGeometryTrianglesDataKHR {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_acceleration_structure_geometry_triangles_data_khr
 	p_next         voidptr
 	vertex_format  Format
 	vertex_data    DeviceOrHostAddressConstKHR
@@ -20486,7 +19854,7 @@ pub mut:
 
 pub struct AccelerationStructureGeometryAabbsDataKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_acceleration_structure_geometry_aabbs_data_khr
 	p_next voidptr
 	data   DeviceOrHostAddressConstKHR
 	stride DeviceSize
@@ -20494,7 +19862,7 @@ pub mut:
 
 pub struct AccelerationStructureGeometryInstancesDataKHR {
 pub mut:
-	s_type            StructureType
+	s_type            StructureType = StructureType.structure_type_acceleration_structure_geometry_instances_data_khr
 	p_next            voidptr
 	array_of_pointers Bool32
 	data              DeviceOrHostAddressConstKHR
@@ -20509,7 +19877,7 @@ pub mut:
 
 pub struct AccelerationStructureGeometryKHR {
 pub mut:
-	s_type        StructureType
+	s_type        StructureType = StructureType.structure_type_acceleration_structure_geometry_khr
 	p_next        voidptr
 	geometry_type GeometryTypeKHR
 	geometry      AccelerationStructureGeometryDataKHR
@@ -20518,7 +19886,7 @@ pub mut:
 
 pub struct AccelerationStructureBuildGeometryInfoKHR {
 pub mut:
-	s_type                     StructureType
+	s_type                     StructureType = StructureType.structure_type_acceleration_structure_build_geometry_info_khr
 	p_next                     voidptr
 	vktype                     AccelerationStructureTypeKHR
 	flags                      BuildAccelerationStructureFlagsKHR
@@ -20533,7 +19901,7 @@ pub mut:
 
 pub struct AccelerationStructureCreateInfoKHR {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_acceleration_structure_create_info_khr
 	p_next         voidptr
 	create_flags   AccelerationStructureCreateFlagsKHR
 	buffer         C.Buffer
@@ -20545,7 +19913,7 @@ pub mut:
 
 pub struct WriteDescriptorSetAccelerationStructureKHR {
 pub mut:
-	s_type                       StructureType
+	s_type                       StructureType = StructureType.structure_type_write_descriptor_set_acceleration_structure_khr
 	p_next                       voidptr
 	acceleration_structure_count u32
 	p_acceleration_structures    &C.AccelerationStructureKHR
@@ -20553,7 +19921,7 @@ pub mut:
 
 pub struct PhysicalDeviceAccelerationStructureFeaturesKHR {
 pub mut:
-	s_type                                                      StructureType
+	s_type                                                      StructureType = StructureType.structure_type_physical_device_acceleration_structure_features_khr
 	p_next                                                      voidptr
 	acceleration_structure                                      Bool32
 	acceleration_structure_capture_replay                       Bool32
@@ -20564,7 +19932,7 @@ pub mut:
 
 pub struct PhysicalDeviceAccelerationStructurePropertiesKHR {
 pub mut:
-	s_type                                                             StructureType
+	s_type                                                             StructureType = StructureType.structure_type_physical_device_acceleration_structure_properties_khr
 	p_next                                                             voidptr
 	max_geometry_count                                                 u64
 	max_instance_count                                                 u64
@@ -20578,21 +19946,21 @@ pub mut:
 
 pub struct AccelerationStructureDeviceAddressInfoKHR {
 pub mut:
-	s_type                 StructureType
+	s_type                 StructureType = StructureType.structure_type_acceleration_structure_device_address_info_khr
 	p_next                 voidptr
 	acceleration_structure C.AccelerationStructureKHR
 }
 
 pub struct AccelerationStructureVersionInfoKHR {
 pub mut:
-	s_type         StructureType
+	s_type         StructureType = StructureType.structure_type_acceleration_structure_version_info_khr
 	p_next         voidptr
 	p_version_data &u8
 }
 
 pub struct CopyAccelerationStructureToMemoryInfoKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_copy_acceleration_structure_to_memory_info_khr
 	p_next voidptr
 	src    C.AccelerationStructureKHR
 	dst    DeviceOrHostAddressKHR
@@ -20601,7 +19969,7 @@ pub mut:
 
 pub struct CopyMemoryToAccelerationStructureInfoKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_copy_memory_to_acceleration_structure_info_khr
 	p_next voidptr
 	src    DeviceOrHostAddressConstKHR
 	dst    C.AccelerationStructureKHR
@@ -20610,7 +19978,7 @@ pub mut:
 
 pub struct CopyAccelerationStructureInfoKHR {
 pub mut:
-	s_type StructureType
+	s_type StructureType = StructureType.structure_type_copy_acceleration_structure_info_khr
 	p_next voidptr
 	src    C.AccelerationStructureKHR
 	dst    C.AccelerationStructureKHR
@@ -20619,7 +19987,7 @@ pub mut:
 
 pub struct AccelerationStructureBuildSizesInfoKHR {
 pub mut:
-	s_type                      StructureType
+	s_type                      StructureType = StructureType.structure_type_acceleration_structure_build_sizes_info_khr
 	p_next                      voidptr
 	acceleration_structure_size DeviceSize
 	update_scratch_size         DeviceSize
@@ -20812,7 +20180,7 @@ pub enum ShaderGroupShaderKHR {
 
 pub struct RayTracingShaderGroupCreateInfoKHR {
 pub mut:
-	s_type                               StructureType
+	s_type                               StructureType = StructureType.structure_type_ray_tracing_shader_group_create_info_khr
 	p_next                               voidptr
 	vktype                               RayTracingShaderGroupTypeKHR
 	general_shader                       u32
@@ -20824,7 +20192,7 @@ pub mut:
 
 pub struct RayTracingPipelineInterfaceCreateInfoKHR {
 pub mut:
-	s_type                              StructureType
+	s_type                              StructureType = StructureType.structure_type_ray_tracing_pipeline_interface_create_info_khr
 	p_next                              voidptr
 	max_pipeline_ray_payload_size       u32
 	max_pipeline_ray_hit_attribute_size u32
@@ -20832,7 +20200,7 @@ pub mut:
 
 pub struct RayTracingPipelineCreateInfoKHR {
 pub mut:
-	s_type                           StructureType
+	s_type                           StructureType = StructureType.structure_type_ray_tracing_pipeline_create_info_khr
 	p_next                           voidptr
 	flags                            PipelineCreateFlags
 	stage_count                      u32
@@ -20850,7 +20218,7 @@ pub mut:
 
 pub struct PhysicalDeviceRayTracingPipelineFeaturesKHR {
 pub mut:
-	s_type                                                        StructureType
+	s_type                                                        StructureType = StructureType.structure_type_physical_device_ray_tracing_pipeline_features_khr
 	p_next                                                        voidptr
 	ray_tracing_pipeline                                          Bool32
 	ray_tracing_pipeline_shader_group_handle_capture_replay       Bool32
@@ -20861,7 +20229,7 @@ pub mut:
 
 pub struct PhysicalDeviceRayTracingPipelinePropertiesKHR {
 pub mut:
-	s_type                                  StructureType
+	s_type                                  StructureType = StructureType.structure_type_physical_device_ray_tracing_pipeline_properties_khr
 	p_next                                  voidptr
 	shader_group_handle_size                u32
 	max_ray_recursion_depth                 u32
@@ -20980,7 +20348,7 @@ pub const khr_ray_query_extension_name = 'VK_KHR_ray_query'
 
 pub struct PhysicalDeviceRayQueryFeaturesKHR {
 pub mut:
-	s_type    StructureType
+	s_type    StructureType = StructureType.structure_type_physical_device_ray_query_features_khr
 	p_next    voidptr
 	ray_query Bool32
 }
@@ -20990,7 +20358,7 @@ pub const ext_mesh_shader_extension_name = 'VK_EXT_mesh_shader'
 
 pub struct PhysicalDeviceMeshShaderFeaturesEXT {
 pub mut:
-	s_type                                      StructureType
+	s_type                                      StructureType = StructureType.structure_type_physical_device_mesh_shader_features_ext
 	p_next                                      voidptr
 	task_shader                                 Bool32
 	mesh_shader                                 Bool32
@@ -21001,7 +20369,7 @@ pub mut:
 
 pub struct PhysicalDeviceMeshShaderPropertiesEXT {
 pub mut:
-	s_type                                    StructureType
+	s_type                                    StructureType = StructureType.structure_type_physical_device_mesh_shader_properties_ext
 	p_next                                    voidptr
 	max_task_work_group_total_count           u32
 	max_task_work_group_count                 [3]u32
