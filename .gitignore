@@ -296,8 +296,9 @@ pyrightconfig.json
 spec_tools/
 cache/
 .idea/
-vulkan_core.h
-replacement_map.txt
 
 *.gfxr
 *.so
+
+
+examples/vk_glfw_volk

@@ -17,12 +17,13 @@ import vulkan as vk
 
 // GLFW
 // https://www.glfw.org/docs/latest/vulkan_guide.html
-#flag windows -I <YOUR PATH TO GLFW INCLUDE, LIKE C:\glfw-3.4.bin.WIN64\include>
+#flag windows -I<PATH TO GLFW INCLUDE, LIKE C:\glfw-3.4.bin.WIN64\include>
 #flag windows -Iinclude
 #flag linux -L/usr/lib/x86_64-linux-gnu
-#flag windows -L<YOUR PATH TO GLFW LIB, LIKE C:\glfw-3.4.bin.WIN64\lib-static-ucrt>
+#flag windows -L<PATH TO GLFW LIB, LIKE C:\glfw-3.4.bin.WIN64\lib-mingw-w64>
 #flag linux -lglfw
 #flag windows -lglfw3
+#flag windows -lgdi32
 // Please see https://www.glfw.org/docs/latest/build_guide.html#build_macros for more information
 #flag windows -DGLFW_INCLUDE_GLCOREARB=1 // makes the GLFW header include the modern GL/glcorearb.h header (OpenGL/gl3.h on macOS) instead of the regular OpenGL header.
 
