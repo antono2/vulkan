@@ -7,7 +7,7 @@ The bindings in `src/vulkan.v` were generated from the current [KhronosGroup](ht
 Please make sure to clone the commit tag matching your installed [Vulkan SDK](https://vulkan.lunarg.com/doc/sdk/latest/).
 
 ### Linux
-Please install the [vulkan sdk](https://vulkan.lunarg.com/sdk/home).
+Please install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home).
 Further reading at [https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html](https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html).
 
 GLFW is required for the example app. It provides OS independent window creation.
@@ -24,13 +24,15 @@ portable library for OpenGL, window and input (development files)
 $ sudo apt install libglfw3-dev
 
 ```
-`VULKAN_SDK` is an environment variable and should have the path to your [Vulkan SDK](https://vulkan.lunarg.com/doc/sdk/latest/), like `$HOME/vulkansdk-linux-x86_64-1.3.290.0/x86_64`. Besides that `LD_LIBRARY_PATH` needs to contain the vulkan SDK library directory. On linux you can append it like 
+`VULKAN_SDK` is an environment variable and should have the path to your [Vulkan SDK](https://vulkan.lunarg.com/doc/sdk/latest/), like `$HOME/vulkansdk-linux-x86_64-1.3.290.0/x86_64`. Besides that `LD_LIBRARY_PATH` and `VK_LAYER_PATH` have to be set. On linux you can append this to your shell start script
 ```
+export VULKAN_SDK=$HOME/vulkansdk-linux-x86_64-<VERSION>/x86_64
 export LD_LIBRARY_PATH=$VULKAN_SDK/lib:$LD_LIBRARY_PATH
+export VK_LAYER_PATH=$VULKAN_SDK/share/vulkan/explicit_layer.d
 ```
 
 ### Windows
-Please install the [vulkan sdk](https://vulkan.lunarg.com/sdk/home).
+Please install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home).
 All environment variables are set automatically by the installer.
 
 GLFW is required for the example app. It provides OS independent window creation.
