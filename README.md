@@ -1,15 +1,14 @@
 
 
 # Vulkan Bindings for [Vlang](https://vlang.io/)
-The bindings in `src/vulkan.v` were generated from the official [vk.xml](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml) vulkan registry.
+The bindings in `src/vulkan.v` were generated from the current [KhronosGroup](https://github.com/KhronosGroup/) [API description](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml).
 
 ## Dependencies
-Please make sure to pick the v vulkan bindings commit tag for your installed SDK.
-I also assume `VULKAN_SDK` is a standard environment variable and contains the path to your [Vulkan SDK](https://vulkan.lunarg.com/doc/sdk/latest/), like `$HOME/vulkansdk-linux-x86_64-1.3.290.0/x86_64`. Please create it, if not there.
+Please make sure to clone the commit tag matching your installed [Vulkan SDK](https://vulkan.lunarg.com/doc/sdk/latest/).
 
 ### Linux
 Please install the [vulkan sdk](https://vulkan.lunarg.com/sdk/home).
-Further reading material available at [https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html](https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html).
+Further reading at [https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html](https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html).
 
 GLFW is required for the example app. It provides OS independent window creation.
 You can get it at [glfw.org download](https://www.glfw.org/download.html).
@@ -25,10 +24,14 @@ portable library for OpenGL, window and input (development files)
 $ sudo apt install libglfw3-dev
 
 ```
+`VULKAN_SDK` is an environment variable and should have the path to your [Vulkan SDK](https://vulkan.lunarg.com/doc/sdk/latest/), like `$HOME/vulkansdk-linux-x86_64-1.3.290.0/x86_64`. Besides that `LD_LIBRARY_PATH` needs to contain the vulkan SDK library directory. On linux you can append it like 
+```
+export LD_LIBRARY_PATH=$VULKAN_SDK/lib:$LD_LIBRARY_PATH
+```
+
 ### Windows
 Please install the [vulkan sdk](https://vulkan.lunarg.com/sdk/home).
-
-Further reading material available at [https://vulkan.lunarg.com/doc/sdk/latest/windows/getting_started.html](https://vulkan.lunarg.com/doc/sdk/latest/windows/getting_started.html).
+All environment variables are set automatically by the installer.
 
 GLFW is required for the example app. It provides OS independent window creation.
 You can get it at [glfw.org download](https://www.glfw.org/download.html).
@@ -76,8 +79,15 @@ v -cc x86_64-w64-mingw32-gcc run vk_glfw_volk.v
 
 
 ## Further Reading
+### Doesn't work. What now?
+If you get `Could not create vulkan instance. VkResult: error_layer_not_present`, please make sure `LD_LIBRARY_PATH` contains the path to vulkan lib
+```
+export LD_LIBRARY_PATH=$VULKAN_SDK/lib:$LD_LIBRARY_PATH
+```
+
+For vulkan related issues you can try [`VK_LOADER_DEBUG=all`](https://github.com/KhronosGroup/Vulkan-Loader/blob/main/docs/LoaderInterfaceArchitecture.md#active-environment-variables).
+
 ### Compiler #Flags
-`VULKAN_SDK` is a standard environment variable and should contain the path to your [Vulkan SDK](https://vulkan.lunarg.com/doc/sdk/latest/), like `$HOME/vulkansdk-linux-x86_64-1.3.290.0/x86_64`. Please create it, if not there.
 There are some `#include` in the vulkan bindings, for which the correct compiler flags have to be set by you.
 The example already contains all required flags for Windows and Linux x64.
 
@@ -90,8 +100,6 @@ Alternatively we can load the function address whenever we first call it. Well, 
 
 ### [GLFW](https://www.glfw.org/download.html) Bindings?
 There are some C. functions for GLFW at the bottom of the example. V bindings for GLFW are available, but I prefer to control the global namespace for C. functions, as they might overlap and cause issues later. This will change in future.
-### Manipulating vulkan.v
-If you need to remove extensions or functions for later versions of vulkan, create your own `vulkan.v` and just pick the things you need. Nothing - except includes ofc. - outside that file is referenced.
 
 ## Pull Request
 There is always stuff to do and help is welcome. The goal is to cover some more vulkan functionality by example. Roughly like [this](https://github.com/SaschaWillems/Vulkan).
