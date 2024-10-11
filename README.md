@@ -82,10 +82,7 @@ v -cc x86_64-w64-mingw32-gcc run vk_glfw_volk.v
 
 ## Further Reading
 ### Doesn't work. What now?
-If you get `Could not create vulkan instance. VkResult: error_layer_not_present`, please make sure `LD_LIBRARY_PATH` contains the path to vulkan lib
-```
-export LD_LIBRARY_PATH=$VULKAN_SDK/lib:$LD_LIBRARY_PATH
-```
+For missing information, like `Could not create vulkan instance. VkResult: error_layer_not_present`, please double check for missing environment variables and correct paths.
 
 For vulkan related issues you can try [`VK_LOADER_DEBUG=all`](https://github.com/KhronosGroup/Vulkan-Loader/blob/main/docs/LoaderInterfaceArchitecture.md#active-environment-variables).
 
