@@ -153,7 +153,6 @@ fn main() {
 		panic('Could not enumerate physical devices')
 	}
 	mut physical_device := C.PhysicalDevice(unsafe { nil })
-	// TODO: "v fmt -w" on this file removes the "C." from "C.PhysicalDevice"
 	physical_devices := to_v_array[C.PhysicalDevice](physical_devices_c, physical_device_cnt)
 
 	for i in 0 .. physical_device_cnt {
