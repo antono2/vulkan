@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 299
+pub const header_version = 298
 pub const header_version_complete = make_api_version(0, 1, 3, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -441,6 +441,10 @@ pub enum StructureType {
 	structure_type_video_decode_h264_session_parameters_add_info_khr                   = int(1000040005)
 	structure_type_video_decode_h264_dpb_slot_info_khr                                 = int(1000040006)
 	structure_type_texture_lod_gather_format_properties_amd                            = int(1000041000)
+	structure_type_rendering_fragment_shading_rate_attachment_info_khr                 = int(1000044006)
+	structure_type_rendering_fragment_density_map_attachment_info_ext                  = int(1000044007)
+	structure_type_attachment_sample_count_info_amd                                    = int(1000044008)
+	structure_type_multiview_per_view_attributes_info_nvx                              = int(1000044009)
 	structure_type_stream_descriptor_surface_create_info_ggp                           = int(1000049000)
 	structure_type_physical_device_corner_sampled_image_features_nv                    = int(1000050000)
 	structure_type_external_memory_image_create_info_nv                                = int(1000056000)
@@ -482,7 +486,6 @@ pub enum StructureType {
 	structure_type_swapchain_counter_create_info_ext                                   = int(1000091003)
 	structure_type_present_times_info_google                                           = int(1000092000)
 	structure_type_physical_device_multiview_per_view_attributes_properties_nvx        = int(1000097000)
-	structure_type_multiview_per_view_attributes_info_nvx                              = int(1000044009)
 	structure_type_pipeline_viewport_swizzle_state_create_info_nv                      = int(1000098000)
 	structure_type_physical_device_discard_rectangle_properties_ext                    = int(1000099000)
 	structure_type_pipeline_discard_rectangle_state_create_info_ext                    = int(1000099001)
@@ -527,7 +530,6 @@ pub enum StructureType {
 	structure_type_memory_get_android_hardware_buffer_info_android                     = int(1000129004)
 	structure_type_external_format_android                                             = int(1000129005)
 	structure_type_android_hardware_buffer_format_properties2_android                  = int(1000129006)
-	structure_type_attachment_sample_count_info_amd                                    = int(1000044008)
 	structure_type_sample_locations_info_ext                                           = int(1000143000)
 	structure_type_render_pass_sample_locations_begin_info_ext                         = int(1000143001)
 	structure_type_pipeline_sample_locations_state_create_info_ext                     = int(1000143002)
@@ -613,8 +615,6 @@ pub enum StructureType {
 	structure_type_physical_device_exclusive_scissor_features_nv                       = int(1000205002)
 	structure_type_checkpoint_data_nv                                                  = int(1000206000)
 	structure_type_queue_family_checkpoint_properties_nv                               = int(1000206001)
-	structure_type_queue_family_checkpoint_properties2_nv                              = int(1000314008)
-	structure_type_checkpoint_data2_nv                                                 = int(1000314009)
 	structure_type_physical_device_shader_integer_functions2_features_intel            = int(1000209000)
 	structure_type_query_pool_performance_query_create_info_intel                      = int(1000210000)
 	structure_type_initialize_performance_api_info_intel                               = int(1000210001)
@@ -630,13 +630,11 @@ pub enum StructureType {
 	structure_type_physical_device_fragment_density_map_features_ext                   = int(1000218000)
 	structure_type_physical_device_fragment_density_map_properties_ext                 = int(1000218001)
 	structure_type_render_pass_fragment_density_map_create_info_ext                    = int(1000218002)
-	structure_type_rendering_fragment_density_map_attachment_info_ext                  = int(1000044007)
 	structure_type_fragment_shading_rate_attachment_info_khr                           = int(1000226000)
 	structure_type_pipeline_fragment_shading_rate_state_create_info_khr                = int(1000226001)
 	structure_type_physical_device_fragment_shading_rate_properties_khr                = int(1000226002)
 	structure_type_physical_device_fragment_shading_rate_features_khr                  = int(1000226003)
 	structure_type_physical_device_fragment_shading_rate_khr                           = int(1000226004)
-	structure_type_rendering_fragment_shading_rate_attachment_info_khr                 = int(1000044006)
 	structure_type_physical_device_shader_core_properties2_amd                         = int(1000227000)
 	structure_type_physical_device_coherent_memory_features_amd                        = int(1000229000)
 	structure_type_physical_device_dynamic_rendering_local_read_features_khr           = int(1000232000)
@@ -762,6 +760,8 @@ pub enum StructureType {
 	structure_type_import_metal_io_surface_info_ext                                    = int(1000311009)
 	structure_type_export_metal_shared_event_info_ext                                  = int(1000311010)
 	structure_type_import_metal_shared_event_info_ext                                  = int(1000311011)
+	structure_type_queue_family_checkpoint_properties2_nv                              = int(1000314008)
+	structure_type_checkpoint_data2_nv                                                 = int(1000314009)
 	structure_type_physical_device_descriptor_buffer_properties_ext                    = int(1000316000)
 	structure_type_physical_device_descriptor_buffer_density_map_properties_ext        = int(1000316001)
 	structure_type_physical_device_descriptor_buffer_features_ext                      = int(1000316002)
@@ -2241,6 +2241,8 @@ pub enum PipelineCreateFlagBits {
 	pipeline_create_dispatch_base_bit                                      = int(0x00000010)
 	pipeline_create_fail_on_pipeline_compile_required_bit                  = int(0x00000100)
 	pipeline_create_early_return_on_failure_bit                            = int(0x00000200)
+	pipeline_create_rendering_fragment_shading_rate_attachment_bit_khr     = int(0x00200000)
+	pipeline_create_rendering_fragment_density_map_attachment_bit_ext      = int(0x00400000)
 	pipeline_create_ray_tracing_no_null_any_hit_shaders_bit_khr            = int(0x00004000)
 	pipeline_create_ray_tracing_no_null_closest_hit_shaders_bit_khr        = int(0x00008000)
 	pipeline_create_ray_tracing_no_null_miss_shaders_bit_khr               = int(0x00010000)
@@ -2249,8 +2251,6 @@ pub enum PipelineCreateFlagBits {
 	pipeline_create_ray_tracing_skip_aabbs_bit_khr                         = int(0x00002000)
 	pipeline_create_ray_tracing_shader_group_handle_capture_replay_bit_khr = int(0x00080000)
 	pipeline_create_defer_compile_bit_nv                                   = int(0x00000020)
-	pipeline_create_rendering_fragment_density_map_attachment_bit_ext      = int(0x00400000)
-	pipeline_create_rendering_fragment_shading_rate_attachment_bit_khr     = int(0x00200000)
 	pipeline_create_capture_statistics_bit_khr                             = int(0x00000040)
 	pipeline_create_capture_internal_representations_bit_khr               = int(0x00000080)
 	pipeline_create_indirect_bindable_bit_nv                               = int(0x00040000)
@@ -9651,6 +9651,42 @@ pub type PhysicalDeviceDynamicRenderingFeaturesKHR = PhysicalDeviceDynamicRender
 
 pub type CommandBufferInheritanceRenderingInfoKHR = CommandBufferInheritanceRenderingInfo
 
+pub struct RenderingFragmentShadingRateAttachmentInfoKHR {
+pub mut:
+	s_type                             StructureType = StructureType.structure_type_rendering_fragment_shading_rate_attachment_info_khr
+	p_next                             voidptr
+	image_view                         C.ImageView
+	image_layout                       ImageLayout
+	shading_rate_attachment_texel_size Extent2D
+}
+
+pub struct RenderingFragmentDensityMapAttachmentInfoEXT {
+pub mut:
+	s_type       StructureType = StructureType.structure_type_rendering_fragment_density_map_attachment_info_ext
+	p_next       voidptr
+	image_view   C.ImageView
+	image_layout ImageLayout
+}
+
+pub struct AttachmentSampleCountInfoAMD {
+pub mut:
+	s_type                           StructureType = StructureType.structure_type_attachment_sample_count_info_amd
+	p_next                           voidptr
+	color_attachment_count           u32
+	p_color_attachment_samples       &SampleCountFlagBits
+	depth_stencil_attachment_samples SampleCountFlagBits
+}
+
+pub type AttachmentSampleCountInfoNV = AttachmentSampleCountInfoAMD
+
+pub struct MultiviewPerViewAttributesInfoNVX {
+pub mut:
+	s_type                              StructureType = StructureType.structure_type_multiview_per_view_attributes_info_nvx
+	p_next                              voidptr
+	per_view_attributes                 Bool32
+	per_view_attributes_position_x_only Bool32
+}
+
 pub const khr_multiview_spec_version = 1
 pub const khr_multiview_extension_name = 'VK_KHR_multiview'
 
@@ -10681,15 +10717,6 @@ pub mut:
 	fragment_size Extent2D
 }
 
-pub struct RenderingFragmentShadingRateAttachmentInfoKHR {
-pub mut:
-	s_type                             StructureType = StructureType.structure_type_rendering_fragment_shading_rate_attachment_info_khr
-	p_next                             voidptr
-	image_view                         C.ImageView
-	image_layout                       ImageLayout
-	shading_rate_attachment_texel_size Extent2D
-}
-
 fn C.vkGetPhysicalDeviceFragmentShadingRatesKHR(C.PhysicalDevice,
 	&u32,
 	&PhysicalDeviceFragmentShadingRateKHR) Result
@@ -11282,6 +11309,43 @@ pub type CommandBufferSubmitInfoKHR = CommandBufferSubmitInfo
 
 pub type PhysicalDeviceSynchronization2FeaturesKHR = PhysicalDeviceSynchronization2Features
 
+pub struct QueueFamilyCheckpointProperties2NV {
+pub mut:
+	s_type                          StructureType = StructureType.structure_type_queue_family_checkpoint_properties2_nv
+	p_next                          voidptr
+	checkpoint_execution_stage_mask PipelineStageFlags2
+}
+
+pub struct CheckpointData2NV {
+pub mut:
+	s_type              StructureType = StructureType.structure_type_checkpoint_data2_nv
+	p_next              voidptr
+	stage               PipelineStageFlags2
+	p_checkpoint_marker voidptr
+}
+
+fn C.vkCmdWriteBufferMarker2AMD(C.CommandBuffer,
+	PipelineStageFlags2,
+	C.Buffer,
+	DeviceSize,
+	u32)
+pub fn cmd_write_buffer_marker2_amd(command_buffer C.CommandBuffer,
+	stage PipelineStageFlags2,
+	dst_buffer C.Buffer,
+	dst_offset DeviceSize,
+	marker u32) {
+	C.vkCmdWriteBufferMarker2AMD(command_buffer, stage, dst_buffer, dst_offset, marker)
+}
+
+fn C.vkGetQueueCheckpointData2NV(C.Queue,
+	&u32,
+	&CheckpointData2NV)
+pub fn get_queue_checkpoint_data2_nv(queue C.Queue,
+	p_checkpoint_data_count &u32,
+	p_checkpoint_data &CheckpointData2NV) {
+	C.vkGetQueueCheckpointData2NV(queue, p_checkpoint_data_count, p_checkpoint_data)
+}
+
 pub const khr_fragment_shader_barycentric_spec_version = 1
 pub const khr_fragment_shader_barycentric_extension_name = 'VK_KHR_fragment_shader_barycentric'
 
@@ -11442,13 +11506,7 @@ pub type PipelineCreateFlagBits2KHR = u64
 pub const pipeline_create_2_disable_optimization_bit_khr = u64(0x00000001)
 pub const pipeline_create_2_allow_derivatives_bit_khr = u64(0x00000002)
 pub const pipeline_create_2_derivative_bit_khr = u64(0x00000004)
-
-#ifdef VK_ENABLE_BETA_EXTENSIONS
-
 pub const pipeline_create_2_execution_graph_bit_amdx = u64(0x100000000)
-
-#endif
-
 pub const pipeline_create_2_enable_legacy_dithering_bit_ext = u64(0x400000000)
 pub const pipeline_create_2_view_index_from_device_index_bit_khr = u64(0x00000008)
 pub const pipeline_create_2_dispatch_base_bit_khr = u64(0x00000010)
@@ -11495,13 +11553,7 @@ pub const buffer_usage_2_storage_buffer_bit_khr = u64(0x00000020)
 pub const buffer_usage_2_index_buffer_bit_khr = u64(0x00000040)
 pub const buffer_usage_2_vertex_buffer_bit_khr = u64(0x00000080)
 pub const buffer_usage_2_indirect_buffer_bit_khr = u64(0x00000100)
-
-#ifdef VK_ENABLE_BETA_EXTENSIONS
-
 pub const buffer_usage_2_execution_graph_scratch_bit_amdx = u64(0x02000000)
-
-#endif
-
 pub const buffer_usage_2_conditional_rendering_bit_ext = u64(0x00000200)
 pub const buffer_usage_2_shader_binding_table_bit_khr = u64(0x00000400)
 pub const buffer_usage_2_ray_tracing_bit_nv = u32(buffer_usage_2_shader_binding_table_bit_khr)
@@ -13309,14 +13361,6 @@ pub mut:
 	per_view_position_all_components Bool32
 }
 
-pub struct MultiviewPerViewAttributesInfoNVX {
-pub mut:
-	s_type                              StructureType = StructureType.structure_type_multiview_per_view_attributes_info_nvx
-	p_next                              voidptr
-	per_view_attributes                 Bool32
-	per_view_attributes_position_x_only Bool32
-}
-
 pub const nv_viewport_swizzle_spec_version = 1
 pub const nv_viewport_swizzle_extension_name = 'VK_NV_viewport_swizzle'
 
@@ -13697,15 +13741,6 @@ pub const amd_gpu_shader_int16_extension_name = 'VK_AMD_gpu_shader_int16'
 pub const amd_mixed_attachment_samples_spec_version = 1
 pub const amd_mixed_attachment_samples_extension_name = 'VK_AMD_mixed_attachment_samples'
 
-pub struct AttachmentSampleCountInfoAMD {
-pub mut:
-	s_type                           StructureType = StructureType.structure_type_attachment_sample_count_info_amd
-	p_next                           voidptr
-	color_attachment_count           u32
-	p_color_attachment_samples       &SampleCountFlagBits
-	depth_stencil_attachment_samples SampleCountFlagBits
-}
-
 pub const amd_shader_fragment_mask_spec_version = 1
 pub const amd_shader_fragment_mask_extension_name = 'VK_AMD_shader_fragment_mask'
 
@@ -13881,8 +13916,6 @@ pub mut:
 	coverage_modulation_table_count  u32
 	p_coverage_modulation_table      &f32
 }
-
-pub type AttachmentSampleCountInfoNV = AttachmentSampleCountInfoAMD
 
 pub const nv_fill_rectangle_spec_version = 1
 pub const nv_fill_rectangle_extension_name = 'VK_NV_fill_rectangle'
@@ -14717,19 +14750,6 @@ pub fn cmd_write_buffer_marker_amd(command_buffer C.CommandBuffer,
 		marker)
 }
 
-fn C.vkCmdWriteBufferMarker2AMD(C.CommandBuffer,
-	PipelineStageFlags2,
-	C.Buffer,
-	DeviceSize,
-	u32)
-pub fn cmd_write_buffer_marker2_amd(command_buffer C.CommandBuffer,
-	stage PipelineStageFlags2,
-	dst_buffer C.Buffer,
-	dst_offset DeviceSize,
-	marker u32) {
-	C.vkCmdWriteBufferMarker2AMD(command_buffer, stage, dst_buffer, dst_offset, marker)
-}
-
 pub const amd_pipeline_compiler_control_spec_version = 1
 pub const amd_pipeline_compiler_control_extension_name = 'VK_AMD_pipeline_compiler_control'
 
@@ -14978,21 +14998,6 @@ pub mut:
 	p_checkpoint_marker voidptr
 }
 
-pub struct QueueFamilyCheckpointProperties2NV {
-pub mut:
-	s_type                          StructureType = StructureType.structure_type_queue_family_checkpoint_properties2_nv
-	p_next                          voidptr
-	checkpoint_execution_stage_mask PipelineStageFlags2
-}
-
-pub struct CheckpointData2NV {
-pub mut:
-	s_type              StructureType = StructureType.structure_type_checkpoint_data2_nv
-	p_next              voidptr
-	stage               PipelineStageFlags2
-	p_checkpoint_marker voidptr
-}
-
 fn C.vkCmdSetCheckpointNV(C.CommandBuffer,
 	voidptr)
 pub fn cmd_set_checkpoint_nv(command_buffer C.CommandBuffer,
@@ -15007,15 +15012,6 @@ pub fn get_queue_checkpoint_data_nv(queue C.Queue,
 	p_checkpoint_data_count &u32,
 	p_checkpoint_data &CheckpointDataNV) {
 	C.vkGetQueueCheckpointDataNV(queue, p_checkpoint_data_count, p_checkpoint_data)
-}
-
-fn C.vkGetQueueCheckpointData2NV(C.Queue,
-	&u32,
-	&CheckpointData2NV)
-pub fn get_queue_checkpoint_data2_nv(queue C.Queue,
-	p_checkpoint_data_count &u32,
-	p_checkpoint_data &CheckpointData2NV) {
-	C.vkGetQueueCheckpointData2NV(queue, p_checkpoint_data_count, p_checkpoint_data)
 }
 
 pub const intel_shader_integer_functions_2_spec_version = 1
@@ -15255,14 +15251,6 @@ pub mut:
 	s_type                          StructureType = StructureType.structure_type_render_pass_fragment_density_map_create_info_ext
 	p_next                          voidptr
 	fragment_density_map_attachment AttachmentReference
-}
-
-pub struct RenderingFragmentDensityMapAttachmentInfoEXT {
-pub mut:
-	s_type       StructureType = StructureType.structure_type_rendering_fragment_density_map_attachment_info_ext
-	p_next       voidptr
-	image_view   C.ImageView
-	image_layout ImageLayout
 }
 
 pub const ext_scalar_block_layout_spec_version = 1
