@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 299
+pub const header_version = 300
 pub const header_version_complete = make_api_version(0, 1, 3, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -1066,6 +1066,9 @@ pub enum StructureType {
 	structure_type_image_alignment_control_create_info_mesa                            = int(1000575002)
 	structure_type_physical_device_depth_clamp_control_features_ext                    = int(1000582000)
 	structure_type_pipeline_viewport_depth_clamp_control_create_info_ext               = int(1000582001)
+	structure_type_physical_device_cooperative_matrix2_features_nv                     = int(1000593000)
+	structure_type_cooperative_matrix_flexible_dimensions_properties_nv                = int(1000593001)
+	structure_type_physical_device_cooperative_matrix2_properties_nv                   = int(1000593002)
 	structure_type_max_enum                                                            = int(0x7FFFFFFF)
 }
 
@@ -20456,6 +20459,57 @@ pub mut:
 	p_next              voidptr
 	depth_clamp_mode    DepthClampModeEXT
 	p_depth_clamp_range &DepthClampRangeEXT
+}
+
+pub const nv_cooperative_matrix_2_spec_version = 1
+pub const nv_cooperative_matrix_2_extension_name = 'VK_NV_cooperative_matrix2'
+
+pub struct CooperativeMatrixFlexibleDimensionsPropertiesNV {
+pub mut:
+	s_type                  StructureType = StructureType.structure_type_cooperative_matrix_flexible_dimensions_properties_nv
+	p_next                  voidptr
+	m_granularity           u32
+	n_granularity           u32
+	k_granularity           u32
+	a_type                  ComponentTypeKHR
+	b_type                  ComponentTypeKHR
+	c_type                  ComponentTypeKHR
+	result_type             ComponentTypeKHR
+	saturating_accumulation Bool32
+	scope                   ScopeKHR
+	workgroup_invocations   u32
+}
+
+pub struct PhysicalDeviceCooperativeMatrix2FeaturesNV {
+pub mut:
+	s_type                                    StructureType = StructureType.structure_type_physical_device_cooperative_matrix2_features_nv
+	p_next                                    voidptr
+	cooperative_matrix_workgroup_scope        Bool32
+	cooperative_matrix_flexible_dimensions    Bool32
+	cooperative_matrix_reductions             Bool32
+	cooperative_matrix_conversions            Bool32
+	cooperative_matrix_per_element_operations Bool32
+	cooperative_matrix_tensor_addressing      Bool32
+	cooperative_matrix_block_loads            Bool32
+}
+
+pub struct PhysicalDeviceCooperativeMatrix2PropertiesNV {
+pub mut:
+	s_type                                                    StructureType = StructureType.structure_type_physical_device_cooperative_matrix2_properties_nv
+	p_next                                                    voidptr
+	cooperative_matrix_workgroup_scope_max_workgroup_size     u32
+	cooperative_matrix_flexible_dimensions_max_dimension      u32
+	cooperative_matrix_workgroup_scope_reserved_shared_memory u32
+}
+
+fn C.vkGetPhysicalDeviceCooperativeMatrixFlexibleDimensionsPropertiesNV(C.PhysicalDevice,
+	&u32,
+	&CooperativeMatrixFlexibleDimensionsPropertiesNV) Result
+pub fn get_physical_device_cooperative_matrix_flexible_dimensions_properties_nv(physical_device C.PhysicalDevice,
+	p_property_count &u32,
+	p_properties &CooperativeMatrixFlexibleDimensionsPropertiesNV) Result {
+	return C.vkGetPhysicalDeviceCooperativeMatrixFlexibleDimensionsPropertiesNV(physical_device,
+		p_property_count, p_properties)
 }
 
 pub const khr_acceleration_structure_spec_version = 13
