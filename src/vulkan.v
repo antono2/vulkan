@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 300
+pub const header_version = 301
 pub const header_version_complete = make_api_version(0, 1, 3, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -1066,6 +1066,8 @@ pub enum StructureType {
 	structure_type_image_alignment_control_create_info_mesa                            = int(1000575002)
 	structure_type_physical_device_depth_clamp_control_features_ext                    = int(1000582000)
 	structure_type_pipeline_viewport_depth_clamp_control_create_info_ext               = int(1000582001)
+	structure_type_physical_device_hdr_vivid_features_huawei                           = int(1000590000)
+	structure_type_hdr_vivid_dynamic_metadata_huawei                                   = int(1000590001)
 	structure_type_physical_device_cooperative_matrix2_features_nv                     = int(1000593000)
 	structure_type_cooperative_matrix_flexible_dimensions_properties_nv                = int(1000593001)
 	structure_type_physical_device_cooperative_matrix2_properties_nv                   = int(1000593002)
@@ -20459,6 +20461,24 @@ pub mut:
 	p_next              voidptr
 	depth_clamp_mode    DepthClampModeEXT
 	p_depth_clamp_range &DepthClampRangeEXT
+}
+
+pub const huawei_hdr_vivid_spec_version = 1
+pub const huawei_hdr_vivid_extension_name = 'VK_HAWEI_hdr_vivid'
+
+pub struct PhysicalDeviceHdrVividFeaturesHUAWEI {
+pub mut:
+	s_type    StructureType = StructureType.structure_type_physical_device_hdr_vivid_features_huawei
+	p_next    voidptr
+	hdr_vivid Bool32
+}
+
+pub struct HdrVividDynamicMetadataHUAWEI {
+pub mut:
+	s_type                StructureType = StructureType.structure_type_hdr_vivid_dynamic_metadata_huawei
+	p_next                voidptr
+	dynamic_metadata_size usize
+	p_dynamic_metadata    voidptr
 }
 
 pub const nv_cooperative_matrix_2_spec_version = 1
