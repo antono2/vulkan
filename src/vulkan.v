@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 301
+pub const header_version = 302
 pub const header_version_complete = make_api_version(0, 1, 3, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -404,6 +404,7 @@ pub enum StructureType {
 	structure_type_cu_module_create_info_nvx                                           = int(1000029000)
 	structure_type_cu_function_create_info_nvx                                         = int(1000029001)
 	structure_type_cu_launch_info_nvx                                                  = int(1000029002)
+	structure_type_cu_module_texturing_mode_create_info_nvx                            = int(1000029004)
 	structure_type_image_view_handle_info_nvx                                          = int(1000030000)
 	structure_type_image_view_address_properties_nvx                                   = int(1000030001)
 	structure_type_video_encode_h264_capabilities_khr                                  = int(1000038000)
@@ -997,6 +998,17 @@ pub enum StructureType {
 	structure_type_video_decode_av1_profile_info_khr                                   = int(1000512003)
 	structure_type_video_decode_av1_session_parameters_create_info_khr                 = int(1000512004)
 	structure_type_video_decode_av1_dpb_slot_info_khr                                  = int(1000512005)
+	structure_type_video_encode_av1_capabilities_khr                                   = int(1000513000)
+	structure_type_video_encode_av1_session_parameters_create_info_khr                 = int(1000513001)
+	structure_type_video_encode_av1_picture_info_khr                                   = int(1000513002)
+	structure_type_video_encode_av1_dpb_slot_info_khr                                  = int(1000513003)
+	structure_type_physical_device_video_encode_av1_features_khr                       = int(1000513004)
+	structure_type_video_encode_av1_profile_info_khr                                   = int(1000513005)
+	structure_type_video_encode_av1_rate_control_info_khr                              = int(1000513006)
+	structure_type_video_encode_av1_rate_control_layer_info_khr                        = int(1000513007)
+	structure_type_video_encode_av1_quality_level_properties_khr                       = int(1000513008)
+	structure_type_video_encode_av1_session_create_info_khr                            = int(1000513009)
+	structure_type_video_encode_av1_gop_remaining_frame_info_khr                       = int(1000513010)
 	structure_type_physical_device_video_maintenance1_features_khr                     = int(1000515000)
 	structure_type_video_inline_query_info_khr                                         = int(1000515001)
 	structure_type_physical_device_per_stage_descriptor_set_features_nv                = int(1000516000)
@@ -1036,6 +1048,18 @@ pub enum StructureType {
 	structure_type_set_descriptor_buffer_offsets_info_ext                              = int(1000545007)
 	structure_type_bind_descriptor_buffer_embedded_samplers_info_ext                   = int(1000545008)
 	structure_type_physical_device_descriptor_pool_overallocation_features_nv          = int(1000546000)
+	structure_type_display_surface_stereo_create_info_nv                               = int(1000551000)
+	structure_type_display_mode_stereo_properties_nv                                   = int(1000551001)
+	structure_type_video_encode_quantization_map_capabilities_khr                      = int(1000553000)
+	structure_type_video_format_quantization_map_properties_khr                        = int(1000553001)
+	structure_type_video_encode_quantization_map_info_khr                              = int(1000553002)
+	structure_type_video_encode_quantization_map_session_parameters_create_info_khr    = int(1000553005)
+	structure_type_physical_device_video_encode_quantization_map_features_khr          = int(1000553009)
+	structure_type_video_encode_h264_quantization_map_capabilities_khr                 = int(1000553003)
+	structure_type_video_encode_h265_quantization_map_capabilities_khr                 = int(1000553004)
+	structure_type_video_format_h265_quantization_map_properties_khr                   = int(1000553006)
+	structure_type_video_encode_av1_quantization_map_capabilities_khr                  = int(1000553007)
+	structure_type_video_format_av1_quantization_map_properties_khr                    = int(1000553008)
 	structure_type_physical_device_raw_access_chains_features_nv                       = int(1000555000)
 	structure_type_physical_device_shader_relaxed_extended_instruction_features_khr    = int(1000558000)
 	structure_type_physical_device_command_buffer_inheritance_features_nv              = int(1000559000)
@@ -1071,6 +1095,7 @@ pub enum StructureType {
 	structure_type_physical_device_cooperative_matrix2_features_nv                     = int(1000593000)
 	structure_type_cooperative_matrix_flexible_dimensions_properties_nv                = int(1000593001)
 	structure_type_physical_device_cooperative_matrix2_properties_nv                   = int(1000593002)
+	structure_type_physical_device_vertex_attribute_robustness_features_ext            = int(1000608000)
 	structure_type_max_enum                                                            = int(0x7FFFFFFF)
 }
 
@@ -1109,6 +1134,7 @@ pub enum ImageLayout {
 	image_layout_video_encode_src_khr                         = int(1000299001)
 	image_layout_video_encode_dpb_khr                         = int(1000299002)
 	image_layout_attachment_feedback_loop_optimal_ext         = int(1000339000)
+	image_layout_video_encode_quantization_map_khr            = int(1000553000)
 	image_layout_max_enum                                     = int(0x7FFFFFFF)
 }
 
@@ -1985,28 +2011,30 @@ pub enum SampleCountFlagBits {
 pub type SampleCountFlags = u32
 
 pub enum ImageUsageFlagBits {
-	image_usage_transfer_src_bit                         = int(0x00000001)
-	image_usage_transfer_dst_bit                         = int(0x00000002)
-	image_usage_sampled_bit                              = int(0x00000004)
-	image_usage_storage_bit                              = int(0x00000008)
-	image_usage_color_attachment_bit                     = int(0x00000010)
-	image_usage_depth_stencil_attachment_bit             = int(0x00000020)
-	image_usage_transient_attachment_bit                 = int(0x00000040)
-	image_usage_input_attachment_bit                     = int(0x00000080)
-	image_usage_video_decode_dst_bit_khr                 = int(0x00000400)
-	image_usage_video_decode_src_bit_khr                 = int(0x00000800)
-	image_usage_video_decode_dpb_bit_khr                 = int(0x00001000)
-	image_usage_fragment_density_map_bit_ext             = int(0x00000200)
-	image_usage_fragment_shading_rate_attachment_bit_khr = int(0x00000100)
-	image_usage_host_transfer_bit_ext                    = int(0x00400000)
-	image_usage_video_encode_dst_bit_khr                 = int(0x00002000)
-	image_usage_video_encode_src_bit_khr                 = int(0x00004000)
-	image_usage_video_encode_dpb_bit_khr                 = int(0x00008000)
-	image_usage_attachment_feedback_loop_bit_ext         = int(0x00080000)
-	image_usage_invocation_mask_bit_huawei               = int(0x00040000)
-	image_usage_sample_weight_bit_qcom                   = int(0x00100000)
-	image_usage_sample_block_match_bit_qcom              = int(0x00200000)
-	image_usage_flag_bits_max_enum                       = int(0x7FFFFFFF)
+	image_usage_transfer_src_bit                            = int(0x00000001)
+	image_usage_transfer_dst_bit                            = int(0x00000002)
+	image_usage_sampled_bit                                 = int(0x00000004)
+	image_usage_storage_bit                                 = int(0x00000008)
+	image_usage_color_attachment_bit                        = int(0x00000010)
+	image_usage_depth_stencil_attachment_bit                = int(0x00000020)
+	image_usage_transient_attachment_bit                    = int(0x00000040)
+	image_usage_input_attachment_bit                        = int(0x00000080)
+	image_usage_video_decode_dst_bit_khr                    = int(0x00000400)
+	image_usage_video_decode_src_bit_khr                    = int(0x00000800)
+	image_usage_video_decode_dpb_bit_khr                    = int(0x00001000)
+	image_usage_fragment_density_map_bit_ext                = int(0x00000200)
+	image_usage_fragment_shading_rate_attachment_bit_khr    = int(0x00000100)
+	image_usage_host_transfer_bit_ext                       = int(0x00400000)
+	image_usage_video_encode_dst_bit_khr                    = int(0x00002000)
+	image_usage_video_encode_src_bit_khr                    = int(0x00004000)
+	image_usage_video_encode_dpb_bit_khr                    = int(0x00008000)
+	image_usage_attachment_feedback_loop_bit_ext            = int(0x00080000)
+	image_usage_invocation_mask_bit_huawei                  = int(0x00040000)
+	image_usage_sample_weight_bit_qcom                      = int(0x00100000)
+	image_usage_sample_block_match_bit_qcom                 = int(0x00200000)
+	image_usage_video_encode_quantization_delta_map_bit_khr = int(0x02000000)
+	image_usage_video_encode_emphasis_map_bit_khr           = int(0x04000000)
+	image_usage_flag_bits_max_enum                          = int(0x7FFFFFFF)
 }
 
 pub type ImageUsageFlags = u32
@@ -7272,6 +7300,8 @@ pub const format_feature_2_box_filter_sampled_bit_qcom = u64(0x2000000000)
 pub const format_feature_2_optical_flow_image_bit_nv = u64(0x10000000000)
 pub const format_feature_2_optical_flow_vector_bit_nv = u64(0x20000000000)
 pub const format_feature_2_optical_flow_cost_bit_nv = u64(0x40000000000)
+pub const format_feature_2_video_encode_quantization_delta_map_bit_khr = u64(0x2000000000000)
+pub const format_feature_2_video_encode_emphasis_map_bit_khr = u64(0x4000000000000)
 
 pub struct PhysicalDeviceVulkan13Features {
 pub mut:
@@ -8729,6 +8759,7 @@ pub enum VideoCodecOperationFlagBitsKHR {
 	video_codec_operation_decode_h264_bit_khr    = int(0x00000001)
 	video_codec_operation_decode_h265_bit_khr    = int(0x00000002)
 	video_codec_operation_decode_av1_bit_khr     = int(0x00000004)
+	video_codec_operation_encode_av1_bit_khr     = int(0x00040000)
 	video_codec_operation_flag_bits_max_enum_khr = int(0x7FFFFFFF)
 }
 
@@ -8767,10 +8798,18 @@ pub enum VideoSessionCreateFlagBitsKHR {
 	video_session_create_protected_content_bit_khr                    = int(0x00000001)
 	video_session_create_allow_encode_parameter_optimizations_bit_khr = int(0x00000002)
 	video_session_create_inline_queries_bit_khr                       = int(0x00000004)
+	video_session_create_allow_encode_quantization_delta_map_bit_khr  = int(0x00000008)
+	video_session_create_allow_encode_emphasis_map_bit_khr            = int(0x00000010)
 	video_session_create_flag_bits_max_enum_khr                       = int(0x7FFFFFFF)
 }
 
 pub type VideoSessionCreateFlagsKHR = u32
+
+pub enum VideoSessionParametersCreateFlagBitsKHR {
+	video_session_parameters_create_quantization_map_compatible_bit_khr = int(0x00000001)
+	video_session_parameters_create_flag_bits_max_enum_khr              = int(0x7FFFFFFF)
+}
+
 pub type VideoSessionParametersCreateFlagsKHR = u32
 pub type VideoBeginCodingFlagsKHR = u32
 pub type VideoEndCodingFlagsKHR = u32
@@ -9131,6 +9170,7 @@ pub enum VideoEncodeH264CapabilityFlagBitsKHR {
 	video_encode_h264_capability_per_picture_type_min_max_qp_bit_khr       = int(0x00000040)
 	video_encode_h264_capability_per_slice_constant_qp_bit_khr             = int(0x00000080)
 	video_encode_h264_capability_generate_prefix_nalu_bit_khr              = int(0x00000100)
+	video_encode_h264_capability_mb_qp_diff_wraparound_bit_khr             = int(0x00000200)
 	video_encode_h264_capability_flag_bits_max_enum_khr                    = int(0x7FFFFFFF)
 }
 
@@ -9348,6 +9388,7 @@ pub enum VideoEncodeH265CapabilityFlagBitsKHR {
 	video_encode_h265_capability_per_slice_segment_constant_qp_bit_khr     = int(0x00000080)
 	video_encode_h265_capability_multiple_tiles_per_slice_segment_bit_khr  = int(0x00000100)
 	video_encode_h265_capability_multiple_slice_segments_per_tile_bit_khr  = int(0x00000200)
+	video_encode_h265_capability_cu_qp_diff_wraparound_bit_khr             = int(0x00000400)
 	video_encode_h265_capability_flag_bits_max_enum_khr                    = int(0x7FFFFFFF)
 }
 
@@ -11074,11 +11115,19 @@ pub enum VideoEncodeTuningModeKHR {
 	video_encode_tuning_mode_max_enum_khr          = int(0x7FFFFFFF)
 }
 
+pub enum VideoEncodeFlagBitsKHR {
+	video_encode_with_quantization_delta_map_bit_khr = int(0x00000001)
+	video_encode_with_emphasis_map_bit_khr           = int(0x00000002)
+	video_encode_flag_bits_max_enum_khr              = int(0x7FFFFFFF)
+}
+
 pub type VideoEncodeFlagsKHR = u32
 
 pub enum VideoEncodeCapabilityFlagBitsKHR {
 	video_encode_capability_preceding_externally_encoded_bytes_bit_khr            = int(0x00000001)
 	video_encode_capability_insufficient_bitstream_buffer_range_detection_bit_khr = int(0x00000002)
+	video_encode_capability_quantization_delta_map_bit_khr                        = int(0x00000004)
+	video_encode_capability_emphasis_map_bit_khr                                  = int(0x00000008)
 	video_encode_capability_flag_bits_max_enum_khr                                = int(0x7FFFFFFF)
 }
 
@@ -11913,6 +11962,215 @@ pub mut:
 	p_std_reference_info &voidptr
 }
 
+#include "vk_video/vulkan_video_codec_av1std_encode.h"
+
+pub const khr_video_encode_av1_spec_version = 1
+pub const khr_video_encode_av1_extension_name = 'VK_KHR_video_encode_av1'
+
+pub enum VideoEncodeAV1PredictionModeKHR {
+	video_encode_av1_prediction_mode_intra_only_khr              = int(0)
+	video_encode_av1_prediction_mode_single_reference_khr        = int(1)
+	video_encode_av1_prediction_mode_unidirectional_compound_khr = int(2)
+	video_encode_av1_prediction_mode_bidirectional_compound_khr  = int(3)
+	video_encode_av1_prediction_mode_max_enum_khr                = int(0x7FFFFFFF)
+}
+
+pub enum VideoEncodeAV1RateControlGroupKHR {
+	video_encode_av1_rate_control_group_intra_khr        = int(0)
+	video_encode_av1_rate_control_group_predictive_khr   = int(1)
+	video_encode_av1_rate_control_group_bipredictive_khr = int(2)
+	video_encode_av1_rate_control_group_max_enum_khr     = int(0x7FFFFFFF)
+}
+
+pub enum VideoEncodeAV1CapabilityFlagBitsKHR {
+	video_encode_av1_capability_per_rate_control_group_min_max_q_index_bit_khr = int(0x00000001)
+	video_encode_av1_capability_generate_obu_extension_header_bit_khr          = int(0x00000002)
+	video_encode_av1_capability_primary_reference_cdf_only_bit_khr             = int(0x00000004)
+	video_encode_av1_capability_frame_size_override_bit_khr                    = int(0x00000008)
+	video_encode_av1_capability_motion_vector_scaling_bit_khr                  = int(0x00000010)
+	video_encode_av1_capability_flag_bits_max_enum_khr                         = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeAV1CapabilityFlagsKHR = u32
+
+pub enum VideoEncodeAV1StdFlagBitsKHR {
+	video_encode_av1_std_uniform_tile_spacing_flag_set_bit_khr = int(0x00000001)
+	video_encode_av1_std_skip_mode_present_unset_bit_khr       = int(0x00000002)
+	video_encode_av1_std_primary_ref_frame_bit_khr             = int(0x00000004)
+	video_encode_av1_std_delta_q_bit_khr                       = int(0x00000008)
+	video_encode_av1_std_flag_bits_max_enum_khr                = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeAV1StdFlagsKHR = u32
+
+pub enum VideoEncodeAV1SuperblockSizeFlagBitsKHR {
+	video_encode_av1_superblock_size64_bit_khr              = int(0x00000001)
+	video_encode_av1_superblock_size128_bit_khr             = int(0x00000002)
+	video_encode_av1_superblock_size_flag_bits_max_enum_khr = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeAV1SuperblockSizeFlagsKHR = u32
+
+pub enum VideoEncodeAV1RateControlFlagBitsKHR {
+	video_encode_av1_rate_control_regular_gop_bit_khr                   = int(0x00000001)
+	video_encode_av1_rate_control_temporal_layer_pattern_dyadic_bit_khr = int(0x00000002)
+	video_encode_av1_rate_control_reference_pattern_flat_bit_khr        = int(0x00000004)
+	video_encode_av1_rate_control_reference_pattern_dyadic_bit_khr      = int(0x00000008)
+	video_encode_av1_rate_control_flag_bits_max_enum_khr                = int(0x7FFFFFFF)
+}
+
+pub type VideoEncodeAV1RateControlFlagsKHR = u32
+
+pub struct PhysicalDeviceVideoEncodeAV1FeaturesKHR {
+pub mut:
+	s_type           StructureType = StructureType.structure_type_physical_device_video_encode_av1_features_khr
+	p_next           voidptr
+	video_encode_av1 Bool32
+}
+
+pub struct VideoEncodeAV1CapabilitiesKHR {
+pub mut:
+	s_type                                             StructureType = StructureType.structure_type_video_encode_av1_capabilities_khr
+	p_next                                             voidptr
+	flags                                              VideoEncodeAV1CapabilityFlagsKHR
+	max_level                                          u32
+	coded_picture_alignment                            Extent2D
+	max_tiles                                          Extent2D
+	min_tile_size                                      Extent2D
+	max_tile_size                                      Extent2D
+	superblock_sizes                                   VideoEncodeAV1SuperblockSizeFlagsKHR
+	max_single_reference_count                         u32
+	single_reference_name_mask                         u32
+	max_unidirectional_compound_reference_count        u32
+	max_unidirectional_compound_group1_reference_count u32
+	unidirectional_compound_reference_name_mask        u32
+	max_bidirectional_compound_reference_count         u32
+	max_bidirectional_compound_group1_reference_count  u32
+	max_bidirectional_compound_group2_reference_count  u32
+	bidirectional_compound_reference_name_mask         u32
+	max_temporal_layer_count                           u32
+	max_spatial_layer_count                            u32
+	max_operating_points                               u32
+	min_q_index                                        u32
+	max_q_index                                        u32
+	prefers_gop_remaining_frames                       Bool32
+	requires_gop_remaining_frames                      Bool32
+	std_syntax_flags                                   VideoEncodeAV1StdFlagsKHR
+}
+
+pub struct VideoEncodeAV1QIndexKHR {
+pub mut:
+	intra_q_index        u32
+	predictive_q_index   u32
+	bipredictive_q_index u32
+}
+
+pub struct VideoEncodeAV1QualityLevelPropertiesKHR {
+pub mut:
+	s_type                                                       StructureType = StructureType.structure_type_video_encode_av1_quality_level_properties_khr
+	p_next                                                       voidptr
+	preferred_rate_control_flags                                 VideoEncodeAV1RateControlFlagsKHR
+	preferred_gop_frame_count                                    u32
+	preferred_key_frame_period                                   u32
+	preferred_consecutive_bipredictive_frame_count               u32
+	preferred_temporal_layer_count                               u32
+	preferred_constant_q_index                                   VideoEncodeAV1QIndexKHR
+	preferred_max_single_reference_count                         u32
+	preferred_single_reference_name_mask                         u32
+	preferred_max_unidirectional_compound_reference_count        u32
+	preferred_max_unidirectional_compound_group1_reference_count u32
+	preferred_unidirectional_compound_reference_name_mask        u32
+	preferred_max_bidirectional_compound_reference_count         u32
+	preferred_max_bidirectional_compound_group1_reference_count  u32
+	preferred_max_bidirectional_compound_group2_reference_count  u32
+	preferred_bidirectional_compound_reference_name_mask         u32
+}
+
+pub struct VideoEncodeAV1SessionCreateInfoKHR {
+pub mut:
+	s_type        StructureType = StructureType.structure_type_video_encode_av1_session_create_info_khr
+	p_next        voidptr
+	use_max_level Bool32
+	max_level     u32
+}
+
+pub struct VideoEncodeAV1SessionParametersCreateInfoKHR {
+pub mut:
+	s_type                    StructureType = StructureType.structure_type_video_encode_av1_session_parameters_create_info_khr
+	p_next                    voidptr
+	p_std_sequence_header     &voidptr
+	p_std_decoder_model_info  &StdVideoEncodeAV1DecoderModelInfo
+	std_operating_point_count u32
+	p_std_operating_points    &StdVideoEncodeAV1OperatingPointInfo
+}
+
+pub struct VideoEncodeAV1PictureInfoKHR {
+pub mut:
+	s_type                        StructureType = StructureType.structure_type_video_encode_av1_picture_info_khr
+	p_next                        voidptr
+	prediction_mode               VideoEncodeAV1PredictionModeKHR
+	rate_control_group            VideoEncodeAV1RateControlGroupKHR
+	constant_q_index              u32
+	p_std_picture_info            &StdVideoEncodeAV1PictureInfo
+	reference_name_slot_indices   [max_video_av1_references_per_frame_khr]i32
+	primary_reference_cdf_only    Bool32
+	generate_obu_extension_header Bool32
+}
+
+pub struct VideoEncodeAV1DpbSlotInfoKHR {
+pub mut:
+	s_type               StructureType = StructureType.structure_type_video_encode_av1_dpb_slot_info_khr
+	p_next               voidptr
+	p_std_reference_info &StdVideoEncodeAV1ReferenceInfo
+}
+
+pub struct VideoEncodeAV1ProfileInfoKHR {
+pub mut:
+	s_type      StructureType = StructureType.structure_type_video_encode_av1_profile_info_khr
+	p_next      voidptr
+	std_profile u32
+}
+
+pub struct VideoEncodeAV1FrameSizeKHR {
+pub mut:
+	intra_frame_size        u32
+	predictive_frame_size   u32
+	bipredictive_frame_size u32
+}
+
+pub struct VideoEncodeAV1GopRemainingFrameInfoKHR {
+pub mut:
+	s_type                     StructureType = StructureType.structure_type_video_encode_av1_gop_remaining_frame_info_khr
+	p_next                     voidptr
+	use_gop_remaining_frames   Bool32
+	gop_remaining_intra        u32
+	gop_remaining_predictive   u32
+	gop_remaining_bipredictive u32
+}
+
+pub struct VideoEncodeAV1RateControlInfoKHR {
+pub mut:
+	s_type                               StructureType = StructureType.structure_type_video_encode_av1_rate_control_info_khr
+	p_next                               voidptr
+	flags                                VideoEncodeAV1RateControlFlagsKHR
+	gop_frame_count                      u32
+	key_frame_period                     u32
+	consecutive_bipredictive_frame_count u32
+	temporal_layer_count                 u32
+}
+
+pub struct VideoEncodeAV1RateControlLayerInfoKHR {
+pub mut:
+	s_type             StructureType = StructureType.structure_type_video_encode_av1_rate_control_layer_info_khr
+	p_next             voidptr
+	use_min_q_index    Bool32
+	min_q_index        VideoEncodeAV1QIndexKHR
+	use_max_q_index    Bool32
+	max_q_index        VideoEncodeAV1QIndexKHR
+	use_max_frame_size Bool32
+	max_frame_size     VideoEncodeAV1FrameSizeKHR
+}
+
 pub const khr_video_maintenance_1_spec_version = 1
 pub const khr_video_maintenance_1_extension_name = 'VK_KHR_video_maintenance1'
 
@@ -12221,6 +12479,83 @@ fn C.vkCmdBindDescriptorBufferEmbeddedSamplers2EXT(C.CommandBuffer,
 pub fn cmd_bind_descriptor_buffer_embedded_samplers2_ext(command_buffer C.CommandBuffer,
 	p_bind_descriptor_buffer_embedded_samplers_info &BindDescriptorBufferEmbeddedSamplersInfoEXT) {
 	C.vkCmdBindDescriptorBufferEmbeddedSamplers2EXT(command_buffer, p_bind_descriptor_buffer_embedded_samplers_info)
+}
+
+pub const khr_video_encode_quantization_map_spec_version = 2
+pub const khr_video_encode_quantization_map_extension_name = 'VK_KHR_video_encode_quantization_map'
+
+pub struct VideoEncodeQuantizationMapCapabilitiesKHR {
+pub mut:
+	s_type                      StructureType = StructureType.structure_type_video_encode_quantization_map_capabilities_khr
+	p_next                      voidptr
+	max_quantization_map_extent Extent2D
+}
+
+pub struct VideoFormatQuantizationMapPropertiesKHR {
+pub mut:
+	s_type                      StructureType = StructureType.structure_type_video_format_quantization_map_properties_khr
+	p_next                      voidptr
+	quantization_map_texel_size Extent2D
+}
+
+pub struct VideoEncodeQuantizationMapInfoKHR {
+pub mut:
+	s_type                  StructureType = StructureType.structure_type_video_encode_quantization_map_info_khr
+	p_next                  voidptr
+	quantization_map        C.ImageView
+	quantization_map_extent Extent2D
+}
+
+pub struct VideoEncodeQuantizationMapSessionParametersCreateInfoKHR {
+pub mut:
+	s_type                      StructureType = StructureType.structure_type_video_encode_quantization_map_session_parameters_create_info_khr
+	p_next                      voidptr
+	quantization_map_texel_size Extent2D
+}
+
+pub struct PhysicalDeviceVideoEncodeQuantizationMapFeaturesKHR {
+pub mut:
+	s_type                        StructureType = StructureType.structure_type_physical_device_video_encode_quantization_map_features_khr
+	p_next                        voidptr
+	video_encode_quantization_map Bool32
+}
+
+pub struct VideoEncodeH264QuantizationMapCapabilitiesKHR {
+pub mut:
+	s_type       StructureType = StructureType.structure_type_video_encode_h264_quantization_map_capabilities_khr
+	p_next       voidptr
+	min_qp_delta i32
+	max_qp_delta i32
+}
+
+pub struct VideoEncodeH265QuantizationMapCapabilitiesKHR {
+pub mut:
+	s_type       StructureType = StructureType.structure_type_video_encode_h265_quantization_map_capabilities_khr
+	p_next       voidptr
+	min_qp_delta i32
+	max_qp_delta i32
+}
+
+pub struct VideoFormatH265QuantizationMapPropertiesKHR {
+pub mut:
+	s_type               StructureType = StructureType.structure_type_video_format_h265_quantization_map_properties_khr
+	p_next               voidptr
+	compatible_ctb_sizes VideoEncodeH265CtbSizeFlagsKHR
+}
+
+pub struct VideoEncodeAV1QuantizationMapCapabilitiesKHR {
+pub mut:
+	s_type            StructureType = StructureType.structure_type_video_encode_av1_quantization_map_capabilities_khr
+	p_next            voidptr
+	min_q_index_delta i32
+	max_q_index_delta i32
+}
+
+pub struct VideoFormatAV1QuantizationMapPropertiesKHR {
+pub mut:
+	s_type                      StructureType = StructureType.structure_type_video_format_av1_quantization_map_properties_khr
+	p_next                      voidptr
+	compatible_superblock_sizes VideoEncodeAV1SuperblockSizeFlagsKHR
 }
 
 pub const khr_shader_relaxed_extended_instruction_spec_version = 1
@@ -12651,7 +12986,7 @@ pub fn cmd_draw_indirect_byte_count_ext(command_buffer C.CommandBuffer,
 pub type C.CuModuleNVX = voidptr
 pub type C.CuFunctionNVX = voidptr
 
-pub const nvx_binary_import_spec_version = 1
+pub const nvx_binary_import_spec_version = 2
 pub const nvx_binary_import_extension_name = 'VK_NVX_binary_import'
 
 pub struct CuModuleCreateInfoNVX {
@@ -12660,6 +12995,13 @@ pub mut:
 	p_next    voidptr
 	data_size usize
 	p_data    voidptr
+}
+
+pub struct CuModuleTexturingModeCreateInfoNVX {
+pub mut:
+	s_type             StructureType = StructureType.structure_type_cu_module_texturing_mode_create_info_nvx
+	p_next             voidptr
+	use64bit_texturing Bool32
 }
 
 pub struct CuFunctionCreateInfoNVX {
@@ -12735,7 +13077,7 @@ pub fn cmd_cu_launch_kernel_nvx(command_buffer C.CommandBuffer,
 	C.vkCmdCuLaunchKernelNVX(command_buffer, p_launch_info)
 }
 
-pub const nvx_image_view_handle_spec_version = 2
+pub const nvx_image_view_handle_spec_version = 3
 pub const nvx_image_view_handle_extension_name = 'VK_NVX_image_view_handle'
 
 pub struct ImageViewHandleInfoNVX {
@@ -12760,6 +13102,13 @@ fn C.vkGetImageViewHandleNVX(C.Device,
 pub fn get_image_view_handle_nvx(device C.Device,
 	p_info &ImageViewHandleInfoNVX) u32 {
 	return C.vkGetImageViewHandleNVX(device, p_info)
+}
+
+fn C.vkGetImageViewHandle64NVX(C.Device,
+	&ImageViewHandleInfoNVX) u64
+pub fn get_image_view_handle64_nvx(device C.Device,
+	p_info &ImageViewHandleInfoNVX) u64 {
+	return C.vkGetImageViewHandle64NVX(device, p_info)
 }
 
 fn C.vkGetImageViewAddressNVX(C.Device,
@@ -20037,6 +20386,31 @@ pub mut:
 	descriptor_pool_overallocation Bool32
 }
 
+pub const nv_display_stereo_spec_version = 1
+pub const nv_display_stereo_extension_name = 'VK_NV_display_stereo'
+
+pub enum DisplaySurfaceStereoTypeNV {
+	display_surface_stereo_type_none_nv               = int(0)
+	display_surface_stereo_type_onboard_din_nv        = int(1)
+	display_surface_stereo_type_hdmi3d_nv             = int(2)
+	display_surface_stereo_type_inband_displayport_nv = int(3)
+	display_surface_stereo_type_max_enum_nv           = int(0x7FFFFFFF)
+}
+
+pub struct DisplaySurfaceStereoCreateInfoNV {
+pub mut:
+	s_type      StructureType = StructureType.structure_type_display_surface_stereo_create_info_nv
+	p_next      voidptr
+	stereo_type DisplaySurfaceStereoTypeNV
+}
+
+pub struct DisplayModeStereoPropertiesNV {
+pub mut:
+	s_type            StructureType = StructureType.structure_type_display_mode_stereo_properties_nv
+	p_next            voidptr
+	hdmi3_d_supported Bool32
+}
+
 pub const nv_raw_access_chains_spec_version = 1
 pub const nv_raw_access_chains_extension_name = 'VK_NV_raw_access_chains'
 
@@ -20530,6 +20904,16 @@ pub fn get_physical_device_cooperative_matrix_flexible_dimensions_properties_nv(
 	p_properties &CooperativeMatrixFlexibleDimensionsPropertiesNV) Result {
 	return C.vkGetPhysicalDeviceCooperativeMatrixFlexibleDimensionsPropertiesNV(physical_device,
 		p_property_count, p_properties)
+}
+
+pub const ext_vertex_attribute_robustness_spec_version = 1
+pub const ext_vertex_attribute_robustness_extension_name = 'VK_EXT_vertex_attribute_robustness'
+
+pub struct PhysicalDeviceVertexAttributeRobustnessFeaturesEXT {
+pub mut:
+	s_type                      StructureType = StructureType.structure_type_physical_device_vertex_attribute_robustness_features_ext
+	p_next                      voidptr
+	vertex_attribute_robustness Bool32
 }
 
 pub const khr_acceleration_structure_spec_version = 13
