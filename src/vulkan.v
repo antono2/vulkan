@@ -19,8 +19,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
 pub const header_version = 303
-
-pub type HEADER_VERSION_COMPLETE = MAKE_API_VERSION
+pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
 	return version >> 29
@@ -8216,7 +8215,8 @@ pub fn get_device_image_sparse_memory_requirements(device C.Device,
 		p_sparse_memory_requirements)
 }
 
-pub type API_VERSION_1_4 = MAKE_API_VERSION
+// Vulkan 1.4 version number
+pub const api_version_1_4 = make_api_version(0, 1, 4, 0) // Patch version should always be set to 0
 
 pub const max_global_priority_size = u32(16)
 
