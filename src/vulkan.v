@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 304
+pub const header_version = 305
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -910,7 +910,6 @@ pub enum StructureType {
 	structure_type_physical_device_descriptor_set_host_mapping_features_valve          = int(1000420000)
 	structure_type_descriptor_set_binding_reference_valve                              = int(1000420001)
 	structure_type_descriptor_set_layout_host_mapping_info_valve                       = int(1000420002)
-	structure_type_physical_device_depth_clamp_zero_one_features_ext                   = int(1000421000)
 	structure_type_physical_device_non_seamless_cube_map_features_ext                  = int(1000422000)
 	structure_type_physical_device_render_pass_striped_features_arm                    = int(1000424000)
 	structure_type_physical_device_render_pass_striped_properties_arm                  = int(1000424001)
@@ -1087,6 +1086,8 @@ pub enum StructureType {
 	structure_type_indirect_execution_set_shader_layout_info_ext                       = int(1000572012)
 	structure_type_generated_commands_pipeline_info_ext                                = int(1000572013)
 	structure_type_generated_commands_shader_info_ext                                  = int(1000572014)
+	structure_type_physical_device_maintenance8_features_khr                           = int(1000574000)
+	structure_type_memory_barrier_access_flags3_khr                                    = int(1000574002)
 	structure_type_physical_device_image_alignment_control_features_mesa               = int(1000575000)
 	structure_type_physical_device_image_alignment_control_properties_mesa             = int(1000575001)
 	structure_type_image_alignment_control_create_info_mesa                            = int(1000575002)
@@ -1097,6 +1098,8 @@ pub enum StructureType {
 	structure_type_physical_device_cooperative_matrix2_features_nv                     = int(1000593000)
 	structure_type_cooperative_matrix_flexible_dimensions_properties_nv                = int(1000593001)
 	structure_type_physical_device_cooperative_matrix2_properties_nv                   = int(1000593002)
+	structure_type_physical_device_pipeline_opacity_micromap_features_arm              = int(1000596000)
+	structure_type_physical_device_depth_clamp_zero_one_features_khr                   = int(1000421000)
 	structure_type_physical_device_vertex_attribute_robustness_features_ext            = int(1000608000)
 	structure_type_max_enum                                                            = int(0x7FFFFFFF)
 }
@@ -2252,8 +2255,9 @@ pub type ImageViewCreateFlags = u32
 pub type ShaderModuleCreateFlags = u32
 
 pub enum PipelineCacheCreateFlagBits {
-	pipeline_cache_create_externally_synchronized_bit = int(0x00000001)
-	pipeline_cache_create_flag_bits_max_enum          = int(0x7FFFFFFF)
+	pipeline_cache_create_externally_synchronized_bit           = int(0x00000001)
+	pipeline_cache_create_internally_synchronized_merge_bit_khr = int(0x00000008)
+	pipeline_cache_create_flag_bits_max_enum                    = int(0x7FFFFFFF)
 }
 
 pub type PipelineCacheCreateFlags = u32
@@ -2418,11 +2422,12 @@ pub enum AttachmentDescriptionFlagBits {
 pub type AttachmentDescriptionFlags = u32
 
 pub enum DependencyFlagBits {
-	dependency_by_region_bit         = int(0x00000001)
-	dependency_device_group_bit      = int(0x00000004)
-	dependency_view_local_bit        = int(0x00000002)
-	dependency_feedback_loop_bit_ext = int(0x00000008)
-	dependency_flag_bits_max_enum    = int(0x7FFFFFFF)
+	dependency_by_region_bit                                          = int(0x00000001)
+	dependency_device_group_bit                                       = int(0x00000004)
+	dependency_view_local_bit                                         = int(0x00000002)
+	dependency_feedback_loop_bit_ext                                  = int(0x00000008)
+	dependency_queue_family_ownership_transfer_use_all_stages_bit_khr = int(0x00000020)
+	dependency_flag_bits_max_enum                                     = int(0x7FFFFFFF)
 }
 
 pub type DependencyFlags = u32
@@ -8305,6 +8310,7 @@ pub const pipeline_create_2_no_protected_access_bit_ext = pipeline_create_2_no_p
 pub const pipeline_create_2_protected_access_only_bit_ext = pipeline_create_2_protected_access_only_bit
 pub const pipeline_create_2_ray_tracing_displacement_micromap_bit_nv = u64(0x10000000)
 pub const pipeline_create_2_descriptor_buffer_bit_ext = u64(0x20000000)
+pub const pipeline_create_2_disallow_opacity_micromap_bit_arm = u64(0x2000000000)
 pub const pipeline_create_2_capture_data_bit_khr = u64(0x80000000)
 pub const pipeline_create_2_indirect_bindable_bit_ext = u64(0x4000000000)
 
@@ -12981,6 +12987,41 @@ pub mut:
 	s_type     StructureType = StructureType.structure_type_physical_device_layered_api_vulkan_properties_khr
 	p_next     voidptr
 	properties PhysicalDeviceProperties2
+}
+
+pub const khr_maintenance_8_spec_version = 1
+pub const khr_maintenance_8_extension_name = 'VK_KHR_maintenance8'
+
+pub type AccessFlags3KHR = u64
+
+// Flag bits for AccessFlagBits3KHR
+pub type AccessFlagBits3KHR = u64
+
+pub const access_3_none_khr = u64(0)
+
+pub struct PhysicalDeviceMaintenance8FeaturesKHR {
+pub mut:
+	s_type       StructureType = StructureType.structure_type_physical_device_maintenance8_features_khr
+	p_next       voidptr
+	maintenance8 Bool32
+}
+
+pub struct MemoryBarrierAccessFlags3KHR {
+pub mut:
+	s_type           StructureType = StructureType.structure_type_memory_barrier_access_flags3_khr
+	p_next           voidptr
+	src_access_mask3 AccessFlags3KHR
+	dst_access_mask3 AccessFlags3KHR
+}
+
+pub const khr_depth_clamp_zero_one_spec_version = 1
+pub const khr_depth_clamp_zero_one_extension_name = 'VK_KHR_depth_clamp_zero_one'
+
+pub struct PhysicalDeviceDepthClampZeroOneFeaturesKHR {
+pub mut:
+	s_type               StructureType = StructureType.structure_type_physical_device_depth_clamp_zero_one_features_khr
+	p_next               voidptr
+	depth_clamp_zero_one Bool32
 }
 
 pub type C.DebugReportCallbackEXT = voidptr
@@ -18895,12 +18936,7 @@ pub fn get_descriptor_set_host_mapping_valve(device C.Device,
 pub const ext_depth_clamp_zero_one_spec_version = 1
 pub const ext_depth_clamp_zero_one_extension_name = 'VK_EXT_depth_clamp_zero_one'
 
-pub struct PhysicalDeviceDepthClampZeroOneFeaturesEXT {
-pub mut:
-	s_type               StructureType = StructureType.structure_type_physical_device_depth_clamp_zero_one_features_ext
-	p_next               voidptr
-	depth_clamp_zero_one Bool32
-}
+pub type PhysicalDeviceDepthClampZeroOneFeaturesEXT = PhysicalDeviceDepthClampZeroOneFeaturesKHR
 
 pub const ext_non_seamless_cube_map_spec_version = 1
 pub const ext_non_seamless_cube_map_extension_name = 'VK_EXT_non_seamless_cube_map'
@@ -21106,6 +21142,16 @@ pub fn get_physical_device_cooperative_matrix_flexible_dimensions_properties_nv(
 	p_properties &CooperativeMatrixFlexibleDimensionsPropertiesNV) Result {
 	return C.vkGetPhysicalDeviceCooperativeMatrixFlexibleDimensionsPropertiesNV(physical_device,
 		p_property_count, p_properties)
+}
+
+pub const arm_pipeline_opacity_micromap_spec_version = 1
+pub const arm_pipeline_opacity_micromap_extension_name = 'VK_ARM_pipeline_opacity_micromap'
+
+pub struct PhysicalDevicePipelineOpacityMicromapFeaturesARM {
+pub mut:
+	s_type                    StructureType = StructureType.structure_type_physical_device_pipeline_opacity_micromap_features_arm
+	p_next                    voidptr
+	pipeline_opacity_micromap Bool32
 }
 
 pub const ext_vertex_attribute_robustness_spec_version = 1
