@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 305
+pub const header_version = 306
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -1093,12 +1093,19 @@ pub enum StructureType {
 	structure_type_image_alignment_control_create_info_mesa                            = int(1000575002)
 	structure_type_physical_device_depth_clamp_control_features_ext                    = int(1000582000)
 	structure_type_pipeline_viewport_depth_clamp_control_create_info_ext               = int(1000582001)
+	structure_type_physical_device_video_maintenance2_features_khr                     = int(1000586000)
+	structure_type_video_decode_h264_inline_session_parameters_info_khr                = int(1000586001)
+	structure_type_video_decode_h265_inline_session_parameters_info_khr                = int(1000586002)
+	structure_type_video_decode_av1_inline_session_parameters_info_khr                 = int(1000586003)
 	structure_type_physical_device_hdr_vivid_features_huawei                           = int(1000590000)
 	structure_type_hdr_vivid_dynamic_metadata_huawei                                   = int(1000590001)
 	structure_type_physical_device_cooperative_matrix2_features_nv                     = int(1000593000)
 	structure_type_cooperative_matrix_flexible_dimensions_properties_nv                = int(1000593001)
 	structure_type_physical_device_cooperative_matrix2_properties_nv                   = int(1000593002)
 	structure_type_physical_device_pipeline_opacity_micromap_features_arm              = int(1000596000)
+	structure_type_import_memory_metal_handle_info_ext                                 = int(1000602000)
+	structure_type_memory_metal_handle_properties_ext                                  = int(1000602001)
+	structure_type_memory_get_metal_handle_info_ext                                    = int(1000602002)
 	structure_type_physical_device_depth_clamp_zero_one_features_khr                   = int(1000421000)
 	structure_type_physical_device_vertex_attribute_robustness_features_ext            = int(1000608000)
 	structure_type_max_enum                                                            = int(0x7FFFFFFF)
@@ -5310,6 +5317,9 @@ pub enum ExternalMemoryHandleTypeFlagBits {
 	external_memory_handle_type_zircon_vmo_bit_fuchsia              = int(0x00000800)
 	external_memory_handle_type_rdma_address_bit_nv                 = int(0x00001000)
 	external_memory_handle_type_screen_buffer_bit_qnx               = int(0x00004000)
+	external_memory_handle_type_mtlbuffer_bit_ext                   = int(0x00010000)
+	external_memory_handle_type_mtltexture_bit_ext                  = int(0x00020000)
+	external_memory_handle_type_mtlheap_bit_ext                     = int(0x00040000)
 	external_memory_handle_type_flag_bits_max_enum                  = int(0x7FFFFFFF)
 }
 
@@ -9611,6 +9621,7 @@ pub enum VideoSessionCreateFlagBitsKHR {
 	video_session_create_inline_queries_bit_khr                       = int(0x00000004)
 	video_session_create_allow_encode_quantization_delta_map_bit_khr  = int(0x00000008)
 	video_session_create_allow_encode_emphasis_map_bit_khr            = int(0x00000010)
+	video_session_create_inline_session_parameters_bit_khr            = int(0x00000020)
 	video_session_create_flag_bits_max_enum_khr                       = int(0x7FFFFFFF)
 }
 
@@ -13012,6 +13023,40 @@ pub mut:
 	p_next           voidptr
 	src_access_mask3 AccessFlags3KHR
 	dst_access_mask3 AccessFlags3KHR
+}
+
+pub const khr_video_maintenance_2_spec_version = 1
+pub const khr_video_maintenance_2_extension_name = 'VK_KHR_video_maintenance2'
+
+pub struct PhysicalDeviceVideoMaintenance2FeaturesKHR {
+pub mut:
+	s_type             StructureType = StructureType.structure_type_physical_device_video_maintenance2_features_khr
+	p_next             voidptr
+	video_maintenance2 Bool32
+}
+
+pub struct VideoDecodeH264InlineSessionParametersInfoKHR {
+pub mut:
+	s_type    StructureType = StructureType.structure_type_video_decode_h264_inline_session_parameters_info_khr
+	p_next    voidptr
+	p_std_sps &C.StdVideoH264SequenceParameterSet
+	p_std_pps &C.StdVideoH264PictureParameterSet
+}
+
+pub struct VideoDecodeH265InlineSessionParametersInfoKHR {
+pub mut:
+	s_type    StructureType = StructureType.structure_type_video_decode_h265_inline_session_parameters_info_khr
+	p_next    voidptr
+	p_std_vps &C.StdVideoH265VideoParameterSet
+	p_std_sps &C.StdVideoH265SequenceParameterSet
+	p_std_pps &C.StdVideoH265PictureParameterSet
+}
+
+pub struct VideoDecodeAV1InlineSessionParametersInfoKHR {
+pub mut:
+	s_type                StructureType = StructureType.structure_type_video_decode_av1_inline_session_parameters_info_khr
+	p_next                voidptr
+	p_std_sequence_header &voidptr
 }
 
 pub const khr_depth_clamp_zero_one_spec_version = 1
@@ -21152,6 +21197,52 @@ pub mut:
 	s_type                    StructureType = StructureType.structure_type_physical_device_pipeline_opacity_micromap_features_arm
 	p_next                    voidptr
 	pipeline_opacity_micromap Bool32
+}
+
+pub const ext_external_memory_metal_spec_version = 1
+pub const ext_external_memory_metal_extension_name = 'VK_EXT_external_memory_metal'
+
+pub struct ImportMemoryMetalHandleInfoEXT {
+pub mut:
+	s_type      StructureType = StructureType.structure_type_import_memory_metal_handle_info_ext
+	p_next      voidptr
+	handle_type ExternalMemoryHandleTypeFlagBits
+	handle      voidptr
+}
+
+pub struct MemoryMetalHandlePropertiesEXT {
+pub mut:
+	s_type           StructureType = StructureType.structure_type_memory_metal_handle_properties_ext
+	p_next           voidptr
+	memory_type_bits u32
+}
+
+pub struct MemoryGetMetalHandleInfoEXT {
+pub mut:
+	s_type      StructureType = StructureType.structure_type_memory_get_metal_handle_info_ext
+	p_next      voidptr
+	memory      C.DeviceMemory
+	handle_type ExternalMemoryHandleTypeFlagBits
+}
+
+fn C.vkGetMemoryMetalHandleEXT(C.Device,
+	&MemoryGetMetalHandleInfoEXT,
+	&voidptr) Result
+pub fn get_memory_metal_handle_ext(device C.Device,
+	p_get_metal_handle_info &MemoryGetMetalHandleInfoEXT,
+	p_handle &voidptr) Result {
+	return C.vkGetMemoryMetalHandleEXT(device, p_get_metal_handle_info, p_handle)
+}
+
+fn C.vkGetMemoryMetalHandlePropertiesEXT(C.Device,
+	ExternalMemoryHandleTypeFlagBits,
+	voidptr,
+	&MemoryMetalHandlePropertiesEXT) Result
+pub fn get_memory_metal_handle_properties_ext(device C.Device,
+	handle_type ExternalMemoryHandleTypeFlagBits,
+	p_handle voidptr,
+	p_memory_metal_handle_properties &MemoryMetalHandlePropertiesEXT) Result {
+	return C.vkGetMemoryMetalHandlePropertiesEXT(device, handle_type, p_handle, p_memory_metal_handle_properties)
 }
 
 pub const ext_vertex_attribute_robustness_spec_version = 1
