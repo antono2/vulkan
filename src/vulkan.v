@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 306
+pub const header_version = 307
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -926,6 +926,9 @@ pub enum StructureType {
 	structure_type_physical_device_device_generated_commands_compute_features_nv       = int(1000428000)
 	structure_type_compute_pipeline_indirect_buffer_info_nv                            = int(1000428001)
 	structure_type_pipeline_indirect_device_address_info_nv                            = int(1000428002)
+	structure_type_physical_device_ray_tracing_linear_swept_spheres_features_nv        = int(1000429008)
+	structure_type_acceleration_structure_geometry_linear_swept_spheres_data_nv        = int(1000429009)
+	structure_type_acceleration_structure_geometry_spheres_data_nv                     = int(1000429010)
 	structure_type_physical_device_linear_color_attachment_features_nv                 = int(1000430000)
 	structure_type_physical_device_shader_maximal_reconvergence_features_khr           = int(1000434000)
 	structure_type_physical_device_image_compression_control_swapchain_features_ext    = int(1000437000)
@@ -983,6 +986,10 @@ pub enum StructureType {
 	structure_type_physical_device_multiview_per_view_viewports_features_qcom          = int(1000488000)
 	structure_type_physical_device_ray_tracing_invocation_reorder_features_nv          = int(1000490000)
 	structure_type_physical_device_ray_tracing_invocation_reorder_properties_nv        = int(1000490001)
+	structure_type_physical_device_cooperative_vector_features_nv                      = int(1000491000)
+	structure_type_physical_device_cooperative_vector_properties_nv                    = int(1000491001)
+	structure_type_cooperative_vector_properties_nv                                    = int(1000491002)
+	structure_type_convert_cooperative_vector_matrix_info_nv                           = int(1000491004)
 	structure_type_physical_device_extended_sparse_address_space_features_nv           = int(1000492000)
 	structure_type_physical_device_extended_sparse_address_space_properties_nv         = int(1000492001)
 	structure_type_physical_device_mutable_descriptor_type_features_ext                = int(1000351000)
@@ -1072,6 +1079,20 @@ pub enum StructureType {
 	structure_type_physical_device_shader_atomic_float16_vector_features_nv            = int(1000563000)
 	structure_type_physical_device_shader_replicated_composites_features_ext           = int(1000564000)
 	structure_type_physical_device_ray_tracing_validation_features_nv                  = int(1000568000)
+	structure_type_physical_device_cluster_acceleration_structure_features_nv          = int(1000569000)
+	structure_type_physical_device_cluster_acceleration_structure_properties_nv        = int(1000569001)
+	structure_type_cluster_acceleration_structure_clusters_bottom_level_input_nv       = int(1000569002)
+	structure_type_cluster_acceleration_structure_triangle_cluster_input_nv            = int(1000569003)
+	structure_type_cluster_acceleration_structure_move_objects_input_nv                = int(1000569004)
+	structure_type_cluster_acceleration_structure_input_info_nv                        = int(1000569005)
+	structure_type_cluster_acceleration_structure_commands_info_nv                     = int(1000569006)
+	structure_type_ray_tracing_pipeline_cluster_acceleration_structure_create_info_nv  = int(1000569007)
+	structure_type_physical_device_partitioned_acceleration_structure_features_nv      = int(1000570000)
+	structure_type_physical_device_partitioned_acceleration_structure_properties_nv    = int(1000570001)
+	structure_type_write_descriptor_set_partitioned_acceleration_structure_nv          = int(1000570002)
+	structure_type_partitioned_acceleration_structure_instances_input_nv               = int(1000570003)
+	structure_type_build_partitioned_acceleration_structure_info_nv                    = int(1000570004)
+	structure_type_partitioned_acceleration_structure_flags_nv                         = int(1000570005)
 	structure_type_physical_device_device_generated_commands_features_ext              = int(1000572000)
 	structure_type_physical_device_device_generated_commands_properties_ext            = int(1000572001)
 	structure_type_generated_commands_memory_requirements_info_ext                     = int(1000572002)
@@ -1829,24 +1850,25 @@ pub enum SamplerMipmapMode {
 }
 
 pub enum DescriptorType {
-	descriptor_type_sampler                    = int(0)
-	descriptor_type_combined_image_sampler     = int(1)
-	descriptor_type_sampled_image              = int(2)
-	descriptor_type_storage_image              = int(3)
-	descriptor_type_uniform_texel_buffer       = int(4)
-	descriptor_type_storage_texel_buffer       = int(5)
-	descriptor_type_uniform_buffer             = int(6)
-	descriptor_type_storage_buffer             = int(7)
-	descriptor_type_uniform_buffer_dynamic     = int(8)
-	descriptor_type_storage_buffer_dynamic     = int(9)
-	descriptor_type_input_attachment           = int(10)
-	descriptor_type_inline_uniform_block       = int(1000138000)
-	descriptor_type_acceleration_structure_khr = int(1000150000)
-	descriptor_type_acceleration_structure_nv  = int(1000165000)
-	descriptor_type_sample_weight_image_qcom   = int(1000440000)
-	descriptor_type_block_match_image_qcom     = int(1000440001)
-	descriptor_type_mutable_ext                = int(1000351000)
-	descriptor_type_max_enum                   = int(0x7FFFFFFF)
+	descriptor_type_sampler                               = int(0)
+	descriptor_type_combined_image_sampler                = int(1)
+	descriptor_type_sampled_image                         = int(2)
+	descriptor_type_storage_image                         = int(3)
+	descriptor_type_uniform_texel_buffer                  = int(4)
+	descriptor_type_storage_texel_buffer                  = int(5)
+	descriptor_type_uniform_buffer                        = int(6)
+	descriptor_type_storage_buffer                        = int(7)
+	descriptor_type_uniform_buffer_dynamic                = int(8)
+	descriptor_type_storage_buffer_dynamic                = int(9)
+	descriptor_type_input_attachment                      = int(10)
+	descriptor_type_inline_uniform_block                  = int(1000138000)
+	descriptor_type_acceleration_structure_khr            = int(1000150000)
+	descriptor_type_acceleration_structure_nv             = int(1000165000)
+	descriptor_type_sample_weight_image_qcom              = int(1000440000)
+	descriptor_type_block_match_image_qcom                = int(1000440001)
+	descriptor_type_mutable_ext                           = int(1000351000)
+	descriptor_type_partitioned_acceleration_structure_nv = int(1000570000)
+	descriptor_type_max_enum                              = int(0x7FFFFFFF)
 }
 
 pub enum AttachmentLoadOp {
@@ -7149,6 +7171,7 @@ pub const pipeline_stage_2_acceleration_structure_copy_bit_khr = u64(0x10000000)
 pub const pipeline_stage_2_micromap_build_bit_ext = u64(0x40000000)
 pub const pipeline_stage_2_cluster_culling_shader_bit_huawei = u64(0x20000000000)
 pub const pipeline_stage_2_optical_flow_bit_nv = u64(0x20000000)
+pub const pipeline_stage_2_convert_cooperative_vector_matrix_bit_nv = u64(0x100000000000)
 
 pub type AccessFlags2 = u64
 
@@ -7310,6 +7333,7 @@ pub const format_feature_2_storage_write_without_format_bit_khr = u32(format_fea
 pub const format_feature_2_sampled_image_depth_comparison_bit_khr = u32(format_feature_2_sampled_image_depth_comparison_bit)
 pub const format_feature_2_sampled_image_filter_minmax_bit_khr = u32(format_feature_2_sampled_image_filter_minmax_bit)
 pub const format_feature_2_sampled_image_filter_cubic_bit_ext = u32(format_feature_2_sampled_image_filter_cubic_bit)
+pub const format_feature_2_acceleration_structure_radius_buffer_bit_nv = u64(0x8000000000000)
 pub const format_feature_2_linear_color_attachment_bit_nv = u64(0x4000000000)
 pub const format_feature_2_weight_image_bit_qcom = u64(0x400000000)
 pub const format_feature_2_weight_sampled_image_bit_qcom = u64(0x800000000)
@@ -8288,6 +8312,8 @@ pub const pipeline_create_2_early_return_on_failure_bit = u64(0x00000200)
 pub const pipeline_create_2_no_protected_access_bit = u64(0x08000000)
 pub const pipeline_create_2_protected_access_only_bit = u64(0x40000000)
 pub const pipeline_create_2_execution_graph_bit_amdx = u64(0x100000000)
+pub const pipeline_create_2_ray_tracing_skip_built_in_primitives_bit_khr = pipeline_create_2_ray_tracing_skip_triangles_bit_khr
+pub const pipeline_create_2_ray_tracing_allow_spheres_and_linear_swept_spheres_bit_nv = u64(0x200000000)
 pub const pipeline_create_2_enable_legacy_dithering_bit_ext = u64(0x400000000)
 pub const pipeline_create_2_disable_optimization_bit_khr = pipeline_create_2_disable_optimization_bit
 pub const pipeline_create_2_allow_derivatives_bit_khr = pipeline_create_2_allow_derivatives_bit
@@ -12365,18 +12391,22 @@ pub const khr_cooperative_matrix_spec_version = 2
 pub const khr_cooperative_matrix_extension_name = 'VK_KHR_cooperative_matrix'
 
 pub enum ComponentTypeKHR {
-	component_type_float16_khr  = int(0)
-	component_type_float32_khr  = int(1)
-	component_type_float64_khr  = int(2)
-	component_type_sint8_khr    = int(3)
-	component_type_sint16_khr   = int(4)
-	component_type_sint32_khr   = int(5)
-	component_type_sint64_khr   = int(6)
-	component_type_uint8_khr    = int(7)
-	component_type_uint16_khr   = int(8)
-	component_type_uint32_khr   = int(9)
-	component_type_uint64_khr   = int(10)
-	component_type_max_enum_khr = int(0x7FFFFFFF)
+	component_type_float16_khr     = int(0)
+	component_type_float32_khr     = int(1)
+	component_type_float64_khr     = int(2)
+	component_type_sint8_khr       = int(3)
+	component_type_sint16_khr      = int(4)
+	component_type_sint32_khr      = int(5)
+	component_type_sint64_khr      = int(6)
+	component_type_uint8_khr       = int(7)
+	component_type_uint16_khr      = int(8)
+	component_type_uint32_khr      = int(9)
+	component_type_uint64_khr      = int(10)
+	component_type_sint8_packed_nv = int(1000491000)
+	component_type_uint8_packed_nv = int(1000491001)
+	component_type_float_e4m3_nv   = int(1000491002)
+	component_type_float_e5m2_nv   = int(1000491003)
+	component_type_max_enum_khr    = int(0x7FFFFFFF)
 }
 
 pub enum ScopeKHR {
@@ -14958,10 +14988,12 @@ pub enum RayTracingShaderGroupTypeKHR {
 pub type RayTracingShaderGroupTypeNV = RayTracingShaderGroupTypeKHR
 
 pub enum GeometryTypeKHR {
-	geometry_type_triangles_khr = int(0)
-	geometry_type_aabbs_khr     = int(1)
-	geometry_type_instances_khr = int(2)
-	geometry_type_max_enum_khr  = int(0x7FFFFFFF)
+	geometry_type_triangles_khr           = int(0)
+	geometry_type_aabbs_khr               = int(1)
+	geometry_type_instances_khr           = int(2)
+	geometry_type_spheres_nv              = int(1000429004)
+	geometry_type_linear_swept_spheres_nv = int(1000429005)
+	geometry_type_max_enum_khr            = int(0x7FFFFFFF)
 }
 
 pub type GeometryTypeNV = GeometryTypeKHR
@@ -18482,11 +18514,12 @@ pub enum OpacityMicromapFormatEXT {
 }
 
 pub enum OpacityMicromapSpecialIndexEXT {
-	opacity_micromap_special_index_fully_transparent_ext         = int(-1)
-	opacity_micromap_special_index_fully_opaque_ext              = int(-2)
-	opacity_micromap_special_index_fully_unknown_transparent_ext = int(-3)
-	opacity_micromap_special_index_fully_unknown_opaque_ext      = int(-4)
-	opacity_micromap_special_index_max_enum_ext                  = int(0x7FFFFFFF)
+	opacity_micromap_special_index_fully_transparent_ext                        = int(-1)
+	opacity_micromap_special_index_fully_opaque_ext                             = int(-2)
+	opacity_micromap_special_index_fully_unknown_transparent_ext                = int(-3)
+	opacity_micromap_special_index_fully_unknown_opaque_ext                     = int(-4)
+	opacity_micromap_special_index_cluster_geometry_disable_opacity_micromap_nv = int(-5)
+	opacity_micromap_special_index_max_enum_ext                                 = int(0x7FFFFFFF)
 }
 
 pub enum AccelerationStructureCompatibilityKHR {
@@ -19234,6 +19267,61 @@ fn C.vkGetPipelineIndirectDeviceAddressNV(C.Device,
 pub fn get_pipeline_indirect_device_address_nv(device C.Device,
 	p_info &PipelineIndirectDeviceAddressInfoNV) DeviceAddress {
 	return C.vkGetPipelineIndirectDeviceAddressNV(device, p_info)
+}
+
+pub const nv_ray_tracing_linear_swept_spheres_spec_version = 1
+pub const nv_ray_tracing_linear_swept_spheres_extension_name = 'VK_NV_ray_tracing_linear_swept_spheres'
+
+pub enum RayTracingLssIndexingModeNV {
+	ray_tracing_lss_indexing_mode_list_nv       = int(0)
+	ray_tracing_lss_indexing_mode_successive_nv = int(1)
+	ray_tracing_lss_indexing_mode_max_enum_nv   = int(0x7FFFFFFF)
+}
+
+pub enum RayTracingLssPrimitiveEndCapsModeNV {
+	ray_tracing_lss_primitive_end_caps_mode_none_nv     = int(0)
+	ray_tracing_lss_primitive_end_caps_mode_chained_nv  = int(1)
+	ray_tracing_lss_primitive_end_caps_mode_max_enum_nv = int(0x7FFFFFFF)
+}
+
+pub struct PhysicalDeviceRayTracingLinearSweptSpheresFeaturesNV {
+pub mut:
+	s_type               StructureType = StructureType.structure_type_physical_device_ray_tracing_linear_swept_spheres_features_nv
+	p_next               voidptr
+	spheres              Bool32
+	linear_swept_spheres Bool32
+}
+
+pub struct AccelerationStructureGeometryLinearSweptSpheresDataNV {
+pub mut:
+	s_type        StructureType = StructureType.structure_type_acceleration_structure_geometry_linear_swept_spheres_data_nv
+	p_next        voidptr
+	vertex_format Format
+	vertex_data   DeviceOrHostAddressConstKHR
+	vertex_stride DeviceSize
+	radius_format Format
+	radius_data   DeviceOrHostAddressConstKHR
+	radius_stride DeviceSize
+	index_type    IndexType
+	index_data    DeviceOrHostAddressConstKHR
+	index_stride  DeviceSize
+	indexing_mode RayTracingLssIndexingModeNV
+	end_caps_mode RayTracingLssPrimitiveEndCapsModeNV
+}
+
+pub struct AccelerationStructureGeometrySpheresDataNV {
+pub mut:
+	s_type        StructureType = StructureType.structure_type_acceleration_structure_geometry_spheres_data_nv
+	p_next        voidptr
+	vertex_format Format
+	vertex_data   DeviceOrHostAddressConstKHR
+	vertex_stride DeviceSize
+	radius_format Format
+	radius_data   DeviceOrHostAddressConstKHR
+	radius_stride DeviceSize
+	index_type    IndexType
+	index_data    DeviceOrHostAddressConstKHR
+	index_stride  DeviceSize
 }
 
 pub const nv_linear_color_attachment_spec_version = 1
@@ -20246,6 +20334,91 @@ pub mut:
 	ray_tracing_invocation_reorder Bool32
 }
 
+pub const nv_cooperative_vector_spec_version = 4
+pub const nv_cooperative_vector_extension_name = 'VK_NV_cooperative_vector'
+
+pub enum CooperativeVectorMatrixLayoutNV {
+	cooperative_vector_matrix_layout_row_major_nv           = int(0)
+	cooperative_vector_matrix_layout_column_major_nv        = int(1)
+	cooperative_vector_matrix_layout_inferencing_optimal_nv = int(2)
+	cooperative_vector_matrix_layout_training_optimal_nv    = int(3)
+	cooperative_vector_matrix_layout_max_enum_nv            = int(0x7FFFFFFF)
+}
+
+pub struct PhysicalDeviceCooperativeVectorPropertiesNV {
+pub mut:
+	s_type                                           StructureType = StructureType.structure_type_physical_device_cooperative_vector_properties_nv
+	p_next                                           voidptr
+	cooperative_vector_supported_stages              ShaderStageFlags
+	cooperative_vector_training_float16_accumulation Bool32
+	cooperative_vector_training_float32_accumulation Bool32
+	max_cooperative_vector_components                u32
+}
+
+pub struct PhysicalDeviceCooperativeVectorFeaturesNV {
+pub mut:
+	s_type                      StructureType = StructureType.structure_type_physical_device_cooperative_vector_features_nv
+	p_next                      voidptr
+	cooperative_vector          Bool32
+	cooperative_vector_training Bool32
+}
+
+pub struct CooperativeVectorPropertiesNV {
+pub mut:
+	s_type                StructureType = StructureType.structure_type_cooperative_vector_properties_nv
+	p_next                voidptr
+	input_type            ComponentTypeKHR
+	input_interpretation  ComponentTypeKHR
+	matrix_interpretation ComponentTypeKHR
+	bias_interpretation   ComponentTypeKHR
+	result_type           ComponentTypeKHR
+	transpose             Bool32
+}
+
+pub struct ConvertCooperativeVectorMatrixInfoNV {
+pub mut:
+	s_type             StructureType = StructureType.structure_type_convert_cooperative_vector_matrix_info_nv
+	p_next             voidptr
+	src_size           usize
+	src_data           DeviceOrHostAddressConstKHR
+	p_dst_size         &usize
+	dst_data           DeviceOrHostAddressKHR
+	src_component_type ComponentTypeKHR
+	dst_component_type ComponentTypeKHR
+	num_rows           u32
+	num_columns        u32
+	src_layout         CooperativeVectorMatrixLayoutNV
+	src_stride         usize
+	dst_layout         CooperativeVectorMatrixLayoutNV
+	dst_stride         usize
+}
+
+fn C.vkGetPhysicalDeviceCooperativeVectorPropertiesNV(C.PhysicalDevice,
+	&u32,
+	&CooperativeVectorPropertiesNV) Result
+pub fn get_physical_device_cooperative_vector_properties_nv(physical_device C.PhysicalDevice,
+	p_property_count &u32,
+	p_properties &CooperativeVectorPropertiesNV) Result {
+	return C.vkGetPhysicalDeviceCooperativeVectorPropertiesNV(physical_device, p_property_count,
+		p_properties)
+}
+
+fn C.vkConvertCooperativeVectorMatrixNV(C.Device,
+	&ConvertCooperativeVectorMatrixInfoNV) Result
+pub fn convert_cooperative_vector_matrix_nv(device C.Device,
+	p_info &ConvertCooperativeVectorMatrixInfoNV) Result {
+	return C.vkConvertCooperativeVectorMatrixNV(device, p_info)
+}
+
+fn C.vkCmdConvertCooperativeVectorMatrixNV(C.CommandBuffer,
+	u32,
+	&ConvertCooperativeVectorMatrixInfoNV)
+pub fn cmd_convert_cooperative_vector_matrix_nv(command_buffer C.CommandBuffer,
+	info_count u32,
+	p_infos &ConvertCooperativeVectorMatrixInfoNV) {
+	C.vkCmdConvertCooperativeVectorMatrixNV(command_buffer, info_count, p_infos)
+}
+
 pub const nv_extended_sparse_address_space_spec_version = 1
 pub const nv_extended_sparse_address_space_extension_name = 'VK_NV_extended_sparse_address_space'
 
@@ -20742,6 +20915,392 @@ pub mut:
 	s_type                 StructureType = StructureType.structure_type_physical_device_ray_tracing_validation_features_nv
 	p_next                 voidptr
 	ray_tracing_validation Bool32
+}
+
+pub const nv_cluster_acceleration_structure_spec_version = 2
+pub const nv_cluster_acceleration_structure_extension_name = 'VK_NV_cluster_acceleration_structure'
+
+pub enum ClusterAccelerationStructureTypeNV {
+	cluster_acceleration_structure_type_clusters_bottom_level_nv     = int(0)
+	cluster_acceleration_structure_type_triangle_cluster_nv          = int(1)
+	cluster_acceleration_structure_type_triangle_cluster_template_nv = int(2)
+	cluster_acceleration_structure_type_max_enum_nv                  = int(0x7FFFFFFF)
+}
+
+pub enum ClusterAccelerationStructureOpTypeNV {
+	cluster_acceleration_structure_op_type_move_objects_nv                    = int(0)
+	cluster_acceleration_structure_op_type_build_clusters_bottom_level_nv     = int(1)
+	cluster_acceleration_structure_op_type_build_triangle_cluster_nv          = int(2)
+	cluster_acceleration_structure_op_type_build_triangle_cluster_template_nv = int(3)
+	cluster_acceleration_structure_op_type_instantiate_triangle_cluster_nv    = int(4)
+	cluster_acceleration_structure_op_type_max_enum_nv                        = int(0x7FFFFFFF)
+}
+
+pub enum ClusterAccelerationStructureOpModeNV {
+	cluster_acceleration_structure_op_mode_implicit_destinations_nv = int(0)
+	cluster_acceleration_structure_op_mode_explicit_destinations_nv = int(1)
+	cluster_acceleration_structure_op_mode_compute_sizes_nv         = int(2)
+	cluster_acceleration_structure_op_mode_max_enum_nv              = int(0x7FFFFFFF)
+}
+
+pub enum ClusterAccelerationStructureAddressResolutionFlagBitsNV {
+	cluster_acceleration_structure_address_resolution_indirected_dst_implicit_data_bit_nv = int(0x00000001)
+	cluster_acceleration_structure_address_resolution_indirected_scratch_data_bit_nv      = int(0x00000002)
+	cluster_acceleration_structure_address_resolution_indirected_dst_address_array_bit_nv = int(0x00000004)
+	cluster_acceleration_structure_address_resolution_indirected_dst_sizes_array_bit_nv   = int(0x00000008)
+	cluster_acceleration_structure_address_resolution_indirected_src_infos_array_bit_nv   = int(0x00000010)
+	cluster_acceleration_structure_address_resolution_indirected_src_infos_count_bit_nv   = int(0x00000020)
+	cluster_acceleration_structure_address_resolution_flag_bits_max_enum_nv               = int(0x7FFFFFFF)
+}
+
+pub type ClusterAccelerationStructureAddressResolutionFlagsNV = u32
+
+pub enum ClusterAccelerationStructureClusterFlagBitsNV {
+	cluster_acceleration_structure_cluster_allow_disable_opacity_micromaps_nv = int(0x00000001)
+	cluster_acceleration_structure_cluster_flag_bits_max_enum_nv              = int(0x7FFFFFFF)
+}
+
+pub type ClusterAccelerationStructureClusterFlagsNV = u32
+
+pub enum ClusterAccelerationStructureGeometryFlagBitsNV {
+	cluster_acceleration_structure_geometry_cull_disable_bit_nv                   = int(0x00000001)
+	cluster_acceleration_structure_geometry_no_duplicate_anyhit_invocation_bit_nv = int(0x00000002)
+	cluster_acceleration_structure_geometry_opaque_bit_nv                         = int(0x00000004)
+	cluster_acceleration_structure_geometry_flag_bits_max_enum_nv                 = int(0x7FFFFFFF)
+}
+
+pub type ClusterAccelerationStructureGeometryFlagsNV = u32
+
+pub enum ClusterAccelerationStructureIndexFormatFlagBitsNV {
+	cluster_acceleration_structure_index_format8bit_nv                = int(0x00000001)
+	cluster_acceleration_structure_index_format16bit_nv               = int(0x00000002)
+	cluster_acceleration_structure_index_format32bit_nv               = int(0x00000004)
+	cluster_acceleration_structure_index_format_flag_bits_max_enum_nv = int(0x7FFFFFFF)
+}
+
+pub type ClusterAccelerationStructureIndexFormatFlagsNV = u32
+
+pub struct PhysicalDeviceClusterAccelerationStructureFeaturesNV {
+pub mut:
+	s_type                         StructureType = StructureType.structure_type_physical_device_cluster_acceleration_structure_features_nv
+	p_next                         voidptr
+	cluster_acceleration_structure Bool32
+}
+
+pub struct PhysicalDeviceClusterAccelerationStructurePropertiesNV {
+pub mut:
+	s_type                                 StructureType = StructureType.structure_type_physical_device_cluster_acceleration_structure_properties_nv
+	p_next                                 voidptr
+	max_vertices_per_cluster               u32
+	max_triangles_per_cluster              u32
+	cluster_scratch_byte_alignment         u32
+	cluster_byte_alignment                 u32
+	cluster_template_byte_alignment        u32
+	cluster_bottom_level_byte_alignment    u32
+	cluster_template_bounds_byte_alignment u32
+	max_cluster_geometry_index             u32
+}
+
+pub struct ClusterAccelerationStructureClustersBottomLevelInputNV {
+pub mut:
+	s_type                                       StructureType = StructureType.structure_type_cluster_acceleration_structure_clusters_bottom_level_input_nv
+	p_next                                       voidptr
+	max_total_cluster_count                      u32
+	max_cluster_count_per_acceleration_structure u32
+}
+
+pub struct ClusterAccelerationStructureTriangleClusterInputNV {
+pub mut:
+	s_type                            StructureType = StructureType.structure_type_cluster_acceleration_structure_triangle_cluster_input_nv
+	p_next                            voidptr
+	vertex_format                     Format
+	max_geometry_index_value          u32
+	max_cluster_unique_geometry_count u32
+	max_cluster_triangle_count        u32
+	max_cluster_vertex_count          u32
+	max_total_triangle_count          u32
+	max_total_vertex_count            u32
+	min_position_truncate_bit_count   u32
+}
+
+pub struct ClusterAccelerationStructureMoveObjectsInputNV {
+pub mut:
+	s_type          StructureType = StructureType.structure_type_cluster_acceleration_structure_move_objects_input_nv
+	p_next          voidptr
+	vktype          ClusterAccelerationStructureTypeNV
+	no_move_overlap Bool32
+	max_moved_bytes DeviceSize
+}
+
+pub union ClusterAccelerationStructureOpInputNV {
+pub mut:
+	p_clusters_bottom_level &ClusterAccelerationStructureClustersBottomLevelInputNV
+	p_triangle_clusters     &ClusterAccelerationStructureTriangleClusterInputNV
+	p_move_objects          &ClusterAccelerationStructureMoveObjectsInputNV
+}
+
+pub struct ClusterAccelerationStructureInputInfoNV {
+pub mut:
+	s_type                           StructureType = StructureType.structure_type_cluster_acceleration_structure_input_info_nv
+	p_next                           voidptr
+	max_acceleration_structure_count u32
+	flags                            BuildAccelerationStructureFlagsKHR
+	op_type                          ClusterAccelerationStructureOpTypeNV
+	op_mode                          ClusterAccelerationStructureOpModeNV
+	op_input                         ClusterAccelerationStructureOpInputNV
+}
+
+pub struct StridedDeviceAddressRegionKHR {
+pub mut:
+	device_address DeviceAddress
+	stride         DeviceSize
+	size           DeviceSize
+}
+
+pub struct ClusterAccelerationStructureCommandsInfoNV {
+pub mut:
+	s_type                   StructureType = StructureType.structure_type_cluster_acceleration_structure_commands_info_nv
+	p_next                   voidptr
+	input                    ClusterAccelerationStructureInputInfoNV
+	dst_implicit_data        DeviceAddress
+	scratch_data             DeviceAddress
+	dst_addresses_array      StridedDeviceAddressRegionKHR
+	dst_sizes_array          StridedDeviceAddressRegionKHR
+	src_infos_array          StridedDeviceAddressRegionKHR
+	src_infos_count          DeviceAddress
+	address_resolution_flags ClusterAccelerationStructureAddressResolutionFlagsNV
+}
+
+pub struct StridedDeviceAddressNV {
+pub mut:
+	start_address   DeviceAddress
+	stride_in_bytes DeviceSize
+}
+
+pub struct ClusterAccelerationStructureGeometryIndexAndGeometryFlagsNV {
+pub mut:
+	geometry_index u32
+	reserved       u32
+	geometry_flags u32
+}
+
+pub struct ClusterAccelerationStructureMoveObjectsInfoNV {
+pub mut:
+	src_acceleration_structure DeviceAddress
+}
+
+pub struct ClusterAccelerationStructureBuildClustersBottomLevelInfoNV {
+pub mut:
+	cluster_references_count  u32
+	cluster_references_stride u32
+	cluster_references        DeviceAddress
+}
+
+pub struct ClusterAccelerationStructureBuildTriangleClusterInfoNV {
+pub mut:
+	cluster_id                             u32
+	cluster_flags                          ClusterAccelerationStructureClusterFlagsNV
+	triangle_count                         u32
+	vertex_count                           u32
+	position_truncate_bit_count            u32
+	index_type                             u32
+	opacity_micromap_index_type            u32
+	base_geometry_index_and_geometry_flags ClusterAccelerationStructureGeometryIndexAndGeometryFlagsNV
+	index_buffer_stride                    u16
+	vertex_buffer_stride                   u16
+	geometry_index_and_flags_buffer_stride u16
+	opacity_micromap_index_buffer_stride   u16
+	index_buffer                           DeviceAddress
+	vertex_buffer                          DeviceAddress
+	geometry_index_and_flags_buffer        DeviceAddress
+	opacity_micromap_array                 DeviceAddress
+	opacity_micromap_index_buffer          DeviceAddress
+}
+
+pub struct ClusterAccelerationStructureBuildTriangleClusterTemplateInfoNV {
+pub mut:
+	cluster_id                             u32
+	cluster_flags                          ClusterAccelerationStructureClusterFlagsNV
+	triangle_count                         u32
+	vertex_count                           u32
+	position_truncate_bit_count            u32
+	index_type                             u32
+	opacity_micromap_index_type            u32
+	base_geometry_index_and_geometry_flags ClusterAccelerationStructureGeometryIndexAndGeometryFlagsNV
+	index_buffer_stride                    u16
+	vertex_buffer_stride                   u16
+	geometry_index_and_flags_buffer_stride u16
+	opacity_micromap_index_buffer_stride   u16
+	index_buffer                           DeviceAddress
+	vertex_buffer                          DeviceAddress
+	geometry_index_and_flags_buffer        DeviceAddress
+	opacity_micromap_array                 DeviceAddress
+	opacity_micromap_index_buffer          DeviceAddress
+	instantiation_bounding_box_limit       DeviceAddress
+}
+
+pub struct ClusterAccelerationStructureInstantiateClusterInfoNV {
+pub mut:
+	cluster_id_offset        u32
+	geometry_index_offset    u32
+	reserved                 u32
+	cluster_template_address DeviceAddress
+	vertex_buffer            StridedDeviceAddressNV
+}
+
+pub struct AccelerationStructureBuildSizesInfoKHR {
+pub mut:
+	s_type                      StructureType = StructureType.structure_type_acceleration_structure_build_sizes_info_khr
+	p_next                      voidptr
+	acceleration_structure_size DeviceSize
+	update_scratch_size         DeviceSize
+	build_scratch_size          DeviceSize
+}
+
+pub struct RayTracingPipelineClusterAccelerationStructureCreateInfoNV {
+pub mut:
+	s_type                               StructureType = StructureType.structure_type_ray_tracing_pipeline_cluster_acceleration_structure_create_info_nv
+	p_next                               voidptr
+	allow_cluster_acceleration_structure Bool32
+}
+
+fn C.vkGetClusterAccelerationStructureBuildSizesNV(C.Device,
+	&ClusterAccelerationStructureInputInfoNV,
+	&AccelerationStructureBuildSizesInfoKHR)
+pub fn get_cluster_acceleration_structure_build_sizes_nv(device C.Device,
+	p_info &ClusterAccelerationStructureInputInfoNV,
+	p_size_info &AccelerationStructureBuildSizesInfoKHR) {
+	C.vkGetClusterAccelerationStructureBuildSizesNV(device, p_info, p_size_info)
+}
+
+fn C.vkCmdBuildClusterAccelerationStructureIndirectNV(C.CommandBuffer,
+	&ClusterAccelerationStructureCommandsInfoNV)
+pub fn cmd_build_cluster_acceleration_structure_indirect_nv(command_buffer C.CommandBuffer,
+	p_command_infos &ClusterAccelerationStructureCommandsInfoNV) {
+	C.vkCmdBuildClusterAccelerationStructureIndirectNV(command_buffer, p_command_infos)
+}
+
+pub const nv_partitioned_acceleration_structure_spec_version = 1
+pub const nv_partitioned_acceleration_structure_extension_name = 'VK_NV_partitioned_acceleration_structure'
+pub const partitioned_acceleration_structure_partition_index_global_nv = ~u32(0)
+
+pub enum PartitionedAccelerationStructureOpTypeNV {
+	partitioned_acceleration_structure_op_type_write_instance_nv              = int(0)
+	partitioned_acceleration_structure_op_type_update_instance_nv             = int(1)
+	partitioned_acceleration_structure_op_type_write_partition_translation_nv = int(2)
+	partitioned_acceleration_structure_op_type_max_enum_nv                    = int(0x7FFFFFFF)
+}
+
+pub enum PartitionedAccelerationStructureInstanceFlagBitsNV {
+	partitioned_acceleration_structure_instance_flag_triangle_facing_cull_disable_bit_nv = int(0x00000001)
+	partitioned_acceleration_structure_instance_flag_triangle_flip_facing_bit_nv         = int(0x00000002)
+	partitioned_acceleration_structure_instance_flag_force_opaque_bit_nv                 = int(0x00000004)
+	partitioned_acceleration_structure_instance_flag_force_no_opaque_bit_nv              = int(0x00000008)
+	partitioned_acceleration_structure_instance_flag_enable_explicit_bounding_box_nv     = int(0x00000010)
+	partitioned_acceleration_structure_instance_flag_bits_max_enum_nv                    = int(0x7FFFFFFF)
+}
+
+pub type PartitionedAccelerationStructureInstanceFlagsNV = u32
+
+pub struct PhysicalDevicePartitionedAccelerationStructureFeaturesNV {
+pub mut:
+	s_type                             StructureType = StructureType.structure_type_physical_device_partitioned_acceleration_structure_features_nv
+	p_next                             voidptr
+	partitioned_acceleration_structure Bool32
+}
+
+pub struct PhysicalDevicePartitionedAccelerationStructurePropertiesNV {
+pub mut:
+	s_type              StructureType = StructureType.structure_type_physical_device_partitioned_acceleration_structure_properties_nv
+	p_next              voidptr
+	max_partition_count u32
+}
+
+pub struct PartitionedAccelerationStructureFlagsNV {
+pub mut:
+	s_type                       StructureType = StructureType.structure_type_partitioned_acceleration_structure_flags_nv
+	p_next                       voidptr
+	enable_partition_translation Bool32
+}
+
+pub struct BuildPartitionedAccelerationStructureIndirectCommandNV {
+pub mut:
+	op_type   PartitionedAccelerationStructureOpTypeNV
+	arg_count u32
+	arg_data  StridedDeviceAddressNV
+}
+
+pub struct PartitionedAccelerationStructureWriteInstanceDataNV {
+pub mut:
+	transform                                TransformMatrixKHR
+	explicit_aabb                            [6]f32
+	instance_id                              u32
+	instance_mask                            u32
+	instance_contribution_to_hit_group_index u32
+	instance_flags                           PartitionedAccelerationStructureInstanceFlagsNV
+	instance_index                           u32
+	partition_index                          u32
+	acceleration_structure                   DeviceAddress
+}
+
+pub struct PartitionedAccelerationStructureUpdateInstanceDataNV {
+pub mut:
+	instance_index                           u32
+	instance_contribution_to_hit_group_index u32
+	acceleration_structure                   DeviceAddress
+}
+
+pub struct PartitionedAccelerationStructureWritePartitionTranslationDataNV {
+pub mut:
+	partition_index       u32
+	partition_translation [3]f32
+}
+
+pub struct WriteDescriptorSetPartitionedAccelerationStructureNV {
+pub mut:
+	s_type                       StructureType = StructureType.structure_type_write_descriptor_set_partitioned_acceleration_structure_nv
+	p_next                       voidptr
+	acceleration_structure_count u32
+	p_acceleration_structures    &DeviceAddress
+}
+
+pub struct PartitionedAccelerationStructureInstancesInputNV {
+pub mut:
+	s_type                                 StructureType = StructureType.structure_type_partitioned_acceleration_structure_instances_input_nv
+	p_next                                 voidptr
+	flags                                  BuildAccelerationStructureFlagsKHR
+	instance_count                         u32
+	max_instance_per_partition_count       u32
+	partition_count                        u32
+	max_instance_in_global_partition_count u32
+}
+
+pub struct BuildPartitionedAccelerationStructureInfoNV {
+pub mut:
+	s_type                          StructureType = StructureType.structure_type_build_partitioned_acceleration_structure_info_nv
+	p_next                          voidptr
+	input                           PartitionedAccelerationStructureInstancesInputNV
+	src_acceleration_structure_data DeviceAddress
+	dst_acceleration_structure_data DeviceAddress
+	scratch_data                    DeviceAddress
+	src_infos                       DeviceAddress
+	src_infos_count                 DeviceAddress
+}
+
+fn C.vkGetPartitionedAccelerationStructuresBuildSizesNV(C.Device,
+	&PartitionedAccelerationStructureInstancesInputNV,
+	&AccelerationStructureBuildSizesInfoKHR)
+pub fn get_partitioned_acceleration_structures_build_sizes_nv(device C.Device,
+	p_info &PartitionedAccelerationStructureInstancesInputNV,
+	p_size_info &AccelerationStructureBuildSizesInfoKHR) {
+	C.vkGetPartitionedAccelerationStructuresBuildSizesNV(device, p_info, p_size_info)
+}
+
+fn C.vkCmdBuildPartitionedAccelerationStructuresNV(C.CommandBuffer,
+	&BuildPartitionedAccelerationStructureInfoNV)
+pub fn cmd_build_partitioned_acceleration_structures_nv(command_buffer C.CommandBuffer,
+	p_build_info &BuildPartitionedAccelerationStructureInfoNV) {
+	C.vkCmdBuildPartitionedAccelerationStructuresNV(command_buffer, p_build_info)
 }
 
 pub type C.IndirectExecutionSetEXT = voidptr
@@ -21427,15 +21986,6 @@ pub mut:
 	mode   CopyAccelerationStructureModeKHR
 }
 
-pub struct AccelerationStructureBuildSizesInfoKHR {
-pub mut:
-	s_type                      StructureType = StructureType.structure_type_acceleration_structure_build_sizes_info_khr
-	p_next                      voidptr
-	acceleration_structure_size DeviceSize
-	update_scratch_size         DeviceSize
-	build_scratch_size          DeviceSize
-}
-
 fn C.vkCreateAccelerationStructureKHR(C.Device,
 	&AccelerationStructureCreateInfoKHR,
 	&AllocationCallbacks,
@@ -21681,13 +22231,6 @@ pub mut:
 	max_ray_dispatch_invocation_count       u32
 	shader_group_handle_alignment           u32
 	max_ray_hit_attribute_size              u32
-}
-
-pub struct StridedDeviceAddressRegionKHR {
-pub mut:
-	device_address DeviceAddress
-	stride         DeviceSize
-	size           DeviceSize
 }
 
 pub struct TraceRaysIndirectCommandKHR {
