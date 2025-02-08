@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 307
+pub const header_version = 308
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -21812,6 +21812,24 @@ pub mut:
 	s_type                      StructureType = StructureType.structure_type_physical_device_vertex_attribute_robustness_features_ext
 	p_next                      voidptr
 	vertex_attribute_robustness Bool32
+}
+
+pub const nv_present_metering_spec_version = 1
+pub const nv_present_metering_extension_name = 'VK_NV_present_metering'
+
+pub struct SetPresentConfigNV {
+pub mut:
+	s_type                  StructureType
+	p_next                  voidptr
+	num_frames_per_batch    u32
+	present_config_feedback u32
+}
+
+pub struct PhysicalDevicePresentMeteringFeaturesNV {
+pub mut:
+	s_type           StructureType
+	p_next           voidptr
+	present_metering Bool32
 }
 
 pub const khr_acceleration_structure_spec_version = 13
