@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 308
+pub const header_version = 309
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
