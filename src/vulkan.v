@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 309
+pub const header_version = 310
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -773,11 +773,6 @@ pub enum StructureType {
 	structure_type_video_encode_session_parameters_feedback_info_khr                   = int(1000299010)
 	structure_type_physical_device_diagnostics_config_features_nv                      = int(1000300000)
 	structure_type_device_diagnostics_config_create_info_nv                            = int(1000300001)
-	structure_type_cuda_module_create_info_nv                                          = int(1000307000)
-	structure_type_cuda_function_create_info_nv                                        = int(1000307001)
-	structure_type_cuda_launch_info_nv                                                 = int(1000307002)
-	structure_type_physical_device_cuda_kernel_launch_features_nv                      = int(1000307003)
-	structure_type_physical_device_cuda_kernel_launch_properties_nv                    = int(1000307004)
 	structure_type_query_low_latency_support_nv                                        = int(1000310000)
 	structure_type_export_metal_object_create_info_ext                                 = int(1000311000)
 	structure_type_export_metal_objects_info_ext                                       = int(1000311001)
@@ -1217,8 +1212,6 @@ pub enum ObjectType {
 	object_type_performance_configuration_intel = int(1000210000)
 	object_type_deferred_operation_khr          = int(1000268000)
 	object_type_indirect_commands_layout_nv     = int(1000277000)
-	object_type_cuda_module_nv                  = int(1000307000)
-	object_type_cuda_function_nv                = int(1000307001)
 	object_type_buffer_collection_fuchsia       = int(1000366000)
 	object_type_micromap_ext                    = int(1000396000)
 	object_type_optical_flow_session_nv         = int(1000464000)
@@ -1943,8 +1936,8 @@ pub enum AccessFlagBits {
 	access_acceleration_structure_write_bit_khr          = int(0x00400000)
 	access_fragment_density_map_read_bit_ext             = int(0x01000000)
 	access_fragment_shading_rate_attachment_read_bit_khr = int(0x00800000)
-	access_command_preprocess_read_bit_nv                = int(0x00020000)
-	access_command_preprocess_write_bit_nv               = int(0x00040000)
+	access_command_preprocess_read_bit_ext               = int(0x00020000)
+	access_command_preprocess_write_bit_ext              = int(0x00040000)
 	access_flag_bits_max_enum                            = int(0x7FFFFFFF)
 }
 
@@ -2150,9 +2143,9 @@ pub enum PipelineStageFlagBits {
 	pipeline_stage_ray_tracing_shader_bit_khr               = int(0x00200000)
 	pipeline_stage_fragment_density_process_bit_ext         = int(0x00800000)
 	pipeline_stage_fragment_shading_rate_attachment_bit_khr = int(0x00400000)
-	pipeline_stage_command_preprocess_bit_nv                = int(0x00020000)
 	pipeline_stage_task_shader_bit_ext                      = int(0x00080000)
 	pipeline_stage_mesh_shader_bit_ext                      = int(0x00100000)
+	pipeline_stage_command_preprocess_bit_ext               = int(0x00020000)
 	pipeline_stage_flag_bits_max_enum                       = int(0x7FFFFFFF)
 }
 
@@ -7150,8 +7143,8 @@ pub const pipeline_stage_2_vertex_attribute_input_bit_khr = u32(pipeline_stage_2
 pub const pipeline_stage_2_pre_rasterization_shaders_bit_khr = pipeline_stage_2_pre_rasterization_shaders_bit
 pub const pipeline_stage_2_transform_feedback_bit_ext = u64(0x01000000)
 pub const pipeline_stage_2_conditional_rendering_bit_ext = u64(0x00040000)
-pub const pipeline_stage_2_command_preprocess_bit_nv = u64(0x00020000)
-pub const pipeline_stage_2_command_preprocess_bit_ext = pipeline_stage_2_command_preprocess_bit_nv
+pub const pipeline_stage_2_command_preprocess_bit_nv = pipeline_stage_2_command_preprocess_bit_ext
+pub const pipeline_stage_2_command_preprocess_bit_ext = u64(0x00020000)
 pub const pipeline_stage_2_fragment_shading_rate_attachment_bit_khr = u64(0x00400000)
 pub const pipeline_stage_2_shading_rate_image_bit_nv = pipeline_stage_2_fragment_shading_rate_attachment_bit_khr
 pub const pipeline_stage_2_acceleration_structure_build_bit_khr = u64(0x02000000)
@@ -7228,10 +7221,10 @@ pub const access_2_transform_feedback_write_bit_ext = u64(0x02000000)
 pub const access_2_transform_feedback_counter_read_bit_ext = u64(0x04000000)
 pub const access_2_transform_feedback_counter_write_bit_ext = u64(0x08000000)
 pub const access_2_conditional_rendering_read_bit_ext = u64(0x00100000)
-pub const access_2_command_preprocess_read_bit_nv = u64(0x00020000)
-pub const access_2_command_preprocess_write_bit_nv = u64(0x00040000)
-pub const access_2_command_preprocess_read_bit_ext = access_2_command_preprocess_read_bit_nv
-pub const access_2_command_preprocess_write_bit_ext = access_2_command_preprocess_write_bit_nv
+pub const access_2_command_preprocess_read_bit_nv = access_2_command_preprocess_read_bit_ext
+pub const access_2_command_preprocess_write_bit_nv = access_2_command_preprocess_write_bit_ext
+pub const access_2_command_preprocess_read_bit_ext = u64(0x00020000)
+pub const access_2_command_preprocess_write_bit_ext = u64(0x00040000)
 pub const access_2_fragment_shading_rate_attachment_read_bit_khr = u64(0x00800000)
 pub const access_2_shading_rate_image_read_bit_nv = access_2_fragment_shading_rate_attachment_read_bit_khr
 pub const access_2_acceleration_structure_read_bit_khr = u64(0x00200000)
@@ -17141,7 +17134,7 @@ pub const nv_cuda_kernel_launch_extension_name = 'VK_NV_cuda_kernel_launch'
 
 pub struct CudaModuleCreateInfoNV {
 pub mut:
-	s_type    StructureType = StructureType.structure_type_cuda_module_create_info_nv
+	s_type    StructureType
 	p_next    voidptr
 	data_size usize
 	p_data    voidptr
@@ -17149,7 +17142,7 @@ pub mut:
 
 pub struct CudaFunctionCreateInfoNV {
 pub mut:
-	s_type   StructureType = StructureType.structure_type_cuda_function_create_info_nv
+	s_type   StructureType
 	p_next   voidptr
 	vkmodule C.CudaModuleNV
 	p_name   &char
@@ -17157,7 +17150,7 @@ pub mut:
 
 pub struct CudaLaunchInfoNV {
 pub mut:
-	s_type           StructureType = StructureType.structure_type_cuda_launch_info_nv
+	s_type           StructureType
 	p_next           voidptr
 	function         C.CudaFunctionNV
 	grid_dim_x       u32
@@ -17175,14 +17168,14 @@ pub mut:
 
 pub struct PhysicalDeviceCudaKernelLaunchFeaturesNV {
 pub mut:
-	s_type                      StructureType = StructureType.structure_type_physical_device_cuda_kernel_launch_features_nv
+	s_type                      StructureType
 	p_next                      voidptr
 	cuda_kernel_launch_features Bool32
 }
 
 pub struct PhysicalDeviceCudaKernelLaunchPropertiesNV {
 pub mut:
-	s_type                   StructureType = StructureType.structure_type_physical_device_cuda_kernel_launch_properties_nv
+	s_type                   StructureType
 	p_next                   voidptr
 	compute_capability_minor u32
 	compute_capability_major u32
