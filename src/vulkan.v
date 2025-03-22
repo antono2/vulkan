@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 310
+pub const header_version = 311
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -575,6 +575,7 @@ pub enum StructureType {
 	structure_type_external_format_android                                             = int(1000129005)
 	structure_type_android_hardware_buffer_format_properties2_android                  = int(1000129006)
 	structure_type_attachment_sample_count_info_amd                                    = int(1000044008)
+	structure_type_physical_device_shader_bfloat16_features_khr                        = int(1000141000)
 	structure_type_sample_locations_info_ext                                           = int(1000143000)
 	structure_type_render_pass_sample_locations_begin_info_ext                         = int(1000143001)
 	structure_type_pipeline_sample_locations_state_create_info_ext                     = int(1000143002)
@@ -911,9 +912,6 @@ pub enum StructureType {
 	structure_type_render_pass_stripe_begin_info_arm                                   = int(1000424002)
 	structure_type_render_pass_stripe_info_arm                                         = int(1000424003)
 	structure_type_render_pass_stripe_submit_info_arm                                  = int(1000424004)
-	structure_type_physical_device_fragment_density_map_offset_features_qcom           = int(1000425000)
-	structure_type_physical_device_fragment_density_map_offset_properties_qcom         = int(1000425001)
-	structure_type_subpass_fragment_density_map_offset_end_info_qcom                   = int(1000425002)
 	structure_type_physical_device_copy_memory_indirect_features_nv                    = int(1000426000)
 	structure_type_physical_device_copy_memory_indirect_properties_nv                  = int(1000426001)
 	structure_type_physical_device_memory_decompression_features_nv                    = int(1000427000)
@@ -1124,6 +1122,10 @@ pub enum StructureType {
 	structure_type_memory_get_metal_handle_info_ext                                    = int(1000602002)
 	structure_type_physical_device_depth_clamp_zero_one_features_khr                   = int(1000421000)
 	structure_type_physical_device_vertex_attribute_robustness_features_ext            = int(1000608000)
+	structure_type_physical_device_fragment_density_map_offset_features_ext            = int(1000425000)
+	structure_type_physical_device_fragment_density_map_offset_properties_ext          = int(1000425001)
+	structure_type_render_pass_fragment_density_map_offset_end_info_ext                = int(1000425002)
+	structure_type_rendering_end_info_ext                                              = int(1000619003)
 	structure_type_max_enum                                                            = int(0x7FFFFFFF)
 }
 
@@ -2017,8 +2019,8 @@ pub enum ImageCreateFlagBits {
 	image_create_descriptor_buffer_capture_replay_bit_ext      = int(0x00010000)
 	image_create_multisampled_render_to_single_sampled_bit_ext = int(0x00040000)
 	image_create2d_view_compatible_bit_ext                     = int(0x00020000)
-	image_create_fragment_density_map_offset_bit_qcom          = int(0x00008000)
 	image_create_video_profile_independent_bit_khr             = int(0x00100000)
+	image_create_fragment_density_map_offset_bit_ext           = int(0x00008000)
 	image_create_flag_bits_max_enum                            = int(0x7FFFFFFF)
 }
 
@@ -11222,6 +11224,18 @@ pub type MemoryDedicatedAllocateInfoKHR = MemoryDedicatedAllocateInfo
 pub const khr_storage_buffer_storage_class_spec_version = 1
 pub const khr_storage_buffer_storage_class_extension_name = 'VK_KHR_storage_buffer_storage_class'
 
+pub const khr_shader_bfloat16_spec_version = 1
+pub const khr_shader_bfloat16_extension_name = 'VK_KHR_shader_bfloat16'
+
+pub struct PhysicalDeviceShaderBfloat16FeaturesKHR {
+pub mut:
+	s_type                              StructureType = StructureType.structure_type_physical_device_shader_bfloat16_features_khr
+	p_next                              voidptr
+	shader_b_float16_type               Bool32
+	shader_b_float16_dot_product        Bool32
+	shader_b_float16_cooperative_matrix Bool32
+}
+
 pub const khr_relaxed_block_layout_spec_version = 1
 pub const khr_relaxed_block_layout_extension_name = 'VK_KHR_relaxed_block_layout'
 
@@ -12395,6 +12409,7 @@ pub enum ComponentTypeKHR {
 	component_type_uint16_khr      = int(8)
 	component_type_uint32_khr      = int(9)
 	component_type_uint64_khr      = int(10)
+	component_type_bfloat16_khr    = int(1000141000)
 	component_type_sint8_packed_nv = int(1000491000)
 	component_type_uint8_packed_nv = int(1000491001)
 	component_type_float_e4m3_nv   = int(1000491002)
@@ -19060,30 +19075,36 @@ pub mut:
 	p_stripe_semaphore_infos    &SemaphoreSubmitInfo
 }
 
-pub const qcom_fragment_density_map_offset_spec_version = 2
+pub const qcom_fragment_density_map_offset_spec_version = 3
 pub const qcom_fragment_density_map_offset_extension_name = 'VK_QCOM_fragment_density_map_offset'
 
-pub struct PhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM {
+pub struct PhysicalDeviceFragmentDensityMapOffsetFeaturesEXT {
 pub mut:
-	s_type                      StructureType = StructureType.structure_type_physical_device_fragment_density_map_offset_features_qcom
+	s_type                      StructureType = StructureType.structure_type_physical_device_fragment_density_map_offset_features_ext
 	p_next                      voidptr
 	fragment_density_map_offset Bool32
 }
 
-pub struct PhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM {
+pub type PhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM = PhysicalDeviceFragmentDensityMapOffsetFeaturesEXT
+
+pub struct PhysicalDeviceFragmentDensityMapOffsetPropertiesEXT {
 pub mut:
-	s_type                              StructureType = StructureType.structure_type_physical_device_fragment_density_map_offset_properties_qcom
+	s_type                              StructureType = StructureType.structure_type_physical_device_fragment_density_map_offset_properties_ext
 	p_next                              voidptr
 	fragment_density_offset_granularity Extent2D
 }
 
-pub struct SubpassFragmentDensityMapOffsetEndInfoQCOM {
+pub type PhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM = PhysicalDeviceFragmentDensityMapOffsetPropertiesEXT
+
+pub struct RenderPassFragmentDensityMapOffsetEndInfoEXT {
 pub mut:
-	s_type                        StructureType = StructureType.structure_type_subpass_fragment_density_map_offset_end_info_qcom
+	s_type                        StructureType = StructureType.structure_type_render_pass_fragment_density_map_offset_end_info_ext
 	p_next                        voidptr
 	fragment_density_offset_count u32
 	p_fragment_density_offsets    &Offset2D
 }
+
+pub type SubpassFragmentDensityMapOffsetEndInfoQCOM = RenderPassFragmentDensityMapOffsetEndInfoEXT
 
 pub const nv_copy_memory_indirect_spec_version = 1
 pub const nv_copy_memory_indirect_extension_name = 'VK_NV_copy_memory_indirect'
@@ -21823,6 +21844,22 @@ pub mut:
 	s_type           StructureType
 	p_next           voidptr
 	present_metering Bool32
+}
+
+pub const ext_fragment_density_map_offset_spec_version = 1
+pub const ext_fragment_density_map_offset_extension_name = 'VK_EXT_fragment_density_map_offset'
+
+pub struct RenderingEndInfoEXT {
+pub mut:
+	s_type StructureType = StructureType.structure_type_rendering_end_info_ext
+	p_next voidptr
+}
+
+fn C.vkCmdEndRendering2EXT(C.CommandBuffer,
+	&RenderingEndInfoEXT)
+pub fn cmd_end_rendering2_ext(command_buffer C.CommandBuffer,
+	p_rendering_end_info &RenderingEndInfoEXT) {
+	C.vkCmdEndRendering2EXT(command_buffer, p_rendering_end_info)
 }
 
 pub const khr_acceleration_structure_spec_version = 13
