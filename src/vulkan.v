@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 311
+pub const header_version = 312
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -774,6 +774,12 @@ pub enum StructureType {
 	structure_type_video_encode_session_parameters_feedback_info_khr                   = int(1000299010)
 	structure_type_physical_device_diagnostics_config_features_nv                      = int(1000300000)
 	structure_type_device_diagnostics_config_create_info_nv                            = int(1000300001)
+	structure_type_physical_device_tile_shading_features_qcom                          = int(1000309000)
+	structure_type_physical_device_tile_shading_properties_qcom                        = int(1000309001)
+	structure_type_render_pass_tile_shading_create_info_qcom                           = int(1000309002)
+	structure_type_per_tile_begin_info_qcom                                            = int(1000309003)
+	structure_type_per_tile_end_info_qcom                                              = int(1000309004)
+	structure_type_dispatch_tile_info_qcom                                             = int(1000309005)
 	structure_type_query_low_latency_support_nv                                        = int(1000310000)
 	structure_type_export_metal_object_create_info_ext                                 = int(1000311000)
 	structure_type_export_metal_objects_info_ext                                       = int(1000311001)
@@ -1062,6 +1068,10 @@ pub enum StructureType {
 	structure_type_video_encode_av1_quantization_map_capabilities_khr                  = int(1000553007)
 	structure_type_video_format_av1_quantization_map_properties_khr                    = int(1000553008)
 	structure_type_physical_device_raw_access_chains_features_nv                       = int(1000555000)
+	structure_type_external_compute_queue_device_create_info_nv                        = int(1000556000)
+	structure_type_external_compute_queue_create_info_nv                               = int(1000556001)
+	structure_type_external_compute_queue_data_params_nv                               = int(1000556002)
+	structure_type_physical_device_external_compute_queue_properties_nv                = int(1000556003)
 	structure_type_physical_device_shader_relaxed_extended_instruction_features_khr    = int(1000558000)
 	structure_type_physical_device_command_buffer_inheritance_features_nv              = int(1000559000)
 	structure_type_physical_device_maintenance7_features_khr                           = int(1000562000)
@@ -1219,6 +1229,7 @@ pub enum ObjectType {
 	object_type_optical_flow_session_nv         = int(1000464000)
 	object_type_shader_ext                      = int(1000482000)
 	object_type_pipeline_binary_khr             = int(1000483000)
+	object_type_external_compute_queue_nv       = int(1000556000)
 	object_type_indirect_commands_layout_ext    = int(1000572000)
 	object_type_indirect_execution_set_ext      = int(1000572001)
 	object_type_max_enum                        = int(0x7FFFFFFF)
@@ -2475,6 +2486,7 @@ pub enum SubpassDescriptionFlagBits {
 	subpass_description_per_view_position_x_only_bit_nvx                      = int(0x00000002)
 	subpass_description_fragment_region_bit_qcom                              = int(0x00000004)
 	subpass_description_shader_resolve_bit_qcom                               = int(0x00000008)
+	subpass_description_tile_shading_apron_bit_qcom                           = int(0x00000100)
 	subpass_description_rasterization_order_attachment_color_access_bit_ext   = int(0x00000010)
 	subpass_description_rasterization_order_attachment_depth_access_bit_ext   = int(0x00000020)
 	subpass_description_rasterization_order_attachment_stencil_access_bit_ext = int(0x00000040)
@@ -7198,6 +7210,8 @@ pub const access_2_video_decode_read_bit_khr = u64(0x800000000)
 pub const access_2_video_decode_write_bit_khr = u64(0x1000000000)
 pub const access_2_video_encode_read_bit_khr = u64(0x2000000000)
 pub const access_2_video_encode_write_bit_khr = u64(0x4000000000)
+pub const access_2_shader_tile_attachment_read_bit_qcom = u64(0x8000000000000)
+pub const access_2_shader_tile_attachment_write_bit_qcom = u64(0x10000000000000)
 pub const access_2_none_khr = access_2_none
 pub const access_2_indirect_command_read_bit_khr = access_2_indirect_command_read_bit
 pub const access_2_index_read_bit_khr = access_2_index_read_bit
@@ -17254,6 +17268,92 @@ pub fn cmd_cuda_launch_kernel_nv(command_buffer C.CommandBuffer,
 	C.vkCmdCudaLaunchKernelNV(command_buffer, p_launch_info)
 }
 
+pub const qcom_tile_shading_spec_version = 1
+pub const qcom_tile_shading_extension_name = 'VK_QCOM_tile_shading'
+
+pub enum TileShadingRenderPassFlagBitsQCOM {
+	tile_shading_render_pass_enable_bit_qcom             = int(0x00000001)
+	tile_shading_render_pass_per_tile_execution_bit_qcom = int(0x00000002)
+	tile_shading_render_pass_flag_bits_max_enum_qcom     = int(0x7FFFFFFF)
+}
+
+pub type TileShadingRenderPassFlagsQCOM = u32
+
+pub struct PhysicalDeviceTileShadingFeaturesQCOM {
+pub mut:
+	s_type                           StructureType = StructureType.structure_type_physical_device_tile_shading_features_qcom
+	p_next                           voidptr
+	tile_shading                     Bool32
+	tile_shading_fragment_stage      Bool32
+	tile_shading_color_attachments   Bool32
+	tile_shading_depth_attachments   Bool32
+	tile_shading_stencil_attachments Bool32
+	tile_shading_input_attachments   Bool32
+	tile_shading_sampled_attachments Bool32
+	tile_shading_per_tile_draw       Bool32
+	tile_shading_per_tile_dispatch   Bool32
+	tile_shading_dispatch_tile       Bool32
+	tile_shading_apron               Bool32
+	tile_shading_anisotropic_apron   Bool32
+	tile_shading_atomic_ops          Bool32
+	tile_shading_image_processing    Bool32
+}
+
+pub struct PhysicalDeviceTileShadingPropertiesQCOM {
+pub mut:
+	s_type                StructureType = StructureType.structure_type_physical_device_tile_shading_properties_qcom
+	p_next                voidptr
+	max_apron_size        u32
+	prefer_non_coherent   Bool32
+	tile_granularity      Extent2D
+	max_tile_shading_rate Extent2D
+}
+
+pub struct RenderPassTileShadingCreateInfoQCOM {
+pub mut:
+	s_type          StructureType = StructureType.structure_type_render_pass_tile_shading_create_info_qcom
+	p_next          voidptr
+	flags           TileShadingRenderPassFlagsQCOM
+	tile_apron_size Extent2D
+}
+
+pub struct PerTileBeginInfoQCOM {
+pub mut:
+	s_type StructureType = StructureType.structure_type_per_tile_begin_info_qcom
+	p_next voidptr
+}
+
+pub struct PerTileEndInfoQCOM {
+pub mut:
+	s_type StructureType = StructureType.structure_type_per_tile_end_info_qcom
+	p_next voidptr
+}
+
+pub struct DispatchTileInfoQCOM {
+pub mut:
+	s_type StructureType = StructureType.structure_type_dispatch_tile_info_qcom
+	p_next voidptr
+}
+
+fn C.vkCmdDispatchTileQCOM(C.CommandBuffer)
+pub fn cmd_dispatch_tile_qcom(command_buffer C.CommandBuffer) {
+	C.vkCmdDispatchTileQCOM(command_buffer)
+}
+
+fn C.vkCmdBeginPerTileExecutionQCOM(C.CommandBuffer,
+	&PerTileBeginInfoQCOM)
+pub fn cmd_begin_per_tile_execution_qcom(command_buffer C.CommandBuffer,
+	p_per_tile_begin_info &PerTileBeginInfoQCOM) {
+	C.vkCmdBeginPerTileExecutionQCOM(command_buffer, p_per_tile_begin_info)
+}
+
+fn C.vkCmdEndPerTileExecutionQCOM(C.CommandBuffer,
+	&PerTileEndInfoQCOM)
+pub fn cmd_end_per_tile_execution_qcom(command_buffer C.CommandBuffer,
+	p_per_tile_end_info &PerTileEndInfoQCOM) {
+	C.vkCmdEndPerTileExecutionQCOM(command_buffer, p_per_tile_end_info)
+}
+
 pub const nv_low_latency_spec_version = 1
 pub const nv_low_latency_extension_name = 'VK_NV_low_latency'
 
@@ -20889,6 +20989,69 @@ pub mut:
 	s_type                   StructureType = StructureType.structure_type_physical_device_raw_access_chains_features_nv
 	p_next                   voidptr
 	shader_raw_access_chains Bool32
+}
+
+pub type C.ExternalComputeQueueNV = voidptr
+
+pub const nv_external_compute_queue_spec_version = 1
+pub const nv_external_compute_queue_extension_name = 'VK_NV_external_compute_queue'
+
+pub struct ExternalComputeQueueDeviceCreateInfoNV {
+pub mut:
+	s_type                   StructureType = StructureType.structure_type_external_compute_queue_device_create_info_nv
+	p_next                   voidptr
+	reserved_external_queues u32
+}
+
+pub struct ExternalComputeQueueCreateInfoNV {
+pub mut:
+	s_type          StructureType = StructureType.structure_type_external_compute_queue_create_info_nv
+	p_next          voidptr
+	preferred_queue C.Queue
+}
+
+pub struct ExternalComputeQueueDataParamsNV {
+pub mut:
+	s_type       StructureType = StructureType.structure_type_external_compute_queue_data_params_nv
+	p_next       voidptr
+	device_index u32
+}
+
+pub struct PhysicalDeviceExternalComputeQueuePropertiesNV {
+pub mut:
+	s_type              StructureType = StructureType.structure_type_physical_device_external_compute_queue_properties_nv
+	p_next              voidptr
+	external_data_size  u32
+	max_external_queues u32
+}
+
+fn C.vkCreateExternalComputeQueueNV(C.Device,
+	&ExternalComputeQueueCreateInfoNV,
+	&AllocationCallbacks,
+	&C.ExternalComputeQueueNV) Result
+pub fn create_external_compute_queue_nv(device C.Device,
+	p_create_info &ExternalComputeQueueCreateInfoNV,
+	p_allocator &AllocationCallbacks,
+	p_external_queue &C.ExternalComputeQueueNV) Result {
+	return C.vkCreateExternalComputeQueueNV(device, p_create_info, p_allocator, p_external_queue)
+}
+
+fn C.vkDestroyExternalComputeQueueNV(C.Device,
+	C.ExternalComputeQueueNV,
+	&AllocationCallbacks)
+pub fn destroy_external_compute_queue_nv(device C.Device,
+	external_queue C.ExternalComputeQueueNV,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyExternalComputeQueueNV(device, external_queue, p_allocator)
+}
+
+fn C.vkGetExternalComputeQueueDataNV(C.ExternalComputeQueueNV,
+	&ExternalComputeQueueDataParamsNV,
+	voidptr)
+pub fn get_external_compute_queue_data_nv(external_queue C.ExternalComputeQueueNV,
+	params &ExternalComputeQueueDataParamsNV,
+	p_data voidptr) {
+	C.vkGetExternalComputeQueueDataNV(external_queue, params, p_data)
 }
 
 pub const nv_command_buffer_inheritance_spec_version = 1
