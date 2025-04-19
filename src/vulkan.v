@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 312
+pub const header_version = 313
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -1055,6 +1055,11 @@ pub enum StructureType {
 	structure_type_set_descriptor_buffer_offsets_info_ext                              = int(1000545007)
 	structure_type_bind_descriptor_buffer_embedded_samplers_info_ext                   = int(1000545008)
 	structure_type_physical_device_descriptor_pool_overallocation_features_nv          = int(1000546000)
+	structure_type_physical_device_tile_memory_heap_features_qcom                      = int(1000547000)
+	structure_type_physical_device_tile_memory_heap_properties_qcom                    = int(1000547001)
+	structure_type_tile_memory_requirements_qcom                                       = int(1000547002)
+	structure_type_tile_memory_bind_info_qcom                                          = int(1000547003)
+	structure_type_tile_memory_size_info_qcom                                          = int(1000547004)
 	structure_type_display_surface_stereo_create_info_nv                               = int(1000551000)
 	structure_type_display_mode_stereo_properties_nv                                   = int(1000551001)
 	structure_type_video_encode_quantization_map_capabilities_khr                      = int(1000553000)
@@ -2072,6 +2077,7 @@ pub enum ImageUsageFlagBits {
 	image_usage_invocation_mask_bit_huawei                  = int(0x00040000)
 	image_usage_sample_weight_bit_qcom                      = int(0x00100000)
 	image_usage_sample_block_match_bit_qcom                 = int(0x00200000)
+	image_usage_tile_memory_qcom                            = int(0x08000000)
 	image_usage_video_encode_quantization_delta_map_bit_khr = int(0x02000000)
 	image_usage_video_encode_emphasis_map_bit_khr           = int(0x04000000)
 	image_usage_flag_bits_max_enum                          = int(0x7FFFFFFF)
@@ -2087,9 +2093,10 @@ pub enum InstanceCreateFlagBits {
 pub type InstanceCreateFlags = u32
 
 pub enum MemoryHeapFlagBits {
-	memory_heap_device_local_bit   = int(0x00000001)
-	memory_heap_multi_instance_bit = int(0x00000002)
-	memory_heap_flag_bits_max_enum = int(0x7FFFFFFF)
+	memory_heap_device_local_bit     = int(0x00000001)
+	memory_heap_multi_instance_bit   = int(0x00000002)
+	memory_heap_tile_memory_bit_qcom = int(0x00000008)
+	memory_heap_flag_bits_max_enum   = int(0x7FFFFFFF)
 }
 
 pub type MemoryHeapFlags = u32
@@ -2273,6 +2280,7 @@ pub enum BufferUsageFlagBits {
 	buffer_usage_push_descriptors_descriptor_buffer_bit_ext           = int(0x04000000)
 	buffer_usage_micromap_build_input_read_only_bit_ext               = int(0x00800000)
 	buffer_usage_micromap_storage_bit_ext                             = int(0x01000000)
+	buffer_usage_tile_memory_qcom                                     = int(0x08000000)
 	buffer_usage_flag_bits_max_enum                                   = int(0x7FFFFFFF)
 }
 
@@ -8401,6 +8409,7 @@ pub const buffer_usage_2_resource_descriptor_buffer_bit_ext = u64(0x00400000)
 pub const buffer_usage_2_push_descriptors_descriptor_buffer_bit_ext = u64(0x04000000)
 pub const buffer_usage_2_micromap_build_input_read_only_bit_ext = u64(0x00800000)
 pub const buffer_usage_2_micromap_storage_bit_ext = u64(0x01000000)
+pub const buffer_usage_2_tile_memory_qcom = u64(0x08000000)
 pub const buffer_usage_2_preprocess_buffer_bit_ext = u64(0x80000000)
 
 pub enum HostImageCopyFlagBits {
@@ -20954,6 +20963,53 @@ pub mut:
 	s_type                         StructureType = StructureType.structure_type_physical_device_descriptor_pool_overallocation_features_nv
 	p_next                         voidptr
 	descriptor_pool_overallocation Bool32
+}
+
+pub const qcom_tile_memory_heap_spec_version = 1
+pub const qcom_tile_memory_heap_extension_name = 'VK_QCOM_tile_memory_heap'
+
+pub struct PhysicalDeviceTileMemoryHeapFeaturesQCOM {
+pub mut:
+	s_type           StructureType = StructureType.structure_type_physical_device_tile_memory_heap_features_qcom
+	p_next           voidptr
+	tile_memory_heap Bool32
+}
+
+pub struct PhysicalDeviceTileMemoryHeapPropertiesQCOM {
+pub mut:
+	s_type                StructureType = StructureType.structure_type_physical_device_tile_memory_heap_properties_qcom
+	p_next                voidptr
+	queue_submit_boundary Bool32
+	tile_buffer_transfers Bool32
+}
+
+pub struct TileMemoryRequirementsQCOM {
+pub mut:
+	s_type    StructureType = StructureType.structure_type_tile_memory_requirements_qcom
+	p_next    voidptr
+	size      DeviceSize
+	alignment DeviceSize
+}
+
+pub struct TileMemoryBindInfoQCOM {
+pub mut:
+	s_type StructureType = StructureType.structure_type_tile_memory_bind_info_qcom
+	p_next voidptr
+	memory C.DeviceMemory
+}
+
+pub struct TileMemorySizeInfoQCOM {
+pub mut:
+	s_type StructureType = StructureType.structure_type_tile_memory_size_info_qcom
+	p_next voidptr
+	size   DeviceSize
+}
+
+fn C.vkCmdBindTileMemoryQCOM(C.CommandBuffer,
+	&TileMemoryBindInfoQCOM)
+pub fn cmd_bind_tile_memory_qcom(command_buffer C.CommandBuffer,
+	p_tile_memory_bind_info &TileMemoryBindInfoQCOM) {
+	C.vkCmdBindTileMemoryQCOM(command_buffer, p_tile_memory_bind_info)
 }
 
 pub const nv_display_stereo_spec_version = 1
