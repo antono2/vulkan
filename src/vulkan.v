@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 313
+pub const header_version = 314
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -750,8 +750,6 @@ pub enum StructureType {
 	structure_type_physical_device_device_memory_report_features_ext                   = int(1000284000)
 	structure_type_device_device_memory_report_create_info_ext                         = int(1000284001)
 	structure_type_device_memory_report_callback_data_ext                              = int(1000284002)
-	structure_type_physical_device_robustness2_features_ext                            = int(1000286000)
-	structure_type_physical_device_robustness2_properties_ext                          = int(1000286001)
 	structure_type_sampler_custom_border_color_create_info_ext                         = int(1000287000)
 	structure_type_physical_device_custom_border_color_properties_ext                  = int(1000287001)
 	structure_type_physical_device_custom_border_color_features_ext                    = int(1000287002)
@@ -1137,6 +1135,8 @@ pub enum StructureType {
 	structure_type_memory_get_metal_handle_info_ext                                    = int(1000602002)
 	structure_type_physical_device_depth_clamp_zero_one_features_khr                   = int(1000421000)
 	structure_type_physical_device_vertex_attribute_robustness_features_ext            = int(1000608000)
+	structure_type_physical_device_robustness2_features_khr                            = int(1000286000)
+	structure_type_physical_device_robustness2_properties_khr                          = int(1000286001)
 	structure_type_physical_device_fragment_density_map_offset_features_ext            = int(1000425000)
 	structure_type_physical_device_fragment_density_map_offset_properties_ext          = int(1000425001)
 	structure_type_render_pass_fragment_density_map_offset_end_info_ext                = int(1000425002)
@@ -13130,6 +13130,26 @@ pub mut:
 	depth_clamp_zero_one Bool32
 }
 
+pub const khr_robustness_2_spec_version = 1
+pub const khr_robustness_2_extension_name = 'VK_KHR_robustness2'
+
+pub struct PhysicalDeviceRobustness2FeaturesKHR {
+pub mut:
+	s_type                StructureType = StructureType.structure_type_physical_device_robustness2_features_khr
+	p_next                voidptr
+	robust_buffer_access2 Bool32
+	robust_image_access2  Bool32
+	null_descriptor       Bool32
+}
+
+pub struct PhysicalDeviceRobustness2PropertiesKHR {
+pub mut:
+	s_type                                      StructureType = StructureType.structure_type_physical_device_robustness2_properties_khr
+	p_next                                      voidptr
+	robust_storage_buffer_access_size_alignment DeviceSize
+	robust_uniform_buffer_access_size_alignment DeviceSize
+}
+
 pub type C.DebugReportCallbackEXT = voidptr
 
 pub const ext_debug_report_spec_version = 10
@@ -17047,22 +17067,9 @@ pub fn get_drm_display_ext(physical_device C.PhysicalDevice,
 pub const ext_robustness_2_spec_version = 1
 pub const ext_robustness_2_extension_name = 'VK_EXT_robustness2'
 
-pub struct PhysicalDeviceRobustness2FeaturesEXT {
-pub mut:
-	s_type                StructureType = StructureType.structure_type_physical_device_robustness2_features_ext
-	p_next                voidptr
-	robust_buffer_access2 Bool32
-	robust_image_access2  Bool32
-	null_descriptor       Bool32
-}
+pub type PhysicalDeviceRobustness2FeaturesEXT = PhysicalDeviceRobustness2FeaturesKHR
 
-pub struct PhysicalDeviceRobustness2PropertiesEXT {
-pub mut:
-	s_type                                      StructureType = StructureType.structure_type_physical_device_robustness2_properties_ext
-	p_next                                      voidptr
-	robust_storage_buffer_access_size_alignment DeviceSize
-	robust_uniform_buffer_access_size_alignment DeviceSize
-}
+pub type PhysicalDeviceRobustness2PropertiesEXT = PhysicalDeviceRobustness2PropertiesKHR
 
 pub const ext_custom_border_color_spec_version = 12
 pub const ext_custom_border_color_extension_name = 'VK_EXT_custom_border_color'
