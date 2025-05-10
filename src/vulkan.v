@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 314
+pub const header_version = 315
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -1141,6 +1141,7 @@ pub enum StructureType {
 	structure_type_physical_device_fragment_density_map_offset_properties_ext          = int(1000425001)
 	structure_type_render_pass_fragment_density_map_offset_end_info_ext                = int(1000425002)
 	structure_type_rendering_end_info_ext                                              = int(1000619003)
+	structure_type_physical_device_zero_initialize_device_memory_features_ext          = int(1000620000)
 	structure_type_max_enum                                                            = int(0x7FFFFFFF)
 }
 
@@ -1180,6 +1181,7 @@ pub enum ImageLayout {
 	image_layout_video_encode_dpb_khr                         = int(1000299002)
 	image_layout_attachment_feedback_loop_optimal_ext         = int(1000339000)
 	image_layout_video_encode_quantization_map_khr            = int(1000553000)
+	image_layout_zero_initialized_ext                         = int(1000620000)
 	image_layout_max_enum                                     = int(0x7FFFFFFF)
 }
 
@@ -2077,7 +2079,7 @@ pub enum ImageUsageFlagBits {
 	image_usage_invocation_mask_bit_huawei                  = int(0x00040000)
 	image_usage_sample_weight_bit_qcom                      = int(0x00100000)
 	image_usage_sample_block_match_bit_qcom                 = int(0x00200000)
-	image_usage_tile_memory_qcom                            = int(0x08000000)
+	image_usage_tile_memory_bit_qcom                        = int(0x08000000)
 	image_usage_video_encode_quantization_delta_map_bit_khr = int(0x02000000)
 	image_usage_video_encode_emphasis_map_bit_khr           = int(0x04000000)
 	image_usage_flag_bits_max_enum                          = int(0x7FFFFFFF)
@@ -2280,7 +2282,7 @@ pub enum BufferUsageFlagBits {
 	buffer_usage_push_descriptors_descriptor_buffer_bit_ext           = int(0x04000000)
 	buffer_usage_micromap_build_input_read_only_bit_ext               = int(0x00800000)
 	buffer_usage_micromap_storage_bit_ext                             = int(0x01000000)
-	buffer_usage_tile_memory_qcom                                     = int(0x08000000)
+	buffer_usage_tile_memory_bit_qcom                                 = int(0x08000000)
 	buffer_usage_flag_bits_max_enum                                   = int(0x7FFFFFFF)
 }
 
@@ -5332,6 +5334,7 @@ pub enum MemoryAllocateFlagBits {
 	memory_allocate_device_mask_bit                   = int(0x00000001)
 	memory_allocate_device_address_bit                = int(0x00000002)
 	memory_allocate_device_address_capture_replay_bit = int(0x00000004)
+	memory_allocate_zero_initialize_bit_ext           = int(0x00000008)
 	memory_allocate_flag_bits_max_enum                = int(0x7FFFFFFF)
 }
 
@@ -8409,7 +8412,7 @@ pub const buffer_usage_2_resource_descriptor_buffer_bit_ext = u64(0x00400000)
 pub const buffer_usage_2_push_descriptors_descriptor_buffer_bit_ext = u64(0x04000000)
 pub const buffer_usage_2_micromap_build_input_read_only_bit_ext = u64(0x00800000)
 pub const buffer_usage_2_micromap_storage_bit_ext = u64(0x01000000)
-pub const buffer_usage_2_tile_memory_qcom = u64(0x08000000)
+pub const buffer_usage_2_tile_memory_bit_qcom = u64(0x08000000)
 pub const buffer_usage_2_preprocess_buffer_bit_ext = u64(0x80000000)
 
 pub enum HostImageCopyFlagBits {
@@ -22086,6 +22089,16 @@ fn C.vkCmdEndRendering2EXT(C.CommandBuffer,
 pub fn cmd_end_rendering2_ext(command_buffer C.CommandBuffer,
 	p_rendering_end_info &RenderingEndInfoEXT) {
 	C.vkCmdEndRendering2EXT(command_buffer, p_rendering_end_info)
+}
+
+pub const ext_zero_initialize_device_memory_spec_version = 1
+pub const ext_zero_initialize_device_memory_extension_name = 'VK_EXT_zero_initialize_device_memory'
+
+pub struct PhysicalDeviceZeroInitializeDeviceMemoryFeaturesEXT {
+pub mut:
+	s_type                        StructureType = StructureType.structure_type_physical_device_zero_initialize_device_memory_features_ext
+	p_next                        voidptr
+	zero_initialize_device_memory Bool32
 }
 
 pub const khr_acceleration_structure_spec_version = 13
