@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 316
+pub const header_version = 317
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -943,6 +943,30 @@ pub enum StructureType {
 	structure_type_render_pass_subpass_feedback_create_info_ext                        = int(1000458003)
 	structure_type_direct_driver_loading_info_lunarg                                   = int(1000459000)
 	structure_type_direct_driver_loading_list_lunarg                                   = int(1000459001)
+	structure_type_tensor_create_info_arm                                              = int(1000460000)
+	structure_type_tensor_view_create_info_arm                                         = int(1000460001)
+	structure_type_bind_tensor_memory_info_arm                                         = int(1000460002)
+	structure_type_write_descriptor_set_tensor_arm                                     = int(1000460003)
+	structure_type_physical_device_tensor_properties_arm                               = int(1000460004)
+	structure_type_tensor_format_properties_arm                                        = int(1000460005)
+	structure_type_tensor_description_arm                                              = int(1000460006)
+	structure_type_tensor_memory_requirements_info_arm                                 = int(1000460007)
+	structure_type_tensor_memory_barrier_arm                                           = int(1000460008)
+	structure_type_physical_device_tensor_features_arm                                 = int(1000460009)
+	structure_type_device_tensor_memory_requirements_arm                               = int(1000460010)
+	structure_type_copy_tensor_info_arm                                                = int(1000460011)
+	structure_type_tensor_copy_arm                                                     = int(1000460012)
+	structure_type_tensor_dependency_info_arm                                          = int(1000460013)
+	structure_type_memory_dedicated_allocate_info_tensor_arm                           = int(1000460014)
+	structure_type_physical_device_external_tensor_info_arm                            = int(1000460015)
+	structure_type_external_tensor_properties_arm                                      = int(1000460016)
+	structure_type_external_memory_tensor_create_info_arm                              = int(1000460017)
+	structure_type_physical_device_descriptor_buffer_tensor_features_arm               = int(1000460018)
+	structure_type_physical_device_descriptor_buffer_tensor_properties_arm             = int(1000460019)
+	structure_type_descriptor_get_tensor_info_arm                                      = int(1000460020)
+	structure_type_tensor_capture_descriptor_data_info_arm                             = int(1000460021)
+	structure_type_tensor_view_capture_descriptor_data_info_arm                        = int(1000460022)
+	structure_type_frame_boundary_tensors_arm                                          = int(1000460023)
 	structure_type_physical_device_shader_module_identifier_features_ext               = int(1000462000)
 	structure_type_physical_device_shader_module_identifier_properties_ext             = int(1000462001)
 	structure_type_pipeline_shader_stage_module_identifier_create_info_ext             = int(1000462002)
@@ -962,6 +986,12 @@ pub enum StructureType {
 	structure_type_physical_device_anti_lag_features_amd                               = int(1000476000)
 	structure_type_anti_lag_data_amd                                                   = int(1000476001)
 	structure_type_anti_lag_presentation_info_amd                                      = int(1000476002)
+	structure_type_surface_capabilities_present_id2_khr                                = int(1000479000)
+	structure_type_present_id2_khr                                                     = int(1000479001)
+	structure_type_physical_device_present_id2_features_khr                            = int(1000479002)
+	structure_type_surface_capabilities_present_wait2_khr                              = int(1000480000)
+	structure_type_physical_device_present_wait2_features_khr                          = int(1000480001)
+	structure_type_present_wait2_info_khr                                              = int(1000480002)
 	structure_type_physical_device_ray_tracing_position_fetch_features_khr             = int(1000481000)
 	structure_type_physical_device_shader_object_features_ext                          = int(1000482000)
 	structure_type_physical_device_shader_object_properties_ext                        = int(1000482001)
@@ -1030,6 +1060,10 @@ pub enum StructureType {
 	structure_type_video_encode_av1_quality_level_properties_khr                       = int(1000513008)
 	structure_type_video_encode_av1_session_create_info_khr                            = int(1000513009)
 	structure_type_video_encode_av1_gop_remaining_frame_info_khr                       = int(1000513010)
+	structure_type_physical_device_video_decode_vp9_features_khr                       = int(1000514000)
+	structure_type_video_decode_vp9_capabilities_khr                                   = int(1000514001)
+	structure_type_video_decode_vp9_picture_info_khr                                   = int(1000514002)
+	structure_type_video_decode_vp9_profile_info_khr                                   = int(1000514003)
 	structure_type_physical_device_video_maintenance1_features_khr                     = int(1000515000)
 	structure_type_video_inline_query_info_khr                                         = int(1000515001)
 	structure_type_physical_device_per_stage_descriptor_set_features_nv                = int(1000516000)
@@ -1043,6 +1077,8 @@ pub enum StructureType {
 	structure_type_sampler_ycbcr_conversion_ycbcr_degamma_create_info_qcom             = int(1000520001)
 	structure_type_physical_device_cubic_clamp_features_qcom                           = int(1000521000)
 	structure_type_physical_device_attachment_feedback_loop_dynamic_state_features_ext = int(1000524000)
+	structure_type_physical_device_unified_image_layouts_features_khr                  = int(1000527000)
+	structure_type_attachment_feedback_loop_info_ext                                   = int(1000527001)
 	structure_type_screen_buffer_properties_qnx                                        = int(1000529000)
 	structure_type_screen_buffer_format_properties_qnx                                 = int(1000529001)
 	structure_type_import_screen_buffer_info_qnx                                       = int(1000529002)
@@ -1084,6 +1120,7 @@ pub enum StructureType {
 	structure_type_physical_device_layered_api_vulkan_properties_khr                   = int(1000562004)
 	structure_type_physical_device_shader_atomic_float16_vector_features_nv            = int(1000563000)
 	structure_type_physical_device_shader_replicated_composites_features_ext           = int(1000564000)
+	structure_type_physical_device_shader_float8_features_ext                          = int(1000567000)
 	structure_type_physical_device_ray_tracing_validation_features_nv                  = int(1000568000)
 	structure_type_physical_device_cluster_acceleration_structure_features_nv          = int(1000569000)
 	structure_type_physical_device_cluster_acceleration_structure_properties_nv        = int(1000569001)
@@ -1120,6 +1157,9 @@ pub enum StructureType {
 	structure_type_image_alignment_control_create_info_mesa                            = int(1000575002)
 	structure_type_physical_device_depth_clamp_control_features_ext                    = int(1000582000)
 	structure_type_pipeline_viewport_depth_clamp_control_create_info_ext               = int(1000582001)
+	structure_type_physical_device_maintenance9_features_khr                           = int(1000584000)
+	structure_type_physical_device_maintenance9_properties_khr                         = int(1000584001)
+	structure_type_queue_family_ownership_transfer_properties_khr                      = int(1000584002)
 	structure_type_physical_device_video_maintenance2_features_khr                     = int(1000586000)
 	structure_type_video_decode_h264_inline_session_parameters_info_khr                = int(1000586001)
 	structure_type_video_decode_h265_inline_session_parameters_info_khr                = int(1000586002)
@@ -1181,6 +1221,7 @@ pub enum ImageLayout {
 	image_layout_video_encode_src_khr                         = int(1000299001)
 	image_layout_video_encode_dpb_khr                         = int(1000299002)
 	image_layout_attachment_feedback_loop_optimal_ext         = int(1000339000)
+	image_layout_tensor_aliasing_arm                          = int(1000460000)
 	image_layout_video_encode_quantization_map_khr            = int(1000553000)
 	image_layout_zero_initialized_ext                         = int(1000620000)
 	image_layout_max_enum                                     = int(0x7FFFFFFF)
@@ -1234,6 +1275,8 @@ pub enum ObjectType {
 	object_type_indirect_commands_layout_nv     = int(1000277000)
 	object_type_buffer_collection_fuchsia       = int(1000366000)
 	object_type_micromap_ext                    = int(1000396000)
+	object_type_tensor_arm                      = int(1000460000)
+	object_type_tensor_view_arm                 = int(1000460001)
 	object_type_optical_flow_session_nv         = int(1000464000)
 	object_type_shader_ext                      = int(1000482000)
 	object_type_pipeline_binary_khr             = int(1000483000)
@@ -1519,6 +1562,7 @@ pub enum Format {
 	format_pvrtc1_4bpp_srgb_block_img                  = int(1000054005)
 	format_pvrtc2_2bpp_srgb_block_img                  = int(1000054006)
 	format_pvrtc2_4bpp_srgb_block_img                  = int(1000054007)
+	format_r8_bool_arm                                 = int(1000460000)
 	format_r16g16_sfixed5_nv                           = int(1000464000)
 	format_r10x6_uint_pack16_arm                       = int(1000609000)
 	format_r10x6g10x6_uint2pack16_arm                  = int(1000609001)
@@ -1894,6 +1938,7 @@ pub enum DescriptorType {
 	descriptor_type_acceleration_structure_nv             = int(1000165000)
 	descriptor_type_sample_weight_image_qcom              = int(1000440000)
 	descriptor_type_block_match_image_qcom                = int(1000440001)
+	descriptor_type_tensor_arm                            = int(1000460000)
 	descriptor_type_mutable_ext                           = int(1000351000)
 	descriptor_type_partitioned_acceleration_structure_nv = int(1000570000)
 	descriptor_type_max_enum                              = int(0x7FFFFFFF)
@@ -2094,6 +2139,7 @@ pub enum ImageUsageFlagBits {
 	image_usage_invocation_mask_bit_huawei                  = int(0x00040000)
 	image_usage_sample_weight_bit_qcom                      = int(0x00100000)
 	image_usage_sample_block_match_bit_qcom                 = int(0x00200000)
+	image_usage_tensor_aliasing_bit_arm                     = int(0x00800000)
 	image_usage_tile_memory_bit_qcom                        = int(0x08000000)
 	image_usage_video_encode_quantization_delta_map_bit_khr = int(0x02000000)
 	image_usage_video_encode_emphasis_map_bit_khr           = int(0x04000000)
@@ -2245,6 +2291,12 @@ pub enum QueryPipelineStatisticFlagBits {
 }
 
 pub type QueryPipelineStatisticFlags = u32
+
+pub enum QueryPoolCreateFlagBits {
+	query_pool_create_reset_bit_khr      = int(0x00000001)
+	query_pool_create_flag_bits_max_enum = int(0x7FFFFFFF)
+}
+
 pub type QueryPoolCreateFlags = u32
 
 pub enum QueryResultFlagBits {
@@ -2487,6 +2539,7 @@ pub enum DependencyFlagBits {
 	dependency_view_local_bit                                         = int(0x00000002)
 	dependency_feedback_loop_bit_ext                                  = int(0x00000008)
 	dependency_queue_family_ownership_transfer_use_all_stages_bit_khr = int(0x00000020)
+	dependency_asymmetric_event_bit_khr                               = int(0x00000040)
 	dependency_flag_bits_max_enum                                     = int(0x7FFFFFFF)
 }
 
@@ -6329,13 +6382,13 @@ pub enum SemaphoreType {
 }
 
 pub enum ResolveModeFlagBits {
-	resolve_mode_none                               = int(0)
-	resolve_mode_sample_zero_bit                    = int(0x00000001)
-	resolve_mode_average_bit                        = int(0x00000002)
-	resolve_mode_min_bit                            = int(0x00000004)
-	resolve_mode_max_bit                            = int(0x00000008)
-	resolve_mode_external_format_downsample_android = int(0x00000010)
-	resolve_mode_flag_bits_max_enum                 = int(0x7FFFFFFF)
+	resolve_mode_none                                   = int(0)
+	resolve_mode_sample_zero_bit                        = int(0x00000001)
+	resolve_mode_average_bit                            = int(0x00000002)
+	resolve_mode_min_bit                                = int(0x00000004)
+	resolve_mode_max_bit                                = int(0x00000008)
+	resolve_mode_external_format_downsample_bit_android = int(0x00000010)
+	resolve_mode_flag_bits_max_enum                     = int(0x7FFFFFFF)
 }
 
 pub type ResolveModeFlags = u32
@@ -7374,6 +7427,8 @@ pub const format_feature_2_weight_image_bit_qcom = u64(0x400000000)
 pub const format_feature_2_weight_sampled_image_bit_qcom = u64(0x800000000)
 pub const format_feature_2_block_matching_bit_qcom = u64(0x1000000000)
 pub const format_feature_2_box_filter_sampled_bit_qcom = u64(0x2000000000)
+pub const format_feature_2_tensor_shader_bit_arm = u64(0x8000000000)
+pub const format_feature_2_tensor_image_aliasing_bit_arm = u64(0x80000000000)
 pub const format_feature_2_optical_flow_image_bit_nv = u64(0x10000000000)
 pub const format_feature_2_optical_flow_vector_bit_nv = u64(0x20000000000)
 pub const format_feature_2_optical_flow_cost_bit_nv = u64(0x40000000000)
@@ -8431,7 +8486,7 @@ pub const buffer_usage_2_tile_memory_bit_qcom = u64(0x08000000)
 pub const buffer_usage_2_preprocess_buffer_bit_ext = u64(0x80000000)
 
 pub enum HostImageCopyFlagBits {
-	host_image_copy_memcpy             = int(0x00000001)
+	host_image_copy_memcpy_bit         = int(0x00000001)
 	host_image_copy_flag_bits_max_enum = int(0x7FFFFFFF)
 }
 
@@ -9240,6 +9295,8 @@ pub enum SwapchainCreateFlagBitsKHR {
 	swapchain_create_protected_bit_khr                   = int(0x00000002)
 	swapchain_create_mutable_format_bit_khr              = int(0x00000004)
 	swapchain_create_deferred_memory_allocation_bit_ext  = int(0x00000008)
+	swapchain_create_present_id2_bit_khr                 = int(0x00000040)
+	swapchain_create_present_wait2_bit_khr               = int(0x00000080)
 	swapchain_create_flag_bits_max_enum_khr              = int(0x7FFFFFFF)
 }
 
@@ -9643,6 +9700,7 @@ pub enum VideoCodecOperationFlagBitsKHR {
 	video_codec_operation_decode_h265_bit_khr    = int(0x00000002)
 	video_codec_operation_decode_av1_bit_khr     = int(0x00000004)
 	video_codec_operation_encode_av1_bit_khr     = int(0x00040000)
+	video_codec_operation_decode_vp9_bit_khr     = int(0x00000008)
 	video_codec_operation_flag_bits_max_enum_khr = int(0x7FFFFFFF)
 }
 
@@ -12276,6 +12334,65 @@ pub type PipelineCreateFlags2CreateInfoKHR = PipelineCreateFlags2CreateInfo
 
 pub type BufferUsageFlags2CreateInfoKHR = BufferUsageFlags2CreateInfo
 
+pub const khr_present_id_2_spec_version = 1
+pub const khr_present_id_2_extension_name = 'VK_KHR_present_id2'
+
+pub struct SurfaceCapabilitiesPresentId2KHR {
+pub mut:
+	s_type                StructureType = StructureType.structure_type_surface_capabilities_present_id2_khr
+	p_next                voidptr
+	present_id2_supported Bool32
+}
+
+pub struct PresentId2KHR {
+pub mut:
+	s_type          StructureType = StructureType.structure_type_present_id2_khr
+	p_next          voidptr
+	swapchain_count u32
+	p_present_ids   &u64
+}
+
+pub struct PhysicalDevicePresentId2FeaturesKHR {
+pub mut:
+	s_type      StructureType = StructureType.structure_type_physical_device_present_id2_features_khr
+	p_next      voidptr
+	present_id2 Bool32
+}
+
+pub const khr_present_wait_2_spec_version = 1
+pub const khr_present_wait_2_extension_name = 'VK_KHR_present_wait2'
+
+pub struct SurfaceCapabilitiesPresentWait2KHR {
+pub mut:
+	s_type                  StructureType = StructureType.structure_type_surface_capabilities_present_wait2_khr
+	p_next                  voidptr
+	present_wait2_supported Bool32
+}
+
+pub struct PhysicalDevicePresentWait2FeaturesKHR {
+pub mut:
+	s_type        StructureType = StructureType.structure_type_physical_device_present_wait2_features_khr
+	p_next        voidptr
+	present_wait2 Bool32
+}
+
+pub struct PresentWait2InfoKHR {
+pub mut:
+	s_type     StructureType = StructureType.structure_type_present_wait2_info_khr
+	p_next     voidptr
+	present_id u64
+	timeout    u64
+}
+
+fn C.vkWaitForPresent2KHR(C.Device,
+	C.SwapchainKHR,
+	&PresentWait2InfoKHR) Result
+pub fn wait_for_present2_khr(device C.Device,
+	swapchain C.SwapchainKHR,
+	p_present_wait2_info &PresentWait2InfoKHR) Result {
+	return C.vkWaitForPresent2KHR(device, swapchain, p_present_wait2_info)
+}
+
 pub const khr_ray_tracing_position_fetch_spec_version = 1
 pub const khr_ray_tracing_position_fetch_extension_name = 'VK_KHR_ray_tracing_position_fetch'
 
@@ -12455,6 +12572,8 @@ pub enum ComponentTypeKHR {
 	component_type_uint8_packed_nv = int(1000491001)
 	component_type_float_e4m3_nv   = int(1000491002)
 	component_type_float_e5m2_nv   = int(1000491003)
+	component_type_float8_e4m3_ext = int(1000567000)
+	component_type_float8_e5m2_ext = int(1000567001)
 	component_type_max_enum_khr    = int(0x7FFFFFFF)
 }
 
@@ -12781,6 +12900,45 @@ pub mut:
 	max_frame_size     VideoEncodeAV1FrameSizeKHR
 }
 
+#include "vk_video/vulkan_video_codec_vp9std.h"
+#include "vk_video/vulkan_video_codec_vp9std_decode.h"
+
+pub const max_video_vp9_references_per_frame_khr = u32(3)
+pub const khr_video_decode_vp9_spec_version = 1
+pub const khr_video_decode_vp9_extension_name = 'VK_KHR_video_decode_vp9'
+
+pub struct PhysicalDeviceVideoDecodeVP9FeaturesKHR {
+pub mut:
+	s_type           StructureType = StructureType.structure_type_physical_device_video_decode_vp9_features_khr
+	p_next           voidptr
+	video_decode_vp9 Bool32
+}
+
+pub struct VideoDecodeVP9ProfileInfoKHR {
+pub mut:
+	s_type      StructureType = StructureType.structure_type_video_decode_vp9_profile_info_khr
+	p_next      voidptr
+	std_profile StdVideoVP9Profile
+}
+
+pub struct VideoDecodeVP9CapabilitiesKHR {
+pub mut:
+	s_type    StructureType = StructureType.structure_type_video_decode_vp9_capabilities_khr
+	p_next    voidptr
+	max_level StdVideoVP9Level
+}
+
+pub struct VideoDecodeVP9PictureInfoKHR {
+pub mut:
+	s_type                      StructureType = StructureType.structure_type_video_decode_vp9_picture_info_khr
+	p_next                      voidptr
+	p_std_picture_info          &StdVideoDecodeVP9PictureInfo
+	reference_name_slot_indices [max_video_vp9_references_per_frame_khr]i32
+	uncompressed_header_offset  u32
+	compressed_header_offset    u32
+	tiles_offset                u32
+}
+
 pub const khr_video_maintenance_1_spec_version = 1
 pub const khr_video_maintenance_1_extension_name = 'VK_KHR_video_maintenance1'
 
@@ -12813,6 +12971,24 @@ pub type PhysicalDeviceVertexAttributeDivisorFeaturesKHR = PhysicalDeviceVertexA
 
 pub const khr_load_store_op_none_spec_version = 1
 pub const khr_load_store_op_none_extension_name = 'VK_KHR_load_store_op_none'
+
+pub const khr_unified_image_layouts_spec_version = 1
+pub const khr_unified_image_layouts_extension_name = 'VK_KHR_unified_image_layouts'
+
+pub struct PhysicalDeviceUnifiedImageLayoutsFeaturesKHR {
+pub mut:
+	s_type                      StructureType = StructureType.structure_type_physical_device_unified_image_layouts_features_khr
+	p_next                      voidptr
+	unified_image_layouts       Bool32
+	unified_image_layouts_video Bool32
+}
+
+pub struct AttachmentFeedbackLoopInfoEXT {
+pub mut:
+	s_type               StructureType = StructureType.structure_type_attachment_feedback_loop_info_ext
+	p_next               voidptr
+	feedback_loop_enable Bool32
+}
 
 pub const khr_shader_float_controls_2_spec_version = 1
 pub const khr_shader_float_controls_2_extension_name = 'VK_KHR_shader_float_controls2'
@@ -13102,6 +13278,37 @@ pub mut:
 	p_next           voidptr
 	src_access_mask3 AccessFlags3KHR
 	dst_access_mask3 AccessFlags3KHR
+}
+
+pub const khr_maintenance_9_spec_version = 1
+pub const khr_maintenance_9_extension_name = 'VK_KHR_maintenance9'
+
+pub enum DefaultVertexAttributeValueKHR {
+	default_vertex_attribute_value_zero_zero_zero_zero_khr = int(0)
+	default_vertex_attribute_value_zero_zero_zero_one_khr  = int(1)
+	default_vertex_attribute_value_max_enum_khr            = int(0x7FFFFFFF)
+}
+
+pub struct PhysicalDeviceMaintenance9FeaturesKHR {
+pub mut:
+	s_type       StructureType = StructureType.structure_type_physical_device_maintenance9_features_khr
+	p_next       voidptr
+	maintenance9 Bool32
+}
+
+pub struct PhysicalDeviceMaintenance9PropertiesKHR {
+pub mut:
+	s_type                         StructureType = StructureType.structure_type_physical_device_maintenance9_properties_khr
+	p_next                         voidptr
+	image2_d_view_of3_d_sparse     Bool32
+	default_vertex_attribute_value DefaultVertexAttributeValueKHR
+}
+
+pub struct QueueFamilyOwnershipTransferPropertiesKHR {
+pub mut:
+	s_type                                   StructureType = StructureType.structure_type_queue_family_ownership_transfer_properties_khr
+	p_next                                   voidptr
+	optimal_image_transfer_to_queue_families u32
 }
 
 pub const khr_video_maintenance_2_spec_version = 1
@@ -15104,13 +15311,13 @@ pub type GeometryFlagsNV = u32
 pub type GeometryFlagBitsNV = GeometryFlagBitsKHR
 
 pub enum GeometryInstanceFlagBitsKHR {
-	geometry_instance_triangle_facing_cull_disable_bit_khr = int(0x00000001)
-	geometry_instance_triangle_flip_facing_bit_khr         = int(0x00000002)
-	geometry_instance_force_opaque_bit_khr                 = int(0x00000004)
-	geometry_instance_force_no_opaque_bit_khr              = int(0x00000008)
-	geometry_instance_force_opacity_micromap2_state_ext    = int(0x00000010)
-	geometry_instance_disable_opacity_micromaps_ext        = int(0x00000020)
-	geometry_instance_flag_bits_max_enum_khr               = int(0x7FFFFFFF)
+	geometry_instance_triangle_facing_cull_disable_bit_khr  = int(0x00000001)
+	geometry_instance_triangle_flip_facing_bit_khr          = int(0x00000002)
+	geometry_instance_force_opaque_bit_khr                  = int(0x00000004)
+	geometry_instance_force_no_opaque_bit_khr               = int(0x00000008)
+	geometry_instance_force_opacity_micromap2_state_bit_ext = int(0x00000010)
+	geometry_instance_disable_opacity_micromaps_bit_ext     = int(0x00000020)
+	geometry_instance_flag_bits_max_enum_khr                = int(0x7FFFFFFF)
 }
 
 pub type GeometryInstanceFlagsKHR = u32
@@ -15118,17 +15325,17 @@ pub type GeometryInstanceFlagsNV = u32
 pub type GeometryInstanceFlagBitsNV = GeometryInstanceFlagBitsKHR
 
 pub enum BuildAccelerationStructureFlagBitsKHR {
-	build_acceleration_structure_allow_update_bit_khr                   = int(0x00000001)
-	build_acceleration_structure_allow_compaction_bit_khr               = int(0x00000002)
-	build_acceleration_structure_prefer_fast_trace_bit_khr              = int(0x00000004)
-	build_acceleration_structure_prefer_fast_build_bit_khr              = int(0x00000008)
-	build_acceleration_structure_low_memory_bit_khr                     = int(0x00000010)
-	build_acceleration_structure_motion_bit_nv                          = int(0x00000020)
-	build_acceleration_structure_allow_opacity_micromap_update_ext      = int(0x00000040)
-	build_acceleration_structure_allow_disable_opacity_micromaps_ext    = int(0x00000080)
-	build_acceleration_structure_allow_opacity_micromap_data_update_ext = int(0x00000100)
-	build_acceleration_structure_allow_data_access_khr                  = int(0x00000800)
-	build_acceleration_structure_flag_bits_max_enum_khr                 = int(0x7FFFFFFF)
+	build_acceleration_structure_allow_update_bit_khr                       = int(0x00000001)
+	build_acceleration_structure_allow_compaction_bit_khr                   = int(0x00000002)
+	build_acceleration_structure_prefer_fast_trace_bit_khr                  = int(0x00000004)
+	build_acceleration_structure_prefer_fast_build_bit_khr                  = int(0x00000008)
+	build_acceleration_structure_low_memory_bit_khr                         = int(0x00000010)
+	build_acceleration_structure_motion_bit_nv                              = int(0x00000020)
+	build_acceleration_structure_allow_opacity_micromap_update_bit_ext      = int(0x00000040)
+	build_acceleration_structure_allow_disable_opacity_micromaps_bit_ext    = int(0x00000080)
+	build_acceleration_structure_allow_opacity_micromap_data_update_bit_ext = int(0x00000100)
+	build_acceleration_structure_allow_data_access_bit_khr                  = int(0x00000800)
+	build_acceleration_structure_flag_bits_max_enum_khr                     = int(0x7FFFFFFF)
 }
 
 pub type BuildAccelerationStructureFlagsKHR = u32
@@ -19958,6 +20165,364 @@ pub mut:
 	p_drivers    &DirectDriverLoadingInfoLUNARG
 }
 
+pub type C.TensorARM = voidptr
+pub type C.TensorViewARM = voidptr
+
+pub const arm_tensors_spec_version = 1
+pub const arm_tensors_extension_name = 'VK_ARM_tensors'
+
+pub enum TensorTilingARM {
+	tensor_tiling_optimal_arm  = int(0)
+	tensor_tiling_linear_arm   = int(1)
+	tensor_tiling_max_enum_arm = int(0x7FFFFFFF)
+}
+
+pub type TensorCreateFlagsARM = u64
+
+// Flag bits for TensorCreateFlagBitsARM
+pub type TensorCreateFlagBitsARM = u64
+
+pub const tensor_create_mutable_format_bit_arm = u64(0x00000001)
+pub const tensor_create_protected_bit_arm = u64(0x00000002)
+pub const tensor_create_descriptor_buffer_capture_replay_bit_arm = u64(0x00000004)
+
+pub type TensorViewCreateFlagsARM = u64
+
+// Flag bits for TensorViewCreateFlagBitsARM
+pub type TensorViewCreateFlagBitsARM = u64
+
+pub const tensor_view_create_descriptor_buffer_capture_replay_bit_arm = u64(0x00000001)
+
+pub type TensorUsageFlagsARM = u64
+
+// Flag bits for TensorUsageFlagBitsARM
+pub type TensorUsageFlagBitsARM = u64
+
+pub const tensor_usage_shader_bit_arm = u64(0x00000002)
+pub const tensor_usage_transfer_src_bit_arm = u64(0x00000004)
+pub const tensor_usage_transfer_dst_bit_arm = u64(0x00000008)
+pub const tensor_usage_image_aliasing_bit_arm = u64(0x00000010)
+
+pub struct TensorDescriptionARM {
+pub mut:
+	s_type          StructureType = StructureType.structure_type_tensor_description_arm
+	p_next          voidptr
+	tiling          TensorTilingARM
+	format          Format
+	dimension_count u32
+	p_dimensions    &i64
+	p_strides       &i64
+	usage           TensorUsageFlagsARM
+}
+
+pub struct TensorCreateInfoARM {
+pub mut:
+	s_type                   StructureType = StructureType.structure_type_tensor_create_info_arm
+	p_next                   voidptr
+	flags                    TensorCreateFlagsARM
+	p_description            &TensorDescriptionARM
+	sharing_mode             SharingMode
+	queue_family_index_count u32
+	p_queue_family_indices   &u32
+}
+
+pub struct TensorViewCreateInfoARM {
+pub mut:
+	s_type StructureType = StructureType.structure_type_tensor_view_create_info_arm
+	p_next voidptr
+	flags  TensorViewCreateFlagsARM
+	tensor C.TensorARM
+	format Format
+}
+
+pub struct TensorMemoryRequirementsInfoARM {
+pub mut:
+	s_type StructureType = StructureType.structure_type_tensor_memory_requirements_info_arm
+	p_next voidptr
+	tensor C.TensorARM
+}
+
+pub struct BindTensorMemoryInfoARM {
+pub mut:
+	s_type        StructureType = StructureType.structure_type_bind_tensor_memory_info_arm
+	p_next        voidptr
+	tensor        C.TensorARM
+	memory        C.DeviceMemory
+	memory_offset DeviceSize
+}
+
+pub struct WriteDescriptorSetTensorARM {
+pub mut:
+	s_type            StructureType = StructureType.structure_type_write_descriptor_set_tensor_arm
+	p_next            voidptr
+	tensor_view_count u32
+	p_tensor_views    &C.TensorViewARM
+}
+
+pub struct TensorFormatPropertiesARM {
+pub mut:
+	s_type                         StructureType = StructureType.structure_type_tensor_format_properties_arm
+	p_next                         voidptr
+	optimal_tiling_tensor_features FormatFeatureFlags2
+	linear_tiling_tensor_features  FormatFeatureFlags2
+}
+
+pub struct PhysicalDeviceTensorPropertiesARM {
+pub mut:
+	s_type                                                     StructureType = StructureType.structure_type_physical_device_tensor_properties_arm
+	p_next                                                     voidptr
+	max_tensor_dimension_count                                 u32
+	max_tensor_elements                                        u64
+	max_per_dimension_tensor_elements                          u64
+	max_tensor_stride                                          i64
+	max_tensor_size                                            u64
+	max_tensor_shader_access_array_length                      u32
+	max_tensor_shader_access_size                              u32
+	max_descriptor_set_storage_tensors                         u32
+	max_per_stage_descriptor_set_storage_tensors               u32
+	max_descriptor_set_update_after_bind_storage_tensors       u32
+	max_per_stage_descriptor_update_after_bind_storage_tensors u32
+	shader_storage_tensor_array_non_uniform_indexing_native    Bool32
+	shader_tensor_supported_stages                             ShaderStageFlags
+}
+
+pub struct TensorMemoryBarrierARM {
+pub mut:
+	s_type                 StructureType = StructureType.structure_type_tensor_memory_barrier_arm
+	p_next                 voidptr
+	src_stage_mask         PipelineStageFlags2
+	src_access_mask        AccessFlags2
+	dst_stage_mask         PipelineStageFlags2
+	dst_access_mask        AccessFlags2
+	src_queue_family_index u32
+	dst_queue_family_index u32
+	tensor                 C.TensorARM
+}
+
+pub struct TensorDependencyInfoARM {
+pub mut:
+	s_type                      StructureType = StructureType.structure_type_tensor_dependency_info_arm
+	p_next                      voidptr
+	tensor_memory_barrier_count u32
+	p_tensor_memory_barriers    &TensorMemoryBarrierARM
+}
+
+pub struct PhysicalDeviceTensorFeaturesARM {
+pub mut:
+	s_type                                              StructureType = StructureType.structure_type_physical_device_tensor_features_arm
+	p_next                                              voidptr
+	tensor_non_packed                                   Bool32
+	shader_tensor_access                                Bool32
+	shader_storage_tensor_array_dynamic_indexing        Bool32
+	shader_storage_tensor_array_non_uniform_indexing    Bool32
+	descriptor_binding_storage_tensor_update_after_bind Bool32
+	tensors                                             Bool32
+}
+
+pub struct DeviceTensorMemoryRequirementsARM {
+pub mut:
+	s_type        StructureType = StructureType.structure_type_device_tensor_memory_requirements_arm
+	p_next        voidptr
+	p_create_info &TensorCreateInfoARM
+}
+
+pub struct TensorCopyARM {
+pub mut:
+	s_type          StructureType = StructureType.structure_type_tensor_copy_arm
+	p_next          voidptr
+	dimension_count u32
+	p_src_offset    &u64
+	p_dst_offset    &u64
+	p_extent        &u64
+}
+
+pub struct CopyTensorInfoARM {
+pub mut:
+	s_type       StructureType = StructureType.structure_type_copy_tensor_info_arm
+	p_next       voidptr
+	src_tensor   C.TensorARM
+	dst_tensor   C.TensorARM
+	region_count u32
+	p_regions    &TensorCopyARM
+}
+
+pub struct MemoryDedicatedAllocateInfoTensorARM {
+pub mut:
+	s_type StructureType = StructureType.structure_type_memory_dedicated_allocate_info_tensor_arm
+	p_next voidptr
+	tensor C.TensorARM
+}
+
+pub struct PhysicalDeviceExternalTensorInfoARM {
+pub mut:
+	s_type        StructureType = StructureType.structure_type_physical_device_external_tensor_info_arm
+	p_next        voidptr
+	flags         TensorCreateFlagsARM
+	p_description &TensorDescriptionARM
+	handle_type   ExternalMemoryHandleTypeFlagBits
+}
+
+pub struct ExternalTensorPropertiesARM {
+pub mut:
+	s_type                     StructureType = StructureType.structure_type_external_tensor_properties_arm
+	p_next                     voidptr
+	external_memory_properties ExternalMemoryProperties
+}
+
+pub struct ExternalMemoryTensorCreateInfoARM {
+pub mut:
+	s_type       StructureType = StructureType.structure_type_external_memory_tensor_create_info_arm
+	p_next       voidptr
+	handle_types ExternalMemoryHandleTypeFlags
+}
+
+pub struct PhysicalDeviceDescriptorBufferTensorFeaturesARM {
+pub mut:
+	s_type                               StructureType = StructureType.structure_type_physical_device_descriptor_buffer_tensor_features_arm
+	p_next                               voidptr
+	descriptor_buffer_tensor_descriptors Bool32
+}
+
+pub struct PhysicalDeviceDescriptorBufferTensorPropertiesARM {
+pub mut:
+	s_type                                          StructureType = StructureType.structure_type_physical_device_descriptor_buffer_tensor_properties_arm
+	p_next                                          voidptr
+	tensor_capture_replay_descriptor_data_size      usize
+	tensor_view_capture_replay_descriptor_data_size usize
+	tensor_descriptor_size                          usize
+}
+
+pub struct DescriptorGetTensorInfoARM {
+pub mut:
+	s_type      StructureType = StructureType.structure_type_descriptor_get_tensor_info_arm
+	p_next      voidptr
+	tensor_view C.TensorViewARM
+}
+
+pub struct TensorCaptureDescriptorDataInfoARM {
+pub mut:
+	s_type StructureType = StructureType.structure_type_tensor_capture_descriptor_data_info_arm
+	p_next voidptr
+	tensor C.TensorARM
+}
+
+pub struct TensorViewCaptureDescriptorDataInfoARM {
+pub mut:
+	s_type      StructureType = StructureType.structure_type_tensor_view_capture_descriptor_data_info_arm
+	p_next      voidptr
+	tensor_view C.TensorViewARM
+}
+
+pub struct FrameBoundaryTensorsARM {
+pub mut:
+	s_type       StructureType = StructureType.structure_type_frame_boundary_tensors_arm
+	p_next       voidptr
+	tensor_count u32
+	p_tensors    &C.TensorARM
+}
+
+fn C.vkCreateTensorARM(C.Device,
+	&TensorCreateInfoARM,
+	&AllocationCallbacks,
+	&C.TensorARM) Result
+pub fn create_tensor_arm(device C.Device,
+	p_create_info &TensorCreateInfoARM,
+	p_allocator &AllocationCallbacks,
+	p_tensor &C.TensorARM) Result {
+	return C.vkCreateTensorARM(device, p_create_info, p_allocator, p_tensor)
+}
+
+fn C.vkDestroyTensorARM(C.Device,
+	C.TensorARM,
+	&AllocationCallbacks)
+pub fn destroy_tensor_arm(device C.Device,
+	tensor C.TensorARM,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyTensorARM(device, tensor, p_allocator)
+}
+
+fn C.vkCreateTensorViewARM(C.Device,
+	&TensorViewCreateInfoARM,
+	&AllocationCallbacks,
+	&C.TensorViewARM) Result
+pub fn create_tensor_view_arm(device C.Device,
+	p_create_info &TensorViewCreateInfoARM,
+	p_allocator &AllocationCallbacks,
+	p_view &C.TensorViewARM) Result {
+	return C.vkCreateTensorViewARM(device, p_create_info, p_allocator, p_view)
+}
+
+fn C.vkDestroyTensorViewARM(C.Device,
+	C.TensorViewARM,
+	&AllocationCallbacks)
+pub fn destroy_tensor_view_arm(device C.Device,
+	tensor_view C.TensorViewARM,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyTensorViewARM(device, tensor_view, p_allocator)
+}
+
+fn C.vkGetTensorMemoryRequirementsARM(C.Device,
+	&TensorMemoryRequirementsInfoARM,
+	&MemoryRequirements2)
+pub fn get_tensor_memory_requirements_arm(device C.Device,
+	p_info &TensorMemoryRequirementsInfoARM,
+	p_memory_requirements &MemoryRequirements2) {
+	C.vkGetTensorMemoryRequirementsARM(device, p_info, p_memory_requirements)
+}
+
+fn C.vkBindTensorMemoryARM(C.Device,
+	u32,
+	&BindTensorMemoryInfoARM) Result
+pub fn bind_tensor_memory_arm(device C.Device,
+	bind_info_count u32,
+	p_bind_infos &BindTensorMemoryInfoARM) Result {
+	return C.vkBindTensorMemoryARM(device, bind_info_count, p_bind_infos)
+}
+
+fn C.vkGetDeviceTensorMemoryRequirementsARM(C.Device,
+	&DeviceTensorMemoryRequirementsARM,
+	&MemoryRequirements2)
+pub fn get_device_tensor_memory_requirements_arm(device C.Device,
+	p_info &DeviceTensorMemoryRequirementsARM,
+	p_memory_requirements &MemoryRequirements2) {
+	C.vkGetDeviceTensorMemoryRequirementsARM(device, p_info, p_memory_requirements)
+}
+
+fn C.vkCmdCopyTensorARM(C.CommandBuffer,
+	&CopyTensorInfoARM)
+pub fn cmd_copy_tensor_arm(command_buffer C.CommandBuffer,
+	p_copy_tensor_info &CopyTensorInfoARM) {
+	C.vkCmdCopyTensorARM(command_buffer, p_copy_tensor_info)
+}
+
+fn C.vkGetPhysicalDeviceExternalTensorPropertiesARM(C.PhysicalDevice,
+	&PhysicalDeviceExternalTensorInfoARM,
+	&ExternalTensorPropertiesARM)
+pub fn get_physical_device_external_tensor_properties_arm(physical_device C.PhysicalDevice,
+	p_external_tensor_info &PhysicalDeviceExternalTensorInfoARM,
+	p_external_tensor_properties &ExternalTensorPropertiesARM) {
+	C.vkGetPhysicalDeviceExternalTensorPropertiesARM(physical_device, p_external_tensor_info,
+		p_external_tensor_properties)
+}
+
+fn C.vkGetTensorOpaqueCaptureDescriptorDataARM(C.Device,
+	&TensorCaptureDescriptorDataInfoARM,
+	voidptr) Result
+pub fn get_tensor_opaque_capture_descriptor_data_arm(device C.Device,
+	p_info &TensorCaptureDescriptorDataInfoARM,
+	p_data voidptr) Result {
+	return C.vkGetTensorOpaqueCaptureDescriptorDataARM(device, p_info, p_data)
+}
+
+fn C.vkGetTensorViewOpaqueCaptureDescriptorDataARM(C.Device,
+	&TensorViewCaptureDescriptorDataInfoARM,
+	voidptr) Result
+pub fn get_tensor_view_opaque_capture_descriptor_data_arm(device C.Device,
+	p_info &TensorViewCaptureDescriptorDataInfoARM,
+	p_data voidptr) Result {
+	return C.vkGetTensorViewOpaqueCaptureDescriptorDataARM(device, p_info, p_data)
+}
+
 pub const max_shader_module_identifier_size_ext = u32(32)
 pub const ext_shader_module_identifier_spec_version = 1
 pub const ext_shader_module_identifier_extension_name = 'VK_EXT_shader_module_identifier'
@@ -21165,6 +21730,17 @@ pub mut:
 	s_type                       StructureType = StructureType.structure_type_physical_device_shader_replicated_composites_features_ext
 	p_next                       voidptr
 	shader_replicated_composites Bool32
+}
+
+pub const ext_shader_float8_spec_version = 1
+pub const ext_shader_float8_extension_name = 'VK_EXT_shader_float8'
+
+pub struct PhysicalDeviceShaderFloat8FeaturesEXT {
+pub mut:
+	s_type                           StructureType = StructureType.structure_type_physical_device_shader_float8_features_ext
+	p_next                           voidptr
+	shader_float8                    Bool32
+	shader_float8_cooperative_matrix Bool32
 }
 
 pub const nv_ray_tracing_validation_spec_version = 1
