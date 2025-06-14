@@ -18,7 +18,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 317
+pub const header_version = 318
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn version_variant(version u32) u32 {
@@ -1164,6 +1164,7 @@ pub enum StructureType {
 	structure_type_video_decode_h264_inline_session_parameters_info_khr                = int(1000586001)
 	structure_type_video_decode_h265_inline_session_parameters_info_khr                = int(1000586002)
 	structure_type_video_decode_av1_inline_session_parameters_info_khr                 = int(1000586003)
+	structure_type_oh_surface_create_info_ohos                                         = int(1000587000)
 	structure_type_physical_device_hdr_vivid_features_huawei                           = int(1000590000)
 	structure_type_hdr_vivid_dynamic_metadata_huawei                                   = int(1000590001)
 	structure_type_physical_device_cooperative_matrix2_features_nv                     = int(1000593000)
@@ -1176,6 +1177,9 @@ pub enum StructureType {
 	structure_type_physical_device_depth_clamp_zero_one_features_khr                   = int(1000421000)
 	structure_type_physical_device_vertex_attribute_robustness_features_ext            = int(1000608000)
 	structure_type_physical_device_format_pack_features_arm                            = int(1000609000)
+	structure_type_physical_device_fragment_density_map_layered_features_valve         = int(1000611000)
+	structure_type_physical_device_fragment_density_map_layered_properties_valve       = int(1000611001)
+	structure_type_pipeline_fragment_density_map_layered_create_info_valve             = int(1000611002)
 	structure_type_physical_device_robustness2_features_khr                            = int(1000286000)
 	structure_type_physical_device_robustness2_properties_khr                          = int(1000286001)
 	structure_type_physical_device_fragment_density_map_offset_features_ext            = int(1000425000)
@@ -2553,8 +2557,9 @@ pub enum FramebufferCreateFlagBits {
 pub type FramebufferCreateFlags = u32
 
 pub enum RenderPassCreateFlagBits {
-	render_pass_create_transform_bit_qcom = int(0x00000002)
-	render_pass_create_flag_bits_max_enum = int(0x7FFFFFFF)
+	render_pass_create_transform_bit_qcom                   = int(0x00000002)
+	render_pass_create_per_layer_fragment_density_bit_valve = int(0x00000004)
+	render_pass_create_flag_bits_max_enum                   = int(0x7FFFFFFF)
 }
 
 pub type RenderPassCreateFlags = u32
@@ -7349,6 +7354,7 @@ pub enum RenderingFlagBits {
 	rendering_resuming_bit                           = int(0x00000004)
 	rendering_enable_legacy_dithering_bit_ext        = int(0x00000008)
 	rendering_contents_inline_bit_khr                = int(0x00000010)
+	rendering_per_layer_fragment_density_bit_valve   = int(0x00000020)
 	rendering_flag_bits_max_enum                     = int(0x7FFFFFFF)
 }
 
@@ -8439,6 +8445,7 @@ pub const pipeline_create_2_descriptor_buffer_bit_ext = u64(0x20000000)
 pub const pipeline_create_2_disallow_opacity_micromap_bit_arm = u64(0x2000000000)
 pub const pipeline_create_2_capture_data_bit_khr = u64(0x80000000)
 pub const pipeline_create_2_indirect_bindable_bit_ext = u64(0x4000000000)
+pub const pipeline_create_2_per_layer_fragment_density_bit_valve = u64(0x10000000000)
 
 pub type BufferUsageFlags2 = u64
 
@@ -12570,10 +12577,8 @@ pub enum ComponentTypeKHR {
 	component_type_bfloat16_khr    = int(1000141000)
 	component_type_sint8_packed_nv = int(1000491000)
 	component_type_uint8_packed_nv = int(1000491001)
-	component_type_float_e4m3_nv   = int(1000491002)
-	component_type_float_e5m2_nv   = int(1000491003)
-	component_type_float8_e4m3_ext = int(1000567000)
-	component_type_float8_e5m2_ext = int(1000567001)
+	component_type_float8_e4m3_ext = int(1000491002)
+	component_type_float8_e5m2_ext = int(1000491003)
 	component_type_max_enum_khr    = int(0x7FFFFFFF)
 }
 
@@ -22515,6 +22520,32 @@ pub mut:
 	p_depth_clamp_range &DepthClampRangeEXT
 }
 
+pub const ohos_surface_spec_version = 1
+pub const ohos_surface_extension_name = 'VK_OHOS_surface'
+
+pub type SurfaceCreateFlagsOHOS = u32
+
+pub struct OHSurfaceCreateInfoOHOS {
+pub mut:
+	s_type StructureType = StructureType.structure_type_oh_surface_create_info_ohos
+	p_next voidptr
+	flags  SurfaceCreateFlagsOHOS
+	window &OHNativeWindow
+}
+
+pub type SurfaceCreateInfoOHOS = OHSurfaceCreateInfoOHOS
+
+fn C.vkCreateSurfaceOHOS(C.Instance,
+	&SurfaceCreateInfoOHOS,
+	&AllocationCallbacks,
+	&C.SurfaceKHR) Result
+pub fn create_surface_ohos(instance C.Instance,
+	p_create_info &SurfaceCreateInfoOHOS,
+	p_allocator &AllocationCallbacks,
+	p_surface &C.SurfaceKHR) Result {
+	return C.vkCreateSurfaceOHOS(instance, p_create_info, p_allocator, p_surface)
+}
+
 pub const huawei_hdr_vivid_spec_version = 1
 pub const huawei_hdr_vivid_extension_name = 'VK_HAWEI_hdr_vivid'
 
@@ -22658,6 +22689,30 @@ pub mut:
 	s_type      StructureType = StructureType.structure_type_physical_device_format_pack_features_arm
 	p_next      voidptr
 	format_pack Bool32
+}
+
+pub const valve_fragment_density_map_layered_spec_version = 1
+pub const valve_fragment_density_map_layered_extension_name = 'VK_VAVE_fragment_density_map_layered'
+
+pub struct PhysicalDeviceFragmentDensityMapLayeredFeaturesVALVE {
+pub mut:
+	s_type                       StructureType = StructureType.structure_type_physical_device_fragment_density_map_layered_features_valve
+	p_next                       voidptr
+	fragment_density_map_layered Bool32
+}
+
+pub struct PhysicalDeviceFragmentDensityMapLayeredPropertiesVALVE {
+pub mut:
+	s_type                          StructureType = StructureType.structure_type_physical_device_fragment_density_map_layered_properties_valve
+	p_next                          voidptr
+	max_fragment_density_map_layers u32
+}
+
+pub struct PipelineFragmentDensityMapLayeredCreateInfoVALVE {
+pub mut:
+	s_type                          StructureType = StructureType.structure_type_pipeline_fragment_density_map_layered_create_info_valve
+	p_next                          voidptr
+	max_fragment_density_map_layers u32
 }
 
 pub const nv_present_metering_spec_version = 1
