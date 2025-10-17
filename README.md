@@ -19,6 +19,11 @@ A video decode app using `vulkan_video.v` can be found at [antono2/v_vulkan_vide
 ## Generate
 The generator is located at [antono2/v_vulkan_bindings](https://github.com/antono2/v_vulkan_bindings).
 
+# Thanks
+Big thanks to [@spytheman](https://github.com/spytheman) for fixing my bugs in times of need.
+To [@JalonSolov](https://github.com/JalonSolov) for quick and solid answers to obscure questions.
+The awesome team at [V](https://vlang.io/) for making this possible.
+
 ## LICENSE
 
 ```
@@ -45,10 +50,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
-
-
-# Thanks
-Big thanks to [@spytheman](https://github.com/spytheman) for fixing my bugs in times of need.
-To [@JalonSolov](https://github.com/JalonSolov) for quick and solid answers to obscure questions.
-The awesome team at [V](https://vlang.io/) for making this possible.
 

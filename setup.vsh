@@ -73,7 +73,7 @@ web.download_file(download_url, file_path) or { panic('Could not download Vulkan
 println('Saved Vulkan Software Development Kit to ${file_path}')
 
 
-// TODO: Update .bashrc and other shell configs automatically to make env vars permanent
+// NOTE: We could update .bashrc and other shell configs automatically to make env vars permanent
 match cur_os {
   .linux {
     println('Unpacking to ${download_dir}')

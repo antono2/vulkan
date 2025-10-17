@@ -1,6 +1,6 @@
 Module {
 	name: 'vulkan'
-	author: 'antono2@github.com'
+	author: 'Anton Oreskin'
 	description: 'V Vulkan Bindings'
 	version: '1.0.0'
 	repo_url: 'https://github.com/antono2/vulkan'
