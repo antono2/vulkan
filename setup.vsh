@@ -81,7 +81,7 @@ match cur_os {
     println('Got all the files, but that\'s not enough.')
     println('Please take a look at ${download_dir}/${version}/README.txt')
     println('Manually append this to your \'~/.bashrc\' to make required environment variables permanent:')
-    println('source ${download_dir}/${version}/setup-env.sh')
+    println('\nsource ${download_dir}/${version}/setup-env.sh\n')
   }
   .windows {
     println('Go double click ${file_path}. It will run the setup and configure your environment variables.')
@@ -99,10 +99,10 @@ env_vk_sdk := $env('VULKAN_SDK')
 if env_vk_sdk != '' {
   println('VULKAN_SDK is GOOD.')
   env_path := $env('PATH')
-  if !env_path.contains('${env_vk_sdk}/bin') {
+  if env_path.contains('${env_vk_sdk}/bin') || env_path.to_lower().contains('${env_vk_sdk}\bin') {
     println('PATH is GOOD.')
   } else {
-    println('PATH is NOT SET for vulkan. Should be ${env_vk_sdk}/bin')
+    println('PATH is NOT SET for vulkan.\nShould be something like ${env_vk_sdk}/bin')
   }
 } else { println('VULKAN_SDK is NOT SET.') }
 
