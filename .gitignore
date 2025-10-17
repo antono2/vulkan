@@ -300,5 +300,6 @@ cache/
 *.gfxr
 *.so
 
+setup
+AvailableVulkanVersions.json
 
-examples/vk_glfw_volk
