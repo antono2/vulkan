@@ -13,7 +13,7 @@ v install https://github.com/antono2/vulkan
 ```
 
 ## Examples
-An example can be found at  [antono2/v_vulkan_bindings/test](https://github.com/antono2/v_vulkan_bindings/tree/master/test).
+An example can be found at  [antono2/v_vulkan_bindings/test](https://github.com/antono2/v_vulkan_bindings/tree/master/test).</br>
 A video decode app using `vulkan_video.v` can be found at [antono2/v_vulkan_video](https://github.com/antono2/v_vulkan_video).
 
 ## Generate
