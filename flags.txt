@@ -1,0 +1,23 @@
+// PICK YOUR FLAGS
+// In this configuration it's assumed the `VULKAN_SDK` environment variable is set
+// and volk is used for loading functions
+
+
+#flag linux -I$env('VULKAN_SDK')/include
+#flag linux -I$env('VULKAN_SDK')/include/vulkan
+#flag linux -I$env('VULKAN_SDK')/include/volk
+#flag linux -L$env('VULKAN_SDK')/lib
+#flag windows -I$env('VULKAN_SDK')/Include
+#flag windows -I$env('VULKAN_SDK')/Include/vulkan
+#flag windows -I$env('VULKAN_SDK')/Include/Volk
+#flag windows -L$env('VULKAN_SDK')/Lib
+
+//#include "vulkan.h"
+#define VOLK_IMPLEMENTATION
+#define VK_NO_PROTOTYPES
+#include "volk.h"
+
+fn C.volkInitialize() vk.Result
+fn C.volkLoadInstance(vk.Instance)
+fn C.volkLoadDevice(vk.Device)
+
