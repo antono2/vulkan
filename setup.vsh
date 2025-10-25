@@ -8,7 +8,6 @@
 
 import net.http as web
 import json
-import os
 
 struct VulkanVersions {
 mut:
@@ -22,24 +21,24 @@ enum CurOS {
   linux
   macos
   windows
+  warm
   other
 }
 
 // print command then execute it
 fn sh(cmd string) {
-	println('❯ ${cmd}')
-	print(execute_or_exit(cmd).output)
+  println('❯ ${cmd}')
+  print(execute_or_exit(cmd).output)
 }
 
 versions_path := 'AvailableVulkanVersions.json'
 web.download_file('https://vulkan.lunarg.com/sdk/latest.json', versions_path) or { panic('Could not download the latest Vulkan SDK version. ${err}') }
-versions_json := os.read_file(versions_path) or { panic('Could not read file ${versions_path}. ${err}') }
+versions_json := read_file(versions_path) or { panic('Could not read file ${versions_path}. ${err}') }
 println('Got current versions:\n${versions_json}')
 versions := json.decode(VulkanVersions, versions_json) or { panic('Could not decode json for latest Vulkan SDK version. ${err}') }
 
 mut version := 'none'
 mut cur_os := CurOS.other
-//mut file_name := 'none'
 mut file_type := 'none'
 
 $if linux {
@@ -64,16 +63,15 @@ if version == 'none' {
 }
 
 file_name := '${version}_vulkan_sdk.${file_type}'
-download_dir := os.vmodules_dir()
+download_dir := vmodules_dir()
 file_path := '${download_dir}/${file_name}'
 download_url := 'https://sdk.lunarg.com/sdk/download/${version}/linux/vulkan_sdk.${file_type}'
 
 println('Downloading to ${file_path}\nfrom\n${download_url}')
 web.download_file(download_url, file_path) or { panic('Could not download Vulkan SDK from ${download_url}. ${err}') }
-println('Saved Vulkan Software Development Kit to ${file_path}')
+println('Saved Vulkan Software Development Kit to')
+println(file_path)
 
-
-// NOTE: We could update .bashrc and other shell configs automatically to make env vars permanent
 match cur_os {
   .linux {
     println('Unpacking to ${download_dir}')
@@ -89,8 +87,11 @@ match cur_os {
   .macos {
     println('SDK available to unpack at ${file_path}')
   }
+  .warm {
+    println('SDK available to unpack at ${file_path}')
+  }
   else {
-    panic('Not sure which OS to install Vulkan SDK for.')
+    println('SDK available at ${file_path}')
   }
 }
 
@@ -106,7 +107,8 @@ if env_vk_sdk != '' {
   }
 } else { println('VULKAN_SDK is NOT SET.') }
 
-if $env('LD_LIBRARY_PATH') != '' { println('LD_LIBRARY_PATH is GOOD.') } else { println('LD_LIBRARY_PATH is NOT SET.') }
+if $env('LD_LIBRARY_PATH') != '' &&
+   $env('LD_LIBRARY_PATH').contains($env('VULKAN_SDK')) { println('LD_LIBRARY_PATH is GOOD.') } else { println('LD_LIBRARY_PATH is NOT SET.') }
 if $env('VK_LAYER_PATH') != '' { println('VK_LAYER_PATH is GOOD.') } else { println('VK_LAYER_PATH is NOT SET.') }
 if $env('VK_ADD_LAYER_PATH') != '' { println('VK_ADD_LAYER_PATH is GOOD.') } else { println('VK_ADD_LAYER_PATH is NOT SET.') }
 if $env('PKG_CONFIG_PATH') != '' { println('PKG_CONFIG_PATH is GOOD.') } else { println('PKG_CONFIG_PATH is NOT SET.') }
