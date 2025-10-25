@@ -95,7 +95,8 @@ match cur_os {
   }
 }
 
-// Check which environment variables are already set
+println('')
+println('Checking which environment variables are already set:')
 env_vk_sdk := $env('VULKAN_SDK')
 if env_vk_sdk != '' {
   println('VULKAN_SDK is GOOD.')
