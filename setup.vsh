@@ -88,7 +88,7 @@ match cur_os {
     println('SDK available to unpack at ${file_path}')
   }
   .warm {
-    println('SDK available to unpack at ${file_path}')
+    println('SDK available at ${file_path}')
   }
   else {
     println('SDK available at ${file_path}')
