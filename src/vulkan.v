@@ -29,8 +29,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // patch version should always be set to 0
-pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // patch version should always be set to 0
-pub const header_version = 329
+pub const header_version = 330
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -64,6 +63,8 @@ pub fn api_version_minor(version u32) u32 {
 pub fn api_version_patch(version u32) u32 {
 	return version & u32(0xFFF)
 }
+
+pub const api_version_1_0 = make_api_version(0, 1, 0, 0) // patch version should always be set to 0
 
 pub type Bool32 = u32
 pub type DeviceAddress = u64
@@ -101,17 +102,26 @@ pub type Fence = voidptr
 // Pointer to VkDeviceMemory_T
 pub type DeviceMemory = voidptr
 
-// Pointer to VkEvent_T
-pub type Event = voidptr
-
 // Pointer to VkQueryPool_T
 pub type QueryPool = voidptr
 
-// Pointer to VkBufferView_T
-pub type BufferView = voidptr
-
 // Pointer to VkImageView_T
 pub type ImageView = voidptr
+
+// Pointer to VkCommandPool_T
+pub type CommandPool = voidptr
+
+// Pointer to VkRenderPass_T
+pub type RenderPass = voidptr
+
+// Pointer to VkFramebuffer_T
+pub type Framebuffer = voidptr
+
+// Pointer to VkEvent_T
+pub type Event = voidptr
+
+// Pointer to VkBufferView_T
+pub type BufferView = voidptr
 
 // Pointer to VkShaderModule_T
 pub type ShaderModule = voidptr
@@ -125,9 +135,6 @@ pub type PipelineLayout = voidptr
 // Pointer to VkPipeline_T
 pub type Pipeline = voidptr
 
-// Pointer to VkRenderPass_T
-pub type RenderPass = voidptr
-
 // Pointer to VkDescriptorSetLayout_T
 pub type DescriptorSetLayout = voidptr
 
@@ -140,19 +147,11 @@ pub type DescriptorSet = voidptr
 // Pointer to VkDescriptorPool_T
 pub type DescriptorPool = voidptr
 
-// Pointer to VkFramebuffer_T
-pub type Framebuffer = voidptr
-
-// Pointer to VkCommandPool_T
-pub type CommandPool = voidptr
-
-pub const attachment_unused = ~u32(0)
 pub const _false = u32(0)
 pub const lod_clamp_none = f32(1000.0)
 pub const queue_family_ignored = ~u32(0)
 pub const remaining_array_layers = ~u32(0)
 pub const remaining_mip_levels = ~u32(0)
-pub const subpass_external = ~u32(0)
 pub const _true = u32(1)
 pub const whole_size = ~u64(0)
 pub const max_memory_types = u32(32)
@@ -161,6 +160,8 @@ pub const uuid_size = u32(16)
 pub const max_extension_name_size = u32(256)
 pub const max_description_size = u32(256)
 pub const max_memory_heaps = u32(16)
+pub const attachment_unused = ~u32(0)
+pub const subpass_external = ~u32(0)
 
 pub enum Result {
 	success                                            = 0
@@ -185,8 +186,8 @@ pub enum Result {
 	error_validation_failed                            = -1000011001
 	error_out_of_pool_memory                           = -1000069000
 	error_invalid_external_handle                      = -1000072003
-	error_fragmentation                                = -1000161000
 	error_invalid_opaque_capture_address               = -1000257000
+	error_fragmentation                                = -1000161000
 	pipeline_compile_required                          = 1000297000
 	error_not_permitted                                = -1000174001
 	error_surface_lost_khr                             = -1000000000
@@ -265,14 +266,11 @@ pub enum StructureType as u32 {
 	memory_barrier                                                        = 46
 	loader_instance_create_info                                           = 47
 	loader_device_create_info                                             = 48
-	physical_device_subgroup_properties                                   = 1000094000
 	bind_buffer_memory_info                                               = 1000157000
 	bind_image_memory_info                                                = 1000157001
-	physical_device16bit_storage_features                                 = 1000083000
 	memory_dedicated_requirements                                         = 1000127000
 	memory_dedicated_allocate_info                                        = 1000127001
 	memory_allocate_flags_info                                            = 1000060000
-	device_group_render_pass_begin_info                                   = 1000060003
 	device_group_command_buffer_begin_info                                = 1000060004
 	device_group_submit_info                                              = 1000060005
 	device_group_bind_sparse_info                                         = 1000060006
@@ -294,25 +292,11 @@ pub enum StructureType as u32 {
 	physical_device_memory_properties2                                    = 1000059006
 	sparse_image_format_properties2                                       = 1000059007
 	physical_device_sparse_image_format_info2                             = 1000059008
-	physical_device_point_clipping_properties                             = 1000117000
-	render_pass_input_attachment_aspect_create_info                       = 1000117001
 	image_view_usage_create_info                                          = 1000117002
-	pipeline_tessellation_domain_origin_state_create_info                 = 1000117003
-	render_pass_multiview_create_info                                     = 1000053000
-	physical_device_multiview_features                                    = 1000053001
-	physical_device_multiview_properties                                  = 1000053002
-	physical_device_variable_pointers_features                            = 1000120000
 	protected_submit_info                                                 = 1000145000
 	physical_device_protected_memory_features                             = 1000145001
 	physical_device_protected_memory_properties                           = 1000145002
 	device_queue_info2                                                    = 1000145003
-	sampler_ycbcr_conversion_create_info                                  = 1000156000
-	sampler_ycbcr_conversion_info                                         = 1000156001
-	bind_image_plane_memory_info                                          = 1000156002
-	image_plane_memory_requirements_info                                  = 1000156003
-	physical_device_sampler_ycbcr_conversion_features                     = 1000156004
-	sampler_ycbcr_conversion_image_format_properties                      = 1000156005
-	descriptor_update_template_create_info                                = 1000085000
 	physical_device_external_image_format_info                            = 1000071000
 	external_image_format_properties                                      = 1000071001
 	physical_device_external_buffer_info                                  = 1000071002
@@ -327,47 +311,33 @@ pub enum StructureType as u32 {
 	export_semaphore_create_info                                          = 1000077000
 	physical_device_external_semaphore_info                               = 1000076000
 	external_semaphore_properties                                         = 1000076001
+	physical_device_subgroup_properties                                   = 1000094000
+	physical_device16bit_storage_features                                 = 1000083000
+	physical_device_variable_pointers_features                            = 1000120000
+	descriptor_update_template_create_info                                = 1000085000
 	physical_device_maintenance3_properties                               = 1000168000
 	descriptor_set_layout_support                                         = 1000168001
+	sampler_ycbcr_conversion_create_info                                  = 1000156000
+	sampler_ycbcr_conversion_info                                         = 1000156001
+	bind_image_plane_memory_info                                          = 1000156002
+	image_plane_memory_requirements_info                                  = 1000156003
+	physical_device_sampler_ycbcr_conversion_features                     = 1000156004
+	sampler_ycbcr_conversion_image_format_properties                      = 1000156005
+	device_group_render_pass_begin_info                                   = 1000060003
+	physical_device_point_clipping_properties                             = 1000117000
+	render_pass_input_attachment_aspect_create_info                       = 1000117001
+	pipeline_tessellation_domain_origin_state_create_info                 = 1000117003
+	render_pass_multiview_create_info                                     = 1000053000
+	physical_device_multiview_features                                    = 1000053001
+	physical_device_multiview_properties                                  = 1000053002
 	physical_device_shader_draw_parameters_features                       = 1000063000
 	physical_device_vulkan1_1_features                                    = 49
 	physical_device_vulkan1_1_properties                                  = 50
 	physical_device_vulkan1_2_features                                    = 51
 	physical_device_vulkan1_2_properties                                  = 52
 	image_format_list_create_info                                         = 1000147000
-	attachment_description2                                               = 1000109000
-	attachment_reference2                                                 = 1000109001
-	subpass_description2                                                  = 1000109002
-	subpass_dependency2                                                   = 1000109003
-	render_pass_create_info2                                              = 1000109004
-	subpass_begin_info                                                    = 1000109005
-	subpass_end_info                                                      = 1000109006
-	physical_device8bit_storage_features                                  = 1000177000
 	physical_device_driver_properties                                     = 1000196000
-	physical_device_shader_atomic_int64_features                          = 1000180000
-	physical_device_shader_float16_int8_features                          = 1000082000
-	physical_device_float_controls_properties                             = 1000197000
-	descriptor_set_layout_binding_flags_create_info                       = 1000161000
-	physical_device_descriptor_indexing_features                          = 1000161001
-	physical_device_descriptor_indexing_properties                        = 1000161002
-	descriptor_set_variable_descriptor_count_allocate_info                = 1000161003
-	descriptor_set_variable_descriptor_count_layout_support               = 1000161004
-	physical_device_depth_stencil_resolve_properties                      = 1000199000
-	subpass_description_depth_stencil_resolve                             = 1000199001
-	physical_device_scalar_block_layout_features                          = 1000221000
-	image_stencil_usage_create_info                                       = 1000246000
-	physical_device_sampler_filter_minmax_properties                      = 1000130000
-	sampler_reduction_mode_create_info                                    = 1000130001
 	physical_device_vulkan_memory_model_features                          = 1000211000
-	physical_device_imageless_framebuffer_features                        = 1000108000
-	framebuffer_attachments_create_info                                   = 1000108001
-	framebuffer_attachment_image_info                                     = 1000108002
-	render_pass_attachment_begin_info                                     = 1000108003
-	physical_device_uniform_buffer_standard_layout_features               = 1000253000
-	physical_device_shader_subgroup_extended_types_features               = 1000175000
-	physical_device_separate_depth_stencil_layouts_features               = 1000241000
-	attachment_reference_stencil_layout                                   = 1000241001
-	attachment_description_stencil_layout                                 = 1000241002
 	physical_device_host_query_reset_features                             = 1000261000
 	physical_device_timeline_semaphore_features                           = 1000207000
 	physical_device_timeline_semaphore_properties                         = 1000207001
@@ -380,16 +350,43 @@ pub enum StructureType as u32 {
 	buffer_opaque_capture_address_create_info                             = 1000257002
 	memory_opaque_capture_address_allocate_info                           = 1000257003
 	device_memory_opaque_capture_address_info                             = 1000257004
+	physical_device8bit_storage_features                                  = 1000177000
+	physical_device_shader_atomic_int64_features                          = 1000180000
+	physical_device_shader_float16_int8_features                          = 1000082000
+	physical_device_float_controls_properties                             = 1000197000
+	descriptor_set_layout_binding_flags_create_info                       = 1000161000
+	physical_device_descriptor_indexing_features                          = 1000161001
+	physical_device_descriptor_indexing_properties                        = 1000161002
+	descriptor_set_variable_descriptor_count_allocate_info                = 1000161003
+	descriptor_set_variable_descriptor_count_layout_support               = 1000161004
+	physical_device_scalar_block_layout_features                          = 1000221000
+	physical_device_sampler_filter_minmax_properties                      = 1000130000
+	sampler_reduction_mode_create_info                                    = 1000130001
+	physical_device_uniform_buffer_standard_layout_features               = 1000253000
+	physical_device_shader_subgroup_extended_types_features               = 1000175000
+	attachment_description2                                               = 1000109000
+	attachment_reference2                                                 = 1000109001
+	subpass_description2                                                  = 1000109002
+	subpass_dependency2                                                   = 1000109003
+	render_pass_create_info2                                              = 1000109004
+	subpass_begin_info                                                    = 1000109005
+	subpass_end_info                                                      = 1000109006
+	physical_device_depth_stencil_resolve_properties                      = 1000199000
+	subpass_description_depth_stencil_resolve                             = 1000199001
+	image_stencil_usage_create_info                                       = 1000246000
+	physical_device_imageless_framebuffer_features                        = 1000108000
+	framebuffer_attachments_create_info                                   = 1000108001
+	framebuffer_attachment_image_info                                     = 1000108002
+	render_pass_attachment_begin_info                                     = 1000108003
+	physical_device_separate_depth_stencil_layouts_features               = 1000241000
+	attachment_reference_stencil_layout                                   = 1000241001
+	attachment_description_stencil_layout                                 = 1000241002
 	physical_device_vulkan1_3_features                                    = 53
 	physical_device_vulkan1_3_properties                                  = 54
-	pipeline_creation_feedback_create_info                                = 1000192000
-	physical_device_shader_terminate_invocation_features                  = 1000215000
 	physical_device_tool_properties                                       = 1000245000
-	physical_device_shader_demote_to_helper_invocation_features           = 1000276000
 	physical_device_private_data_features                                 = 1000295000
 	device_private_data_create_info                                       = 1000295001
 	private_data_slot_create_info                                         = 1000295002
-	physical_device_pipeline_creation_cache_control_features              = 1000297000
 	memory_barrier2                                                       = 1000314000
 	buffer_memory_barrier2                                                = 1000314001
 	image_memory_barrier2                                                 = 1000314002
@@ -398,19 +395,25 @@ pub enum StructureType as u32 {
 	semaphore_submit_info                                                 = 1000314005
 	command_buffer_submit_info                                            = 1000314006
 	physical_device_synchronization2_features                             = 1000314007
-	physical_device_zero_initialize_workgroup_memory_features             = 1000325000
-	physical_device_image_robustness_features                             = 1000335000
 	copy_buffer_info2                                                     = 1000337000
 	copy_image_info2                                                      = 1000337001
 	copy_buffer_to_image_info2                                            = 1000337002
 	copy_image_to_buffer_info2                                            = 1000337003
-	blit_image_info2                                                      = 1000337004
-	resolve_image_info2                                                   = 1000337005
 	buffer_copy2                                                          = 1000337006
 	image_copy2                                                           = 1000337007
-	image_blit2                                                           = 1000337008
 	buffer_image_copy2                                                    = 1000337009
-	image_resolve2                                                        = 1000337010
+	physical_device_texture_compression_astc_hdr_features                 = 1000066000
+	format_properties3                                                    = 1000360000
+	physical_device_maintenance4_features                                 = 1000413000
+	physical_device_maintenance4_properties                               = 1000413001
+	device_buffer_memory_requirements                                     = 1000413002
+	device_image_memory_requirements                                      = 1000413003
+	pipeline_creation_feedback_create_info                                = 1000192000
+	physical_device_shader_terminate_invocation_features                  = 1000215000
+	physical_device_shader_demote_to_helper_invocation_features           = 1000276000
+	physical_device_pipeline_creation_cache_control_features              = 1000297000
+	physical_device_zero_initialize_workgroup_memory_features             = 1000325000
+	physical_device_image_robustness_features                             = 1000335000
 	physical_device_subgroup_size_control_properties                      = 1000225000
 	pipeline_shader_stage_required_subgroup_size_create_info              = 1000225001
 	physical_device_subgroup_size_control_features                        = 1000225002
@@ -418,60 +421,35 @@ pub enum StructureType as u32 {
 	physical_device_inline_uniform_block_properties                       = 1000138001
 	write_descriptor_set_inline_uniform_block                             = 1000138002
 	descriptor_pool_inline_uniform_block_create_info                      = 1000138003
-	physical_device_texture_compression_astc_hdr_features                 = 1000066000
+	physical_device_shader_integer_dot_product_features                   = 1000280000
+	physical_device_shader_integer_dot_product_properties                 = 1000280001
+	physical_device_texel_buffer_alignment_properties                     = 1000281001
+	blit_image_info2                                                      = 1000337004
+	resolve_image_info2                                                   = 1000337005
+	image_blit2                                                           = 1000337008
+	image_resolve2                                                        = 1000337010
 	rendering_info                                                        = 1000044000
 	rendering_attachment_info                                             = 1000044001
 	pipeline_rendering_create_info                                        = 1000044002
 	physical_device_dynamic_rendering_features                            = 1000044003
 	command_buffer_inheritance_rendering_info                             = 1000044004
-	physical_device_shader_integer_dot_product_features                   = 1000280000
-	physical_device_shader_integer_dot_product_properties                 = 1000280001
-	physical_device_texel_buffer_alignment_properties                     = 1000281001
-	format_properties3                                                    = 1000360000
-	physical_device_maintenance4_features                                 = 1000413000
-	physical_device_maintenance4_properties                               = 1000413001
-	device_buffer_memory_requirements                                     = 1000413002
-	device_image_memory_requirements                                      = 1000413003
 	physical_device_vulkan1_4_features                                    = 55
 	physical_device_vulkan1_4_properties                                  = 56
 	device_queue_global_priority_create_info                              = 1000174000
 	physical_device_global_priority_query_features                        = 1000388000
 	queue_family_global_priority_properties                               = 1000388001
-	physical_device_shader_subgroup_rotate_features                       = 1000416000
-	physical_device_shader_float_controls2_features                       = 1000528000
-	physical_device_shader_expect_assume_features                         = 1000544000
-	physical_device_line_rasterization_features                           = 1000259000
-	pipeline_rasterization_line_state_create_info                         = 1000259001
-	physical_device_line_rasterization_properties                         = 1000259002
-	physical_device_vertex_attribute_divisor_properties                   = 1000525000
-	pipeline_vertex_input_divisor_state_create_info                       = 1000190001
-	physical_device_vertex_attribute_divisor_features                     = 1000190002
 	physical_device_index_type_uint8_features                             = 1000265000
 	memory_map_info                                                       = 1000271000
 	memory_unmap_info                                                     = 1000271001
 	physical_device_maintenance5_features                                 = 1000470000
 	physical_device_maintenance5_properties                               = 1000470001
-	rendering_area_info                                                   = 1000470003
 	device_image_subresource_info                                         = 1000470004
 	subresource_layout2                                                   = 1000338002
 	image_subresource2                                                    = 1000338003
-	pipeline_create_flags2_create_info                                    = 1000470005
 	buffer_usage_flags2_create_info                                       = 1000470006
-	physical_device_push_descriptor_properties                            = 1000080000
-	physical_device_dynamic_rendering_local_read_features                 = 1000232000
-	rendering_attachment_location_info                                    = 1000232001
-	rendering_input_attachment_index_info                                 = 1000232002
 	physical_device_maintenance6_features                                 = 1000545000
 	physical_device_maintenance6_properties                               = 1000545001
 	bind_memory_status                                                    = 1000545002
-	bind_descriptor_sets_info                                             = 1000545003
-	push_constants_info                                                   = 1000545004
-	push_descriptor_set_info                                              = 1000545005
-	push_descriptor_set_with_template_info                                = 1000545006
-	physical_device_pipeline_protected_access_features                    = 1000466000
-	pipeline_robustness_create_info                                       = 1000068000
-	physical_device_pipeline_robustness_features                          = 1000068001
-	physical_device_pipeline_robustness_properties                        = 1000068002
 	physical_device_host_image_copy_features                              = 1000270000
 	physical_device_host_image_copy_properties                            = 1000270001
 	memory_to_image_copy                                                  = 1000270002
@@ -482,6 +460,29 @@ pub enum StructureType as u32 {
 	copy_image_to_image_info                                              = 1000270007
 	subresource_host_memcpy_size                                          = 1000270008
 	host_image_copy_device_performance_query                              = 1000270009
+	physical_device_shader_subgroup_rotate_features                       = 1000416000
+	physical_device_shader_float_controls2_features                       = 1000528000
+	physical_device_shader_expect_assume_features                         = 1000544000
+	pipeline_create_flags2_create_info                                    = 1000470005
+	physical_device_push_descriptor_properties                            = 1000080000
+	bind_descriptor_sets_info                                             = 1000545003
+	push_constants_info                                                   = 1000545004
+	push_descriptor_set_info                                              = 1000545005
+	push_descriptor_set_with_template_info                                = 1000545006
+	physical_device_pipeline_protected_access_features                    = 1000466000
+	pipeline_robustness_create_info                                       = 1000068000
+	physical_device_pipeline_robustness_features                          = 1000068001
+	physical_device_pipeline_robustness_properties                        = 1000068002
+	physical_device_line_rasterization_features                           = 1000259000
+	pipeline_rasterization_line_state_create_info                         = 1000259001
+	physical_device_line_rasterization_properties                         = 1000259002
+	physical_device_vertex_attribute_divisor_properties                   = 1000525000
+	pipeline_vertex_input_divisor_state_create_info                       = 1000190001
+	physical_device_vertex_attribute_divisor_features                     = 1000190002
+	rendering_area_info                                                   = 1000470003
+	physical_device_dynamic_rendering_local_read_features                 = 1000232000
+	rendering_attachment_location_info                                    = 1000232001
+	rendering_input_attachment_index_info                                 = 1000232002
 	swapchain_create_info_khr                                             = 1000001000
 	present_info_khr                                                      = 1000001001
 	device_group_present_capabilities_khr                                 = 1000060007
@@ -990,8 +991,6 @@ pub enum StructureType as u32 {
 	render_pass_stripe_info_arm                                           = 1000424003
 	render_pass_stripe_submit_info_arm                                    = 1000424004
 	physical_device_copy_memory_indirect_features_nv                      = 1000426000
-	physical_device_memory_decompression_features_nv                      = 1000427000
-	physical_device_memory_decompression_properties_nv                    = 1000427001
 	physical_device_device_generated_commands_compute_features_nv         = 1000428000
 	compute_pipeline_indirect_buffer_info_nv                              = 1000428001
 	pipeline_indirect_device_address_info_nv                              = 1000428002
@@ -1199,6 +1198,9 @@ pub enum StructureType as u32 {
 	physical_device_copy_memory_indirect_properties_khr                   = 1000426001
 	copy_memory_indirect_info_khr                                         = 1000549002
 	copy_memory_to_image_indirect_info_khr                                = 1000549003
+	physical_device_memory_decompression_features_ext                     = 1000427000
+	physical_device_memory_decompression_properties_ext                   = 1000427001
+	decompress_memory_info_ext                                            = 1000550002
 	display_surface_stereo_create_info_nv                                 = 1000551000
 	display_mode_stereo_properties_nv                                     = 1000551001
 	video_encode_intra_refresh_capabilities_khr                           = 1000552000
@@ -1276,6 +1278,9 @@ pub enum StructureType as u32 {
 	video_decode_h265_inline_session_parameters_info_khr                  = 1000586002
 	video_decode_av1_inline_session_parameters_info_khr                   = 1000586003
 	surface_create_info_ohos                                              = 1000685000
+	native_buffer_ohos                                                    = 1000453001
+	swapchain_image_create_info_ohos                                      = 1000453002
+	physical_device_presentation_properties_ohos                          = 1000453003
 	physical_device_hdr_vivid_features_huawei                             = 1000590000
 	hdr_vivid_dynamic_metadata_huawei                                     = 1000590001
 	physical_device_cooperative_matrix2_features_nv                       = 1000593000
@@ -1296,16 +1301,17 @@ pub enum StructureType as u32 {
 	physical_device_fragment_density_map_offset_features_ext              = 1000425000
 	physical_device_fragment_density_map_offset_properties_ext            = 1000425001
 	render_pass_fragment_density_map_offset_end_info_ext                  = 1000425002
-	rendering_end_info_ext                                                = 1000619003
 	physical_device_zero_initialize_device_memory_features_ext            = 1000620000
 	physical_device_present_mode_fifo_latest_ready_features_khr           = 1000361000
+	physical_device_shader64_bit_indexing_features_ext                    = 1000627000
+	physical_device_maintenance10_features_khr                            = 1000630000
+	physical_device_maintenance10_properties_khr                          = 1000630001
+	rendering_attachment_flags_info_khr                                   = 1000630002
+	rendering_end_info_khr                                                = 1000619003
+	resolve_image_mode_info_khr                                           = 1000630004
 	physical_device_pipeline_cache_incremental_mode_features_sec          = 1000637000
+	physical_device_shader_uniform_buffer_unsized_array_features_ext      = 1000642000
 	max_enum                                                              = max_int
-}
-
-pub enum PipelineCacheHeaderVersion as u32 {
-	one      = 1
-	max_enum = max_int
 }
 
 pub enum ImageLayout as u32 {
@@ -1371,8 +1377,8 @@ pub enum ObjectType as u32 {
 	descriptor_set                  = 23
 	framebuffer                     = 24
 	command_pool                    = 25
-	sampler_ycbcr_conversion        = 1000156000
 	descriptor_update_template      = 1000085000
+	sampler_ycbcr_conversion        = 1000156000
 	private_data_slot               = 1000295000
 	surface_khr                     = 1000000000
 	swapchain_khr                   = 1000001000
@@ -1771,6 +1777,103 @@ pub enum ImageViewType as u32 {
 	max_enum   = max_int
 }
 
+pub enum CommandBufferLevel as u32 {
+	primary   = 0
+	secondary = 1
+	max_enum  = max_int
+}
+
+pub enum IndexType as u32 {
+	uint16   = 0
+	uint32   = 1
+	uint8    = 1000265000
+	none_khr = 1000165000
+	max_enum = max_int
+}
+
+pub enum PipelineCacheHeaderVersion as u32 {
+	one      = 1
+	max_enum = max_int
+}
+
+pub enum BorderColor as u32 {
+	float_transparent_black = 0
+	int_transparent_black   = 1
+	float_opaque_black      = 2
+	int_opaque_black        = 3
+	float_opaque_white      = 4
+	int_opaque_white        = 5
+	float_custom_ext        = 1000287003
+	int_custom_ext          = 1000287004
+	max_enum                = max_int
+}
+
+pub enum Filter as u32 {
+	nearest   = 0
+	linear    = 1
+	cubic_ext = 1000015000
+	max_enum  = max_int
+}
+
+pub enum SamplerAddressMode as u32 {
+	repeat               = 0
+	mirrored_repeat      = 1
+	clamp_to_edge        = 2
+	clamp_to_border      = 3
+	mirror_clamp_to_edge = 4
+	max_enum             = max_int
+}
+
+pub enum SamplerMipmapMode as u32 {
+	nearest  = 0
+	linear   = 1
+	max_enum = max_int
+}
+
+pub enum CompareOp as u32 {
+	never            = 0
+	less             = 1
+	equal            = 2
+	less_or_equal    = 3
+	greater          = 4
+	not_equal        = 5
+	greater_or_equal = 6
+	always           = 7
+	max_enum         = max_int
+}
+
+pub enum DescriptorType as u32 {
+	sampler                               = 0
+	combined_image_sampler                = 1
+	sampled_image                         = 2
+	storage_image                         = 3
+	uniform_texel_buffer                  = 4
+	storage_texel_buffer                  = 5
+	uniform_buffer                        = 6
+	storage_buffer                        = 7
+	uniform_buffer_dynamic                = 8
+	storage_buffer_dynamic                = 9
+	input_attachment                      = 10
+	inline_uniform_block                  = 1000138000
+	acceleration_structure_khr            = 1000150000
+	acceleration_structure_nv             = 1000165000
+	sample_weight_image_qcom              = 1000440000
+	block_match_image_qcom                = 1000440001
+	tensor_arm                            = 1000460000
+	mutable_ext                           = 1000351000
+	partitioned_acceleration_structure_nv = 1000570000
+	max_enum                              = max_int
+}
+
+pub enum PipelineBindPoint as u32 {
+	graphics               = 0
+	compute                = 1
+	ray_tracing_khr        = 1000165000
+	subpass_shading_huawei = 1000369003
+	data_graph_arm         = 1000507000
+	max_enum               = max_int
+}
+
 pub enum BlendFactor as u32 {
 	zero                     = 0
 	one                      = 1
@@ -1847,18 +1950,6 @@ pub enum BlendOp as u32 {
 	green_ext              = 1000148044
 	blue_ext               = 1000148045
 	max_enum               = max_int
-}
-
-pub enum CompareOp as u32 {
-	never            = 0
-	less             = 1
-	equal            = 2
-	less_or_equal    = 3
-	greater          = 4
-	not_equal        = 5
-	greater_or_equal = 6
-	always           = 7
-	max_enum         = max_int
 }
 
 pub enum DynamicState as u32 {
@@ -2005,63 +2096,6 @@ pub enum LogicOp as u32 {
 	max_enum      = max_int
 }
 
-pub enum BorderColor as u32 {
-	float_transparent_black = 0
-	int_transparent_black   = 1
-	float_opaque_black      = 2
-	int_opaque_black        = 3
-	float_opaque_white      = 4
-	int_opaque_white        = 5
-	float_custom_ext        = 1000287003
-	int_custom_ext          = 1000287004
-	max_enum                = max_int
-}
-
-pub enum Filter as u32 {
-	nearest   = 0
-	linear    = 1
-	cubic_ext = 1000015000
-	max_enum  = max_int
-}
-
-pub enum SamplerAddressMode as u32 {
-	repeat               = 0
-	mirrored_repeat      = 1
-	clamp_to_edge        = 2
-	clamp_to_border      = 3
-	mirror_clamp_to_edge = 4
-	max_enum             = max_int
-}
-
-pub enum SamplerMipmapMode as u32 {
-	nearest  = 0
-	linear   = 1
-	max_enum = max_int
-}
-
-pub enum DescriptorType as u32 {
-	sampler                               = 0
-	combined_image_sampler                = 1
-	sampled_image                         = 2
-	storage_image                         = 3
-	uniform_texel_buffer                  = 4
-	storage_texel_buffer                  = 5
-	uniform_buffer                        = 6
-	storage_buffer                        = 7
-	uniform_buffer_dynamic                = 8
-	storage_buffer_dynamic                = 9
-	input_attachment                      = 10
-	inline_uniform_block                  = 1000138000
-	acceleration_structure_khr            = 1000150000
-	acceleration_structure_nv             = 1000165000
-	sample_weight_image_qcom              = 1000440000
-	block_match_image_qcom                = 1000440001
-	tensor_arm                            = 1000460000
-	mutable_ext                           = 1000351000
-	partitioned_acceleration_structure_nv = 1000570000
-	max_enum                              = max_int
-}
-
 pub enum AttachmentLoadOp as u32 {
 	load      = 0
 	clear     = 1
@@ -2075,29 +2109,6 @@ pub enum AttachmentStoreOp as u32 {
 	dont_care = 1
 	none      = 1000301000
 	max_enum  = max_int
-}
-
-pub enum PipelineBindPoint as u32 {
-	graphics               = 0
-	compute                = 1
-	ray_tracing_khr        = 1000165000
-	subpass_shading_huawei = 1000369003
-	data_graph_arm         = 1000507000
-	max_enum               = max_int
-}
-
-pub enum CommandBufferLevel as u32 {
-	primary   = 0
-	secondary = 1
-	max_enum  = max_int
-}
-
-pub enum IndexType as u32 {
-	uint16   = 0
-	uint32   = 1
-	uint8    = 1000265000
-	none_khr = 1000165000
-	max_enum = max_int
 }
 
 pub enum SubpassContents as u32 {
@@ -2369,11 +2380,11 @@ pub enum FenceCreateFlagBits as u32 {
 pub type FenceCreateFlags = u32
 pub type SemaphoreCreateFlags = u32
 
-pub enum EventCreateFlagBits as u32 {
-	device_only = u32(0x00000001)
-	max_enum    = max_int
+pub enum QueryPoolCreateFlagBits as u32 {
+	reset    = u32(0x00000001)
+	max_enum = max_int
 }
-pub type EventCreateFlags = u32
+pub type QueryPoolCreateFlags = u32
 
 pub enum QueryPipelineStatisticFlagBits as u32 {
 	input_assembly_vertices                       = u32(0x00000001)
@@ -2393,12 +2404,6 @@ pub enum QueryPipelineStatisticFlagBits as u32 {
 	max_enum                                      = max_int
 }
 pub type QueryPipelineStatisticFlags = u32
-
-pub enum QueryPoolCreateFlagBits as u32 {
-	reset    = u32(0x00000001)
-	max_enum = max_int
-}
-pub type QueryPoolCreateFlags = u32
 
 pub enum QueryResultFlagBits as u32 {
 	_64               = u32(0x00000001)
@@ -2452,7 +2457,6 @@ pub enum BufferUsageFlagBits as u32 {
 	max_enum                                     = max_int
 }
 pub type BufferUsageFlags = u32
-pub type BufferViewCreateFlags = u32
 
 pub enum ImageViewCreateFlagBits as u32 {
 	fragment_density_map_dynamic_bit_ext     = u32(0x00000001)
@@ -2461,6 +2465,58 @@ pub enum ImageViewCreateFlagBits as u32 {
 	max_enum                                 = max_int
 }
 pub type ImageViewCreateFlags = u32
+
+pub enum DependencyFlagBits as u32 {
+	by_region                                      = u32(0x00000001)
+	device_group                                   = u32(0x00000004)
+	view_local                                     = u32(0x00000002)
+	feedback_loop_bit_ext                          = u32(0x00000008)
+	queue_family_ownership_transfer_use_all_stages = u32(0x00000020)
+	asymmetric_event                               = u32(0x00000040)
+	max_enum                                       = max_int
+}
+pub type DependencyFlags = u32
+
+pub enum CommandPoolCreateFlagBits as u32 {
+	transient            = u32(0x00000001)
+	reset_command_buffer = u32(0x00000002)
+	protected            = u32(0x00000004)
+	max_enum             = max_int
+}
+pub type CommandPoolCreateFlags = u32
+
+pub enum CommandPoolResetFlagBits as u32 {
+	release_resources = u32(0x00000001)
+	max_enum          = max_int
+}
+pub type CommandPoolResetFlags = u32
+
+pub enum CommandBufferUsageFlagBits as u32 {
+	one_time_submit      = u32(0x00000001)
+	render_pass_continue = u32(0x00000002)
+	simultaneous_use     = u32(0x00000004)
+	max_enum             = max_int
+}
+pub type CommandBufferUsageFlags = u32
+
+pub enum QueryControlFlagBits as u32 {
+	precise  = u32(0x00000001)
+	max_enum = max_int
+}
+pub type QueryControlFlags = u32
+
+pub enum CommandBufferResetFlagBits as u32 {
+	release_resources = u32(0x00000001)
+	max_enum          = max_int
+}
+pub type CommandBufferResetFlags = u32
+
+pub enum EventCreateFlagBits as u32 {
+	device_only = u32(0x00000001)
+	max_enum    = max_int
+}
+pub type EventCreateFlags = u32
+pub type BufferViewCreateFlags = u32
 pub type ShaderModuleCreateFlags = u32
 
 pub enum PipelineCacheCreateFlagBits as u32 {
@@ -2470,21 +2526,12 @@ pub enum PipelineCacheCreateFlagBits as u32 {
 }
 pub type PipelineCacheCreateFlags = u32
 
-pub enum ColorComponentFlagBits as u32 {
-	r        = u32(0x00000001)
-	g        = u32(0x00000002)
-	b        = u32(0x00000004)
-	a        = u32(0x00000008)
-	max_enum = max_int
-}
-pub type ColorComponentFlags = u32
-
 pub enum PipelineCreateFlagBits as u32 {
 	disable_optimization                              = u32(0x00000001)
 	allow_derivatives                                 = u32(0x00000002)
 	derivative                                        = u32(0x00000004)
-	view_index_from_device_index                      = u32(0x00000008)
 	dispatch_base                                     = u32(0x00000010)
+	view_index_from_device_index                      = u32(0x00000008)
 	fail_on_pipeline_compile_required                 = u32(0x00000100)
 	early_return_on_failure                           = u32(0x00000200)
 	no_protected_access                               = u32(0x08000000)
@@ -2542,35 +2589,6 @@ pub enum ShaderStageFlagBits as u32 {
 	cluster_culling_bit_huawei = u32(0x00080000)
 }
 
-pub enum CullModeFlagBits as u32 {
-	none           = 0
-	front          = u32(0x00000001)
-	back           = u32(0x00000002)
-	front_and_back = u32(0x00000003)
-	max_enum       = max_int
-}
-pub type CullModeFlags = u32
-pub type PipelineVertexInputStateCreateFlags = u32
-pub type PipelineInputAssemblyStateCreateFlags = u32
-pub type PipelineTessellationStateCreateFlags = u32
-pub type PipelineViewportStateCreateFlags = u32
-pub type PipelineRasterizationStateCreateFlags = u32
-pub type PipelineMultisampleStateCreateFlags = u32
-
-pub enum PipelineDepthStencilStateCreateFlagBits as u32 {
-	rasterization_order_attachment_depth_access_bit_ext   = u32(0x00000001)
-	rasterization_order_attachment_stencil_access_bit_ext = u32(0x00000002)
-	max_enum                                              = max_int
-}
-pub type PipelineDepthStencilStateCreateFlags = u32
-
-pub enum PipelineColorBlendStateCreateFlagBits as u32 {
-	rasterization_order_attachment_access_bit_ext = u32(0x00000001)
-	max_enum                                      = max_int
-}
-pub type PipelineColorBlendStateCreateFlags = u32
-pub type PipelineDynamicStateCreateFlags = u32
-
 pub enum PipelineLayoutCreateFlagBits as u32 {
 	independent_sets_bit_ext = u32(0x00000002)
 	max_enum                 = max_int
@@ -2611,22 +2629,51 @@ pub enum DescriptorSetLayoutCreateFlagBits as u32 {
 }
 pub type DescriptorSetLayoutCreateFlags = u32
 
+pub enum ColorComponentFlagBits as u32 {
+	r        = u32(0x00000001)
+	g        = u32(0x00000002)
+	b        = u32(0x00000004)
+	a        = u32(0x00000008)
+	max_enum = max_int
+}
+pub type ColorComponentFlags = u32
+
+pub enum CullModeFlagBits as u32 {
+	none           = 0
+	front          = u32(0x00000001)
+	back           = u32(0x00000002)
+	front_and_back = u32(0x00000003)
+	max_enum       = max_int
+}
+pub type CullModeFlags = u32
+pub type PipelineVertexInputStateCreateFlags = u32
+pub type PipelineInputAssemblyStateCreateFlags = u32
+pub type PipelineTessellationStateCreateFlags = u32
+pub type PipelineViewportStateCreateFlags = u32
+pub type PipelineRasterizationStateCreateFlags = u32
+pub type PipelineMultisampleStateCreateFlags = u32
+
+pub enum PipelineDepthStencilStateCreateFlagBits as u32 {
+	rasterization_order_attachment_depth_access_bit_ext   = u32(0x00000001)
+	rasterization_order_attachment_stencil_access_bit_ext = u32(0x00000002)
+	max_enum                                              = max_int
+}
+pub type PipelineDepthStencilStateCreateFlags = u32
+
+pub enum PipelineColorBlendStateCreateFlagBits as u32 {
+	rasterization_order_attachment_access_bit_ext = u32(0x00000001)
+	max_enum                                      = max_int
+}
+pub type PipelineColorBlendStateCreateFlags = u32
+pub type PipelineDynamicStateCreateFlags = u32
+
 pub enum AttachmentDescriptionFlagBits as u32 {
-	may_alias = u32(0x00000001)
-	max_enum  = max_int
+	may_alias                        = u32(0x00000001)
+	resolve_skip_transfer_function   = u32(0x00000002)
+	resolve_enable_transfer_function = u32(0x00000004)
+	max_enum                         = max_int
 }
 pub type AttachmentDescriptionFlags = u32
-
-pub enum DependencyFlagBits as u32 {
-	by_region                                      = u32(0x00000001)
-	device_group                                   = u32(0x00000004)
-	view_local                                     = u32(0x00000002)
-	feedback_loop_bit_ext                          = u32(0x00000008)
-	queue_family_ownership_transfer_use_all_stages = u32(0x00000020)
-	asymmetric_event                               = u32(0x00000040)
-	max_enum                                       = max_int
-}
-pub type DependencyFlags = u32
 
 pub enum FramebufferCreateFlagBits as u32 {
 	imageless = u32(0x00000001)
@@ -2654,40 +2701,6 @@ pub enum SubpassDescriptionFlagBits as u32 {
 	max_enum                                              = max_int
 }
 pub type SubpassDescriptionFlags = u32
-
-pub enum CommandPoolCreateFlagBits as u32 {
-	transient            = u32(0x00000001)
-	reset_command_buffer = u32(0x00000002)
-	protected            = u32(0x00000004)
-	max_enum             = max_int
-}
-pub type CommandPoolCreateFlags = u32
-
-pub enum CommandPoolResetFlagBits as u32 {
-	release_resources = u32(0x00000001)
-	max_enum          = max_int
-}
-pub type CommandPoolResetFlags = u32
-
-pub enum CommandBufferUsageFlagBits as u32 {
-	one_time_submit      = u32(0x00000001)
-	render_pass_continue = u32(0x00000002)
-	simultaneous_use     = u32(0x00000004)
-	max_enum             = max_int
-}
-pub type CommandBufferUsageFlags = u32
-
-pub enum QueryControlFlagBits as u32 {
-	precise  = u32(0x00000001)
-	max_enum = max_int
-}
-pub type QueryControlFlags = u32
-
-pub enum CommandBufferResetFlagBits as u32 {
-	release_resources = u32(0x00000001)
-	max_enum          = max_int
-}
-pub type CommandBufferResetFlags = u32
 
 pub enum StencilFaceFlagBits as u32 {
 	front          = u32(0x00000001)
@@ -2777,39 +2790,6 @@ pub mut:
 	size                DeviceSize
 }
 
-pub type DispatchIndirectCommand = C.VkDispatchIndirectCommand
-
-@[typedef]
-pub struct C.VkDispatchIndirectCommand {
-pub mut:
-	x u32
-	y u32
-	z u32
-}
-
-pub type DrawIndexedIndirectCommand = C.VkDrawIndexedIndirectCommand
-
-@[typedef]
-pub struct C.VkDrawIndexedIndirectCommand {
-pub mut:
-	indexCount    u32
-	instanceCount u32
-	firstIndex    u32
-	vertexOffset  i32
-	firstInstance u32
-}
-
-pub type DrawIndirectCommand = C.VkDrawIndirectCommand
-
-@[typedef]
-pub struct C.VkDrawIndirectCommand {
-pub mut:
-	vertexCount   u32
-	instanceCount u32
-	firstVertex   u32
-	firstInstance u32
-}
-
 pub type ImageSubresourceRange = C.VkImageSubresourceRange
 
 @[typedef]
@@ -2848,18 +2828,6 @@ pub mut:
 	pNext         voidptr       = unsafe { nil }
 	srcAccessMask AccessFlags
 	dstAccessMask AccessFlags
-}
-
-pub type PipelineCacheHeaderVersionOne = C.VkPipelineCacheHeaderVersionOne
-
-@[typedef]
-pub struct C.VkPipelineCacheHeaderVersionOne {
-pub mut:
-	headerSize        u32
-	headerVersion     PipelineCacheHeaderVersion
-	vendorID          u32
-	deviceID          u32
-	pipelineCacheUUID [uuid_size]u8
 }
 
 pub type PFN_vkAllocationFunction = fn (voidptr, usize, usize, SystemAllocationScope)
@@ -3408,16 +3376,6 @@ pub mut:
 	flags SemaphoreCreateFlags
 }
 
-pub type EventCreateInfo = C.VkEventCreateInfo
-
-@[typedef]
-pub struct C.VkEventCreateInfo {
-pub mut:
-	sType StructureType = StructureType.event_create_info
-	pNext voidptr       = unsafe { nil }
-	flags EventCreateFlags
-}
-
 pub type QueryPoolCreateInfo = C.VkQueryPoolCreateInfo
 
 @[typedef]
@@ -3444,20 +3402,6 @@ pub mut:
 	sharingMode           SharingMode
 	queueFamilyIndexCount u32
 	pQueueFamilyIndices   &u32
-}
-
-pub type BufferViewCreateInfo = C.VkBufferViewCreateInfo
-
-@[typedef]
-pub struct C.VkBufferViewCreateInfo {
-pub mut:
-	sType  StructureType = StructureType.buffer_view_create_info
-	pNext  voidptr       = unsafe { nil }
-	flags  BufferViewCreateFlags
-	buffer Buffer
-	format Format
-	offset DeviceSize
-	range  DeviceSize
 }
 
 pub type ImageCreateInfo = C.VkImageCreateInfo
@@ -3518,6 +3462,147 @@ pub mut:
 	format           Format
 	components       ComponentMapping
 	subresourceRange ImageSubresourceRange
+}
+
+pub type CommandPoolCreateInfo = C.VkCommandPoolCreateInfo
+
+@[typedef]
+pub struct C.VkCommandPoolCreateInfo {
+pub mut:
+	sType            StructureType = StructureType.command_pool_create_info
+	pNext            voidptr       = unsafe { nil }
+	flags            CommandPoolCreateFlags
+	queueFamilyIndex u32
+}
+
+pub type CommandBufferAllocateInfo = C.VkCommandBufferAllocateInfo
+
+@[typedef]
+pub struct C.VkCommandBufferAllocateInfo {
+pub mut:
+	sType              StructureType = StructureType.command_buffer_allocate_info
+	pNext              voidptr       = unsafe { nil }
+	commandPool        CommandPool
+	level              CommandBufferLevel
+	commandBufferCount u32
+}
+
+pub type CommandBufferInheritanceInfo = C.VkCommandBufferInheritanceInfo
+
+@[typedef]
+pub struct C.VkCommandBufferInheritanceInfo {
+pub mut:
+	sType                StructureType = StructureType.command_buffer_inheritance_info
+	pNext                voidptr       = unsafe { nil }
+	renderPass           RenderPass
+	subpass              u32
+	framebuffer          Framebuffer
+	occlusionQueryEnable Bool32
+	queryFlags           QueryControlFlags
+	pipelineStatistics   QueryPipelineStatisticFlags
+}
+
+pub type CommandBufferBeginInfo = C.VkCommandBufferBeginInfo
+
+@[typedef]
+pub struct C.VkCommandBufferBeginInfo {
+pub mut:
+	sType            StructureType = StructureType.command_buffer_begin_info
+	pNext            voidptr       = unsafe { nil }
+	flags            CommandBufferUsageFlags
+	pInheritanceInfo &CommandBufferInheritanceInfo
+}
+
+pub type BufferCopy = C.VkBufferCopy
+
+@[typedef]
+pub struct C.VkBufferCopy {
+pub mut:
+	srcOffset DeviceSize
+	dstOffset DeviceSize
+	size      DeviceSize
+}
+
+pub type ImageSubresourceLayers = C.VkImageSubresourceLayers
+
+@[typedef]
+pub struct C.VkImageSubresourceLayers {
+pub mut:
+	aspectMask     ImageAspectFlags
+	mipLevel       u32
+	baseArrayLayer u32
+	layerCount     u32
+}
+
+pub type BufferImageCopy = C.VkBufferImageCopy
+
+@[typedef]
+pub struct C.VkBufferImageCopy {
+pub mut:
+	bufferOffset      DeviceSize
+	bufferRowLength   u32
+	bufferImageHeight u32
+	imageSubresource  ImageSubresourceLayers
+	imageOffset       Offset3D
+	imageExtent       Extent3D
+}
+
+pub type ImageCopy = C.VkImageCopy
+
+@[typedef]
+pub struct C.VkImageCopy {
+pub mut:
+	srcSubresource ImageSubresourceLayers
+	srcOffset      Offset3D
+	dstSubresource ImageSubresourceLayers
+	dstOffset      Offset3D
+	extent         Extent3D
+}
+
+pub type DispatchIndirectCommand = C.VkDispatchIndirectCommand
+
+@[typedef]
+pub struct C.VkDispatchIndirectCommand {
+pub mut:
+	x u32
+	y u32
+	z u32
+}
+
+pub type PipelineCacheHeaderVersionOne = C.VkPipelineCacheHeaderVersionOne
+
+@[typedef]
+pub struct C.VkPipelineCacheHeaderVersionOne {
+pub mut:
+	headerSize        u32
+	headerVersion     PipelineCacheHeaderVersion
+	vendorID          u32
+	deviceID          u32
+	pipelineCacheUUID [uuid_size]u8
+}
+
+pub type EventCreateInfo = C.VkEventCreateInfo
+
+@[typedef]
+pub struct C.VkEventCreateInfo {
+pub mut:
+	sType StructureType = StructureType.event_create_info
+	pNext voidptr       = unsafe { nil }
+	flags EventCreateFlags
+}
+
+pub type BufferViewCreateInfo = C.VkBufferViewCreateInfo
+
+@[typedef]
+pub struct C.VkBufferViewCreateInfo {
+pub mut:
+	sType  StructureType = StructureType.buffer_view_create_info
+	pNext  voidptr       = unsafe { nil }
+	flags  BufferViewCreateFlags
+	buffer Buffer
+	format Format
+	offset DeviceSize
+	range  DeviceSize
 }
 
 // ShaderModuleCreateInfo extends VkPipelineShaderStageCreateInfo,VkDataGraphPipelineCreateInfoARM
@@ -3592,6 +3677,200 @@ pub mut:
 	layout             PipelineLayout
 	basePipelineHandle Pipeline
 	basePipelineIndex  i32
+}
+
+pub type PushConstantRange = C.VkPushConstantRange
+
+@[typedef]
+pub struct C.VkPushConstantRange {
+pub mut:
+	stageFlags ShaderStageFlags
+	offset     u32
+	size       u32
+}
+
+// PipelineLayoutCreateInfo extends VkBindDescriptorSetsInfo,VkPushConstantsInfo,VkPushDescriptorSetInfo,VkPushDescriptorSetWithTemplateInfo,VkSetDescriptorBufferOffsetsInfoEXT,VkBindDescriptorBufferEmbeddedSamplersInfoEXT,VkIndirectCommandsLayoutCreateInfoEXT
+pub type PipelineLayoutCreateInfo = C.VkPipelineLayoutCreateInfo
+
+@[typedef]
+pub struct C.VkPipelineLayoutCreateInfo {
+pub mut:
+	sType                  StructureType = StructureType.pipeline_layout_create_info
+	pNext                  voidptr       = unsafe { nil }
+	flags                  PipelineLayoutCreateFlags
+	setLayoutCount         u32
+	pSetLayouts            &DescriptorSetLayout
+	pushConstantRangeCount u32
+	pPushConstantRanges    &PushConstantRange
+}
+
+pub type SamplerCreateInfo = C.VkSamplerCreateInfo
+
+@[typedef]
+pub struct C.VkSamplerCreateInfo {
+pub mut:
+	sType                   StructureType = StructureType.sampler_create_info
+	pNext                   voidptr       = unsafe { nil }
+	flags                   SamplerCreateFlags
+	magFilter               Filter
+	minFilter               Filter
+	mipmapMode              SamplerMipmapMode
+	addressModeU            SamplerAddressMode
+	addressModeV            SamplerAddressMode
+	addressModeW            SamplerAddressMode
+	mipLodBias              f32
+	anisotropyEnable        Bool32
+	maxAnisotropy           f32
+	compareEnable           Bool32
+	compareOp               CompareOp
+	minLod                  f32
+	maxLod                  f32
+	borderColor             BorderColor
+	unnormalizedCoordinates Bool32
+}
+
+pub type CopyDescriptorSet = C.VkCopyDescriptorSet
+
+@[typedef]
+pub struct C.VkCopyDescriptorSet {
+pub mut:
+	sType           StructureType = StructureType.copy_descriptor_set
+	pNext           voidptr       = unsafe { nil }
+	srcSet          DescriptorSet
+	srcBinding      u32
+	srcArrayElement u32
+	dstSet          DescriptorSet
+	dstBinding      u32
+	dstArrayElement u32
+	descriptorCount u32
+}
+
+pub type DescriptorBufferInfo = C.VkDescriptorBufferInfo
+
+@[typedef]
+pub struct C.VkDescriptorBufferInfo {
+pub mut:
+	buffer Buffer
+	offset DeviceSize
+	range  DeviceSize
+}
+
+pub type DescriptorImageInfo = C.VkDescriptorImageInfo
+
+@[typedef]
+pub struct C.VkDescriptorImageInfo {
+pub mut:
+	sampler     Sampler
+	imageView   ImageView
+	imageLayout ImageLayout
+}
+
+pub type DescriptorPoolSize = C.VkDescriptorPoolSize
+
+@[typedef]
+pub struct C.VkDescriptorPoolSize {
+pub mut:
+	type            DescriptorType
+	descriptorCount u32
+}
+
+pub type DescriptorPoolCreateInfo = C.VkDescriptorPoolCreateInfo
+
+@[typedef]
+pub struct C.VkDescriptorPoolCreateInfo {
+pub mut:
+	sType         StructureType = StructureType.descriptor_pool_create_info
+	pNext         voidptr       = unsafe { nil }
+	flags         DescriptorPoolCreateFlags
+	maxSets       u32
+	poolSizeCount u32
+	pPoolSizes    &DescriptorPoolSize
+}
+
+pub type DescriptorSetAllocateInfo = C.VkDescriptorSetAllocateInfo
+
+@[typedef]
+pub struct C.VkDescriptorSetAllocateInfo {
+pub mut:
+	sType              StructureType = StructureType.descriptor_set_allocate_info
+	pNext              voidptr       = unsafe { nil }
+	descriptorPool     DescriptorPool
+	descriptorSetCount u32
+	pSetLayouts        &DescriptorSetLayout
+}
+
+pub type DescriptorSetLayoutBinding = C.VkDescriptorSetLayoutBinding
+
+@[typedef]
+pub struct C.VkDescriptorSetLayoutBinding {
+pub mut:
+	binding            u32
+	descriptorType     DescriptorType
+	descriptorCount    u32
+	stageFlags         ShaderStageFlags
+	pImmutableSamplers &Sampler
+}
+
+pub type DescriptorSetLayoutCreateInfo = C.VkDescriptorSetLayoutCreateInfo
+
+@[typedef]
+pub struct C.VkDescriptorSetLayoutCreateInfo {
+pub mut:
+	sType        StructureType = StructureType.descriptor_set_layout_create_info
+	pNext        voidptr       = unsafe { nil }
+	flags        DescriptorSetLayoutCreateFlags
+	bindingCount u32
+	pBindings    &DescriptorSetLayoutBinding
+}
+
+pub type WriteDescriptorSet = C.VkWriteDescriptorSet
+
+@[typedef]
+pub struct C.VkWriteDescriptorSet {
+pub mut:
+	sType            StructureType = StructureType.write_descriptor_set
+	pNext            voidptr       = unsafe { nil }
+	dstSet           DescriptorSet
+	dstBinding       u32
+	dstArrayElement  u32
+	descriptorCount  u32
+	descriptorType   DescriptorType
+	pImageInfo       &DescriptorImageInfo
+	pBufferInfo      &DescriptorBufferInfo
+	pTexelBufferView &BufferView
+}
+
+pub type ClearColorValue = C.VkClearColorValue
+
+@[typedef]
+pub union C.VkClearColorValue {
+pub mut:
+	float32 [4]f32
+	int32   [4]i32
+	uint32  [4]u32
+}
+
+pub type DrawIndexedIndirectCommand = C.VkDrawIndexedIndirectCommand
+
+@[typedef]
+pub struct C.VkDrawIndexedIndirectCommand {
+pub mut:
+	indexCount    u32
+	instanceCount u32
+	firstIndex    u32
+	vertexOffset  i32
+	firstInstance u32
+}
+
+pub type DrawIndirectCommand = C.VkDrawIndirectCommand
+
+@[typedef]
+pub struct C.VkDrawIndirectCommand {
+pub mut:
+	vertexCount   u32
+	instanceCount u32
+	firstVertex   u32
+	firstInstance u32
 }
 
 pub type VertexInputBindingDescription = C.VkVertexInputBindingDescription
@@ -3816,167 +4095,6 @@ pub mut:
 	basePipelineIndex   i32
 }
 
-pub type PushConstantRange = C.VkPushConstantRange
-
-@[typedef]
-pub struct C.VkPushConstantRange {
-pub mut:
-	stageFlags ShaderStageFlags
-	offset     u32
-	size       u32
-}
-
-// PipelineLayoutCreateInfo extends VkBindDescriptorSetsInfo,VkPushConstantsInfo,VkPushDescriptorSetInfo,VkPushDescriptorSetWithTemplateInfo,VkSetDescriptorBufferOffsetsInfoEXT,VkBindDescriptorBufferEmbeddedSamplersInfoEXT,VkIndirectCommandsLayoutCreateInfoEXT
-pub type PipelineLayoutCreateInfo = C.VkPipelineLayoutCreateInfo
-
-@[typedef]
-pub struct C.VkPipelineLayoutCreateInfo {
-pub mut:
-	sType                  StructureType = StructureType.pipeline_layout_create_info
-	pNext                  voidptr       = unsafe { nil }
-	flags                  PipelineLayoutCreateFlags
-	setLayoutCount         u32
-	pSetLayouts            &DescriptorSetLayout
-	pushConstantRangeCount u32
-	pPushConstantRanges    &PushConstantRange
-}
-
-pub type SamplerCreateInfo = C.VkSamplerCreateInfo
-
-@[typedef]
-pub struct C.VkSamplerCreateInfo {
-pub mut:
-	sType                   StructureType = StructureType.sampler_create_info
-	pNext                   voidptr       = unsafe { nil }
-	flags                   SamplerCreateFlags
-	magFilter               Filter
-	minFilter               Filter
-	mipmapMode              SamplerMipmapMode
-	addressModeU            SamplerAddressMode
-	addressModeV            SamplerAddressMode
-	addressModeW            SamplerAddressMode
-	mipLodBias              f32
-	anisotropyEnable        Bool32
-	maxAnisotropy           f32
-	compareEnable           Bool32
-	compareOp               CompareOp
-	minLod                  f32
-	maxLod                  f32
-	borderColor             BorderColor
-	unnormalizedCoordinates Bool32
-}
-
-pub type CopyDescriptorSet = C.VkCopyDescriptorSet
-
-@[typedef]
-pub struct C.VkCopyDescriptorSet {
-pub mut:
-	sType           StructureType = StructureType.copy_descriptor_set
-	pNext           voidptr       = unsafe { nil }
-	srcSet          DescriptorSet
-	srcBinding      u32
-	srcArrayElement u32
-	dstSet          DescriptorSet
-	dstBinding      u32
-	dstArrayElement u32
-	descriptorCount u32
-}
-
-pub type DescriptorBufferInfo = C.VkDescriptorBufferInfo
-
-@[typedef]
-pub struct C.VkDescriptorBufferInfo {
-pub mut:
-	buffer Buffer
-	offset DeviceSize
-	range  DeviceSize
-}
-
-pub type DescriptorImageInfo = C.VkDescriptorImageInfo
-
-@[typedef]
-pub struct C.VkDescriptorImageInfo {
-pub mut:
-	sampler     Sampler
-	imageView   ImageView
-	imageLayout ImageLayout
-}
-
-pub type DescriptorPoolSize = C.VkDescriptorPoolSize
-
-@[typedef]
-pub struct C.VkDescriptorPoolSize {
-pub mut:
-	type            DescriptorType
-	descriptorCount u32
-}
-
-pub type DescriptorPoolCreateInfo = C.VkDescriptorPoolCreateInfo
-
-@[typedef]
-pub struct C.VkDescriptorPoolCreateInfo {
-pub mut:
-	sType         StructureType = StructureType.descriptor_pool_create_info
-	pNext         voidptr       = unsafe { nil }
-	flags         DescriptorPoolCreateFlags
-	maxSets       u32
-	poolSizeCount u32
-	pPoolSizes    &DescriptorPoolSize
-}
-
-pub type DescriptorSetAllocateInfo = C.VkDescriptorSetAllocateInfo
-
-@[typedef]
-pub struct C.VkDescriptorSetAllocateInfo {
-pub mut:
-	sType              StructureType = StructureType.descriptor_set_allocate_info
-	pNext              voidptr       = unsafe { nil }
-	descriptorPool     DescriptorPool
-	descriptorSetCount u32
-	pSetLayouts        &DescriptorSetLayout
-}
-
-pub type DescriptorSetLayoutBinding = C.VkDescriptorSetLayoutBinding
-
-@[typedef]
-pub struct C.VkDescriptorSetLayoutBinding {
-pub mut:
-	binding            u32
-	descriptorType     DescriptorType
-	descriptorCount    u32
-	stageFlags         ShaderStageFlags
-	pImmutableSamplers &Sampler
-}
-
-pub type DescriptorSetLayoutCreateInfo = C.VkDescriptorSetLayoutCreateInfo
-
-@[typedef]
-pub struct C.VkDescriptorSetLayoutCreateInfo {
-pub mut:
-	sType        StructureType = StructureType.descriptor_set_layout_create_info
-	pNext        voidptr       = unsafe { nil }
-	flags        DescriptorSetLayoutCreateFlags
-	bindingCount u32
-	pBindings    &DescriptorSetLayoutBinding
-}
-
-pub type WriteDescriptorSet = C.VkWriteDescriptorSet
-
-@[typedef]
-pub struct C.VkWriteDescriptorSet {
-pub mut:
-	sType            StructureType = StructureType.write_descriptor_set
-	pNext            voidptr       = unsafe { nil }
-	dstSet           DescriptorSet
-	dstBinding       u32
-	dstArrayElement  u32
-	descriptorCount  u32
-	descriptorType   DescriptorType
-	pImageInfo       &DescriptorImageInfo
-	pBufferInfo      &DescriptorBufferInfo
-	pTexelBufferView &BufferView
-}
-
 pub type AttachmentDescription = C.VkAttachmentDescription
 
 @[typedef]
@@ -4065,99 +4183,6 @@ pub mut:
 	pDependencies   &SubpassDependency
 }
 
-pub type CommandPoolCreateInfo = C.VkCommandPoolCreateInfo
-
-@[typedef]
-pub struct C.VkCommandPoolCreateInfo {
-pub mut:
-	sType            StructureType = StructureType.command_pool_create_info
-	pNext            voidptr       = unsafe { nil }
-	flags            CommandPoolCreateFlags
-	queueFamilyIndex u32
-}
-
-pub type CommandBufferAllocateInfo = C.VkCommandBufferAllocateInfo
-
-@[typedef]
-pub struct C.VkCommandBufferAllocateInfo {
-pub mut:
-	sType              StructureType = StructureType.command_buffer_allocate_info
-	pNext              voidptr       = unsafe { nil }
-	commandPool        CommandPool
-	level              CommandBufferLevel
-	commandBufferCount u32
-}
-
-pub type CommandBufferInheritanceInfo = C.VkCommandBufferInheritanceInfo
-
-@[typedef]
-pub struct C.VkCommandBufferInheritanceInfo {
-pub mut:
-	sType                StructureType = StructureType.command_buffer_inheritance_info
-	pNext                voidptr       = unsafe { nil }
-	renderPass           RenderPass
-	subpass              u32
-	framebuffer          Framebuffer
-	occlusionQueryEnable Bool32
-	queryFlags           QueryControlFlags
-	pipelineStatistics   QueryPipelineStatisticFlags
-}
-
-pub type CommandBufferBeginInfo = C.VkCommandBufferBeginInfo
-
-@[typedef]
-pub struct C.VkCommandBufferBeginInfo {
-pub mut:
-	sType            StructureType = StructureType.command_buffer_begin_info
-	pNext            voidptr       = unsafe { nil }
-	flags            CommandBufferUsageFlags
-	pInheritanceInfo &CommandBufferInheritanceInfo
-}
-
-pub type BufferCopy = C.VkBufferCopy
-
-@[typedef]
-pub struct C.VkBufferCopy {
-pub mut:
-	srcOffset DeviceSize
-	dstOffset DeviceSize
-	size      DeviceSize
-}
-
-pub type ImageSubresourceLayers = C.VkImageSubresourceLayers
-
-@[typedef]
-pub struct C.VkImageSubresourceLayers {
-pub mut:
-	aspectMask     ImageAspectFlags
-	mipLevel       u32
-	baseArrayLayer u32
-	layerCount     u32
-}
-
-pub type BufferImageCopy = C.VkBufferImageCopy
-
-@[typedef]
-pub struct C.VkBufferImageCopy {
-pub mut:
-	bufferOffset      DeviceSize
-	bufferRowLength   u32
-	bufferImageHeight u32
-	imageSubresource  ImageSubresourceLayers
-	imageOffset       Offset3D
-	imageExtent       Extent3D
-}
-
-pub type ClearColorValue = C.VkClearColorValue
-
-@[typedef]
-pub union C.VkClearColorValue {
-pub mut:
-	float32 [4]f32
-	int32   [4]i32
-	uint32  [4]u32
-}
-
 pub type ClearDepthStencilValue = C.VkClearDepthStencilValue
 
 @[typedef]
@@ -4205,18 +4230,6 @@ pub mut:
 	srcOffsets     [2]Offset3D
 	dstSubresource ImageSubresourceLayers
 	dstOffsets     [2]Offset3D
-}
-
-pub type ImageCopy = C.VkImageCopy
-
-@[typedef]
-pub struct C.VkImageCopy {
-pub mut:
-	srcSubresource ImageSubresourceLayers
-	srcOffset      Offset3D
-	dstSubresource ImageSubresourceLayers
-	dstOffset      Offset3D
-	extent         Extent3D
 }
 
 pub type ImageResolve = C.VkImageResolve
@@ -4767,64 +4780,6 @@ pub fn destroy_semaphore(device Device,
 }
 
 @[keep_args_alive]
-fn C.vkCreateEvent(device Device, p_create_info &EventCreateInfo, p_allocator &AllocationCallbacks, p_event &Event) Result
-
-pub type PFN_vkCreateEvent = fn (device Device, p_create_info &EventCreateInfo, p_allocator &AllocationCallbacks, p_event &Event) Result
-
-@[inline]
-pub fn create_event(device Device,
-	p_create_info &EventCreateInfo,
-	p_allocator &AllocationCallbacks,
-	p_event &Event) Result {
-	return C.vkCreateEvent(device, p_create_info, p_allocator, p_event)
-}
-
-@[keep_args_alive]
-fn C.vkDestroyEvent(device Device, event Event, p_allocator &AllocationCallbacks)
-
-pub type PFN_vkDestroyEvent = fn (device Device, event Event, p_allocator &AllocationCallbacks)
-
-@[inline]
-pub fn destroy_event(device Device,
-	event Event,
-	p_allocator &AllocationCallbacks) {
-	C.vkDestroyEvent(device, event, p_allocator)
-}
-
-@[keep_args_alive]
-fn C.vkGetEventStatus(device Device, event Event) Result
-
-pub type PFN_vkGetEventStatus = fn (device Device, event Event) Result
-
-@[inline]
-pub fn get_event_status(device Device,
-	event Event) Result {
-	return C.vkGetEventStatus(device, event)
-}
-
-@[keep_args_alive]
-fn C.vkSetEvent(device Device, event Event) Result
-
-pub type PFN_vkSetEvent = fn (device Device, event Event) Result
-
-@[inline]
-pub fn set_event(device Device,
-	event Event) Result {
-	return C.vkSetEvent(device, event)
-}
-
-@[keep_args_alive]
-fn C.vkResetEvent(device Device, event Event) Result
-
-pub type PFN_vkResetEvent = fn (device Device, event Event) Result
-
-@[inline]
-pub fn reset_event(device Device,
-	event Event) Result {
-	return C.vkResetEvent(device, event)
-}
-
-@[keep_args_alive]
 fn C.vkCreateQueryPool(device Device, p_create_info &QueryPoolCreateInfo, p_allocator &AllocationCallbacks, p_query_pool &QueryPool) Result
 
 pub type PFN_vkCreateQueryPool = fn (device Device, p_create_info &QueryPoolCreateInfo, p_allocator &AllocationCallbacks, p_query_pool &QueryPool) Result
@@ -4893,31 +4848,6 @@ pub fn destroy_buffer(device Device,
 }
 
 @[keep_args_alive]
-fn C.vkCreateBufferView(device Device, p_create_info &BufferViewCreateInfo, p_allocator &AllocationCallbacks, p_view &BufferView) Result
-
-pub type PFN_vkCreateBufferView = fn (device Device, p_create_info &BufferViewCreateInfo, p_allocator &AllocationCallbacks, p_view &BufferView) Result
-
-@[inline]
-pub fn create_buffer_view(device Device,
-	p_create_info &BufferViewCreateInfo,
-	p_allocator &AllocationCallbacks,
-	p_view &BufferView) Result {
-	return C.vkCreateBufferView(device, p_create_info, p_allocator, p_view)
-}
-
-@[keep_args_alive]
-fn C.vkDestroyBufferView(device Device, buffer_view BufferView, p_allocator &AllocationCallbacks)
-
-pub type PFN_vkDestroyBufferView = fn (device Device, buffer_view BufferView, p_allocator &AllocationCallbacks)
-
-@[inline]
-pub fn destroy_buffer_view(device Device,
-	buffer_view BufferView,
-	p_allocator &AllocationCallbacks) {
-	C.vkDestroyBufferView(device, buffer_view, p_allocator)
-}
-
-@[keep_args_alive]
 fn C.vkCreateImage(device Device, p_create_info &ImageCreateInfo, p_allocator &AllocationCallbacks, p_image &Image) Result
 
 pub type PFN_vkCreateImage = fn (device Device, p_create_info &ImageCreateInfo, p_allocator &AllocationCallbacks, p_image &Image) Result
@@ -4978,6 +4908,376 @@ pub fn destroy_image_view(device Device,
 	image_view ImageView,
 	p_allocator &AllocationCallbacks) {
 	C.vkDestroyImageView(device, image_view, p_allocator)
+}
+
+@[keep_args_alive]
+fn C.vkCreateCommandPool(device Device, p_create_info &CommandPoolCreateInfo, p_allocator &AllocationCallbacks, p_command_pool &CommandPool) Result
+
+pub type PFN_vkCreateCommandPool = fn (device Device, p_create_info &CommandPoolCreateInfo, p_allocator &AllocationCallbacks, p_command_pool &CommandPool) Result
+
+@[inline]
+pub fn create_command_pool(device Device,
+	p_create_info &CommandPoolCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_command_pool &CommandPool) Result {
+	return C.vkCreateCommandPool(device, p_create_info, p_allocator, p_command_pool)
+}
+
+@[keep_args_alive]
+fn C.vkDestroyCommandPool(device Device, command_pool CommandPool, p_allocator &AllocationCallbacks)
+
+pub type PFN_vkDestroyCommandPool = fn (device Device, command_pool CommandPool, p_allocator &AllocationCallbacks)
+
+@[inline]
+pub fn destroy_command_pool(device Device,
+	command_pool CommandPool,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyCommandPool(device, command_pool, p_allocator)
+}
+
+@[keep_args_alive]
+fn C.vkResetCommandPool(device Device, command_pool CommandPool, flags CommandPoolResetFlags) Result
+
+pub type PFN_vkResetCommandPool = fn (device Device, command_pool CommandPool, flags CommandPoolResetFlags) Result
+
+@[inline]
+pub fn reset_command_pool(device Device,
+	command_pool CommandPool,
+	flags CommandPoolResetFlags) Result {
+	return C.vkResetCommandPool(device, command_pool, flags)
+}
+
+@[keep_args_alive]
+fn C.vkAllocateCommandBuffers(device Device, p_allocate_info &CommandBufferAllocateInfo, p_command_buffers &CommandBuffer) Result
+
+pub type PFN_vkAllocateCommandBuffers = fn (device Device, p_allocate_info &CommandBufferAllocateInfo, p_command_buffers &CommandBuffer) Result
+
+@[inline]
+pub fn allocate_command_buffers(device Device,
+	p_allocate_info &CommandBufferAllocateInfo,
+	p_command_buffers &CommandBuffer) Result {
+	return C.vkAllocateCommandBuffers(device, p_allocate_info, p_command_buffers)
+}
+
+@[keep_args_alive]
+fn C.vkFreeCommandBuffers(device Device, command_pool CommandPool, command_buffer_count u32, p_command_buffers &CommandBuffer)
+
+pub type PFN_vkFreeCommandBuffers = fn (device Device, command_pool CommandPool, command_buffer_count u32, p_command_buffers &CommandBuffer)
+
+@[inline]
+pub fn free_command_buffers(device Device,
+	command_pool CommandPool,
+	command_buffer_count u32,
+	p_command_buffers &CommandBuffer) {
+	C.vkFreeCommandBuffers(device, command_pool, command_buffer_count, p_command_buffers)
+}
+
+@[keep_args_alive]
+fn C.vkBeginCommandBuffer(command_buffer CommandBuffer, p_begin_info &CommandBufferBeginInfo) Result
+
+pub type PFN_vkBeginCommandBuffer = fn (command_buffer CommandBuffer, p_begin_info &CommandBufferBeginInfo) Result
+
+@[inline]
+pub fn begin_command_buffer(command_buffer CommandBuffer,
+	p_begin_info &CommandBufferBeginInfo) Result {
+	return C.vkBeginCommandBuffer(command_buffer, p_begin_info)
+}
+
+@[keep_args_alive]
+fn C.vkEndCommandBuffer(command_buffer CommandBuffer) Result
+
+pub type PFN_vkEndCommandBuffer = fn (command_buffer CommandBuffer) Result
+
+@[inline]
+pub fn end_command_buffer(command_buffer CommandBuffer) Result {
+	return C.vkEndCommandBuffer(command_buffer)
+}
+
+@[keep_args_alive]
+fn C.vkResetCommandBuffer(command_buffer CommandBuffer, flags CommandBufferResetFlags) Result
+
+pub type PFN_vkResetCommandBuffer = fn (command_buffer CommandBuffer, flags CommandBufferResetFlags) Result
+
+@[inline]
+pub fn reset_command_buffer(command_buffer CommandBuffer,
+	flags CommandBufferResetFlags) Result {
+	return C.vkResetCommandBuffer(command_buffer, flags)
+}
+
+@[keep_args_alive]
+fn C.vkCmdCopyBuffer(command_buffer CommandBuffer, src_buffer Buffer, dst_buffer Buffer, region_count u32, p_regions &BufferCopy)
+
+pub type PFN_vkCmdCopyBuffer = fn (command_buffer CommandBuffer, src_buffer Buffer, dst_buffer Buffer, region_count u32, p_regions &BufferCopy)
+
+@[inline]
+pub fn cmd_copy_buffer(command_buffer CommandBuffer,
+	src_buffer Buffer,
+	dst_buffer Buffer,
+	region_count u32,
+	p_regions &BufferCopy) {
+	C.vkCmdCopyBuffer(command_buffer, src_buffer, dst_buffer, region_count, p_regions)
+}
+
+@[keep_args_alive]
+fn C.vkCmdCopyImage(command_buffer CommandBuffer, src_image Image, src_image_layout ImageLayout, dst_image Image, dst_image_layout ImageLayout, region_count u32, p_regions &ImageCopy)
+
+pub type PFN_vkCmdCopyImage = fn (command_buffer CommandBuffer, src_image Image, src_image_layout ImageLayout, dst_image Image, dst_image_layout ImageLayout, region_count u32, p_regions &ImageCopy)
+
+@[inline]
+pub fn cmd_copy_image(command_buffer CommandBuffer,
+	src_image Image,
+	src_image_layout ImageLayout,
+	dst_image Image,
+	dst_image_layout ImageLayout,
+	region_count u32,
+	p_regions &ImageCopy) {
+	C.vkCmdCopyImage(command_buffer, src_image, src_image_layout, dst_image, dst_image_layout,
+		region_count, p_regions)
+}
+
+@[keep_args_alive]
+fn C.vkCmdCopyBufferToImage(command_buffer CommandBuffer, src_buffer Buffer, dst_image Image, dst_image_layout ImageLayout, region_count u32, p_regions &BufferImageCopy)
+
+pub type PFN_vkCmdCopyBufferToImage = fn (command_buffer CommandBuffer, src_buffer Buffer, dst_image Image, dst_image_layout ImageLayout, region_count u32, p_regions &BufferImageCopy)
+
+@[inline]
+pub fn cmd_copy_buffer_to_image(command_buffer CommandBuffer,
+	src_buffer Buffer,
+	dst_image Image,
+	dst_image_layout ImageLayout,
+	region_count u32,
+	p_regions &BufferImageCopy) {
+	C.vkCmdCopyBufferToImage(command_buffer, src_buffer, dst_image, dst_image_layout,
+		region_count, p_regions)
+}
+
+@[keep_args_alive]
+fn C.vkCmdCopyImageToBuffer(command_buffer CommandBuffer, src_image Image, src_image_layout ImageLayout, dst_buffer Buffer, region_count u32, p_regions &BufferImageCopy)
+
+pub type PFN_vkCmdCopyImageToBuffer = fn (command_buffer CommandBuffer, src_image Image, src_image_layout ImageLayout, dst_buffer Buffer, region_count u32, p_regions &BufferImageCopy)
+
+@[inline]
+pub fn cmd_copy_image_to_buffer(command_buffer CommandBuffer,
+	src_image Image,
+	src_image_layout ImageLayout,
+	dst_buffer Buffer,
+	region_count u32,
+	p_regions &BufferImageCopy) {
+	C.vkCmdCopyImageToBuffer(command_buffer, src_image, src_image_layout, dst_buffer,
+		region_count, p_regions)
+}
+
+@[keep_args_alive]
+fn C.vkCmdUpdateBuffer(command_buffer CommandBuffer, dst_buffer Buffer, dst_offset DeviceSize, data_size DeviceSize, p_data voidptr)
+
+pub type PFN_vkCmdUpdateBuffer = fn (command_buffer CommandBuffer, dst_buffer Buffer, dst_offset DeviceSize, data_size DeviceSize, p_data voidptr)
+
+@[inline]
+pub fn cmd_update_buffer(command_buffer CommandBuffer,
+	dst_buffer Buffer,
+	dst_offset DeviceSize,
+	data_size DeviceSize,
+	p_data voidptr) {
+	C.vkCmdUpdateBuffer(command_buffer, dst_buffer, dst_offset, data_size, p_data)
+}
+
+@[keep_args_alive]
+fn C.vkCmdFillBuffer(command_buffer CommandBuffer, dst_buffer Buffer, dst_offset DeviceSize, size DeviceSize, data u32)
+
+pub type PFN_vkCmdFillBuffer = fn (command_buffer CommandBuffer, dst_buffer Buffer, dst_offset DeviceSize, size DeviceSize, data u32)
+
+@[inline]
+pub fn cmd_fill_buffer(command_buffer CommandBuffer,
+	dst_buffer Buffer,
+	dst_offset DeviceSize,
+	size DeviceSize,
+	data u32) {
+	C.vkCmdFillBuffer(command_buffer, dst_buffer, dst_offset, size, data)
+}
+
+@[keep_args_alive]
+fn C.vkCmdPipelineBarrier(command_buffer CommandBuffer, src_stage_mask PipelineStageFlags, dst_stage_mask PipelineStageFlags, dependency_flags DependencyFlags, memory_barrier_count u32, p_memory_barriers &MemoryBarrier, buffer_memory_barrier_count u32, p_buffer_memory_barriers &BufferMemoryBarrier, image_memory_barrier_count u32, p_image_memory_barriers &ImageMemoryBarrier)
+
+pub type PFN_vkCmdPipelineBarrier = fn (command_buffer CommandBuffer, src_stage_mask PipelineStageFlags, dst_stage_mask PipelineStageFlags, dependency_flags DependencyFlags, memory_barrier_count u32, p_memory_barriers &MemoryBarrier, buffer_memory_barrier_count u32, p_buffer_memory_barriers &BufferMemoryBarrier, image_memory_barrier_count u32, p_image_memory_barriers &ImageMemoryBarrier)
+
+@[inline]
+pub fn cmd_pipeline_barrier(command_buffer CommandBuffer,
+	src_stage_mask PipelineStageFlags,
+	dst_stage_mask PipelineStageFlags,
+	dependency_flags DependencyFlags,
+	memory_barrier_count u32,
+	p_memory_barriers &MemoryBarrier,
+	buffer_memory_barrier_count u32,
+	p_buffer_memory_barriers &BufferMemoryBarrier,
+	image_memory_barrier_count u32,
+	p_image_memory_barriers &ImageMemoryBarrier) {
+	C.vkCmdPipelineBarrier(command_buffer, src_stage_mask, dst_stage_mask, dependency_flags,
+		memory_barrier_count, p_memory_barriers, buffer_memory_barrier_count, p_buffer_memory_barriers,
+		image_memory_barrier_count, p_image_memory_barriers)
+}
+
+@[keep_args_alive]
+fn C.vkCmdBeginQuery(command_buffer CommandBuffer, query_pool QueryPool, query u32, flags QueryControlFlags)
+
+pub type PFN_vkCmdBeginQuery = fn (command_buffer CommandBuffer, query_pool QueryPool, query u32, flags QueryControlFlags)
+
+@[inline]
+pub fn cmd_begin_query(command_buffer CommandBuffer,
+	query_pool QueryPool,
+	query u32,
+	flags QueryControlFlags) {
+	C.vkCmdBeginQuery(command_buffer, query_pool, query, flags)
+}
+
+@[keep_args_alive]
+fn C.vkCmdEndQuery(command_buffer CommandBuffer, query_pool QueryPool, query u32)
+
+pub type PFN_vkCmdEndQuery = fn (command_buffer CommandBuffer, query_pool QueryPool, query u32)
+
+@[inline]
+pub fn cmd_end_query(command_buffer CommandBuffer,
+	query_pool QueryPool,
+	query u32) {
+	C.vkCmdEndQuery(command_buffer, query_pool, query)
+}
+
+@[keep_args_alive]
+fn C.vkCmdResetQueryPool(command_buffer CommandBuffer, query_pool QueryPool, first_query u32, query_count u32)
+
+pub type PFN_vkCmdResetQueryPool = fn (command_buffer CommandBuffer, query_pool QueryPool, first_query u32, query_count u32)
+
+@[inline]
+pub fn cmd_reset_query_pool(command_buffer CommandBuffer,
+	query_pool QueryPool,
+	first_query u32,
+	query_count u32) {
+	C.vkCmdResetQueryPool(command_buffer, query_pool, first_query, query_count)
+}
+
+@[keep_args_alive]
+fn C.vkCmdWriteTimestamp(command_buffer CommandBuffer, pipeline_stage PipelineStageFlagBits, query_pool QueryPool, query u32)
+
+pub type PFN_vkCmdWriteTimestamp = fn (command_buffer CommandBuffer, pipeline_stage PipelineStageFlagBits, query_pool QueryPool, query u32)
+
+@[inline]
+pub fn cmd_write_timestamp(command_buffer CommandBuffer,
+	pipeline_stage PipelineStageFlagBits,
+	query_pool QueryPool,
+	query u32) {
+	C.vkCmdWriteTimestamp(command_buffer, pipeline_stage, query_pool, query)
+}
+
+@[keep_args_alive]
+fn C.vkCmdCopyQueryPoolResults(command_buffer CommandBuffer, query_pool QueryPool, first_query u32, query_count u32, dst_buffer Buffer, dst_offset DeviceSize, stride DeviceSize, flags QueryResultFlags)
+
+pub type PFN_vkCmdCopyQueryPoolResults = fn (command_buffer CommandBuffer, query_pool QueryPool, first_query u32, query_count u32, dst_buffer Buffer, dst_offset DeviceSize, stride DeviceSize, flags QueryResultFlags)
+
+@[inline]
+pub fn cmd_copy_query_pool_results(command_buffer CommandBuffer,
+	query_pool QueryPool,
+	first_query u32,
+	query_count u32,
+	dst_buffer Buffer,
+	dst_offset DeviceSize,
+	stride DeviceSize,
+	flags QueryResultFlags) {
+	C.vkCmdCopyQueryPoolResults(command_buffer, query_pool, first_query, query_count,
+		dst_buffer, dst_offset, stride, flags)
+}
+
+@[keep_args_alive]
+fn C.vkCmdExecuteCommands(command_buffer CommandBuffer, command_buffer_count u32, p_command_buffers &CommandBuffer)
+
+pub type PFN_vkCmdExecuteCommands = fn (command_buffer CommandBuffer, command_buffer_count u32, p_command_buffers &CommandBuffer)
+
+@[inline]
+pub fn cmd_execute_commands(command_buffer CommandBuffer,
+	command_buffer_count u32,
+	p_command_buffers &CommandBuffer) {
+	C.vkCmdExecuteCommands(command_buffer, command_buffer_count, p_command_buffers)
+}
+
+@[keep_args_alive]
+fn C.vkCreateEvent(device Device, p_create_info &EventCreateInfo, p_allocator &AllocationCallbacks, p_event &Event) Result
+
+pub type PFN_vkCreateEvent = fn (device Device, p_create_info &EventCreateInfo, p_allocator &AllocationCallbacks, p_event &Event) Result
+
+@[inline]
+pub fn create_event(device Device,
+	p_create_info &EventCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_event &Event) Result {
+	return C.vkCreateEvent(device, p_create_info, p_allocator, p_event)
+}
+
+@[keep_args_alive]
+fn C.vkDestroyEvent(device Device, event Event, p_allocator &AllocationCallbacks)
+
+pub type PFN_vkDestroyEvent = fn (device Device, event Event, p_allocator &AllocationCallbacks)
+
+@[inline]
+pub fn destroy_event(device Device,
+	event Event,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyEvent(device, event, p_allocator)
+}
+
+@[keep_args_alive]
+fn C.vkGetEventStatus(device Device, event Event) Result
+
+pub type PFN_vkGetEventStatus = fn (device Device, event Event) Result
+
+@[inline]
+pub fn get_event_status(device Device,
+	event Event) Result {
+	return C.vkGetEventStatus(device, event)
+}
+
+@[keep_args_alive]
+fn C.vkSetEvent(device Device, event Event) Result
+
+pub type PFN_vkSetEvent = fn (device Device, event Event) Result
+
+@[inline]
+pub fn set_event(device Device,
+	event Event) Result {
+	return C.vkSetEvent(device, event)
+}
+
+@[keep_args_alive]
+fn C.vkResetEvent(device Device, event Event) Result
+
+pub type PFN_vkResetEvent = fn (device Device, event Event) Result
+
+@[inline]
+pub fn reset_event(device Device,
+	event Event) Result {
+	return C.vkResetEvent(device, event)
+}
+
+@[keep_args_alive]
+fn C.vkCreateBufferView(device Device, p_create_info &BufferViewCreateInfo, p_allocator &AllocationCallbacks, p_view &BufferView) Result
+
+pub type PFN_vkCreateBufferView = fn (device Device, p_create_info &BufferViewCreateInfo, p_allocator &AllocationCallbacks, p_view &BufferView) Result
+
+@[inline]
+pub fn create_buffer_view(device Device,
+	p_create_info &BufferViewCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_view &BufferView) Result {
+	return C.vkCreateBufferView(device, p_create_info, p_allocator, p_view)
+}
+
+@[keep_args_alive]
+fn C.vkDestroyBufferView(device Device, buffer_view BufferView, p_allocator &AllocationCallbacks)
+
+pub type PFN_vkDestroyBufferView = fn (device Device, buffer_view BufferView, p_allocator &AllocationCallbacks)
+
+@[inline]
+pub fn destroy_buffer_view(device Device,
+	buffer_view BufferView,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroyBufferView(device, buffer_view, p_allocator)
 }
 
 @[keep_args_alive]
@@ -5054,22 +5354,6 @@ pub fn merge_pipeline_caches(device Device,
 	src_cache_count u32,
 	p_src_caches &PipelineCache) Result {
 	return C.vkMergePipelineCaches(device, dst_cache, src_cache_count, p_src_caches)
-}
-
-@[keep_args_alive]
-fn C.vkCreateGraphicsPipelines(device Device, pipeline_cache PipelineCache, create_info_count u32, p_create_infos &GraphicsPipelineCreateInfo, p_allocator &AllocationCallbacks, p_pipelines &Pipeline) Result
-
-pub type PFN_vkCreateGraphicsPipelines = fn (device Device, pipeline_cache PipelineCache, create_info_count u32, p_create_infos &GraphicsPipelineCreateInfo, p_allocator &AllocationCallbacks, p_pipelines &Pipeline) Result
-
-@[inline]
-pub fn create_graphics_pipelines(device Device,
-	pipeline_cache PipelineCache,
-	create_info_count u32,
-	p_create_infos &GraphicsPipelineCreateInfo,
-	p_allocator &AllocationCallbacks,
-	p_pipelines &Pipeline) Result {
-	return C.vkCreateGraphicsPipelines(device, pipeline_cache, create_info_count, p_create_infos,
-		p_allocator, p_pipelines)
 }
 
 @[keep_args_alive]
@@ -5253,6 +5537,154 @@ pub fn update_descriptor_sets(device Device,
 }
 
 @[keep_args_alive]
+fn C.vkCmdBindPipeline(command_buffer CommandBuffer, pipeline_bind_point PipelineBindPoint, pipeline Pipeline)
+
+pub type PFN_vkCmdBindPipeline = fn (command_buffer CommandBuffer, pipeline_bind_point PipelineBindPoint, pipeline Pipeline)
+
+@[inline]
+pub fn cmd_bind_pipeline(command_buffer CommandBuffer,
+	pipeline_bind_point PipelineBindPoint,
+	pipeline Pipeline) {
+	C.vkCmdBindPipeline(command_buffer, pipeline_bind_point, pipeline)
+}
+
+@[keep_args_alive]
+fn C.vkCmdBindDescriptorSets(command_buffer CommandBuffer, pipeline_bind_point PipelineBindPoint, layout PipelineLayout, first_set u32, descriptor_set_count u32, p_descriptor_sets &DescriptorSet, dynamic_offset_count u32, p_dynamic_offsets &u32)
+
+pub type PFN_vkCmdBindDescriptorSets = fn (command_buffer CommandBuffer, pipeline_bind_point PipelineBindPoint, layout PipelineLayout, first_set u32, descriptor_set_count u32, p_descriptor_sets &DescriptorSet, dynamic_offset_count u32, p_dynamic_offsets &u32)
+
+@[inline]
+pub fn cmd_bind_descriptor_sets(command_buffer CommandBuffer,
+	pipeline_bind_point PipelineBindPoint,
+	layout PipelineLayout,
+	first_set u32,
+	descriptor_set_count u32,
+	p_descriptor_sets &DescriptorSet,
+	dynamic_offset_count u32,
+	p_dynamic_offsets &u32) {
+	C.vkCmdBindDescriptorSets(command_buffer, pipeline_bind_point, layout, first_set,
+		descriptor_set_count, p_descriptor_sets, dynamic_offset_count, p_dynamic_offsets)
+}
+
+@[keep_args_alive]
+fn C.vkCmdClearColorImage(command_buffer CommandBuffer, image Image, image_layout ImageLayout, p_color &ClearColorValue, range_count u32, p_ranges &ImageSubresourceRange)
+
+pub type PFN_vkCmdClearColorImage = fn (command_buffer CommandBuffer, image Image, image_layout ImageLayout, p_color &ClearColorValue, range_count u32, p_ranges &ImageSubresourceRange)
+
+@[inline]
+pub fn cmd_clear_color_image(command_buffer CommandBuffer,
+	image Image,
+	image_layout ImageLayout,
+	p_color &ClearColorValue,
+	range_count u32,
+	p_ranges &ImageSubresourceRange) {
+	C.vkCmdClearColorImage(command_buffer, image, image_layout, p_color, range_count,
+		p_ranges)
+}
+
+@[keep_args_alive]
+fn C.vkCmdDispatch(command_buffer CommandBuffer, group_count_x u32, group_count_y u32, group_count_z u32)
+
+pub type PFN_vkCmdDispatch = fn (command_buffer CommandBuffer, group_count_x u32, group_count_y u32, group_count_z u32)
+
+@[inline]
+pub fn cmd_dispatch(command_buffer CommandBuffer,
+	group_count_x u32,
+	group_count_y u32,
+	group_count_z u32) {
+	C.vkCmdDispatch(command_buffer, group_count_x, group_count_y, group_count_z)
+}
+
+@[keep_args_alive]
+fn C.vkCmdDispatchIndirect(command_buffer CommandBuffer, buffer Buffer, offset DeviceSize)
+
+pub type PFN_vkCmdDispatchIndirect = fn (command_buffer CommandBuffer, buffer Buffer, offset DeviceSize)
+
+@[inline]
+pub fn cmd_dispatch_indirect(command_buffer CommandBuffer,
+	buffer Buffer,
+	offset DeviceSize) {
+	C.vkCmdDispatchIndirect(command_buffer, buffer, offset)
+}
+
+@[keep_args_alive]
+fn C.vkCmdSetEvent(command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags)
+
+pub type PFN_vkCmdSetEvent = fn (command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags)
+
+@[inline]
+pub fn cmd_set_event(command_buffer CommandBuffer,
+	event Event,
+	stage_mask PipelineStageFlags) {
+	C.vkCmdSetEvent(command_buffer, event, stage_mask)
+}
+
+@[keep_args_alive]
+fn C.vkCmdResetEvent(command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags)
+
+pub type PFN_vkCmdResetEvent = fn (command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags)
+
+@[inline]
+pub fn cmd_reset_event(command_buffer CommandBuffer,
+	event Event,
+	stage_mask PipelineStageFlags) {
+	C.vkCmdResetEvent(command_buffer, event, stage_mask)
+}
+
+@[keep_args_alive]
+fn C.vkCmdWaitEvents(command_buffer CommandBuffer, event_count u32, p_events &Event, src_stage_mask PipelineStageFlags, dst_stage_mask PipelineStageFlags, memory_barrier_count u32, p_memory_barriers &MemoryBarrier, buffer_memory_barrier_count u32, p_buffer_memory_barriers &BufferMemoryBarrier, image_memory_barrier_count u32, p_image_memory_barriers &ImageMemoryBarrier)
+
+pub type PFN_vkCmdWaitEvents = fn (command_buffer CommandBuffer, event_count u32, p_events &Event, src_stage_mask PipelineStageFlags, dst_stage_mask PipelineStageFlags, memory_barrier_count u32, p_memory_barriers &MemoryBarrier, buffer_memory_barrier_count u32, p_buffer_memory_barriers &BufferMemoryBarrier, image_memory_barrier_count u32, p_image_memory_barriers &ImageMemoryBarrier)
+
+@[inline]
+pub fn cmd_wait_events(command_buffer CommandBuffer,
+	event_count u32,
+	p_events &Event,
+	src_stage_mask PipelineStageFlags,
+	dst_stage_mask PipelineStageFlags,
+	memory_barrier_count u32,
+	p_memory_barriers &MemoryBarrier,
+	buffer_memory_barrier_count u32,
+	p_buffer_memory_barriers &BufferMemoryBarrier,
+	image_memory_barrier_count u32,
+	p_image_memory_barriers &ImageMemoryBarrier) {
+	C.vkCmdWaitEvents(command_buffer, event_count, p_events, src_stage_mask, dst_stage_mask,
+		memory_barrier_count, p_memory_barriers, buffer_memory_barrier_count, p_buffer_memory_barriers,
+		image_memory_barrier_count, p_image_memory_barriers)
+}
+
+@[keep_args_alive]
+fn C.vkCmdPushConstants(command_buffer CommandBuffer, layout PipelineLayout, stage_flags ShaderStageFlags, offset u32, size u32, p_values voidptr)
+
+pub type PFN_vkCmdPushConstants = fn (command_buffer CommandBuffer, layout PipelineLayout, stage_flags ShaderStageFlags, offset u32, size u32, p_values voidptr)
+
+@[inline]
+pub fn cmd_push_constants(command_buffer CommandBuffer,
+	layout PipelineLayout,
+	stage_flags ShaderStageFlags,
+	offset u32,
+	size u32,
+	p_values voidptr) {
+	C.vkCmdPushConstants(command_buffer, layout, stage_flags, offset, size, p_values)
+}
+
+@[keep_args_alive]
+fn C.vkCreateGraphicsPipelines(device Device, pipeline_cache PipelineCache, create_info_count u32, p_create_infos &GraphicsPipelineCreateInfo, p_allocator &AllocationCallbacks, p_pipelines &Pipeline) Result
+
+pub type PFN_vkCreateGraphicsPipelines = fn (device Device, pipeline_cache PipelineCache, create_info_count u32, p_create_infos &GraphicsPipelineCreateInfo, p_allocator &AllocationCallbacks, p_pipelines &Pipeline) Result
+
+@[inline]
+pub fn create_graphics_pipelines(device Device,
+	pipeline_cache PipelineCache,
+	create_info_count u32,
+	p_create_infos &GraphicsPipelineCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_pipelines &Pipeline) Result {
+	return C.vkCreateGraphicsPipelines(device, pipeline_cache, create_info_count, p_create_infos,
+		p_allocator, p_pipelines)
+}
+
+@[keep_args_alive]
 fn C.vkCreateFramebuffer(device Device, p_create_info &FramebufferCreateInfo, p_allocator &AllocationCallbacks, p_framebuffer &Framebuffer) Result
 
 pub type PFN_vkCreateFramebuffer = fn (device Device, p_create_info &FramebufferCreateInfo, p_allocator &AllocationCallbacks, p_framebuffer &Framebuffer) Result
@@ -5312,112 +5744,6 @@ pub fn get_render_area_granularity(device Device,
 	render_pass RenderPass,
 	mut p_granularity Extent2D) {
 	C.vkGetRenderAreaGranularity(device, render_pass, mut p_granularity)
-}
-
-@[keep_args_alive]
-fn C.vkCreateCommandPool(device Device, p_create_info &CommandPoolCreateInfo, p_allocator &AllocationCallbacks, p_command_pool &CommandPool) Result
-
-pub type PFN_vkCreateCommandPool = fn (device Device, p_create_info &CommandPoolCreateInfo, p_allocator &AllocationCallbacks, p_command_pool &CommandPool) Result
-
-@[inline]
-pub fn create_command_pool(device Device,
-	p_create_info &CommandPoolCreateInfo,
-	p_allocator &AllocationCallbacks,
-	p_command_pool &CommandPool) Result {
-	return C.vkCreateCommandPool(device, p_create_info, p_allocator, p_command_pool)
-}
-
-@[keep_args_alive]
-fn C.vkDestroyCommandPool(device Device, command_pool CommandPool, p_allocator &AllocationCallbacks)
-
-pub type PFN_vkDestroyCommandPool = fn (device Device, command_pool CommandPool, p_allocator &AllocationCallbacks)
-
-@[inline]
-pub fn destroy_command_pool(device Device,
-	command_pool CommandPool,
-	p_allocator &AllocationCallbacks) {
-	C.vkDestroyCommandPool(device, command_pool, p_allocator)
-}
-
-@[keep_args_alive]
-fn C.vkResetCommandPool(device Device, command_pool CommandPool, flags CommandPoolResetFlags) Result
-
-pub type PFN_vkResetCommandPool = fn (device Device, command_pool CommandPool, flags CommandPoolResetFlags) Result
-
-@[inline]
-pub fn reset_command_pool(device Device,
-	command_pool CommandPool,
-	flags CommandPoolResetFlags) Result {
-	return C.vkResetCommandPool(device, command_pool, flags)
-}
-
-@[keep_args_alive]
-fn C.vkAllocateCommandBuffers(device Device, p_allocate_info &CommandBufferAllocateInfo, p_command_buffers &CommandBuffer) Result
-
-pub type PFN_vkAllocateCommandBuffers = fn (device Device, p_allocate_info &CommandBufferAllocateInfo, p_command_buffers &CommandBuffer) Result
-
-@[inline]
-pub fn allocate_command_buffers(device Device,
-	p_allocate_info &CommandBufferAllocateInfo,
-	p_command_buffers &CommandBuffer) Result {
-	return C.vkAllocateCommandBuffers(device, p_allocate_info, p_command_buffers)
-}
-
-@[keep_args_alive]
-fn C.vkFreeCommandBuffers(device Device, command_pool CommandPool, command_buffer_count u32, p_command_buffers &CommandBuffer)
-
-pub type PFN_vkFreeCommandBuffers = fn (device Device, command_pool CommandPool, command_buffer_count u32, p_command_buffers &CommandBuffer)
-
-@[inline]
-pub fn free_command_buffers(device Device,
-	command_pool CommandPool,
-	command_buffer_count u32,
-	p_command_buffers &CommandBuffer) {
-	C.vkFreeCommandBuffers(device, command_pool, command_buffer_count, p_command_buffers)
-}
-
-@[keep_args_alive]
-fn C.vkBeginCommandBuffer(command_buffer CommandBuffer, p_begin_info &CommandBufferBeginInfo) Result
-
-pub type PFN_vkBeginCommandBuffer = fn (command_buffer CommandBuffer, p_begin_info &CommandBufferBeginInfo) Result
-
-@[inline]
-pub fn begin_command_buffer(command_buffer CommandBuffer,
-	p_begin_info &CommandBufferBeginInfo) Result {
-	return C.vkBeginCommandBuffer(command_buffer, p_begin_info)
-}
-
-@[keep_args_alive]
-fn C.vkEndCommandBuffer(command_buffer CommandBuffer) Result
-
-pub type PFN_vkEndCommandBuffer = fn (command_buffer CommandBuffer) Result
-
-@[inline]
-pub fn end_command_buffer(command_buffer CommandBuffer) Result {
-	return C.vkEndCommandBuffer(command_buffer)
-}
-
-@[keep_args_alive]
-fn C.vkResetCommandBuffer(command_buffer CommandBuffer, flags CommandBufferResetFlags) Result
-
-pub type PFN_vkResetCommandBuffer = fn (command_buffer CommandBuffer, flags CommandBufferResetFlags) Result
-
-@[inline]
-pub fn reset_command_buffer(command_buffer CommandBuffer,
-	flags CommandBufferResetFlags) Result {
-	return C.vkResetCommandBuffer(command_buffer, flags)
-}
-
-@[keep_args_alive]
-fn C.vkCmdBindPipeline(command_buffer CommandBuffer, pipeline_bind_point PipelineBindPoint, pipeline Pipeline)
-
-pub type PFN_vkCmdBindPipeline = fn (command_buffer CommandBuffer, pipeline_bind_point PipelineBindPoint, pipeline Pipeline)
-
-@[inline]
-pub fn cmd_bind_pipeline(command_buffer CommandBuffer,
-	pipeline_bind_point PipelineBindPoint,
-	pipeline Pipeline) {
-	C.vkCmdBindPipeline(command_buffer, pipeline_bind_point, pipeline)
 }
 
 @[keep_args_alive]
@@ -5531,24 +5857,6 @@ pub fn cmd_set_stencil_reference(command_buffer CommandBuffer,
 }
 
 @[keep_args_alive]
-fn C.vkCmdBindDescriptorSets(command_buffer CommandBuffer, pipeline_bind_point PipelineBindPoint, layout PipelineLayout, first_set u32, descriptor_set_count u32, p_descriptor_sets &DescriptorSet, dynamic_offset_count u32, p_dynamic_offsets &u32)
-
-pub type PFN_vkCmdBindDescriptorSets = fn (command_buffer CommandBuffer, pipeline_bind_point PipelineBindPoint, layout PipelineLayout, first_set u32, descriptor_set_count u32, p_descriptor_sets &DescriptorSet, dynamic_offset_count u32, p_dynamic_offsets &u32)
-
-@[inline]
-pub fn cmd_bind_descriptor_sets(command_buffer CommandBuffer,
-	pipeline_bind_point PipelineBindPoint,
-	layout PipelineLayout,
-	first_set u32,
-	descriptor_set_count u32,
-	p_descriptor_sets &DescriptorSet,
-	dynamic_offset_count u32,
-	p_dynamic_offsets &u32) {
-	C.vkCmdBindDescriptorSets(command_buffer, pipeline_bind_point, layout, first_set,
-		descriptor_set_count, p_descriptor_sets, dynamic_offset_count, p_dynamic_offsets)
-}
-
-@[keep_args_alive]
 fn C.vkCmdBindIndexBuffer(command_buffer CommandBuffer, buffer Buffer, offset DeviceSize, index_type IndexType)
 
 pub type PFN_vkCmdBindIndexBuffer = fn (command_buffer CommandBuffer, buffer Buffer, offset DeviceSize, index_type IndexType)
@@ -5635,62 +5943,6 @@ pub fn cmd_draw_indexed_indirect(command_buffer CommandBuffer,
 }
 
 @[keep_args_alive]
-fn C.vkCmdDispatch(command_buffer CommandBuffer, group_count_x u32, group_count_y u32, group_count_z u32)
-
-pub type PFN_vkCmdDispatch = fn (command_buffer CommandBuffer, group_count_x u32, group_count_y u32, group_count_z u32)
-
-@[inline]
-pub fn cmd_dispatch(command_buffer CommandBuffer,
-	group_count_x u32,
-	group_count_y u32,
-	group_count_z u32) {
-	C.vkCmdDispatch(command_buffer, group_count_x, group_count_y, group_count_z)
-}
-
-@[keep_args_alive]
-fn C.vkCmdDispatchIndirect(command_buffer CommandBuffer, buffer Buffer, offset DeviceSize)
-
-pub type PFN_vkCmdDispatchIndirect = fn (command_buffer CommandBuffer, buffer Buffer, offset DeviceSize)
-
-@[inline]
-pub fn cmd_dispatch_indirect(command_buffer CommandBuffer,
-	buffer Buffer,
-	offset DeviceSize) {
-	C.vkCmdDispatchIndirect(command_buffer, buffer, offset)
-}
-
-@[keep_args_alive]
-fn C.vkCmdCopyBuffer(command_buffer CommandBuffer, src_buffer Buffer, dst_buffer Buffer, region_count u32, p_regions &BufferCopy)
-
-pub type PFN_vkCmdCopyBuffer = fn (command_buffer CommandBuffer, src_buffer Buffer, dst_buffer Buffer, region_count u32, p_regions &BufferCopy)
-
-@[inline]
-pub fn cmd_copy_buffer(command_buffer CommandBuffer,
-	src_buffer Buffer,
-	dst_buffer Buffer,
-	region_count u32,
-	p_regions &BufferCopy) {
-	C.vkCmdCopyBuffer(command_buffer, src_buffer, dst_buffer, region_count, p_regions)
-}
-
-@[keep_args_alive]
-fn C.vkCmdCopyImage(command_buffer CommandBuffer, src_image Image, src_image_layout ImageLayout, dst_image Image, dst_image_layout ImageLayout, region_count u32, p_regions &ImageCopy)
-
-pub type PFN_vkCmdCopyImage = fn (command_buffer CommandBuffer, src_image Image, src_image_layout ImageLayout, dst_image Image, dst_image_layout ImageLayout, region_count u32, p_regions &ImageCopy)
-
-@[inline]
-pub fn cmd_copy_image(command_buffer CommandBuffer,
-	src_image Image,
-	src_image_layout ImageLayout,
-	dst_image Image,
-	dst_image_layout ImageLayout,
-	region_count u32,
-	p_regions &ImageCopy) {
-	C.vkCmdCopyImage(command_buffer, src_image, src_image_layout, dst_image, dst_image_layout,
-		region_count, p_regions)
-}
-
-@[keep_args_alive]
 fn C.vkCmdBlitImage(command_buffer CommandBuffer, src_image Image, src_image_layout ImageLayout, dst_image Image, dst_image_layout ImageLayout, region_count u32, p_regions &ImageBlit, filter Filter)
 
 pub type PFN_vkCmdBlitImage = fn (command_buffer CommandBuffer, src_image Image, src_image_layout ImageLayout, dst_image Image, dst_image_layout ImageLayout, region_count u32, p_regions &ImageBlit, filter Filter)
@@ -5706,82 +5958,6 @@ pub fn cmd_blit_image(command_buffer CommandBuffer,
 	filter Filter) {
 	C.vkCmdBlitImage(command_buffer, src_image, src_image_layout, dst_image, dst_image_layout,
 		region_count, p_regions, filter)
-}
-
-@[keep_args_alive]
-fn C.vkCmdCopyBufferToImage(command_buffer CommandBuffer, src_buffer Buffer, dst_image Image, dst_image_layout ImageLayout, region_count u32, p_regions &BufferImageCopy)
-
-pub type PFN_vkCmdCopyBufferToImage = fn (command_buffer CommandBuffer, src_buffer Buffer, dst_image Image, dst_image_layout ImageLayout, region_count u32, p_regions &BufferImageCopy)
-
-@[inline]
-pub fn cmd_copy_buffer_to_image(command_buffer CommandBuffer,
-	src_buffer Buffer,
-	dst_image Image,
-	dst_image_layout ImageLayout,
-	region_count u32,
-	p_regions &BufferImageCopy) {
-	C.vkCmdCopyBufferToImage(command_buffer, src_buffer, dst_image, dst_image_layout,
-		region_count, p_regions)
-}
-
-@[keep_args_alive]
-fn C.vkCmdCopyImageToBuffer(command_buffer CommandBuffer, src_image Image, src_image_layout ImageLayout, dst_buffer Buffer, region_count u32, p_regions &BufferImageCopy)
-
-pub type PFN_vkCmdCopyImageToBuffer = fn (command_buffer CommandBuffer, src_image Image, src_image_layout ImageLayout, dst_buffer Buffer, region_count u32, p_regions &BufferImageCopy)
-
-@[inline]
-pub fn cmd_copy_image_to_buffer(command_buffer CommandBuffer,
-	src_image Image,
-	src_image_layout ImageLayout,
-	dst_buffer Buffer,
-	region_count u32,
-	p_regions &BufferImageCopy) {
-	C.vkCmdCopyImageToBuffer(command_buffer, src_image, src_image_layout, dst_buffer,
-		region_count, p_regions)
-}
-
-@[keep_args_alive]
-fn C.vkCmdUpdateBuffer(command_buffer CommandBuffer, dst_buffer Buffer, dst_offset DeviceSize, data_size DeviceSize, p_data voidptr)
-
-pub type PFN_vkCmdUpdateBuffer = fn (command_buffer CommandBuffer, dst_buffer Buffer, dst_offset DeviceSize, data_size DeviceSize, p_data voidptr)
-
-@[inline]
-pub fn cmd_update_buffer(command_buffer CommandBuffer,
-	dst_buffer Buffer,
-	dst_offset DeviceSize,
-	data_size DeviceSize,
-	p_data voidptr) {
-	C.vkCmdUpdateBuffer(command_buffer, dst_buffer, dst_offset, data_size, p_data)
-}
-
-@[keep_args_alive]
-fn C.vkCmdFillBuffer(command_buffer CommandBuffer, dst_buffer Buffer, dst_offset DeviceSize, size DeviceSize, data u32)
-
-pub type PFN_vkCmdFillBuffer = fn (command_buffer CommandBuffer, dst_buffer Buffer, dst_offset DeviceSize, size DeviceSize, data u32)
-
-@[inline]
-pub fn cmd_fill_buffer(command_buffer CommandBuffer,
-	dst_buffer Buffer,
-	dst_offset DeviceSize,
-	size DeviceSize,
-	data u32) {
-	C.vkCmdFillBuffer(command_buffer, dst_buffer, dst_offset, size, data)
-}
-
-@[keep_args_alive]
-fn C.vkCmdClearColorImage(command_buffer CommandBuffer, image Image, image_layout ImageLayout, p_color &ClearColorValue, range_count u32, p_ranges &ImageSubresourceRange)
-
-pub type PFN_vkCmdClearColorImage = fn (command_buffer CommandBuffer, image Image, image_layout ImageLayout, p_color &ClearColorValue, range_count u32, p_ranges &ImageSubresourceRange)
-
-@[inline]
-pub fn cmd_clear_color_image(command_buffer CommandBuffer,
-	image Image,
-	image_layout ImageLayout,
-	p_color &ClearColorValue,
-	range_count u32,
-	p_ranges &ImageSubresourceRange) {
-	C.vkCmdClearColorImage(command_buffer, image, image_layout, p_color, range_count,
-		p_ranges)
 }
 
 @[keep_args_alive]
@@ -5833,157 +6009,6 @@ pub fn cmd_resolve_image(command_buffer CommandBuffer,
 }
 
 @[keep_args_alive]
-fn C.vkCmdSetEvent(command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags)
-
-pub type PFN_vkCmdSetEvent = fn (command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags)
-
-@[inline]
-pub fn cmd_set_event(command_buffer CommandBuffer,
-	event Event,
-	stage_mask PipelineStageFlags) {
-	C.vkCmdSetEvent(command_buffer, event, stage_mask)
-}
-
-@[keep_args_alive]
-fn C.vkCmdResetEvent(command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags)
-
-pub type PFN_vkCmdResetEvent = fn (command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags)
-
-@[inline]
-pub fn cmd_reset_event(command_buffer CommandBuffer,
-	event Event,
-	stage_mask PipelineStageFlags) {
-	C.vkCmdResetEvent(command_buffer, event, stage_mask)
-}
-
-@[keep_args_alive]
-fn C.vkCmdWaitEvents(command_buffer CommandBuffer, event_count u32, p_events &Event, src_stage_mask PipelineStageFlags, dst_stage_mask PipelineStageFlags, memory_barrier_count u32, p_memory_barriers &MemoryBarrier, buffer_memory_barrier_count u32, p_buffer_memory_barriers &BufferMemoryBarrier, image_memory_barrier_count u32, p_image_memory_barriers &ImageMemoryBarrier)
-
-pub type PFN_vkCmdWaitEvents = fn (command_buffer CommandBuffer, event_count u32, p_events &Event, src_stage_mask PipelineStageFlags, dst_stage_mask PipelineStageFlags, memory_barrier_count u32, p_memory_barriers &MemoryBarrier, buffer_memory_barrier_count u32, p_buffer_memory_barriers &BufferMemoryBarrier, image_memory_barrier_count u32, p_image_memory_barriers &ImageMemoryBarrier)
-
-@[inline]
-pub fn cmd_wait_events(command_buffer CommandBuffer,
-	event_count u32,
-	p_events &Event,
-	src_stage_mask PipelineStageFlags,
-	dst_stage_mask PipelineStageFlags,
-	memory_barrier_count u32,
-	p_memory_barriers &MemoryBarrier,
-	buffer_memory_barrier_count u32,
-	p_buffer_memory_barriers &BufferMemoryBarrier,
-	image_memory_barrier_count u32,
-	p_image_memory_barriers &ImageMemoryBarrier) {
-	C.vkCmdWaitEvents(command_buffer, event_count, p_events, src_stage_mask, dst_stage_mask,
-		memory_barrier_count, p_memory_barriers, buffer_memory_barrier_count, p_buffer_memory_barriers,
-		image_memory_barrier_count, p_image_memory_barriers)
-}
-
-@[keep_args_alive]
-fn C.vkCmdPipelineBarrier(command_buffer CommandBuffer, src_stage_mask PipelineStageFlags, dst_stage_mask PipelineStageFlags, dependency_flags DependencyFlags, memory_barrier_count u32, p_memory_barriers &MemoryBarrier, buffer_memory_barrier_count u32, p_buffer_memory_barriers &BufferMemoryBarrier, image_memory_barrier_count u32, p_image_memory_barriers &ImageMemoryBarrier)
-
-pub type PFN_vkCmdPipelineBarrier = fn (command_buffer CommandBuffer, src_stage_mask PipelineStageFlags, dst_stage_mask PipelineStageFlags, dependency_flags DependencyFlags, memory_barrier_count u32, p_memory_barriers &MemoryBarrier, buffer_memory_barrier_count u32, p_buffer_memory_barriers &BufferMemoryBarrier, image_memory_barrier_count u32, p_image_memory_barriers &ImageMemoryBarrier)
-
-@[inline]
-pub fn cmd_pipeline_barrier(command_buffer CommandBuffer,
-	src_stage_mask PipelineStageFlags,
-	dst_stage_mask PipelineStageFlags,
-	dependency_flags DependencyFlags,
-	memory_barrier_count u32,
-	p_memory_barriers &MemoryBarrier,
-	buffer_memory_barrier_count u32,
-	p_buffer_memory_barriers &BufferMemoryBarrier,
-	image_memory_barrier_count u32,
-	p_image_memory_barriers &ImageMemoryBarrier) {
-	C.vkCmdPipelineBarrier(command_buffer, src_stage_mask, dst_stage_mask, dependency_flags,
-		memory_barrier_count, p_memory_barriers, buffer_memory_barrier_count, p_buffer_memory_barriers,
-		image_memory_barrier_count, p_image_memory_barriers)
-}
-
-@[keep_args_alive]
-fn C.vkCmdBeginQuery(command_buffer CommandBuffer, query_pool QueryPool, query u32, flags QueryControlFlags)
-
-pub type PFN_vkCmdBeginQuery = fn (command_buffer CommandBuffer, query_pool QueryPool, query u32, flags QueryControlFlags)
-
-@[inline]
-pub fn cmd_begin_query(command_buffer CommandBuffer,
-	query_pool QueryPool,
-	query u32,
-	flags QueryControlFlags) {
-	C.vkCmdBeginQuery(command_buffer, query_pool, query, flags)
-}
-
-@[keep_args_alive]
-fn C.vkCmdEndQuery(command_buffer CommandBuffer, query_pool QueryPool, query u32)
-
-pub type PFN_vkCmdEndQuery = fn (command_buffer CommandBuffer, query_pool QueryPool, query u32)
-
-@[inline]
-pub fn cmd_end_query(command_buffer CommandBuffer,
-	query_pool QueryPool,
-	query u32) {
-	C.vkCmdEndQuery(command_buffer, query_pool, query)
-}
-
-@[keep_args_alive]
-fn C.vkCmdResetQueryPool(command_buffer CommandBuffer, query_pool QueryPool, first_query u32, query_count u32)
-
-pub type PFN_vkCmdResetQueryPool = fn (command_buffer CommandBuffer, query_pool QueryPool, first_query u32, query_count u32)
-
-@[inline]
-pub fn cmd_reset_query_pool(command_buffer CommandBuffer,
-	query_pool QueryPool,
-	first_query u32,
-	query_count u32) {
-	C.vkCmdResetQueryPool(command_buffer, query_pool, first_query, query_count)
-}
-
-@[keep_args_alive]
-fn C.vkCmdWriteTimestamp(command_buffer CommandBuffer, pipeline_stage PipelineStageFlagBits, query_pool QueryPool, query u32)
-
-pub type PFN_vkCmdWriteTimestamp = fn (command_buffer CommandBuffer, pipeline_stage PipelineStageFlagBits, query_pool QueryPool, query u32)
-
-@[inline]
-pub fn cmd_write_timestamp(command_buffer CommandBuffer,
-	pipeline_stage PipelineStageFlagBits,
-	query_pool QueryPool,
-	query u32) {
-	C.vkCmdWriteTimestamp(command_buffer, pipeline_stage, query_pool, query)
-}
-
-@[keep_args_alive]
-fn C.vkCmdCopyQueryPoolResults(command_buffer CommandBuffer, query_pool QueryPool, first_query u32, query_count u32, dst_buffer Buffer, dst_offset DeviceSize, stride DeviceSize, flags QueryResultFlags)
-
-pub type PFN_vkCmdCopyQueryPoolResults = fn (command_buffer CommandBuffer, query_pool QueryPool, first_query u32, query_count u32, dst_buffer Buffer, dst_offset DeviceSize, stride DeviceSize, flags QueryResultFlags)
-
-@[inline]
-pub fn cmd_copy_query_pool_results(command_buffer CommandBuffer,
-	query_pool QueryPool,
-	first_query u32,
-	query_count u32,
-	dst_buffer Buffer,
-	dst_offset DeviceSize,
-	stride DeviceSize,
-	flags QueryResultFlags) {
-	C.vkCmdCopyQueryPoolResults(command_buffer, query_pool, first_query, query_count,
-		dst_buffer, dst_offset, stride, flags)
-}
-
-@[keep_args_alive]
-fn C.vkCmdPushConstants(command_buffer CommandBuffer, layout PipelineLayout, stage_flags ShaderStageFlags, offset u32, size u32, p_values voidptr)
-
-pub type PFN_vkCmdPushConstants = fn (command_buffer CommandBuffer, layout PipelineLayout, stage_flags ShaderStageFlags, offset u32, size u32, p_values voidptr)
-
-@[inline]
-pub fn cmd_push_constants(command_buffer CommandBuffer,
-	layout PipelineLayout,
-	stage_flags ShaderStageFlags,
-	offset u32,
-	size u32,
-	p_values voidptr) {
-	C.vkCmdPushConstants(command_buffer, layout, stage_flags, offset, size, p_values)
-}
-
-@[keep_args_alive]
 fn C.vkCmdBeginRenderPass(command_buffer CommandBuffer, p_render_pass_begin &RenderPassBeginInfo, contents SubpassContents)
 
 pub type PFN_vkCmdBeginRenderPass = fn (command_buffer CommandBuffer, p_render_pass_begin &RenderPassBeginInfo, contents SubpassContents)
@@ -6016,39 +6041,21 @@ pub fn cmd_end_render_pass(command_buffer CommandBuffer) {
 	C.vkCmdEndRenderPass(command_buffer)
 }
 
-@[keep_args_alive]
-fn C.vkCmdExecuteCommands(command_buffer CommandBuffer, command_buffer_count u32, p_command_buffers &CommandBuffer)
-
-pub type PFN_vkCmdExecuteCommands = fn (command_buffer CommandBuffer, command_buffer_count u32, p_command_buffers &CommandBuffer)
-
-@[inline]
-pub fn cmd_execute_commands(command_buffer CommandBuffer,
-	command_buffer_count u32,
-	p_command_buffers &CommandBuffer) {
-	C.vkCmdExecuteCommands(command_buffer, command_buffer_count, p_command_buffers)
-}
-
 pub const api_version_1_1 = make_api_version(0, 1, 1, 0) // patch version should always be set to 0
-// Pointer to VkSamplerYcbcrConversion_T
-pub type SamplerYcbcrConversion = voidptr
-
 // Pointer to VkDescriptorUpdateTemplate_T
 pub type DescriptorUpdateTemplate = voidptr
+
+// Pointer to VkSamplerYcbcrConversion_T
+pub type SamplerYcbcrConversion = voidptr
 
 pub const max_device_group_size = u32(32)
 pub const luid_size = u32(8)
 pub const queue_family_external = ~u32(1)
 
-pub enum PointClippingBehavior as u32 {
-	all_clip_planes       = 0
-	user_clip_planes_only = 1
-	max_enum              = max_int
-}
-
-pub enum TessellationDomainOrigin as u32 {
-	upper_left = 0
-	lower_left = 1
-	max_enum   = max_int
+pub enum DescriptorUpdateTemplateType as u32 {
+	descriptor_set   = 0
+	push_descriptors = 1
+	max_enum         = max_int
 }
 
 pub enum SamplerYcbcrModelConversion as u32 {
@@ -6072,27 +6079,17 @@ pub enum ChromaLocation as u32 {
 	max_enum     = max_int
 }
 
-pub enum DescriptorUpdateTemplateType as u32 {
-	descriptor_set   = 0
-	push_descriptors = 1
-	max_enum         = max_int
+pub enum PointClippingBehavior as u32 {
+	all_clip_planes       = 0
+	user_clip_planes_only = 1
+	max_enum              = max_int
 }
 
-pub enum SubgroupFeatureFlagBits as u32 {
-	basic              = u32(0x00000001)
-	vote               = u32(0x00000002)
-	arithmetic         = u32(0x00000004)
-	ballot             = u32(0x00000008)
-	shuffle            = u32(0x00000010)
-	shuffle_relative   = u32(0x00000020)
-	clustered          = u32(0x00000040)
-	quad               = u32(0x00000080)
-	rotate             = u32(0x00000200)
-	rotate_clustered   = u32(0x00000400)
-	partitioned_bit_nv = u32(0x00000100)
-	max_enum           = max_int
+pub enum TessellationDomainOrigin as u32 {
+	upper_left = 0
+	lower_left = 1
+	max_enum   = max_int
 }
-pub type SubgroupFeatureFlags = u32
 
 pub enum PeerMemoryFeatureFlagBits as u32 {
 	copy_src    = u32(0x00000001)
@@ -6112,7 +6109,6 @@ pub enum MemoryAllocateFlagBits as u32 {
 }
 pub type MemoryAllocateFlags = u32
 pub type CommandPoolTrimFlags = u32
-pub type DescriptorUpdateTemplateCreateFlags = u32
 
 pub enum ExternalMemoryHandleTypeFlagBits as u32 {
 	opaque_fd                           = u32(0x00000001)
@@ -6190,20 +6186,22 @@ pub enum ExternalSemaphoreFeatureFlagBits as u32 {
 }
 pub type ExternalSemaphoreFeatureFlags = u32
 
-// PhysicalDeviceSubgroupProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceSubgroupProperties = C.VkPhysicalDeviceSubgroupProperties
-
-@[typedef]
-pub struct C.VkPhysicalDeviceSubgroupProperties {
-pub mut:
-	sType                     StructureType = StructureType.physical_device_subgroup_properties
-	pNext                     voidptr       = unsafe { nil }
-	subgroupSize              u32
-	supportedStages           ShaderStageFlags
-	supportedOperations       SubgroupFeatureFlags
-	quadOperationsInAllStages Bool32
+pub enum SubgroupFeatureFlagBits as u32 {
+	basic              = u32(0x00000001)
+	vote               = u32(0x00000002)
+	arithmetic         = u32(0x00000004)
+	ballot             = u32(0x00000008)
+	shuffle            = u32(0x00000010)
+	shuffle_relative   = u32(0x00000020)
+	clustered          = u32(0x00000040)
+	quad               = u32(0x00000080)
+	rotate             = u32(0x00000200)
+	rotate_clustered   = u32(0x00000400)
+	partitioned_bit_nv = u32(0x00000100)
+	max_enum           = max_int
 }
-
+pub type SubgroupFeatureFlags = u32
+pub type DescriptorUpdateTemplateCreateFlags = u32
 pub type BindBufferMemoryInfo = C.VkBindBufferMemoryInfo
 
 @[typedef]
@@ -6226,20 +6224,6 @@ pub mut:
 	image        Image
 	memory       DeviceMemory
 	memoryOffset DeviceSize
-}
-
-// PhysicalDevice16BitStorageFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDevice16BitStorageFeatures = C.VkPhysicalDevice16BitStorageFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDevice16BitStorageFeatures {
-pub mut:
-	sType                              StructureType = StructureType.physical_device16bit_storage_features
-	pNext                              voidptr       = unsafe { nil }
-	storageBuffer16BitAccess           Bool32
-	uniformAndStorageBuffer16BitAccess Bool32
-	storagePushConstant16              Bool32
-	storageInputOutput16               Bool32
 }
 
 // MemoryDedicatedRequirements extends VkMemoryRequirements2
@@ -6276,19 +6260,6 @@ pub mut:
 	pNext      voidptr       = unsafe { nil }
 	flags      MemoryAllocateFlags
 	deviceMask u32
-}
-
-// DeviceGroupRenderPassBeginInfo extends VkRenderPassBeginInfo,VkRenderingInfo
-pub type DeviceGroupRenderPassBeginInfo = C.VkDeviceGroupRenderPassBeginInfo
-
-@[typedef]
-pub struct C.VkDeviceGroupRenderPassBeginInfo {
-pub mut:
-	sType                 StructureType = StructureType.device_group_render_pass_begin_info
-	pNext                 voidptr       = unsafe { nil }
-	deviceMask            u32
-	deviceRenderAreaCount u32
-	pDeviceRenderAreas    &Rect2D
 }
 
 // DeviceGroupCommandBufferBeginInfo extends VkCommandBufferBeginInfo
@@ -6529,39 +6500,6 @@ pub mut:
 	tiling  ImageTiling
 }
 
-// PhysicalDevicePointClippingProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDevicePointClippingProperties = C.VkPhysicalDevicePointClippingProperties
-
-@[typedef]
-pub struct C.VkPhysicalDevicePointClippingProperties {
-pub mut:
-	sType                 StructureType = StructureType.physical_device_point_clipping_properties
-	pNext                 voidptr       = unsafe { nil }
-	pointClippingBehavior PointClippingBehavior
-}
-
-pub type InputAttachmentAspectReference = C.VkInputAttachmentAspectReference
-
-@[typedef]
-pub struct C.VkInputAttachmentAspectReference {
-pub mut:
-	subpass              u32
-	inputAttachmentIndex u32
-	aspectMask           ImageAspectFlags
-}
-
-// RenderPassInputAttachmentAspectCreateInfo extends VkRenderPassCreateInfo
-pub type RenderPassInputAttachmentAspectCreateInfo = C.VkRenderPassInputAttachmentAspectCreateInfo
-
-@[typedef]
-pub struct C.VkRenderPassInputAttachmentAspectCreateInfo {
-pub mut:
-	sType                StructureType = StructureType.render_pass_input_attachment_aspect_create_info
-	pNext                voidptr       = unsafe { nil }
-	aspectReferenceCount u32
-	pAspectReferences    &InputAttachmentAspectReference
-}
-
 // ImageViewUsageCreateInfo extends VkImageViewCreateInfo
 pub type ImageViewUsageCreateInfo = C.VkImageViewUsageCreateInfo
 
@@ -6572,72 +6510,6 @@ pub mut:
 	pNext voidptr       = unsafe { nil }
 	usage ImageUsageFlags
 }
-
-// PipelineTessellationDomainOriginStateCreateInfo extends VkPipelineTessellationStateCreateInfo
-pub type PipelineTessellationDomainOriginStateCreateInfo = C.VkPipelineTessellationDomainOriginStateCreateInfo
-
-@[typedef]
-pub struct C.VkPipelineTessellationDomainOriginStateCreateInfo {
-pub mut:
-	sType        StructureType = StructureType.pipeline_tessellation_domain_origin_state_create_info
-	pNext        voidptr       = unsafe { nil }
-	domainOrigin TessellationDomainOrigin
-}
-
-// RenderPassMultiviewCreateInfo extends VkRenderPassCreateInfo
-pub type RenderPassMultiviewCreateInfo = C.VkRenderPassMultiviewCreateInfo
-
-@[typedef]
-pub struct C.VkRenderPassMultiviewCreateInfo {
-pub mut:
-	sType                StructureType = StructureType.render_pass_multiview_create_info
-	pNext                voidptr       = unsafe { nil }
-	subpassCount         u32
-	pViewMasks           &u32
-	dependencyCount      u32
-	pViewOffsets         &i32
-	correlationMaskCount u32
-	pCorrelationMasks    &u32
-}
-
-// PhysicalDeviceMultiviewFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceMultiviewFeatures = C.VkPhysicalDeviceMultiviewFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceMultiviewFeatures {
-pub mut:
-	sType                       StructureType = StructureType.physical_device_multiview_features
-	pNext                       voidptr       = unsafe { nil }
-	multiview                   Bool32
-	multiviewGeometryShader     Bool32
-	multiviewTessellationShader Bool32
-}
-
-// PhysicalDeviceMultiviewProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceMultiviewProperties = C.VkPhysicalDeviceMultiviewProperties
-
-@[typedef]
-pub struct C.VkPhysicalDeviceMultiviewProperties {
-pub mut:
-	sType                     StructureType = StructureType.physical_device_multiview_properties
-	pNext                     voidptr       = unsafe { nil }
-	maxMultiviewViewCount     u32
-	maxMultiviewInstanceIndex u32
-}
-
-// PhysicalDeviceVariablePointersFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceVariablePointersFeatures = C.VkPhysicalDeviceVariablePointersFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceVariablePointersFeatures {
-pub mut:
-	sType                         StructureType = StructureType.physical_device_variable_pointers_features
-	pNext                         voidptr       = unsafe { nil }
-	variablePointersStorageBuffer Bool32
-	variablePointers              Bool32
-}
-
-pub type PhysicalDeviceVariablePointerFeatures = C.VkPhysicalDeviceVariablePointersFeatures
 
 // PhysicalDeviceProtectedMemoryFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub type PhysicalDeviceProtectedMemoryFeatures = C.VkPhysicalDeviceProtectedMemoryFeatures
@@ -6684,34 +6556,6 @@ pub mut:
 	protectedSubmit Bool32
 }
 
-pub type SamplerYcbcrConversionCreateInfo = C.VkSamplerYcbcrConversionCreateInfo
-
-@[typedef]
-pub struct C.VkSamplerYcbcrConversionCreateInfo {
-pub mut:
-	sType                       StructureType = StructureType.sampler_ycbcr_conversion_create_info
-	pNext                       voidptr       = unsafe { nil }
-	format                      Format
-	ycbcrModel                  SamplerYcbcrModelConversion
-	ycbcrRange                  SamplerYcbcrRange
-	components                  ComponentMapping
-	xChromaOffset               ChromaLocation
-	yChromaOffset               ChromaLocation
-	chromaFilter                Filter
-	forceExplicitReconstruction Bool32
-}
-
-// SamplerYcbcrConversionInfo extends VkSamplerCreateInfo,VkImageViewCreateInfo
-pub type SamplerYcbcrConversionInfo = C.VkSamplerYcbcrConversionInfo
-
-@[typedef]
-pub struct C.VkSamplerYcbcrConversionInfo {
-pub mut:
-	sType      StructureType = StructureType.sampler_ycbcr_conversion_info
-	pNext      voidptr       = unsafe { nil }
-	conversion SamplerYcbcrConversion
-}
-
 // BindImagePlaneMemoryInfo extends VkBindImageMemoryInfo
 pub type BindImagePlaneMemoryInfo = C.VkBindImagePlaneMemoryInfo
 
@@ -6732,58 +6576,6 @@ pub mut:
 	sType       StructureType = StructureType.image_plane_memory_requirements_info
 	pNext       voidptr       = unsafe { nil }
 	planeAspect ImageAspectFlagBits
-}
-
-// PhysicalDeviceSamplerYcbcrConversionFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceSamplerYcbcrConversionFeatures = C.VkPhysicalDeviceSamplerYcbcrConversionFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceSamplerYcbcrConversionFeatures {
-pub mut:
-	sType                  StructureType = StructureType.physical_device_sampler_ycbcr_conversion_features
-	pNext                  voidptr       = unsafe { nil }
-	samplerYcbcrConversion Bool32
-}
-
-// SamplerYcbcrConversionImageFormatProperties extends VkImageFormatProperties2
-pub type SamplerYcbcrConversionImageFormatProperties = C.VkSamplerYcbcrConversionImageFormatProperties
-
-@[typedef]
-pub struct C.VkSamplerYcbcrConversionImageFormatProperties {
-pub mut:
-	sType                               StructureType = StructureType.sampler_ycbcr_conversion_image_format_properties
-	pNext                               voidptr       = unsafe { nil }
-	combinedImageSamplerDescriptorCount u32
-}
-
-pub type DescriptorUpdateTemplateEntry = C.VkDescriptorUpdateTemplateEntry
-
-@[typedef]
-pub struct C.VkDescriptorUpdateTemplateEntry {
-pub mut:
-	dstBinding      u32
-	dstArrayElement u32
-	descriptorCount u32
-	descriptorType  DescriptorType
-	offset          usize
-	stride          usize
-}
-
-pub type DescriptorUpdateTemplateCreateInfo = C.VkDescriptorUpdateTemplateCreateInfo
-
-@[typedef]
-pub struct C.VkDescriptorUpdateTemplateCreateInfo {
-pub mut:
-	sType                      StructureType = StructureType.descriptor_update_template_create_info
-	pNext                      voidptr       = unsafe { nil }
-	flags                      DescriptorUpdateTemplateCreateFlags
-	descriptorUpdateEntryCount u32
-	pDescriptorUpdateEntries   &DescriptorUpdateTemplateEntry
-	templateType               DescriptorUpdateTemplateType
-	descriptorSetLayout        DescriptorSetLayout
-	pipelineBindPoint          PipelineBindPoint
-	pipelineLayout             PipelineLayout
-	set                        u32
 }
 
 pub type ExternalMemoryProperties = C.VkExternalMemoryProperties
@@ -6954,6 +6746,78 @@ pub mut:
 	externalSemaphoreFeatures     ExternalSemaphoreFeatureFlags
 }
 
+// PhysicalDeviceSubgroupProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceSubgroupProperties = C.VkPhysicalDeviceSubgroupProperties
+
+@[typedef]
+pub struct C.VkPhysicalDeviceSubgroupProperties {
+pub mut:
+	sType                     StructureType = StructureType.physical_device_subgroup_properties
+	pNext                     voidptr       = unsafe { nil }
+	subgroupSize              u32
+	supportedStages           ShaderStageFlags
+	supportedOperations       SubgroupFeatureFlags
+	quadOperationsInAllStages Bool32
+}
+
+// PhysicalDevice16BitStorageFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDevice16BitStorageFeatures = C.VkPhysicalDevice16BitStorageFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDevice16BitStorageFeatures {
+pub mut:
+	sType                              StructureType = StructureType.physical_device16bit_storage_features
+	pNext                              voidptr       = unsafe { nil }
+	storageBuffer16BitAccess           Bool32
+	uniformAndStorageBuffer16BitAccess Bool32
+	storagePushConstant16              Bool32
+	storageInputOutput16               Bool32
+}
+
+// PhysicalDeviceVariablePointersFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceVariablePointersFeatures = C.VkPhysicalDeviceVariablePointersFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceVariablePointersFeatures {
+pub mut:
+	sType                         StructureType = StructureType.physical_device_variable_pointers_features
+	pNext                         voidptr       = unsafe { nil }
+	variablePointersStorageBuffer Bool32
+	variablePointers              Bool32
+}
+
+pub type PhysicalDeviceVariablePointerFeatures = C.VkPhysicalDeviceVariablePointersFeatures
+
+pub type DescriptorUpdateTemplateEntry = C.VkDescriptorUpdateTemplateEntry
+
+@[typedef]
+pub struct C.VkDescriptorUpdateTemplateEntry {
+pub mut:
+	dstBinding      u32
+	dstArrayElement u32
+	descriptorCount u32
+	descriptorType  DescriptorType
+	offset          usize
+	stride          usize
+}
+
+pub type DescriptorUpdateTemplateCreateInfo = C.VkDescriptorUpdateTemplateCreateInfo
+
+@[typedef]
+pub struct C.VkDescriptorUpdateTemplateCreateInfo {
+pub mut:
+	sType                      StructureType = StructureType.descriptor_update_template_create_info
+	pNext                      voidptr       = unsafe { nil }
+	flags                      DescriptorUpdateTemplateCreateFlags
+	descriptorUpdateEntryCount u32
+	pDescriptorUpdateEntries   &DescriptorUpdateTemplateEntry
+	templateType               DescriptorUpdateTemplateType
+	descriptorSetLayout        DescriptorSetLayout
+	pipelineBindPoint          PipelineBindPoint
+	pipelineLayout             PipelineLayout
+	set                        u32
+}
+
 // PhysicalDeviceMaintenance3Properties extends VkPhysicalDeviceProperties2
 pub type PhysicalDeviceMaintenance3Properties = C.VkPhysicalDeviceMaintenance3Properties
 
@@ -6974,6 +6838,154 @@ pub mut:
 	sType     StructureType = StructureType.descriptor_set_layout_support
 	pNext     voidptr       = unsafe { nil }
 	supported Bool32
+}
+
+pub type SamplerYcbcrConversionCreateInfo = C.VkSamplerYcbcrConversionCreateInfo
+
+@[typedef]
+pub struct C.VkSamplerYcbcrConversionCreateInfo {
+pub mut:
+	sType                       StructureType = StructureType.sampler_ycbcr_conversion_create_info
+	pNext                       voidptr       = unsafe { nil }
+	format                      Format
+	ycbcrModel                  SamplerYcbcrModelConversion
+	ycbcrRange                  SamplerYcbcrRange
+	components                  ComponentMapping
+	xChromaOffset               ChromaLocation
+	yChromaOffset               ChromaLocation
+	chromaFilter                Filter
+	forceExplicitReconstruction Bool32
+}
+
+// SamplerYcbcrConversionInfo extends VkSamplerCreateInfo,VkImageViewCreateInfo
+pub type SamplerYcbcrConversionInfo = C.VkSamplerYcbcrConversionInfo
+
+@[typedef]
+pub struct C.VkSamplerYcbcrConversionInfo {
+pub mut:
+	sType      StructureType = StructureType.sampler_ycbcr_conversion_info
+	pNext      voidptr       = unsafe { nil }
+	conversion SamplerYcbcrConversion
+}
+
+// PhysicalDeviceSamplerYcbcrConversionFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceSamplerYcbcrConversionFeatures = C.VkPhysicalDeviceSamplerYcbcrConversionFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceSamplerYcbcrConversionFeatures {
+pub mut:
+	sType                  StructureType = StructureType.physical_device_sampler_ycbcr_conversion_features
+	pNext                  voidptr       = unsafe { nil }
+	samplerYcbcrConversion Bool32
+}
+
+// SamplerYcbcrConversionImageFormatProperties extends VkImageFormatProperties2
+pub type SamplerYcbcrConversionImageFormatProperties = C.VkSamplerYcbcrConversionImageFormatProperties
+
+@[typedef]
+pub struct C.VkSamplerYcbcrConversionImageFormatProperties {
+pub mut:
+	sType                               StructureType = StructureType.sampler_ycbcr_conversion_image_format_properties
+	pNext                               voidptr       = unsafe { nil }
+	combinedImageSamplerDescriptorCount u32
+}
+
+// DeviceGroupRenderPassBeginInfo extends VkRenderPassBeginInfo,VkRenderingInfo
+pub type DeviceGroupRenderPassBeginInfo = C.VkDeviceGroupRenderPassBeginInfo
+
+@[typedef]
+pub struct C.VkDeviceGroupRenderPassBeginInfo {
+pub mut:
+	sType                 StructureType = StructureType.device_group_render_pass_begin_info
+	pNext                 voidptr       = unsafe { nil }
+	deviceMask            u32
+	deviceRenderAreaCount u32
+	pDeviceRenderAreas    &Rect2D
+}
+
+// PhysicalDevicePointClippingProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDevicePointClippingProperties = C.VkPhysicalDevicePointClippingProperties
+
+@[typedef]
+pub struct C.VkPhysicalDevicePointClippingProperties {
+pub mut:
+	sType                 StructureType = StructureType.physical_device_point_clipping_properties
+	pNext                 voidptr       = unsafe { nil }
+	pointClippingBehavior PointClippingBehavior
+}
+
+pub type InputAttachmentAspectReference = C.VkInputAttachmentAspectReference
+
+@[typedef]
+pub struct C.VkInputAttachmentAspectReference {
+pub mut:
+	subpass              u32
+	inputAttachmentIndex u32
+	aspectMask           ImageAspectFlags
+}
+
+// RenderPassInputAttachmentAspectCreateInfo extends VkRenderPassCreateInfo
+pub type RenderPassInputAttachmentAspectCreateInfo = C.VkRenderPassInputAttachmentAspectCreateInfo
+
+@[typedef]
+pub struct C.VkRenderPassInputAttachmentAspectCreateInfo {
+pub mut:
+	sType                StructureType = StructureType.render_pass_input_attachment_aspect_create_info
+	pNext                voidptr       = unsafe { nil }
+	aspectReferenceCount u32
+	pAspectReferences    &InputAttachmentAspectReference
+}
+
+// PipelineTessellationDomainOriginStateCreateInfo extends VkPipelineTessellationStateCreateInfo
+pub type PipelineTessellationDomainOriginStateCreateInfo = C.VkPipelineTessellationDomainOriginStateCreateInfo
+
+@[typedef]
+pub struct C.VkPipelineTessellationDomainOriginStateCreateInfo {
+pub mut:
+	sType        StructureType = StructureType.pipeline_tessellation_domain_origin_state_create_info
+	pNext        voidptr       = unsafe { nil }
+	domainOrigin TessellationDomainOrigin
+}
+
+// RenderPassMultiviewCreateInfo extends VkRenderPassCreateInfo
+pub type RenderPassMultiviewCreateInfo = C.VkRenderPassMultiviewCreateInfo
+
+@[typedef]
+pub struct C.VkRenderPassMultiviewCreateInfo {
+pub mut:
+	sType                StructureType = StructureType.render_pass_multiview_create_info
+	pNext                voidptr       = unsafe { nil }
+	subpassCount         u32
+	pViewMasks           &u32
+	dependencyCount      u32
+	pViewOffsets         &i32
+	correlationMaskCount u32
+	pCorrelationMasks    &u32
+}
+
+// PhysicalDeviceMultiviewFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceMultiviewFeatures = C.VkPhysicalDeviceMultiviewFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceMultiviewFeatures {
+pub mut:
+	sType                       StructureType = StructureType.physical_device_multiview_features
+	pNext                       voidptr       = unsafe { nil }
+	multiview                   Bool32
+	multiviewGeometryShader     Bool32
+	multiviewTessellationShader Bool32
+}
+
+// PhysicalDeviceMultiviewProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceMultiviewProperties = C.VkPhysicalDeviceMultiviewProperties
+
+@[typedef]
+pub struct C.VkPhysicalDeviceMultiviewProperties {
+pub mut:
+	sType                     StructureType = StructureType.physical_device_multiview_properties
+	pNext                     voidptr       = unsafe { nil }
+	maxMultiviewViewCount     u32
+	maxMultiviewInstanceIndex u32
 }
 
 // PhysicalDeviceShaderDrawParametersFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -7047,23 +7059,6 @@ pub type PFN_vkCmdSetDeviceMask = fn (command_buffer CommandBuffer, device_mask 
 pub fn cmd_set_device_mask(command_buffer CommandBuffer,
 	device_mask u32) {
 	C.vkCmdSetDeviceMask(command_buffer, device_mask)
-}
-
-@[keep_args_alive]
-fn C.vkCmdDispatchBase(command_buffer CommandBuffer, base_group_x u32, base_group_y u32, base_group_z u32, group_count_x u32, group_count_y u32, group_count_z u32)
-
-pub type PFN_vkCmdDispatchBase = fn (command_buffer CommandBuffer, base_group_x u32, base_group_y u32, base_group_z u32, group_count_x u32, group_count_y u32, group_count_z u32)
-
-@[inline]
-pub fn cmd_dispatch_base(command_buffer CommandBuffer,
-	base_group_x u32,
-	base_group_y u32,
-	base_group_z u32,
-	group_count_x u32,
-	group_count_y u32,
-	group_count_z u32) {
-	C.vkCmdDispatchBase(command_buffer, base_group_x, base_group_y, base_group_z, group_count_x,
-		group_count_y, group_count_z)
 }
 
 @[keep_args_alive]
@@ -7227,28 +7222,59 @@ pub fn get_device_queue2(device Device,
 }
 
 @[keep_args_alive]
-fn C.vkCreateSamplerYcbcrConversion(device Device, p_create_info &SamplerYcbcrConversionCreateInfo, p_allocator &AllocationCallbacks, p_ycbcr_conversion &SamplerYcbcrConversion) Result
+fn C.vkGetPhysicalDeviceExternalBufferProperties(physical_device PhysicalDevice, p_external_buffer_info &PhysicalDeviceExternalBufferInfo, mut p_external_buffer_properties ExternalBufferProperties)
 
-pub type PFN_vkCreateSamplerYcbcrConversion = fn (device Device, p_create_info &SamplerYcbcrConversionCreateInfo, p_allocator &AllocationCallbacks, p_ycbcr_conversion &SamplerYcbcrConversion) Result
+pub type PFN_vkGetPhysicalDeviceExternalBufferProperties = fn (physical_device PhysicalDevice, p_external_buffer_info &PhysicalDeviceExternalBufferInfo, mut p_external_buffer_properties ExternalBufferProperties)
 
 @[inline]
-pub fn create_sampler_ycbcr_conversion(device Device,
-	p_create_info &SamplerYcbcrConversionCreateInfo,
-	p_allocator &AllocationCallbacks,
-	p_ycbcr_conversion &SamplerYcbcrConversion) Result {
-	return C.vkCreateSamplerYcbcrConversion(device, p_create_info, p_allocator, p_ycbcr_conversion)
+pub fn get_physical_device_external_buffer_properties(physical_device PhysicalDevice,
+	p_external_buffer_info &PhysicalDeviceExternalBufferInfo,
+	mut p_external_buffer_properties ExternalBufferProperties) {
+	C.vkGetPhysicalDeviceExternalBufferProperties(physical_device, p_external_buffer_info, mut
+		p_external_buffer_properties)
 }
 
 @[keep_args_alive]
-fn C.vkDestroySamplerYcbcrConversion(device Device, ycbcr_conversion SamplerYcbcrConversion, p_allocator &AllocationCallbacks)
+fn C.vkGetPhysicalDeviceExternalFenceProperties(physical_device PhysicalDevice, p_external_fence_info &PhysicalDeviceExternalFenceInfo, mut p_external_fence_properties ExternalFenceProperties)
 
-pub type PFN_vkDestroySamplerYcbcrConversion = fn (device Device, ycbcr_conversion SamplerYcbcrConversion, p_allocator &AllocationCallbacks)
+pub type PFN_vkGetPhysicalDeviceExternalFenceProperties = fn (physical_device PhysicalDevice, p_external_fence_info &PhysicalDeviceExternalFenceInfo, mut p_external_fence_properties ExternalFenceProperties)
 
 @[inline]
-pub fn destroy_sampler_ycbcr_conversion(device Device,
-	ycbcr_conversion SamplerYcbcrConversion,
-	p_allocator &AllocationCallbacks) {
-	C.vkDestroySamplerYcbcrConversion(device, ycbcr_conversion, p_allocator)
+pub fn get_physical_device_external_fence_properties(physical_device PhysicalDevice,
+	p_external_fence_info &PhysicalDeviceExternalFenceInfo,
+	mut p_external_fence_properties ExternalFenceProperties) {
+	C.vkGetPhysicalDeviceExternalFenceProperties(physical_device, p_external_fence_info, mut
+		p_external_fence_properties)
+}
+
+@[keep_args_alive]
+fn C.vkGetPhysicalDeviceExternalSemaphoreProperties(physical_device PhysicalDevice, p_external_semaphore_info &PhysicalDeviceExternalSemaphoreInfo, mut p_external_semaphore_properties ExternalSemaphoreProperties)
+
+pub type PFN_vkGetPhysicalDeviceExternalSemaphoreProperties = fn (physical_device PhysicalDevice, p_external_semaphore_info &PhysicalDeviceExternalSemaphoreInfo, mut p_external_semaphore_properties ExternalSemaphoreProperties)
+
+@[inline]
+pub fn get_physical_device_external_semaphore_properties(physical_device PhysicalDevice,
+	p_external_semaphore_info &PhysicalDeviceExternalSemaphoreInfo,
+	mut p_external_semaphore_properties ExternalSemaphoreProperties) {
+	C.vkGetPhysicalDeviceExternalSemaphoreProperties(physical_device, p_external_semaphore_info, mut
+		p_external_semaphore_properties)
+}
+
+@[keep_args_alive]
+fn C.vkCmdDispatchBase(command_buffer CommandBuffer, base_group_x u32, base_group_y u32, base_group_z u32, group_count_x u32, group_count_y u32, group_count_z u32)
+
+pub type PFN_vkCmdDispatchBase = fn (command_buffer CommandBuffer, base_group_x u32, base_group_y u32, base_group_z u32, group_count_x u32, group_count_y u32, group_count_z u32)
+
+@[inline]
+pub fn cmd_dispatch_base(command_buffer CommandBuffer,
+	base_group_x u32,
+	base_group_y u32,
+	base_group_z u32,
+	group_count_x u32,
+	group_count_y u32,
+	group_count_z u32) {
+	C.vkCmdDispatchBase(command_buffer, base_group_x, base_group_y, base_group_z, group_count_x,
+		group_count_y, group_count_z)
 }
 
 @[keep_args_alive]
@@ -7291,45 +7317,6 @@ pub fn update_descriptor_set_with_template(device Device,
 }
 
 @[keep_args_alive]
-fn C.vkGetPhysicalDeviceExternalBufferProperties(physical_device PhysicalDevice, p_external_buffer_info &PhysicalDeviceExternalBufferInfo, mut p_external_buffer_properties ExternalBufferProperties)
-
-pub type PFN_vkGetPhysicalDeviceExternalBufferProperties = fn (physical_device PhysicalDevice, p_external_buffer_info &PhysicalDeviceExternalBufferInfo, mut p_external_buffer_properties ExternalBufferProperties)
-
-@[inline]
-pub fn get_physical_device_external_buffer_properties(physical_device PhysicalDevice,
-	p_external_buffer_info &PhysicalDeviceExternalBufferInfo,
-	mut p_external_buffer_properties ExternalBufferProperties) {
-	C.vkGetPhysicalDeviceExternalBufferProperties(physical_device, p_external_buffer_info, mut
-		p_external_buffer_properties)
-}
-
-@[keep_args_alive]
-fn C.vkGetPhysicalDeviceExternalFenceProperties(physical_device PhysicalDevice, p_external_fence_info &PhysicalDeviceExternalFenceInfo, mut p_external_fence_properties ExternalFenceProperties)
-
-pub type PFN_vkGetPhysicalDeviceExternalFenceProperties = fn (physical_device PhysicalDevice, p_external_fence_info &PhysicalDeviceExternalFenceInfo, mut p_external_fence_properties ExternalFenceProperties)
-
-@[inline]
-pub fn get_physical_device_external_fence_properties(physical_device PhysicalDevice,
-	p_external_fence_info &PhysicalDeviceExternalFenceInfo,
-	mut p_external_fence_properties ExternalFenceProperties) {
-	C.vkGetPhysicalDeviceExternalFenceProperties(physical_device, p_external_fence_info, mut
-		p_external_fence_properties)
-}
-
-@[keep_args_alive]
-fn C.vkGetPhysicalDeviceExternalSemaphoreProperties(physical_device PhysicalDevice, p_external_semaphore_info &PhysicalDeviceExternalSemaphoreInfo, mut p_external_semaphore_properties ExternalSemaphoreProperties)
-
-pub type PFN_vkGetPhysicalDeviceExternalSemaphoreProperties = fn (physical_device PhysicalDevice, p_external_semaphore_info &PhysicalDeviceExternalSemaphoreInfo, mut p_external_semaphore_properties ExternalSemaphoreProperties)
-
-@[inline]
-pub fn get_physical_device_external_semaphore_properties(physical_device PhysicalDevice,
-	p_external_semaphore_info &PhysicalDeviceExternalSemaphoreInfo,
-	mut p_external_semaphore_properties ExternalSemaphoreProperties) {
-	C.vkGetPhysicalDeviceExternalSemaphoreProperties(physical_device, p_external_semaphore_info, mut
-		p_external_semaphore_properties)
-}
-
-@[keep_args_alive]
 fn C.vkGetDescriptorSetLayoutSupport(device Device, p_create_info &DescriptorSetLayoutCreateInfo, mut p_support DescriptorSetLayoutSupport)
 
 pub type PFN_vkGetDescriptorSetLayoutSupport = fn (device Device, p_create_info &DescriptorSetLayoutCreateInfo, mut p_support DescriptorSetLayoutSupport)
@@ -7339,6 +7326,31 @@ pub fn get_descriptor_set_layout_support(device Device,
 	p_create_info &DescriptorSetLayoutCreateInfo,
 	mut p_support DescriptorSetLayoutSupport) {
 	C.vkGetDescriptorSetLayoutSupport(device, p_create_info, mut p_support)
+}
+
+@[keep_args_alive]
+fn C.vkCreateSamplerYcbcrConversion(device Device, p_create_info &SamplerYcbcrConversionCreateInfo, p_allocator &AllocationCallbacks, p_ycbcr_conversion &SamplerYcbcrConversion) Result
+
+pub type PFN_vkCreateSamplerYcbcrConversion = fn (device Device, p_create_info &SamplerYcbcrConversionCreateInfo, p_allocator &AllocationCallbacks, p_ycbcr_conversion &SamplerYcbcrConversion) Result
+
+@[inline]
+pub fn create_sampler_ycbcr_conversion(device Device,
+	p_create_info &SamplerYcbcrConversionCreateInfo,
+	p_allocator &AllocationCallbacks,
+	p_ycbcr_conversion &SamplerYcbcrConversion) Result {
+	return C.vkCreateSamplerYcbcrConversion(device, p_create_info, p_allocator, p_ycbcr_conversion)
+}
+
+@[keep_args_alive]
+fn C.vkDestroySamplerYcbcrConversion(device Device, ycbcr_conversion SamplerYcbcrConversion, p_allocator &AllocationCallbacks)
+
+pub type PFN_vkDestroySamplerYcbcrConversion = fn (device Device, ycbcr_conversion SamplerYcbcrConversion, p_allocator &AllocationCallbacks)
+
+@[inline]
+pub fn destroy_sampler_ycbcr_conversion(device Device,
+	ycbcr_conversion SamplerYcbcrConversion,
+	p_allocator &AllocationCallbacks) {
+	C.vkDestroySamplerYcbcrConversion(device, ycbcr_conversion, p_allocator)
 }
 
 pub const api_version_1_2 = make_api_version(0, 1, 2, 0) // patch version should always be set to 0
@@ -7373,6 +7385,7 @@ pub enum DriverId as u32 {
 	imagination_open_source_mesa  = 25
 	mesa_honeykrisp               = 26
 	vulkan_sc_emulation_on_vulkan = 27
+	mesa_kosmickrisp              = 28
 	max_enum                      = max_int
 }
 
@@ -7383,18 +7396,18 @@ pub enum ShaderFloatControlsIndependence as u32 {
 	max_enum     = max_int
 }
 
+pub enum SemaphoreType as u32 {
+	binary   = 0
+	timeline = 1
+	max_enum = max_int
+}
+
 pub enum SamplerReductionMode as u32 {
 	weighted_average                 = 0
 	min                              = 1
 	max                              = 2
 	weighted_average_rangeclamp_qcom = 1000521000
 	max_enum                         = max_int
-}
-
-pub enum SemaphoreType as u32 {
-	binary   = 0
-	timeline = 1
-	max_enum = max_int
 }
 
 pub enum ResolveModeFlagBits as u32 {
@@ -7408,6 +7421,12 @@ pub enum ResolveModeFlagBits as u32 {
 }
 pub type ResolveModeFlags = u32
 
+pub enum SemaphoreWaitFlagBits as u32 {
+	any      = u32(0x00000001)
+	max_enum = max_int
+}
+pub type SemaphoreWaitFlags = u32
+
 pub enum DescriptorBindingFlagBits as u32 {
 	update_after_bind           = u32(0x00000001)
 	update_unused_while_pending = u32(0x00000002)
@@ -7416,12 +7435,6 @@ pub enum DescriptorBindingFlagBits as u32 {
 	max_enum                    = max_int
 }
 pub type DescriptorBindingFlags = u32
-
-pub enum SemaphoreWaitFlagBits as u32 {
-	any      = u32(0x00000001)
-	max_enum = max_int
-}
-pub type SemaphoreWaitFlags = u32
 
 // PhysicalDeviceVulkan11Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub type PhysicalDeviceVulkan11Features = C.VkPhysicalDeviceVulkan11Features
@@ -7612,108 +7625,169 @@ pub mut:
 	pViewFormats    &Format
 }
 
-pub type AttachmentDescription2 = C.VkAttachmentDescription2
+// PhysicalDeviceDriverProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceDriverProperties = C.VkPhysicalDeviceDriverProperties
 
 @[typedef]
-pub struct C.VkAttachmentDescription2 {
+pub struct C.VkPhysicalDeviceDriverProperties {
 pub mut:
-	sType          StructureType = StructureType.attachment_description2
+	sType              StructureType = StructureType.physical_device_driver_properties
+	pNext              voidptr       = unsafe { nil }
+	driverID           DriverId
+	driverName         [max_driver_name_size]char
+	driverInfo         [max_driver_info_size]char
+	conformanceVersion ConformanceVersion
+}
+
+// PhysicalDeviceVulkanMemoryModelFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceVulkanMemoryModelFeatures = C.VkPhysicalDeviceVulkanMemoryModelFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceVulkanMemoryModelFeatures {
+pub mut:
+	sType                                         StructureType = StructureType.physical_device_vulkan_memory_model_features
+	pNext                                         voidptr       = unsafe { nil }
+	vulkanMemoryModel                             Bool32
+	vulkanMemoryModelDeviceScope                  Bool32
+	vulkanMemoryModelAvailabilityVisibilityChains Bool32
+}
+
+// PhysicalDeviceHostQueryResetFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceHostQueryResetFeatures = C.VkPhysicalDeviceHostQueryResetFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceHostQueryResetFeatures {
+pub mut:
+	sType          StructureType = StructureType.physical_device_host_query_reset_features
 	pNext          voidptr       = unsafe { nil }
-	flags          AttachmentDescriptionFlags
-	format         Format
-	samples        SampleCountFlagBits
-	loadOp         AttachmentLoadOp
-	storeOp        AttachmentStoreOp
-	stencilLoadOp  AttachmentLoadOp
-	stencilStoreOp AttachmentStoreOp
-	initialLayout  ImageLayout
-	finalLayout    ImageLayout
+	hostQueryReset Bool32
 }
 
-pub type AttachmentReference2 = C.VkAttachmentReference2
+// PhysicalDeviceTimelineSemaphoreFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceTimelineSemaphoreFeatures = C.VkPhysicalDeviceTimelineSemaphoreFeatures
 
 @[typedef]
-pub struct C.VkAttachmentReference2 {
+pub struct C.VkPhysicalDeviceTimelineSemaphoreFeatures {
 pub mut:
-	sType      StructureType = StructureType.attachment_reference2
-	pNext      voidptr       = unsafe { nil }
-	attachment u32
-	layout     ImageLayout
-	aspectMask ImageAspectFlags
+	sType             StructureType = StructureType.physical_device_timeline_semaphore_features
+	pNext             voidptr       = unsafe { nil }
+	timelineSemaphore Bool32
 }
 
-pub type SubpassDescription2 = C.VkSubpassDescription2
+// PhysicalDeviceTimelineSemaphoreProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceTimelineSemaphoreProperties = C.VkPhysicalDeviceTimelineSemaphoreProperties
 
 @[typedef]
-pub struct C.VkSubpassDescription2 {
+pub struct C.VkPhysicalDeviceTimelineSemaphoreProperties {
 pub mut:
-	sType                   StructureType = StructureType.subpass_description2
-	pNext                   voidptr       = unsafe { nil }
-	flags                   SubpassDescriptionFlags
-	pipelineBindPoint       PipelineBindPoint
-	viewMask                u32
-	inputAttachmentCount    u32
-	pInputAttachments       &AttachmentReference2
-	colorAttachmentCount    u32
-	pColorAttachments       &AttachmentReference2
-	pResolveAttachments     &AttachmentReference2
-	pDepthStencilAttachment &AttachmentReference2
-	preserveAttachmentCount u32
-	pPreserveAttachments    &u32
+	sType                               StructureType = StructureType.physical_device_timeline_semaphore_properties
+	pNext                               voidptr       = unsafe { nil }
+	maxTimelineSemaphoreValueDifference u64
 }
 
-pub type SubpassDependency2 = C.VkSubpassDependency2
+// SemaphoreTypeCreateInfo extends VkSemaphoreCreateInfo,VkPhysicalDeviceExternalSemaphoreInfo
+pub type SemaphoreTypeCreateInfo = C.VkSemaphoreTypeCreateInfo
 
 @[typedef]
-pub struct C.VkSubpassDependency2 {
+pub struct C.VkSemaphoreTypeCreateInfo {
 pub mut:
-	sType           StructureType = StructureType.subpass_dependency2
-	pNext           voidptr       = unsafe { nil }
-	srcSubpass      u32
-	dstSubpass      u32
-	srcStageMask    PipelineStageFlags
-	dstStageMask    PipelineStageFlags
-	srcAccessMask   AccessFlags
-	dstAccessMask   AccessFlags
-	dependencyFlags DependencyFlags
-	viewOffset      i32
+	sType         StructureType = StructureType.semaphore_type_create_info
+	pNext         voidptr       = unsafe { nil }
+	semaphoreType SemaphoreType
+	initialValue  u64
 }
 
-pub type RenderPassCreateInfo2 = C.VkRenderPassCreateInfo2
+// TimelineSemaphoreSubmitInfo extends VkSubmitInfo,VkBindSparseInfo
+pub type TimelineSemaphoreSubmitInfo = C.VkTimelineSemaphoreSubmitInfo
 
 @[typedef]
-pub struct C.VkRenderPassCreateInfo2 {
+pub struct C.VkTimelineSemaphoreSubmitInfo {
 pub mut:
-	sType                   StructureType = StructureType.render_pass_create_info2
-	pNext                   voidptr       = unsafe { nil }
-	flags                   RenderPassCreateFlags
-	attachmentCount         u32
-	pAttachments            &AttachmentDescription2
-	subpassCount            u32
-	pSubpasses              &SubpassDescription2
-	dependencyCount         u32
-	pDependencies           &SubpassDependency2
-	correlatedViewMaskCount u32
-	pCorrelatedViewMasks    &u32
+	sType                     StructureType = StructureType.timeline_semaphore_submit_info
+	pNext                     voidptr       = unsafe { nil }
+	waitSemaphoreValueCount   u32
+	pWaitSemaphoreValues      &u64
+	signalSemaphoreValueCount u32
+	pSignalSemaphoreValues    &u64
 }
 
-pub type SubpassBeginInfo = C.VkSubpassBeginInfo
+pub type SemaphoreWaitInfo = C.VkSemaphoreWaitInfo
 
 @[typedef]
-pub struct C.VkSubpassBeginInfo {
+pub struct C.VkSemaphoreWaitInfo {
 pub mut:
-	sType    StructureType = StructureType.subpass_begin_info
-	pNext    voidptr       = unsafe { nil }
-	contents SubpassContents
+	sType          StructureType = StructureType.semaphore_wait_info
+	pNext          voidptr       = unsafe { nil }
+	flags          SemaphoreWaitFlags
+	semaphoreCount u32
+	pSemaphores    &Semaphore
+	pValues        &u64
 }
 
-pub type SubpassEndInfo = C.VkSubpassEndInfo
+pub type SemaphoreSignalInfo = C.VkSemaphoreSignalInfo
 
 @[typedef]
-pub struct C.VkSubpassEndInfo {
+pub struct C.VkSemaphoreSignalInfo {
 pub mut:
-	sType StructureType = StructureType.subpass_end_info
-	pNext voidptr       = unsafe { nil }
+	sType     StructureType = StructureType.semaphore_signal_info
+	pNext     voidptr       = unsafe { nil }
+	semaphore Semaphore
+	value     u64
+}
+
+// PhysicalDeviceBufferDeviceAddressFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceBufferDeviceAddressFeatures = C.VkPhysicalDeviceBufferDeviceAddressFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceBufferDeviceAddressFeatures {
+pub mut:
+	sType                            StructureType = StructureType.physical_device_buffer_device_address_features
+	pNext                            voidptr       = unsafe { nil }
+	bufferDeviceAddress              Bool32
+	bufferDeviceAddressCaptureReplay Bool32
+	bufferDeviceAddressMultiDevice   Bool32
+}
+
+pub type BufferDeviceAddressInfo = C.VkBufferDeviceAddressInfo
+
+@[typedef]
+pub struct C.VkBufferDeviceAddressInfo {
+pub mut:
+	sType  StructureType = StructureType.buffer_device_address_info
+	pNext  voidptr       = unsafe { nil }
+	buffer Buffer
+}
+
+// BufferOpaqueCaptureAddressCreateInfo extends VkBufferCreateInfo
+pub type BufferOpaqueCaptureAddressCreateInfo = C.VkBufferOpaqueCaptureAddressCreateInfo
+
+@[typedef]
+pub struct C.VkBufferOpaqueCaptureAddressCreateInfo {
+pub mut:
+	sType                StructureType = StructureType.buffer_opaque_capture_address_create_info
+	pNext                voidptr       = unsafe { nil }
+	opaqueCaptureAddress u64
+}
+
+// MemoryOpaqueCaptureAddressAllocateInfo extends VkMemoryAllocateInfo
+pub type MemoryOpaqueCaptureAddressAllocateInfo = C.VkMemoryOpaqueCaptureAddressAllocateInfo
+
+@[typedef]
+pub struct C.VkMemoryOpaqueCaptureAddressAllocateInfo {
+pub mut:
+	sType                StructureType = StructureType.memory_opaque_capture_address_allocate_info
+	pNext                voidptr       = unsafe { nil }
+	opaqueCaptureAddress u64
+}
+
+pub type DeviceMemoryOpaqueCaptureAddressInfo = C.VkDeviceMemoryOpaqueCaptureAddressInfo
+
+@[typedef]
+pub struct C.VkDeviceMemoryOpaqueCaptureAddressInfo {
+pub mut:
+	sType  StructureType = StructureType.device_memory_opaque_capture_address_info
+	pNext  voidptr       = unsafe { nil }
+	memory DeviceMemory
 }
 
 // PhysicalDevice8BitStorageFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -7727,20 +7801,6 @@ pub mut:
 	storageBuffer8BitAccess           Bool32
 	uniformAndStorageBuffer8BitAccess Bool32
 	storagePushConstant8              Bool32
-}
-
-// PhysicalDeviceDriverProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceDriverProperties = C.VkPhysicalDeviceDriverProperties
-
-@[typedef]
-pub struct C.VkPhysicalDeviceDriverProperties {
-pub mut:
-	sType              StructureType = StructureType.physical_device_driver_properties
-	pNext              voidptr       = unsafe { nil }
-	driverID           DriverId
-	driverName         [max_driver_name_size]char
-	driverInfo         [max_driver_info_size]char
-	conformanceVersion ConformanceVersion
 }
 
 // PhysicalDeviceShaderAtomicInt64Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -7892,6 +7952,166 @@ pub mut:
 	maxVariableDescriptorCount u32
 }
 
+// PhysicalDeviceScalarBlockLayoutFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceScalarBlockLayoutFeatures = C.VkPhysicalDeviceScalarBlockLayoutFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceScalarBlockLayoutFeatures {
+pub mut:
+	sType             StructureType = StructureType.physical_device_scalar_block_layout_features
+	pNext             voidptr       = unsafe { nil }
+	scalarBlockLayout Bool32
+}
+
+// SamplerReductionModeCreateInfo extends VkSamplerCreateInfo
+pub type SamplerReductionModeCreateInfo = C.VkSamplerReductionModeCreateInfo
+
+@[typedef]
+pub struct C.VkSamplerReductionModeCreateInfo {
+pub mut:
+	sType         StructureType = StructureType.sampler_reduction_mode_create_info
+	pNext         voidptr       = unsafe { nil }
+	reductionMode SamplerReductionMode
+}
+
+// PhysicalDeviceSamplerFilterMinmaxProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceSamplerFilterMinmaxProperties = C.VkPhysicalDeviceSamplerFilterMinmaxProperties
+
+@[typedef]
+pub struct C.VkPhysicalDeviceSamplerFilterMinmaxProperties {
+pub mut:
+	sType                              StructureType = StructureType.physical_device_sampler_filter_minmax_properties
+	pNext                              voidptr       = unsafe { nil }
+	filterMinmaxSingleComponentFormats Bool32
+	filterMinmaxImageComponentMapping  Bool32
+}
+
+// PhysicalDeviceUniformBufferStandardLayoutFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceUniformBufferStandardLayoutFeatures = C.VkPhysicalDeviceUniformBufferStandardLayoutFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceUniformBufferStandardLayoutFeatures {
+pub mut:
+	sType                       StructureType = StructureType.physical_device_uniform_buffer_standard_layout_features
+	pNext                       voidptr       = unsafe { nil }
+	uniformBufferStandardLayout Bool32
+}
+
+// PhysicalDeviceShaderSubgroupExtendedTypesFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceShaderSubgroupExtendedTypesFeatures = C.VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures {
+pub mut:
+	sType                       StructureType = StructureType.physical_device_shader_subgroup_extended_types_features
+	pNext                       voidptr       = unsafe { nil }
+	shaderSubgroupExtendedTypes Bool32
+}
+
+pub type AttachmentDescription2 = C.VkAttachmentDescription2
+
+@[typedef]
+pub struct C.VkAttachmentDescription2 {
+pub mut:
+	sType          StructureType = StructureType.attachment_description2
+	pNext          voidptr       = unsafe { nil }
+	flags          AttachmentDescriptionFlags
+	format         Format
+	samples        SampleCountFlagBits
+	loadOp         AttachmentLoadOp
+	storeOp        AttachmentStoreOp
+	stencilLoadOp  AttachmentLoadOp
+	stencilStoreOp AttachmentStoreOp
+	initialLayout  ImageLayout
+	finalLayout    ImageLayout
+}
+
+pub type AttachmentReference2 = C.VkAttachmentReference2
+
+@[typedef]
+pub struct C.VkAttachmentReference2 {
+pub mut:
+	sType      StructureType = StructureType.attachment_reference2
+	pNext      voidptr       = unsafe { nil }
+	attachment u32
+	layout     ImageLayout
+	aspectMask ImageAspectFlags
+}
+
+pub type SubpassDescription2 = C.VkSubpassDescription2
+
+@[typedef]
+pub struct C.VkSubpassDescription2 {
+pub mut:
+	sType                   StructureType = StructureType.subpass_description2
+	pNext                   voidptr       = unsafe { nil }
+	flags                   SubpassDescriptionFlags
+	pipelineBindPoint       PipelineBindPoint
+	viewMask                u32
+	inputAttachmentCount    u32
+	pInputAttachments       &AttachmentReference2
+	colorAttachmentCount    u32
+	pColorAttachments       &AttachmentReference2
+	pResolveAttachments     &AttachmentReference2
+	pDepthStencilAttachment &AttachmentReference2
+	preserveAttachmentCount u32
+	pPreserveAttachments    &u32
+}
+
+pub type SubpassDependency2 = C.VkSubpassDependency2
+
+@[typedef]
+pub struct C.VkSubpassDependency2 {
+pub mut:
+	sType           StructureType = StructureType.subpass_dependency2
+	pNext           voidptr       = unsafe { nil }
+	srcSubpass      u32
+	dstSubpass      u32
+	srcStageMask    PipelineStageFlags
+	dstStageMask    PipelineStageFlags
+	srcAccessMask   AccessFlags
+	dstAccessMask   AccessFlags
+	dependencyFlags DependencyFlags
+	viewOffset      i32
+}
+
+pub type RenderPassCreateInfo2 = C.VkRenderPassCreateInfo2
+
+@[typedef]
+pub struct C.VkRenderPassCreateInfo2 {
+pub mut:
+	sType                   StructureType = StructureType.render_pass_create_info2
+	pNext                   voidptr       = unsafe { nil }
+	flags                   RenderPassCreateFlags
+	attachmentCount         u32
+	pAttachments            &AttachmentDescription2
+	subpassCount            u32
+	pSubpasses              &SubpassDescription2
+	dependencyCount         u32
+	pDependencies           &SubpassDependency2
+	correlatedViewMaskCount u32
+	pCorrelatedViewMasks    &u32
+}
+
+pub type SubpassBeginInfo = C.VkSubpassBeginInfo
+
+@[typedef]
+pub struct C.VkSubpassBeginInfo {
+pub mut:
+	sType    StructureType = StructureType.subpass_begin_info
+	pNext    voidptr       = unsafe { nil }
+	contents SubpassContents
+}
+
+pub type SubpassEndInfo = C.VkSubpassEndInfo
+
+@[typedef]
+pub struct C.VkSubpassEndInfo {
+pub mut:
+	sType StructureType = StructureType.subpass_end_info
+	pNext voidptr       = unsafe { nil }
+}
+
 // SubpassDescriptionDepthStencilResolve extends VkSubpassDescription2
 pub type SubpassDescriptionDepthStencilResolve = C.VkSubpassDescriptionDepthStencilResolve
 
@@ -7919,17 +8139,6 @@ pub mut:
 	independentResolve           Bool32
 }
 
-// PhysicalDeviceScalarBlockLayoutFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceScalarBlockLayoutFeatures = C.VkPhysicalDeviceScalarBlockLayoutFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceScalarBlockLayoutFeatures {
-pub mut:
-	sType             StructureType = StructureType.physical_device_scalar_block_layout_features
-	pNext             voidptr       = unsafe { nil }
-	scalarBlockLayout Bool32
-}
-
 // ImageStencilUsageCreateInfo extends VkImageCreateInfo,VkPhysicalDeviceImageFormatInfo2
 pub type ImageStencilUsageCreateInfo = C.VkImageStencilUsageCreateInfo
 
@@ -7939,42 +8148,6 @@ pub mut:
 	sType        StructureType = StructureType.image_stencil_usage_create_info
 	pNext        voidptr       = unsafe { nil }
 	stencilUsage ImageUsageFlags
-}
-
-// SamplerReductionModeCreateInfo extends VkSamplerCreateInfo
-pub type SamplerReductionModeCreateInfo = C.VkSamplerReductionModeCreateInfo
-
-@[typedef]
-pub struct C.VkSamplerReductionModeCreateInfo {
-pub mut:
-	sType         StructureType = StructureType.sampler_reduction_mode_create_info
-	pNext         voidptr       = unsafe { nil }
-	reductionMode SamplerReductionMode
-}
-
-// PhysicalDeviceSamplerFilterMinmaxProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceSamplerFilterMinmaxProperties = C.VkPhysicalDeviceSamplerFilterMinmaxProperties
-
-@[typedef]
-pub struct C.VkPhysicalDeviceSamplerFilterMinmaxProperties {
-pub mut:
-	sType                              StructureType = StructureType.physical_device_sampler_filter_minmax_properties
-	pNext                              voidptr       = unsafe { nil }
-	filterMinmaxSingleComponentFormats Bool32
-	filterMinmaxImageComponentMapping  Bool32
-}
-
-// PhysicalDeviceVulkanMemoryModelFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceVulkanMemoryModelFeatures = C.VkPhysicalDeviceVulkanMemoryModelFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceVulkanMemoryModelFeatures {
-pub mut:
-	sType                                         StructureType = StructureType.physical_device_vulkan_memory_model_features
-	pNext                                         voidptr       = unsafe { nil }
-	vulkanMemoryModel                             Bool32
-	vulkanMemoryModelDeviceScope                  Bool32
-	vulkanMemoryModelAvailabilityVisibilityChains Bool32
 }
 
 // PhysicalDeviceImagelessFramebufferFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -8028,28 +8201,6 @@ pub mut:
 	pAttachments    &ImageView
 }
 
-// PhysicalDeviceUniformBufferStandardLayoutFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceUniformBufferStandardLayoutFeatures = C.VkPhysicalDeviceUniformBufferStandardLayoutFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceUniformBufferStandardLayoutFeatures {
-pub mut:
-	sType                       StructureType = StructureType.physical_device_uniform_buffer_standard_layout_features
-	pNext                       voidptr       = unsafe { nil }
-	uniformBufferStandardLayout Bool32
-}
-
-// PhysicalDeviceShaderSubgroupExtendedTypesFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceShaderSubgroupExtendedTypesFeatures = C.VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceShaderSubgroupExtendedTypesFeatures {
-pub mut:
-	sType                       StructureType = StructureType.physical_device_shader_subgroup_extended_types_features
-	pNext                       voidptr       = unsafe { nil }
-	shaderSubgroupExtendedTypes Bool32
-}
-
 // PhysicalDeviceSeparateDepthStencilLayoutsFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub type PhysicalDeviceSeparateDepthStencilLayoutsFeatures = C.VkPhysicalDeviceSeparateDepthStencilLayoutsFeatures
 
@@ -8084,142 +8235,85 @@ pub mut:
 	stencilFinalLayout   ImageLayout
 }
 
-// PhysicalDeviceHostQueryResetFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceHostQueryResetFeatures = C.VkPhysicalDeviceHostQueryResetFeatures
+@[keep_args_alive]
+fn C.vkResetQueryPool(device Device, query_pool QueryPool, first_query u32, query_count u32)
 
-@[typedef]
-pub struct C.VkPhysicalDeviceHostQueryResetFeatures {
-pub mut:
-	sType          StructureType = StructureType.physical_device_host_query_reset_features
-	pNext          voidptr       = unsafe { nil }
-	hostQueryReset Bool32
+pub type PFN_vkResetQueryPool = fn (device Device, query_pool QueryPool, first_query u32, query_count u32)
+
+@[inline]
+pub fn reset_query_pool(device Device,
+	query_pool QueryPool,
+	first_query u32,
+	query_count u32) {
+	C.vkResetQueryPool(device, query_pool, first_query, query_count)
 }
 
-// PhysicalDeviceTimelineSemaphoreFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceTimelineSemaphoreFeatures = C.VkPhysicalDeviceTimelineSemaphoreFeatures
+@[keep_args_alive]
+fn C.vkGetSemaphoreCounterValue(device Device, semaphore Semaphore, p_value &u64) Result
 
-@[typedef]
-pub struct C.VkPhysicalDeviceTimelineSemaphoreFeatures {
-pub mut:
-	sType             StructureType = StructureType.physical_device_timeline_semaphore_features
-	pNext             voidptr       = unsafe { nil }
-	timelineSemaphore Bool32
+pub type PFN_vkGetSemaphoreCounterValue = fn (device Device, semaphore Semaphore, p_value &u64) Result
+
+@[inline]
+pub fn get_semaphore_counter_value(device Device,
+	semaphore Semaphore,
+	p_value &u64) Result {
+	return C.vkGetSemaphoreCounterValue(device, semaphore, p_value)
 }
 
-// PhysicalDeviceTimelineSemaphoreProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceTimelineSemaphoreProperties = C.VkPhysicalDeviceTimelineSemaphoreProperties
+@[keep_args_alive]
+fn C.vkWaitSemaphores(device Device, p_wait_info &SemaphoreWaitInfo, timeout u64) Result
 
-@[typedef]
-pub struct C.VkPhysicalDeviceTimelineSemaphoreProperties {
-pub mut:
-	sType                               StructureType = StructureType.physical_device_timeline_semaphore_properties
-	pNext                               voidptr       = unsafe { nil }
-	maxTimelineSemaphoreValueDifference u64
+pub type PFN_vkWaitSemaphores = fn (device Device, p_wait_info &SemaphoreWaitInfo, timeout u64) Result
+
+@[inline]
+pub fn wait_semaphores(device Device,
+	p_wait_info &SemaphoreWaitInfo,
+	timeout u64) Result {
+	return C.vkWaitSemaphores(device, p_wait_info, timeout)
 }
 
-// SemaphoreTypeCreateInfo extends VkSemaphoreCreateInfo,VkPhysicalDeviceExternalSemaphoreInfo
-pub type SemaphoreTypeCreateInfo = C.VkSemaphoreTypeCreateInfo
+@[keep_args_alive]
+fn C.vkSignalSemaphore(device Device, p_signal_info &SemaphoreSignalInfo) Result
 
-@[typedef]
-pub struct C.VkSemaphoreTypeCreateInfo {
-pub mut:
-	sType         StructureType = StructureType.semaphore_type_create_info
-	pNext         voidptr       = unsafe { nil }
-	semaphoreType SemaphoreType
-	initialValue  u64
+pub type PFN_vkSignalSemaphore = fn (device Device, p_signal_info &SemaphoreSignalInfo) Result
+
+@[inline]
+pub fn signal_semaphore(device Device,
+	p_signal_info &SemaphoreSignalInfo) Result {
+	return C.vkSignalSemaphore(device, p_signal_info)
 }
 
-// TimelineSemaphoreSubmitInfo extends VkSubmitInfo,VkBindSparseInfo
-pub type TimelineSemaphoreSubmitInfo = C.VkTimelineSemaphoreSubmitInfo
+@[keep_args_alive]
+fn C.vkGetBufferDeviceAddress(device Device, p_info &BufferDeviceAddressInfo) DeviceAddress
 
-@[typedef]
-pub struct C.VkTimelineSemaphoreSubmitInfo {
-pub mut:
-	sType                     StructureType = StructureType.timeline_semaphore_submit_info
-	pNext                     voidptr       = unsafe { nil }
-	waitSemaphoreValueCount   u32
-	pWaitSemaphoreValues      &u64
-	signalSemaphoreValueCount u32
-	pSignalSemaphoreValues    &u64
+pub type PFN_vkGetBufferDeviceAddress = fn (device Device, p_info &BufferDeviceAddressInfo) DeviceAddress
+
+@[inline]
+pub fn get_buffer_device_address(device Device,
+	p_info &BufferDeviceAddressInfo) DeviceAddress {
+	return C.vkGetBufferDeviceAddress(device, p_info)
 }
 
-pub type SemaphoreWaitInfo = C.VkSemaphoreWaitInfo
+@[keep_args_alive]
+fn C.vkGetBufferOpaqueCaptureAddress(device Device, p_info &BufferDeviceAddressInfo) u64
 
-@[typedef]
-pub struct C.VkSemaphoreWaitInfo {
-pub mut:
-	sType          StructureType = StructureType.semaphore_wait_info
-	pNext          voidptr       = unsafe { nil }
-	flags          SemaphoreWaitFlags
-	semaphoreCount u32
-	pSemaphores    &Semaphore
-	pValues        &u64
+pub type PFN_vkGetBufferOpaqueCaptureAddress = fn (device Device, p_info &BufferDeviceAddressInfo) u64
+
+@[inline]
+pub fn get_buffer_opaque_capture_address(device Device,
+	p_info &BufferDeviceAddressInfo) u64 {
+	return C.vkGetBufferOpaqueCaptureAddress(device, p_info)
 }
 
-pub type SemaphoreSignalInfo = C.VkSemaphoreSignalInfo
+@[keep_args_alive]
+fn C.vkGetDeviceMemoryOpaqueCaptureAddress(device Device, p_info &DeviceMemoryOpaqueCaptureAddressInfo) u64
 
-@[typedef]
-pub struct C.VkSemaphoreSignalInfo {
-pub mut:
-	sType     StructureType = StructureType.semaphore_signal_info
-	pNext     voidptr       = unsafe { nil }
-	semaphore Semaphore
-	value     u64
-}
+pub type PFN_vkGetDeviceMemoryOpaqueCaptureAddress = fn (device Device, p_info &DeviceMemoryOpaqueCaptureAddressInfo) u64
 
-// PhysicalDeviceBufferDeviceAddressFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceBufferDeviceAddressFeatures = C.VkPhysicalDeviceBufferDeviceAddressFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceBufferDeviceAddressFeatures {
-pub mut:
-	sType                            StructureType = StructureType.physical_device_buffer_device_address_features
-	pNext                            voidptr       = unsafe { nil }
-	bufferDeviceAddress              Bool32
-	bufferDeviceAddressCaptureReplay Bool32
-	bufferDeviceAddressMultiDevice   Bool32
-}
-
-pub type BufferDeviceAddressInfo = C.VkBufferDeviceAddressInfo
-
-@[typedef]
-pub struct C.VkBufferDeviceAddressInfo {
-pub mut:
-	sType  StructureType = StructureType.buffer_device_address_info
-	pNext  voidptr       = unsafe { nil }
-	buffer Buffer
-}
-
-// BufferOpaqueCaptureAddressCreateInfo extends VkBufferCreateInfo
-pub type BufferOpaqueCaptureAddressCreateInfo = C.VkBufferOpaqueCaptureAddressCreateInfo
-
-@[typedef]
-pub struct C.VkBufferOpaqueCaptureAddressCreateInfo {
-pub mut:
-	sType                StructureType = StructureType.buffer_opaque_capture_address_create_info
-	pNext                voidptr       = unsafe { nil }
-	opaqueCaptureAddress u64
-}
-
-// MemoryOpaqueCaptureAddressAllocateInfo extends VkMemoryAllocateInfo
-pub type MemoryOpaqueCaptureAddressAllocateInfo = C.VkMemoryOpaqueCaptureAddressAllocateInfo
-
-@[typedef]
-pub struct C.VkMemoryOpaqueCaptureAddressAllocateInfo {
-pub mut:
-	sType                StructureType = StructureType.memory_opaque_capture_address_allocate_info
-	pNext                voidptr       = unsafe { nil }
-	opaqueCaptureAddress u64
-}
-
-pub type DeviceMemoryOpaqueCaptureAddressInfo = C.VkDeviceMemoryOpaqueCaptureAddressInfo
-
-@[typedef]
-pub struct C.VkDeviceMemoryOpaqueCaptureAddressInfo {
-pub mut:
-	sType  StructureType = StructureType.device_memory_opaque_capture_address_info
-	pNext  voidptr       = unsafe { nil }
-	memory DeviceMemory
+@[inline]
+pub fn get_device_memory_opaque_capture_address(device Device,
+	p_info &DeviceMemoryOpaqueCaptureAddressInfo) u64 {
+	return C.vkGetDeviceMemoryOpaqueCaptureAddress(device, p_info)
 }
 
 @[keep_args_alive]
@@ -8304,101 +8398,12 @@ pub fn cmd_end_render_pass2(command_buffer CommandBuffer,
 	C.vkCmdEndRenderPass2(command_buffer, p_subpass_end_info)
 }
 
-@[keep_args_alive]
-fn C.vkResetQueryPool(device Device, query_pool QueryPool, first_query u32, query_count u32)
-
-pub type PFN_vkResetQueryPool = fn (device Device, query_pool QueryPool, first_query u32, query_count u32)
-
-@[inline]
-pub fn reset_query_pool(device Device,
-	query_pool QueryPool,
-	first_query u32,
-	query_count u32) {
-	C.vkResetQueryPool(device, query_pool, first_query, query_count)
-}
-
-@[keep_args_alive]
-fn C.vkGetSemaphoreCounterValue(device Device, semaphore Semaphore, p_value &u64) Result
-
-pub type PFN_vkGetSemaphoreCounterValue = fn (device Device, semaphore Semaphore, p_value &u64) Result
-
-@[inline]
-pub fn get_semaphore_counter_value(device Device,
-	semaphore Semaphore,
-	p_value &u64) Result {
-	return C.vkGetSemaphoreCounterValue(device, semaphore, p_value)
-}
-
-@[keep_args_alive]
-fn C.vkWaitSemaphores(device Device, p_wait_info &SemaphoreWaitInfo, timeout u64) Result
-
-pub type PFN_vkWaitSemaphores = fn (device Device, p_wait_info &SemaphoreWaitInfo, timeout u64) Result
-
-@[inline]
-pub fn wait_semaphores(device Device,
-	p_wait_info &SemaphoreWaitInfo,
-	timeout u64) Result {
-	return C.vkWaitSemaphores(device, p_wait_info, timeout)
-}
-
-@[keep_args_alive]
-fn C.vkSignalSemaphore(device Device, p_signal_info &SemaphoreSignalInfo) Result
-
-pub type PFN_vkSignalSemaphore = fn (device Device, p_signal_info &SemaphoreSignalInfo) Result
-
-@[inline]
-pub fn signal_semaphore(device Device,
-	p_signal_info &SemaphoreSignalInfo) Result {
-	return C.vkSignalSemaphore(device, p_signal_info)
-}
-
-@[keep_args_alive]
-fn C.vkGetBufferDeviceAddress(device Device, p_info &BufferDeviceAddressInfo) DeviceAddress
-
-pub type PFN_vkGetBufferDeviceAddress = fn (device Device, p_info &BufferDeviceAddressInfo) DeviceAddress
-
-@[inline]
-pub fn get_buffer_device_address(device Device,
-	p_info &BufferDeviceAddressInfo) DeviceAddress {
-	return C.vkGetBufferDeviceAddress(device, p_info)
-}
-
-@[keep_args_alive]
-fn C.vkGetBufferOpaqueCaptureAddress(device Device, p_info &BufferDeviceAddressInfo) u64
-
-pub type PFN_vkGetBufferOpaqueCaptureAddress = fn (device Device, p_info &BufferDeviceAddressInfo) u64
-
-@[inline]
-pub fn get_buffer_opaque_capture_address(device Device,
-	p_info &BufferDeviceAddressInfo) u64 {
-	return C.vkGetBufferOpaqueCaptureAddress(device, p_info)
-}
-
-@[keep_args_alive]
-fn C.vkGetDeviceMemoryOpaqueCaptureAddress(device Device, p_info &DeviceMemoryOpaqueCaptureAddressInfo) u64
-
-pub type PFN_vkGetDeviceMemoryOpaqueCaptureAddress = fn (device Device, p_info &DeviceMemoryOpaqueCaptureAddressInfo) u64
-
-@[inline]
-pub fn get_device_memory_opaque_capture_address(device Device,
-	p_info &DeviceMemoryOpaqueCaptureAddressInfo) u64 {
-	return C.vkGetDeviceMemoryOpaqueCaptureAddress(device, p_info)
-}
-
 pub const api_version_1_3 = make_api_version(0, 1, 3, 0) // patch version should always be set to 0
 
 pub type Flags64 = u64
 
 // Pointer to VkPrivateDataSlot_T
 pub type PrivateDataSlot = voidptr
-
-pub enum PipelineCreationFeedbackFlagBits as u32 {
-	valid                          = u32(0x00000001)
-	application_pipeline_cache_hit = u32(0x00000002)
-	base_pipeline_acceleration     = u32(0x00000004)
-	max_enum                       = max_int
-}
-pub type PipelineCreationFeedbackFlags = u32
 
 pub enum ToolPurposeFlagBits as u32 {
 	validation              = u32(0x00000001)
@@ -8497,6 +8502,7 @@ pub const pipeline_stage_2_optical_flow_bit_nv = u64(0x20000000)
 pub const pipeline_stage_2_convert_cooperative_vector_matrix_bit_nv = u64(0x100000000000)
 pub const pipeline_stage_2_data_graph_bit_arm = u64(0x40000000000)
 pub const pipeline_stage_2_copy_indirect_bit_khr = u64(0x400000000000)
+pub const pipeline_stage_2_memory_decompression_bit_ext = u64(0x200000000000)
 
 pub type AccessFlags2 = u64
 
@@ -8576,23 +8582,14 @@ pub const access_2_optical_flow_read_bit_nv = u64(0x40000000000)
 pub const access_2_optical_flow_write_bit_nv = u64(0x80000000000)
 pub const access_2_data_graph_read_bit_arm = u64(0x800000000000)
 pub const access_2_data_graph_write_bit_arm = u64(0x1000000000000)
+pub const access_2_memory_decompression_read_bit_ext = u64(0x80000000000000)
+pub const access_2_memory_decompression_write_bit_ext = u64(0x100000000000000)
 
 pub enum SubmitFlagBits as u32 {
 	protected = u32(0x00000001)
 	max_enum  = max_int
 }
 pub type SubmitFlags = u32
-
-pub enum RenderingFlagBits as u32 {
-	contents_secondary_command_buffers   = u32(0x00000001)
-	suspending                           = u32(0x00000002)
-	resuming                             = u32(0x00000004)
-	enable_legacy_dithering_bit_ext      = u32(0x00000008)
-	contents_inline                      = u32(0x00000010)
-	per_layer_fragment_density_bit_valve = u32(0x00000020)
-	max_enum                             = max_int
-}
-pub type RenderingFlags = u32
 pub type FormatFeatureFlags2 = u64
 
 // Flag bits for FormatFeatureFlagBits2
@@ -8676,6 +8673,30 @@ pub const format_feature_2_tensor_data_graph_bit_arm = u64(0x1000000000000)
 pub const format_feature_2_copy_image_indirect_dst_bit_khr = u64(0x800000000000000)
 pub const format_feature_2_video_encode_quantization_delta_map_bit_khr = u64(0x2000000000000)
 pub const format_feature_2_video_encode_emphasis_map_bit_khr = u64(0x4000000000000)
+pub const format_feature_2_depth_copy_on_compute_queue_bit_khr = u64(0x10000000000000)
+pub const format_feature_2_depth_copy_on_transfer_queue_bit_khr = u64(0x20000000000000)
+pub const format_feature_2_stencil_copy_on_compute_queue_bit_khr = u64(0x40000000000000)
+pub const format_feature_2_stencil_copy_on_transfer_queue_bit_khr = u64(0x80000000000000)
+
+pub enum PipelineCreationFeedbackFlagBits as u32 {
+	valid                          = u32(0x00000001)
+	application_pipeline_cache_hit = u32(0x00000002)
+	base_pipeline_acceleration     = u32(0x00000004)
+	max_enum                       = max_int
+}
+pub type PipelineCreationFeedbackFlags = u32
+
+pub enum RenderingFlagBits as u32 {
+	contents_secondary_command_buffers   = u32(0x00000001)
+	suspending                           = u32(0x00000002)
+	resuming                             = u32(0x00000004)
+	enable_legacy_dithering_bit_ext      = u32(0x00000008)
+	contents_inline                      = u32(0x00000010)
+	per_layer_fragment_density_bit_valve = u32(0x00000020)
+	local_read_concurrent_access_control = u32(0x00000100)
+	max_enum                             = max_int
+}
+pub type RenderingFlags = u32
 
 // PhysicalDeviceVulkan13Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub type PhysicalDeviceVulkan13Features = C.VkPhysicalDeviceVulkan13Features
@@ -8757,39 +8778,6 @@ pub mut:
 	maxBufferSize                                                                 DeviceSize
 }
 
-pub type PipelineCreationFeedback = C.VkPipelineCreationFeedback
-
-@[typedef]
-pub struct C.VkPipelineCreationFeedback {
-pub mut:
-	flags    PipelineCreationFeedbackFlags
-	duration u64
-}
-
-// PipelineCreationFeedbackCreateInfo extends VkGraphicsPipelineCreateInfo,VkComputePipelineCreateInfo,VkRayTracingPipelineCreateInfoNV,VkRayTracingPipelineCreateInfoKHR,VkDataGraphPipelineCreateInfoARM
-pub type PipelineCreationFeedbackCreateInfo = C.VkPipelineCreationFeedbackCreateInfo
-
-@[typedef]
-pub struct C.VkPipelineCreationFeedbackCreateInfo {
-pub mut:
-	sType                              StructureType = StructureType.pipeline_creation_feedback_create_info
-	pNext                              voidptr       = unsafe { nil }
-	pPipelineCreationFeedback          &PipelineCreationFeedback
-	pipelineStageCreationFeedbackCount u32
-	pPipelineStageCreationFeedbacks    &PipelineCreationFeedback
-}
-
-// PhysicalDeviceShaderTerminateInvocationFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceShaderTerminateInvocationFeatures = C.VkPhysicalDeviceShaderTerminateInvocationFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceShaderTerminateInvocationFeatures {
-pub mut:
-	sType                     StructureType = StructureType.physical_device_shader_terminate_invocation_features
-	pNext                     voidptr       = unsafe { nil }
-	shaderTerminateInvocation Bool32
-}
-
 pub type PhysicalDeviceToolProperties = C.VkPhysicalDeviceToolProperties
 
 @[typedef]
@@ -8802,17 +8790,6 @@ pub mut:
 	purposes    ToolPurposeFlags
 	description [max_description_size]char
 	layer       [max_extension_name_size]char
-}
-
-// PhysicalDeviceShaderDemoteToHelperInvocationFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceShaderDemoteToHelperInvocationFeatures = C.VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures {
-pub mut:
-	sType                          StructureType = StructureType.physical_device_shader_demote_to_helper_invocation_features
-	pNext                          voidptr       = unsafe { nil }
-	shaderDemoteToHelperInvocation Bool32
 }
 
 // PhysicalDevicePrivateDataFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -8845,17 +8822,6 @@ pub mut:
 	sType StructureType = StructureType.private_data_slot_create_info
 	pNext voidptr       = unsafe { nil }
 	flags PrivateDataSlotCreateFlags
-}
-
-// PhysicalDevicePipelineCreationCacheControlFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDevicePipelineCreationCacheControlFeatures = C.VkPhysicalDevicePipelineCreationCacheControlFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDevicePipelineCreationCacheControlFeatures {
-pub mut:
-	sType                        StructureType = StructureType.physical_device_pipeline_creation_cache_control_features
-	pNext                        voidptr       = unsafe { nil }
-	pipelineCreationCacheControl Bool32
 }
 
 // MemoryBarrier2 extends VkSubpassDependency2
@@ -8976,28 +8942,6 @@ pub mut:
 	synchronization2 Bool32
 }
 
-// PhysicalDeviceZeroInitializeWorkgroupMemoryFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceZeroInitializeWorkgroupMemoryFeatures = C.VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures {
-pub mut:
-	sType                               StructureType = StructureType.physical_device_zero_initialize_workgroup_memory_features
-	pNext                               voidptr       = unsafe { nil }
-	shaderZeroInitializeWorkgroupMemory Bool32
-}
-
-// PhysicalDeviceImageRobustnessFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceImageRobustnessFeatures = C.VkPhysicalDeviceImageRobustnessFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceImageRobustnessFeatures {
-pub mut:
-	sType             StructureType = StructureType.physical_device_image_robustness_features
-	pNext             voidptr       = unsafe { nil }
-	robustImageAccess Bool32
-}
-
 pub type BufferCopy2 = C.VkBufferCopy2
 
 @[typedef]
@@ -9095,62 +9039,148 @@ pub mut:
 	pRegions       &BufferImageCopy2
 }
 
-pub type ImageBlit2 = C.VkImageBlit2
+// PhysicalDeviceTextureCompressionASTCHDRFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceTextureCompressionASTCHDRFeatures = C.VkPhysicalDeviceTextureCompressionASTCHDRFeatures
 
 @[typedef]
-pub struct C.VkImageBlit2 {
+pub struct C.VkPhysicalDeviceTextureCompressionASTCHDRFeatures {
 pub mut:
-	sType          StructureType = StructureType.image_blit2
-	pNext          voidptr       = unsafe { nil }
-	srcSubresource ImageSubresourceLayers
-	srcOffsets     [2]Offset3D
-	dstSubresource ImageSubresourceLayers
-	dstOffsets     [2]Offset3D
+	sType                      StructureType = StructureType.physical_device_texture_compression_astc_hdr_features
+	pNext                      voidptr       = unsafe { nil }
+	textureCompressionASTC_HDR Bool32
 }
 
-pub type BlitImageInfo2 = C.VkBlitImageInfo2
+// FormatProperties3 extends VkFormatProperties2
+pub type FormatProperties3 = C.VkFormatProperties3
 
 @[typedef]
-pub struct C.VkBlitImageInfo2 {
+pub struct C.VkFormatProperties3 {
 pub mut:
-	sType          StructureType = StructureType.blit_image_info2
-	pNext          voidptr       = unsafe { nil }
-	srcImage       Image
-	srcImageLayout ImageLayout
-	dstImage       Image
-	dstImageLayout ImageLayout
-	regionCount    u32
-	pRegions       &ImageBlit2
-	filter         Filter
+	sType                 StructureType = StructureType.format_properties3
+	pNext                 voidptr       = unsafe { nil }
+	linearTilingFeatures  FormatFeatureFlags2
+	optimalTilingFeatures FormatFeatureFlags2
+	bufferFeatures        FormatFeatureFlags2
 }
 
-pub type ImageResolve2 = C.VkImageResolve2
+// PhysicalDeviceMaintenance4Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceMaintenance4Features = C.VkPhysicalDeviceMaintenance4Features
 
 @[typedef]
-pub struct C.VkImageResolve2 {
+pub struct C.VkPhysicalDeviceMaintenance4Features {
 pub mut:
-	sType          StructureType = StructureType.image_resolve2
-	pNext          voidptr       = unsafe { nil }
-	srcSubresource ImageSubresourceLayers
-	srcOffset      Offset3D
-	dstSubresource ImageSubresourceLayers
-	dstOffset      Offset3D
-	extent         Extent3D
+	sType        StructureType = StructureType.physical_device_maintenance4_features
+	pNext        voidptr       = unsafe { nil }
+	maintenance4 Bool32
 }
 
-pub type ResolveImageInfo2 = C.VkResolveImageInfo2
+// PhysicalDeviceMaintenance4Properties extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceMaintenance4Properties = C.VkPhysicalDeviceMaintenance4Properties
 
 @[typedef]
-pub struct C.VkResolveImageInfo2 {
+pub struct C.VkPhysicalDeviceMaintenance4Properties {
 pub mut:
-	sType          StructureType = StructureType.resolve_image_info2
-	pNext          voidptr       = unsafe { nil }
-	srcImage       Image
-	srcImageLayout ImageLayout
-	dstImage       Image
-	dstImageLayout ImageLayout
-	regionCount    u32
-	pRegions       &ImageResolve2
+	sType         StructureType = StructureType.physical_device_maintenance4_properties
+	pNext         voidptr       = unsafe { nil }
+	maxBufferSize DeviceSize
+}
+
+pub type DeviceBufferMemoryRequirements = C.VkDeviceBufferMemoryRequirements
+
+@[typedef]
+pub struct C.VkDeviceBufferMemoryRequirements {
+pub mut:
+	sType       StructureType = StructureType.device_buffer_memory_requirements
+	pNext       voidptr       = unsafe { nil }
+	pCreateInfo &BufferCreateInfo
+}
+
+pub type DeviceImageMemoryRequirements = C.VkDeviceImageMemoryRequirements
+
+@[typedef]
+pub struct C.VkDeviceImageMemoryRequirements {
+pub mut:
+	sType       StructureType = StructureType.device_image_memory_requirements
+	pNext       voidptr       = unsafe { nil }
+	pCreateInfo &ImageCreateInfo
+	planeAspect ImageAspectFlagBits
+}
+
+pub type PipelineCreationFeedback = C.VkPipelineCreationFeedback
+
+@[typedef]
+pub struct C.VkPipelineCreationFeedback {
+pub mut:
+	flags    PipelineCreationFeedbackFlags
+	duration u64
+}
+
+// PipelineCreationFeedbackCreateInfo extends VkGraphicsPipelineCreateInfo,VkComputePipelineCreateInfo,VkRayTracingPipelineCreateInfoNV,VkRayTracingPipelineCreateInfoKHR,VkDataGraphPipelineCreateInfoARM
+pub type PipelineCreationFeedbackCreateInfo = C.VkPipelineCreationFeedbackCreateInfo
+
+@[typedef]
+pub struct C.VkPipelineCreationFeedbackCreateInfo {
+pub mut:
+	sType                              StructureType = StructureType.pipeline_creation_feedback_create_info
+	pNext                              voidptr       = unsafe { nil }
+	pPipelineCreationFeedback          &PipelineCreationFeedback
+	pipelineStageCreationFeedbackCount u32
+	pPipelineStageCreationFeedbacks    &PipelineCreationFeedback
+}
+
+// PhysicalDeviceShaderTerminateInvocationFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceShaderTerminateInvocationFeatures = C.VkPhysicalDeviceShaderTerminateInvocationFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceShaderTerminateInvocationFeatures {
+pub mut:
+	sType                     StructureType = StructureType.physical_device_shader_terminate_invocation_features
+	pNext                     voidptr       = unsafe { nil }
+	shaderTerminateInvocation Bool32
+}
+
+// PhysicalDeviceShaderDemoteToHelperInvocationFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceShaderDemoteToHelperInvocationFeatures = C.VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceShaderDemoteToHelperInvocationFeatures {
+pub mut:
+	sType                          StructureType = StructureType.physical_device_shader_demote_to_helper_invocation_features
+	pNext                          voidptr       = unsafe { nil }
+	shaderDemoteToHelperInvocation Bool32
+}
+
+// PhysicalDevicePipelineCreationCacheControlFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDevicePipelineCreationCacheControlFeatures = C.VkPhysicalDevicePipelineCreationCacheControlFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDevicePipelineCreationCacheControlFeatures {
+pub mut:
+	sType                        StructureType = StructureType.physical_device_pipeline_creation_cache_control_features
+	pNext                        voidptr       = unsafe { nil }
+	pipelineCreationCacheControl Bool32
+}
+
+// PhysicalDeviceZeroInitializeWorkgroupMemoryFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceZeroInitializeWorkgroupMemoryFeatures = C.VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceZeroInitializeWorkgroupMemoryFeatures {
+pub mut:
+	sType                               StructureType = StructureType.physical_device_zero_initialize_workgroup_memory_features
+	pNext                               voidptr       = unsafe { nil }
+	shaderZeroInitializeWorkgroupMemory Bool32
+}
+
+// PhysicalDeviceImageRobustnessFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceImageRobustnessFeatures = C.VkPhysicalDeviceImageRobustnessFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceImageRobustnessFeatures {
+pub mut:
+	sType             StructureType = StructureType.physical_device_image_robustness_features
+	pNext             voidptr       = unsafe { nil }
+	robustImageAccess Bool32
 }
 
 // PhysicalDeviceSubgroupSizeControlFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -9240,15 +9270,127 @@ pub mut:
 	maxInlineUniformBlockBindings u32
 }
 
-// PhysicalDeviceTextureCompressionASTCHDRFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceTextureCompressionASTCHDRFeatures = C.VkPhysicalDeviceTextureCompressionASTCHDRFeatures
+// PhysicalDeviceShaderIntegerDotProductFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceShaderIntegerDotProductFeatures = C.VkPhysicalDeviceShaderIntegerDotProductFeatures
 
 @[typedef]
-pub struct C.VkPhysicalDeviceTextureCompressionASTCHDRFeatures {
+pub struct C.VkPhysicalDeviceShaderIntegerDotProductFeatures {
 pub mut:
-	sType                      StructureType = StructureType.physical_device_texture_compression_astc_hdr_features
-	pNext                      voidptr       = unsafe { nil }
-	textureCompressionASTC_HDR Bool32
+	sType                   StructureType = StructureType.physical_device_shader_integer_dot_product_features
+	pNext                   voidptr       = unsafe { nil }
+	shaderIntegerDotProduct Bool32
+}
+
+// PhysicalDeviceShaderIntegerDotProductProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceShaderIntegerDotProductProperties = C.VkPhysicalDeviceShaderIntegerDotProductProperties
+
+@[typedef]
+pub struct C.VkPhysicalDeviceShaderIntegerDotProductProperties {
+pub mut:
+	sType                                                                         StructureType = StructureType.physical_device_shader_integer_dot_product_properties
+	pNext                                                                         voidptr       = unsafe { nil }
+	integerDotProduct8BitUnsignedAccelerated                                      Bool32
+	integerDotProduct8BitSignedAccelerated                                        Bool32
+	integerDotProduct8BitMixedSignednessAccelerated                               Bool32
+	integerDotProduct4x8BitPackedUnsignedAccelerated                              Bool32
+	integerDotProduct4x8BitPackedSignedAccelerated                                Bool32
+	integerDotProduct4x8BitPackedMixedSignednessAccelerated                       Bool32
+	integerDotProduct16BitUnsignedAccelerated                                     Bool32
+	integerDotProduct16BitSignedAccelerated                                       Bool32
+	integerDotProduct16BitMixedSignednessAccelerated                              Bool32
+	integerDotProduct32BitUnsignedAccelerated                                     Bool32
+	integerDotProduct32BitSignedAccelerated                                       Bool32
+	integerDotProduct32BitMixedSignednessAccelerated                              Bool32
+	integerDotProduct64BitUnsignedAccelerated                                     Bool32
+	integerDotProduct64BitSignedAccelerated                                       Bool32
+	integerDotProduct64BitMixedSignednessAccelerated                              Bool32
+	integerDotProductAccumulatingSaturating8BitUnsignedAccelerated                Bool32
+	integerDotProductAccumulatingSaturating8BitSignedAccelerated                  Bool32
+	integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated         Bool32
+	integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated        Bool32
+	integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated          Bool32
+	integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated Bool32
+	integerDotProductAccumulatingSaturating16BitUnsignedAccelerated               Bool32
+	integerDotProductAccumulatingSaturating16BitSignedAccelerated                 Bool32
+	integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated        Bool32
+	integerDotProductAccumulatingSaturating32BitUnsignedAccelerated               Bool32
+	integerDotProductAccumulatingSaturating32BitSignedAccelerated                 Bool32
+	integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated        Bool32
+	integerDotProductAccumulatingSaturating64BitUnsignedAccelerated               Bool32
+	integerDotProductAccumulatingSaturating64BitSignedAccelerated                 Bool32
+	integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated        Bool32
+}
+
+// PhysicalDeviceTexelBufferAlignmentProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceTexelBufferAlignmentProperties = C.VkPhysicalDeviceTexelBufferAlignmentProperties
+
+@[typedef]
+pub struct C.VkPhysicalDeviceTexelBufferAlignmentProperties {
+pub mut:
+	sType                                        StructureType = StructureType.physical_device_texel_buffer_alignment_properties
+	pNext                                        voidptr       = unsafe { nil }
+	storageTexelBufferOffsetAlignmentBytes       DeviceSize
+	storageTexelBufferOffsetSingleTexelAlignment Bool32
+	uniformTexelBufferOffsetAlignmentBytes       DeviceSize
+	uniformTexelBufferOffsetSingleTexelAlignment Bool32
+}
+
+pub type ImageBlit2 = C.VkImageBlit2
+
+@[typedef]
+pub struct C.VkImageBlit2 {
+pub mut:
+	sType          StructureType = StructureType.image_blit2
+	pNext          voidptr       = unsafe { nil }
+	srcSubresource ImageSubresourceLayers
+	srcOffsets     [2]Offset3D
+	dstSubresource ImageSubresourceLayers
+	dstOffsets     [2]Offset3D
+}
+
+pub type BlitImageInfo2 = C.VkBlitImageInfo2
+
+@[typedef]
+pub struct C.VkBlitImageInfo2 {
+pub mut:
+	sType          StructureType = StructureType.blit_image_info2
+	pNext          voidptr       = unsafe { nil }
+	srcImage       Image
+	srcImageLayout ImageLayout
+	dstImage       Image
+	dstImageLayout ImageLayout
+	regionCount    u32
+	pRegions       &ImageBlit2
+	filter         Filter
+}
+
+pub type ImageResolve2 = C.VkImageResolve2
+
+@[typedef]
+pub struct C.VkImageResolve2 {
+pub mut:
+	sType          StructureType = StructureType.image_resolve2
+	pNext          voidptr       = unsafe { nil }
+	srcSubresource ImageSubresourceLayers
+	srcOffset      Offset3D
+	dstSubresource ImageSubresourceLayers
+	dstOffset      Offset3D
+	extent         Extent3D
+}
+
+pub type ResolveImageInfo2 = C.VkResolveImageInfo2
+
+@[typedef]
+pub struct C.VkResolveImageInfo2 {
+pub mut:
+	sType          StructureType = StructureType.resolve_image_info2
+	pNext          voidptr       = unsafe { nil }
+	srcImage       Image
+	srcImageLayout ImageLayout
+	dstImage       Image
+	dstImageLayout ImageLayout
+	regionCount    u32
+	pRegions       &ImageResolve2
 }
 
 pub type RenderingAttachmentInfo = C.VkRenderingAttachmentInfo
@@ -9328,127 +9470,6 @@ pub mut:
 	rasterizationSamples    SampleCountFlagBits
 }
 
-// PhysicalDeviceShaderIntegerDotProductFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceShaderIntegerDotProductFeatures = C.VkPhysicalDeviceShaderIntegerDotProductFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceShaderIntegerDotProductFeatures {
-pub mut:
-	sType                   StructureType = StructureType.physical_device_shader_integer_dot_product_features
-	pNext                   voidptr       = unsafe { nil }
-	shaderIntegerDotProduct Bool32
-}
-
-// PhysicalDeviceShaderIntegerDotProductProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceShaderIntegerDotProductProperties = C.VkPhysicalDeviceShaderIntegerDotProductProperties
-
-@[typedef]
-pub struct C.VkPhysicalDeviceShaderIntegerDotProductProperties {
-pub mut:
-	sType                                                                         StructureType = StructureType.physical_device_shader_integer_dot_product_properties
-	pNext                                                                         voidptr       = unsafe { nil }
-	integerDotProduct8BitUnsignedAccelerated                                      Bool32
-	integerDotProduct8BitSignedAccelerated                                        Bool32
-	integerDotProduct8BitMixedSignednessAccelerated                               Bool32
-	integerDotProduct4x8BitPackedUnsignedAccelerated                              Bool32
-	integerDotProduct4x8BitPackedSignedAccelerated                                Bool32
-	integerDotProduct4x8BitPackedMixedSignednessAccelerated                       Bool32
-	integerDotProduct16BitUnsignedAccelerated                                     Bool32
-	integerDotProduct16BitSignedAccelerated                                       Bool32
-	integerDotProduct16BitMixedSignednessAccelerated                              Bool32
-	integerDotProduct32BitUnsignedAccelerated                                     Bool32
-	integerDotProduct32BitSignedAccelerated                                       Bool32
-	integerDotProduct32BitMixedSignednessAccelerated                              Bool32
-	integerDotProduct64BitUnsignedAccelerated                                     Bool32
-	integerDotProduct64BitSignedAccelerated                                       Bool32
-	integerDotProduct64BitMixedSignednessAccelerated                              Bool32
-	integerDotProductAccumulatingSaturating8BitUnsignedAccelerated                Bool32
-	integerDotProductAccumulatingSaturating8BitSignedAccelerated                  Bool32
-	integerDotProductAccumulatingSaturating8BitMixedSignednessAccelerated         Bool32
-	integerDotProductAccumulatingSaturating4x8BitPackedUnsignedAccelerated        Bool32
-	integerDotProductAccumulatingSaturating4x8BitPackedSignedAccelerated          Bool32
-	integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated Bool32
-	integerDotProductAccumulatingSaturating16BitUnsignedAccelerated               Bool32
-	integerDotProductAccumulatingSaturating16BitSignedAccelerated                 Bool32
-	integerDotProductAccumulatingSaturating16BitMixedSignednessAccelerated        Bool32
-	integerDotProductAccumulatingSaturating32BitUnsignedAccelerated               Bool32
-	integerDotProductAccumulatingSaturating32BitSignedAccelerated                 Bool32
-	integerDotProductAccumulatingSaturating32BitMixedSignednessAccelerated        Bool32
-	integerDotProductAccumulatingSaturating64BitUnsignedAccelerated               Bool32
-	integerDotProductAccumulatingSaturating64BitSignedAccelerated                 Bool32
-	integerDotProductAccumulatingSaturating64BitMixedSignednessAccelerated        Bool32
-}
-
-// PhysicalDeviceTexelBufferAlignmentProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceTexelBufferAlignmentProperties = C.VkPhysicalDeviceTexelBufferAlignmentProperties
-
-@[typedef]
-pub struct C.VkPhysicalDeviceTexelBufferAlignmentProperties {
-pub mut:
-	sType                                        StructureType = StructureType.physical_device_texel_buffer_alignment_properties
-	pNext                                        voidptr       = unsafe { nil }
-	storageTexelBufferOffsetAlignmentBytes       DeviceSize
-	storageTexelBufferOffsetSingleTexelAlignment Bool32
-	uniformTexelBufferOffsetAlignmentBytes       DeviceSize
-	uniformTexelBufferOffsetSingleTexelAlignment Bool32
-}
-
-// FormatProperties3 extends VkFormatProperties2
-pub type FormatProperties3 = C.VkFormatProperties3
-
-@[typedef]
-pub struct C.VkFormatProperties3 {
-pub mut:
-	sType                 StructureType = StructureType.format_properties3
-	pNext                 voidptr       = unsafe { nil }
-	linearTilingFeatures  FormatFeatureFlags2
-	optimalTilingFeatures FormatFeatureFlags2
-	bufferFeatures        FormatFeatureFlags2
-}
-
-// PhysicalDeviceMaintenance4Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceMaintenance4Features = C.VkPhysicalDeviceMaintenance4Features
-
-@[typedef]
-pub struct C.VkPhysicalDeviceMaintenance4Features {
-pub mut:
-	sType        StructureType = StructureType.physical_device_maintenance4_features
-	pNext        voidptr       = unsafe { nil }
-	maintenance4 Bool32
-}
-
-// PhysicalDeviceMaintenance4Properties extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceMaintenance4Properties = C.VkPhysicalDeviceMaintenance4Properties
-
-@[typedef]
-pub struct C.VkPhysicalDeviceMaintenance4Properties {
-pub mut:
-	sType         StructureType = StructureType.physical_device_maintenance4_properties
-	pNext         voidptr       = unsafe { nil }
-	maxBufferSize DeviceSize
-}
-
-pub type DeviceBufferMemoryRequirements = C.VkDeviceBufferMemoryRequirements
-
-@[typedef]
-pub struct C.VkDeviceBufferMemoryRequirements {
-pub mut:
-	sType       StructureType = StructureType.device_buffer_memory_requirements
-	pNext       voidptr       = unsafe { nil }
-	pCreateInfo &BufferCreateInfo
-}
-
-pub type DeviceImageMemoryRequirements = C.VkDeviceImageMemoryRequirements
-
-@[typedef]
-pub struct C.VkDeviceImageMemoryRequirements {
-pub mut:
-	sType       StructureType = StructureType.device_image_memory_requirements
-	pNext       voidptr       = unsafe { nil }
-	pCreateInfo &ImageCreateInfo
-	planeAspect ImageAspectFlagBits
-}
-
 @[keep_args_alive]
 fn C.vkGetPhysicalDeviceToolProperties(physical_device PhysicalDevice, p_tool_count &u32, mut p_tool_properties PhysicalDeviceToolProperties) Result
 
@@ -9512,43 +9533,6 @@ pub fn get_private_data(device Device,
 	private_data_slot PrivateDataSlot,
 	p_data &u64) {
 	C.vkGetPrivateData(device, object_type, object_handle, private_data_slot, p_data)
-}
-
-@[keep_args_alive]
-fn C.vkCmdSetEvent2(command_buffer CommandBuffer, event Event, p_dependency_info &DependencyInfo)
-
-pub type PFN_vkCmdSetEvent2 = fn (command_buffer CommandBuffer, event Event, p_dependency_info &DependencyInfo)
-
-@[inline]
-pub fn cmd_set_event2(command_buffer CommandBuffer,
-	event Event,
-	p_dependency_info &DependencyInfo) {
-	C.vkCmdSetEvent2(command_buffer, event, p_dependency_info)
-}
-
-@[keep_args_alive]
-fn C.vkCmdResetEvent2(command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags2)
-
-pub type PFN_vkCmdResetEvent2 = fn (command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags2)
-
-@[inline]
-pub fn cmd_reset_event2(command_buffer CommandBuffer,
-	event Event,
-	stage_mask PipelineStageFlags2) {
-	C.vkCmdResetEvent2(command_buffer, event, stage_mask)
-}
-
-@[keep_args_alive]
-fn C.vkCmdWaitEvents2(command_buffer CommandBuffer, event_count u32, p_events &Event, p_dependency_infos &DependencyInfo)
-
-pub type PFN_vkCmdWaitEvents2 = fn (command_buffer CommandBuffer, event_count u32, p_events &Event, p_dependency_infos &DependencyInfo)
-
-@[inline]
-pub fn cmd_wait_events2(command_buffer CommandBuffer,
-	event_count u32,
-	p_events &Event,
-	p_dependency_infos &DependencyInfo) {
-	C.vkCmdWaitEvents2(command_buffer, event_count, p_events, p_dependency_infos)
 }
 
 @[keep_args_alive]
@@ -9630,6 +9614,81 @@ pub type PFN_vkCmdCopyImageToBuffer2 = fn (command_buffer CommandBuffer, p_copy_
 pub fn cmd_copy_image_to_buffer2(command_buffer CommandBuffer,
 	p_copy_image_to_buffer_info &CopyImageToBufferInfo2) {
 	C.vkCmdCopyImageToBuffer2(command_buffer, p_copy_image_to_buffer_info)
+}
+
+@[keep_args_alive]
+fn C.vkGetDeviceBufferMemoryRequirements(device Device, p_info &DeviceBufferMemoryRequirements, mut p_memory_requirements MemoryRequirements2)
+
+pub type PFN_vkGetDeviceBufferMemoryRequirements = fn (device Device, p_info &DeviceBufferMemoryRequirements, mut p_memory_requirements MemoryRequirements2)
+
+@[inline]
+pub fn get_device_buffer_memory_requirements(device Device,
+	p_info &DeviceBufferMemoryRequirements,
+	mut p_memory_requirements MemoryRequirements2) {
+	C.vkGetDeviceBufferMemoryRequirements(device, p_info, mut p_memory_requirements)
+}
+
+@[keep_args_alive]
+fn C.vkGetDeviceImageMemoryRequirements(device Device, p_info &DeviceImageMemoryRequirements, mut p_memory_requirements MemoryRequirements2)
+
+pub type PFN_vkGetDeviceImageMemoryRequirements = fn (device Device, p_info &DeviceImageMemoryRequirements, mut p_memory_requirements MemoryRequirements2)
+
+@[inline]
+pub fn get_device_image_memory_requirements(device Device,
+	p_info &DeviceImageMemoryRequirements,
+	mut p_memory_requirements MemoryRequirements2) {
+	C.vkGetDeviceImageMemoryRequirements(device, p_info, mut p_memory_requirements)
+}
+
+@[keep_args_alive]
+fn C.vkGetDeviceImageSparseMemoryRequirements(device Device, p_info &DeviceImageMemoryRequirements, p_sparse_memory_requirement_count &u32, mut p_sparse_memory_requirements SparseImageMemoryRequirements2)
+
+pub type PFN_vkGetDeviceImageSparseMemoryRequirements = fn (device Device, p_info &DeviceImageMemoryRequirements, p_sparse_memory_requirement_count &u32, mut p_sparse_memory_requirements SparseImageMemoryRequirements2)
+
+@[inline]
+pub fn get_device_image_sparse_memory_requirements(device Device,
+	p_info &DeviceImageMemoryRequirements,
+	p_sparse_memory_requirement_count &u32,
+	mut p_sparse_memory_requirements SparseImageMemoryRequirements2) {
+	C.vkGetDeviceImageSparseMemoryRequirements(device, p_info, p_sparse_memory_requirement_count, mut
+		p_sparse_memory_requirements)
+}
+
+@[keep_args_alive]
+fn C.vkCmdSetEvent2(command_buffer CommandBuffer, event Event, p_dependency_info &DependencyInfo)
+
+pub type PFN_vkCmdSetEvent2 = fn (command_buffer CommandBuffer, event Event, p_dependency_info &DependencyInfo)
+
+@[inline]
+pub fn cmd_set_event2(command_buffer CommandBuffer,
+	event Event,
+	p_dependency_info &DependencyInfo) {
+	C.vkCmdSetEvent2(command_buffer, event, p_dependency_info)
+}
+
+@[keep_args_alive]
+fn C.vkCmdResetEvent2(command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags2)
+
+pub type PFN_vkCmdResetEvent2 = fn (command_buffer CommandBuffer, event Event, stage_mask PipelineStageFlags2)
+
+@[inline]
+pub fn cmd_reset_event2(command_buffer CommandBuffer,
+	event Event,
+	stage_mask PipelineStageFlags2) {
+	C.vkCmdResetEvent2(command_buffer, event, stage_mask)
+}
+
+@[keep_args_alive]
+fn C.vkCmdWaitEvents2(command_buffer CommandBuffer, event_count u32, p_events &Event, p_dependency_infos &DependencyInfo)
+
+pub type PFN_vkCmdWaitEvents2 = fn (command_buffer CommandBuffer, event_count u32, p_events &Event, p_dependency_infos &DependencyInfo)
+
+@[inline]
+pub fn cmd_wait_events2(command_buffer CommandBuffer,
+	event_count u32,
+	p_events &Event,
+	p_dependency_infos &DependencyInfo) {
+	C.vkCmdWaitEvents2(command_buffer, event_count, p_events, p_dependency_infos)
 }
 
 @[keep_args_alive]
@@ -9852,44 +9911,6 @@ pub fn cmd_set_primitive_restart_enable(command_buffer CommandBuffer,
 	C.vkCmdSetPrimitiveRestartEnable(command_buffer, primitive_restart_enable)
 }
 
-@[keep_args_alive]
-fn C.vkGetDeviceBufferMemoryRequirements(device Device, p_info &DeviceBufferMemoryRequirements, mut p_memory_requirements MemoryRequirements2)
-
-pub type PFN_vkGetDeviceBufferMemoryRequirements = fn (device Device, p_info &DeviceBufferMemoryRequirements, mut p_memory_requirements MemoryRequirements2)
-
-@[inline]
-pub fn get_device_buffer_memory_requirements(device Device,
-	p_info &DeviceBufferMemoryRequirements,
-	mut p_memory_requirements MemoryRequirements2) {
-	C.vkGetDeviceBufferMemoryRequirements(device, p_info, mut p_memory_requirements)
-}
-
-@[keep_args_alive]
-fn C.vkGetDeviceImageMemoryRequirements(device Device, p_info &DeviceImageMemoryRequirements, mut p_memory_requirements MemoryRequirements2)
-
-pub type PFN_vkGetDeviceImageMemoryRequirements = fn (device Device, p_info &DeviceImageMemoryRequirements, mut p_memory_requirements MemoryRequirements2)
-
-@[inline]
-pub fn get_device_image_memory_requirements(device Device,
-	p_info &DeviceImageMemoryRequirements,
-	mut p_memory_requirements MemoryRequirements2) {
-	C.vkGetDeviceImageMemoryRequirements(device, p_info, mut p_memory_requirements)
-}
-
-@[keep_args_alive]
-fn C.vkGetDeviceImageSparseMemoryRequirements(device Device, p_info &DeviceImageMemoryRequirements, p_sparse_memory_requirement_count &u32, mut p_sparse_memory_requirements SparseImageMemoryRequirements2)
-
-pub type PFN_vkGetDeviceImageSparseMemoryRequirements = fn (device Device, p_info &DeviceImageMemoryRequirements, p_sparse_memory_requirement_count &u32, mut p_sparse_memory_requirements SparseImageMemoryRequirements2)
-
-@[inline]
-pub fn get_device_image_sparse_memory_requirements(device Device,
-	p_info &DeviceImageMemoryRequirements,
-	p_sparse_memory_requirement_count &u32,
-	mut p_sparse_memory_requirements SparseImageMemoryRequirements2) {
-	C.vkGetDeviceImageSparseMemoryRequirements(device, p_info, p_sparse_memory_requirement_count, mut
-		p_sparse_memory_requirements)
-}
-
 pub const api_version_1_4 = make_api_version(0, 1, 4, 0) // patch version should always be set to 0
 pub const max_global_priority_size = u32(16)
 
@@ -9930,6 +9951,59 @@ pub enum MemoryUnmapFlagBits as u32 {
 	max_enum        = max_int
 }
 pub type MemoryUnmapFlags = u32
+pub type BufferUsageFlags2 = u64
+
+// Flag bits for BufferUsageFlagBits2
+pub type BufferUsageFlagBits2 = u64
+
+pub const buffer_usage_2_transfer_src_bit = u64(0x00000001)
+pub const buffer_usage_2_transfer_dst_bit = u64(0x00000002)
+pub const buffer_usage_2_uniform_texel_buffer_bit = u64(0x00000004)
+pub const buffer_usage_2_storage_texel_buffer_bit = u64(0x00000008)
+pub const buffer_usage_2_uniform_buffer_bit = u64(0x00000010)
+pub const buffer_usage_2_storage_buffer_bit = u64(0x00000020)
+pub const buffer_usage_2_index_buffer_bit = u64(0x00000040)
+pub const buffer_usage_2_vertex_buffer_bit = u64(0x00000080)
+pub const buffer_usage_2_indirect_buffer_bit = u64(0x00000100)
+pub const buffer_usage_2_shader_device_address_bit = u64(0x00020000)
+pub const buffer_usage_2_execution_graph_scratch_bit_amdx = u64(0x02000000)
+pub const buffer_usage_2_transfer_src_bit_khr = u32(buffer_usage_2_transfer_src_bit)
+pub const buffer_usage_2_transfer_dst_bit_khr = u32(buffer_usage_2_transfer_dst_bit)
+pub const buffer_usage_2_uniform_texel_buffer_bit_khr = u32(buffer_usage_2_uniform_texel_buffer_bit)
+pub const buffer_usage_2_storage_texel_buffer_bit_khr = u32(buffer_usage_2_storage_texel_buffer_bit)
+pub const buffer_usage_2_uniform_buffer_bit_khr = u32(buffer_usage_2_uniform_buffer_bit)
+pub const buffer_usage_2_storage_buffer_bit_khr = u32(buffer_usage_2_storage_buffer_bit)
+pub const buffer_usage_2_index_buffer_bit_khr = u32(buffer_usage_2_index_buffer_bit)
+pub const buffer_usage_2_vertex_buffer_bit_khr = u32(buffer_usage_2_vertex_buffer_bit)
+pub const buffer_usage_2_indirect_buffer_bit_khr = u32(buffer_usage_2_indirect_buffer_bit)
+pub const buffer_usage_2_conditional_rendering_bit_ext = u64(0x00000200)
+pub const buffer_usage_2_shader_binding_table_bit_khr = u64(0x00000400)
+pub const buffer_usage_2_ray_tracing_bit_nv = u32(buffer_usage_2_shader_binding_table_bit_khr)
+pub const buffer_usage_2_transform_feedback_buffer_bit_ext = u64(0x00000800)
+pub const buffer_usage_2_transform_feedback_counter_buffer_bit_ext = u64(0x00001000)
+pub const buffer_usage_2_video_decode_src_bit_khr = u64(0x00002000)
+pub const buffer_usage_2_video_decode_dst_bit_khr = u64(0x00004000)
+pub const buffer_usage_2_video_encode_dst_bit_khr = u64(0x00008000)
+pub const buffer_usage_2_video_encode_src_bit_khr = u64(0x00010000)
+pub const buffer_usage_2_shader_device_address_bit_khr = u32(buffer_usage_2_shader_device_address_bit)
+pub const buffer_usage_2_acceleration_structure_build_input_read_only_bit_khr = u64(0x00080000)
+pub const buffer_usage_2_acceleration_structure_storage_bit_khr = u64(0x00100000)
+pub const buffer_usage_2_sampler_descriptor_buffer_bit_ext = u64(0x00200000)
+pub const buffer_usage_2_resource_descriptor_buffer_bit_ext = u64(0x00400000)
+pub const buffer_usage_2_push_descriptors_descriptor_buffer_bit_ext = u64(0x04000000)
+pub const buffer_usage_2_micromap_build_input_read_only_bit_ext = u64(0x00800000)
+pub const buffer_usage_2_micromap_storage_bit_ext = u64(0x01000000)
+pub const buffer_usage_2_compressed_data_dgf1_bit_amdx = u64(0x200000000)
+pub const buffer_usage_2_data_graph_foreign_descriptor_bit_arm = u64(0x20000000)
+pub const buffer_usage_2_tile_memory_bit_qcom = u64(0x08000000)
+pub const buffer_usage_2_memory_decompression_bit_ext = u64(0x100000000)
+pub const buffer_usage_2_preprocess_buffer_bit_ext = u64(0x80000000)
+
+pub enum HostImageCopyFlagBits as u32 {
+	memcpy   = u32(0x00000001)
+	max_enum = max_int
+}
+pub type HostImageCopyFlags = u32
 pub type PipelineCreateFlags2 = u64
 
 // Flag bits for PipelineCreateFlagBits2
@@ -9983,59 +10057,7 @@ pub const pipeline_create_2_disallow_opacity_micromap_bit_arm = u64(0x2000000000
 pub const pipeline_create_2_capture_data_bit_khr = u64(0x80000000)
 pub const pipeline_create_2_indirect_bindable_bit_ext = u64(0x4000000000)
 pub const pipeline_create_2_per_layer_fragment_density_bit_valve = u64(0x10000000000)
-
-pub type BufferUsageFlags2 = u64
-
-// Flag bits for BufferUsageFlagBits2
-pub type BufferUsageFlagBits2 = u64
-
-pub const buffer_usage_2_transfer_src_bit = u64(0x00000001)
-pub const buffer_usage_2_transfer_dst_bit = u64(0x00000002)
-pub const buffer_usage_2_uniform_texel_buffer_bit = u64(0x00000004)
-pub const buffer_usage_2_storage_texel_buffer_bit = u64(0x00000008)
-pub const buffer_usage_2_uniform_buffer_bit = u64(0x00000010)
-pub const buffer_usage_2_storage_buffer_bit = u64(0x00000020)
-pub const buffer_usage_2_index_buffer_bit = u64(0x00000040)
-pub const buffer_usage_2_vertex_buffer_bit = u64(0x00000080)
-pub const buffer_usage_2_indirect_buffer_bit = u64(0x00000100)
-pub const buffer_usage_2_shader_device_address_bit = u64(0x00020000)
-pub const buffer_usage_2_execution_graph_scratch_bit_amdx = u64(0x02000000)
-pub const buffer_usage_2_transfer_src_bit_khr = u32(buffer_usage_2_transfer_src_bit)
-pub const buffer_usage_2_transfer_dst_bit_khr = u32(buffer_usage_2_transfer_dst_bit)
-pub const buffer_usage_2_uniform_texel_buffer_bit_khr = u32(buffer_usage_2_uniform_texel_buffer_bit)
-pub const buffer_usage_2_storage_texel_buffer_bit_khr = u32(buffer_usage_2_storage_texel_buffer_bit)
-pub const buffer_usage_2_uniform_buffer_bit_khr = u32(buffer_usage_2_uniform_buffer_bit)
-pub const buffer_usage_2_storage_buffer_bit_khr = u32(buffer_usage_2_storage_buffer_bit)
-pub const buffer_usage_2_index_buffer_bit_khr = u32(buffer_usage_2_index_buffer_bit)
-pub const buffer_usage_2_vertex_buffer_bit_khr = u32(buffer_usage_2_vertex_buffer_bit)
-pub const buffer_usage_2_indirect_buffer_bit_khr = u32(buffer_usage_2_indirect_buffer_bit)
-pub const buffer_usage_2_conditional_rendering_bit_ext = u64(0x00000200)
-pub const buffer_usage_2_shader_binding_table_bit_khr = u64(0x00000400)
-pub const buffer_usage_2_ray_tracing_bit_nv = u32(buffer_usage_2_shader_binding_table_bit_khr)
-pub const buffer_usage_2_transform_feedback_buffer_bit_ext = u64(0x00000800)
-pub const buffer_usage_2_transform_feedback_counter_buffer_bit_ext = u64(0x00001000)
-pub const buffer_usage_2_video_decode_src_bit_khr = u64(0x00002000)
-pub const buffer_usage_2_video_decode_dst_bit_khr = u64(0x00004000)
-pub const buffer_usage_2_video_encode_dst_bit_khr = u64(0x00008000)
-pub const buffer_usage_2_video_encode_src_bit_khr = u64(0x00010000)
-pub const buffer_usage_2_shader_device_address_bit_khr = u32(buffer_usage_2_shader_device_address_bit)
-pub const buffer_usage_2_acceleration_structure_build_input_read_only_bit_khr = u64(0x00080000)
-pub const buffer_usage_2_acceleration_structure_storage_bit_khr = u64(0x00100000)
-pub const buffer_usage_2_sampler_descriptor_buffer_bit_ext = u64(0x00200000)
-pub const buffer_usage_2_resource_descriptor_buffer_bit_ext = u64(0x00400000)
-pub const buffer_usage_2_push_descriptors_descriptor_buffer_bit_ext = u64(0x04000000)
-pub const buffer_usage_2_micromap_build_input_read_only_bit_ext = u64(0x00800000)
-pub const buffer_usage_2_micromap_storage_bit_ext = u64(0x01000000)
-pub const buffer_usage_2_compressed_data_dgf1_bit_amdx = u64(0x200000000)
-pub const buffer_usage_2_data_graph_foreign_descriptor_bit_arm = u64(0x20000000)
-pub const buffer_usage_2_tile_memory_bit_qcom = u64(0x08000000)
-pub const buffer_usage_2_preprocess_buffer_bit_ext = u64(0x80000000)
-
-pub enum HostImageCopyFlagBits as u32 {
-	memcpy   = u32(0x00000001)
-	max_enum = max_int
-}
-pub type HostImageCopyFlags = u32
+pub const pipeline_create_2_64_bit_indexing_bit_ext = u64(0x80000000000)
 
 // PhysicalDeviceVulkan14Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub type PhysicalDeviceVulkan14Features = C.VkPhysicalDeviceVulkan14Features
@@ -10137,126 +10159,6 @@ pub mut:
 	priorities    [max_global_priority_size]QueueGlobalPriority
 }
 
-// PhysicalDeviceShaderSubgroupRotateFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceShaderSubgroupRotateFeatures = C.VkPhysicalDeviceShaderSubgroupRotateFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceShaderSubgroupRotateFeatures {
-pub mut:
-	sType                         StructureType = StructureType.physical_device_shader_subgroup_rotate_features
-	pNext                         voidptr       = unsafe { nil }
-	shaderSubgroupRotate          Bool32
-	shaderSubgroupRotateClustered Bool32
-}
-
-// PhysicalDeviceShaderFloatControls2Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceShaderFloatControls2Features = C.VkPhysicalDeviceShaderFloatControls2Features
-
-@[typedef]
-pub struct C.VkPhysicalDeviceShaderFloatControls2Features {
-pub mut:
-	sType                StructureType = StructureType.physical_device_shader_float_controls2_features
-	pNext                voidptr       = unsafe { nil }
-	shaderFloatControls2 Bool32
-}
-
-// PhysicalDeviceShaderExpectAssumeFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceShaderExpectAssumeFeatures = C.VkPhysicalDeviceShaderExpectAssumeFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceShaderExpectAssumeFeatures {
-pub mut:
-	sType              StructureType = StructureType.physical_device_shader_expect_assume_features
-	pNext              voidptr       = unsafe { nil }
-	shaderExpectAssume Bool32
-}
-
-// PhysicalDeviceLineRasterizationFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceLineRasterizationFeatures = C.VkPhysicalDeviceLineRasterizationFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceLineRasterizationFeatures {
-pub mut:
-	sType                    StructureType = StructureType.physical_device_line_rasterization_features
-	pNext                    voidptr       = unsafe { nil }
-	rectangularLines         Bool32
-	bresenhamLines           Bool32
-	smoothLines              Bool32
-	stippledRectangularLines Bool32
-	stippledBresenhamLines   Bool32
-	stippledSmoothLines      Bool32
-}
-
-// PhysicalDeviceLineRasterizationProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceLineRasterizationProperties = C.VkPhysicalDeviceLineRasterizationProperties
-
-@[typedef]
-pub struct C.VkPhysicalDeviceLineRasterizationProperties {
-pub mut:
-	sType                     StructureType = StructureType.physical_device_line_rasterization_properties
-	pNext                     voidptr       = unsafe { nil }
-	lineSubPixelPrecisionBits u32
-}
-
-// PipelineRasterizationLineStateCreateInfo extends VkPipelineRasterizationStateCreateInfo
-pub type PipelineRasterizationLineStateCreateInfo = C.VkPipelineRasterizationLineStateCreateInfo
-
-@[typedef]
-pub struct C.VkPipelineRasterizationLineStateCreateInfo {
-pub mut:
-	sType                 StructureType = StructureType.pipeline_rasterization_line_state_create_info
-	pNext                 voidptr       = unsafe { nil }
-	lineRasterizationMode LineRasterizationMode
-	stippledLineEnable    Bool32
-	lineStippleFactor     u32
-	lineStipplePattern    u16
-}
-
-// PhysicalDeviceVertexAttributeDivisorProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceVertexAttributeDivisorProperties = C.VkPhysicalDeviceVertexAttributeDivisorProperties
-
-@[typedef]
-pub struct C.VkPhysicalDeviceVertexAttributeDivisorProperties {
-pub mut:
-	sType                        StructureType = StructureType.physical_device_vertex_attribute_divisor_properties
-	pNext                        voidptr       = unsafe { nil }
-	maxVertexAttribDivisor       u32
-	supportsNonZeroFirstInstance Bool32
-}
-
-pub type VertexInputBindingDivisorDescription = C.VkVertexInputBindingDivisorDescription
-
-@[typedef]
-pub struct C.VkVertexInputBindingDivisorDescription {
-pub mut:
-	binding u32
-	divisor u32
-}
-
-// PipelineVertexInputDivisorStateCreateInfo extends VkPipelineVertexInputStateCreateInfo
-pub type PipelineVertexInputDivisorStateCreateInfo = C.VkPipelineVertexInputDivisorStateCreateInfo
-
-@[typedef]
-pub struct C.VkPipelineVertexInputDivisorStateCreateInfo {
-pub mut:
-	sType                     StructureType = StructureType.pipeline_vertex_input_divisor_state_create_info
-	pNext                     voidptr       = unsafe { nil }
-	vertexBindingDivisorCount u32
-	pVertexBindingDivisors    &VertexInputBindingDivisorDescription
-}
-
-// PhysicalDeviceVertexAttributeDivisorFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceVertexAttributeDivisorFeatures = C.VkPhysicalDeviceVertexAttributeDivisorFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceVertexAttributeDivisorFeatures {
-pub mut:
-	sType                                  StructureType = StructureType.physical_device_vertex_attribute_divisor_features
-	pNext                                  voidptr       = unsafe { nil }
-	vertexAttributeInstanceRateDivisor     Bool32
-	vertexAttributeInstanceRateZeroDivisor Bool32
-}
-
 // PhysicalDeviceIndexTypeUint8Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
 pub type PhysicalDeviceIndexTypeUint8Features = C.VkPhysicalDeviceIndexTypeUint8Features
 
@@ -10319,20 +10221,6 @@ pub mut:
 	nonStrictWideLinesUseParallelogram                  Bool32
 }
 
-pub type RenderingAreaInfo = C.VkRenderingAreaInfo
-
-@[typedef]
-pub struct C.VkRenderingAreaInfo {
-pub mut:
-	sType                   StructureType = StructureType.rendering_area_info
-	pNext                   voidptr       = unsafe { nil }
-	viewMask                u32
-	colorAttachmentCount    u32
-	pColorAttachmentFormats &Format
-	depthAttachmentFormat   Format
-	stencilAttachmentFormat Format
-}
-
 pub type ImageSubresource2 = C.VkImageSubresource2
 
 @[typedef]
@@ -10364,17 +10252,6 @@ pub mut:
 	subresourceLayout SubresourceLayout
 }
 
-// PipelineCreateFlags2CreateInfo extends VkComputePipelineCreateInfo,VkGraphicsPipelineCreateInfo,VkRayTracingPipelineCreateInfoNV,VkRayTracingPipelineCreateInfoKHR
-pub type PipelineCreateFlags2CreateInfo = C.VkPipelineCreateFlags2CreateInfo
-
-@[typedef]
-pub struct C.VkPipelineCreateFlags2CreateInfo {
-pub mut:
-	sType StructureType = StructureType.pipeline_create_flags2_create_info
-	pNext voidptr       = unsafe { nil }
-	flags PipelineCreateFlags2
-}
-
 // BufferUsageFlags2CreateInfo extends VkBufferViewCreateInfo,VkBufferCreateInfo,VkPhysicalDeviceExternalBufferInfo,VkDescriptorBufferBindingInfoEXT
 pub type BufferUsageFlags2CreateInfo = C.VkBufferUsageFlags2CreateInfo
 
@@ -10384,54 +10261,6 @@ pub mut:
 	sType StructureType = StructureType.buffer_usage_flags2_create_info
 	pNext voidptr       = unsafe { nil }
 	usage BufferUsageFlags2
-}
-
-// PhysicalDevicePushDescriptorProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDevicePushDescriptorProperties = C.VkPhysicalDevicePushDescriptorProperties
-
-@[typedef]
-pub struct C.VkPhysicalDevicePushDescriptorProperties {
-pub mut:
-	sType              StructureType = StructureType.physical_device_push_descriptor_properties
-	pNext              voidptr       = unsafe { nil }
-	maxPushDescriptors u32
-}
-
-// PhysicalDeviceDynamicRenderingLocalReadFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceDynamicRenderingLocalReadFeatures = C.VkPhysicalDeviceDynamicRenderingLocalReadFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDeviceDynamicRenderingLocalReadFeatures {
-pub mut:
-	sType                     StructureType = StructureType.physical_device_dynamic_rendering_local_read_features
-	pNext                     voidptr       = unsafe { nil }
-	dynamicRenderingLocalRead Bool32
-}
-
-// RenderingAttachmentLocationInfo extends VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo
-pub type RenderingAttachmentLocationInfo = C.VkRenderingAttachmentLocationInfo
-
-@[typedef]
-pub struct C.VkRenderingAttachmentLocationInfo {
-pub mut:
-	sType                     StructureType = StructureType.rendering_attachment_location_info
-	pNext                     voidptr       = unsafe { nil }
-	colorAttachmentCount      u32
-	pColorAttachmentLocations &u32
-}
-
-// RenderingInputAttachmentIndexInfo extends VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo
-pub type RenderingInputAttachmentIndexInfo = C.VkRenderingInputAttachmentIndexInfo
-
-@[typedef]
-pub struct C.VkRenderingInputAttachmentIndexInfo {
-pub mut:
-	sType                        StructureType = StructureType.rendering_input_attachment_index_info
-	pNext                        voidptr       = unsafe { nil }
-	colorAttachmentCount         u32
-	pColorAttachmentInputIndices &u32
-	pDepthInputAttachmentIndex   &u32
-	pStencilInputAttachmentIndex &u32
 }
 
 // PhysicalDeviceMaintenance6Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -10467,113 +10296,6 @@ pub mut:
 	sType   StructureType = StructureType.bind_memory_status
 	pNext   voidptr       = unsafe { nil }
 	pResult &Result
-}
-
-pub type BindDescriptorSetsInfo = C.VkBindDescriptorSetsInfo
-
-@[typedef]
-pub struct C.VkBindDescriptorSetsInfo {
-pub mut:
-	sType              StructureType = StructureType.bind_descriptor_sets_info
-	pNext              voidptr       = unsafe { nil }
-	stageFlags         ShaderStageFlags
-	layout             PipelineLayout
-	firstSet           u32
-	descriptorSetCount u32
-	pDescriptorSets    &DescriptorSet
-	dynamicOffsetCount u32
-	pDynamicOffsets    &u32
-}
-
-pub type PushConstantsInfo = C.VkPushConstantsInfo
-
-@[typedef]
-pub struct C.VkPushConstantsInfo {
-pub mut:
-	sType      StructureType = StructureType.push_constants_info
-	pNext      voidptr       = unsafe { nil }
-	layout     PipelineLayout
-	stageFlags ShaderStageFlags
-	offset     u32
-	size       u32
-	pValues    voidptr
-}
-
-pub type PushDescriptorSetInfo = C.VkPushDescriptorSetInfo
-
-@[typedef]
-pub struct C.VkPushDescriptorSetInfo {
-pub mut:
-	sType                StructureType = StructureType.push_descriptor_set_info
-	pNext                voidptr       = unsafe { nil }
-	stageFlags           ShaderStageFlags
-	layout               PipelineLayout
-	set                  u32
-	descriptorWriteCount u32
-	pDescriptorWrites    &WriteDescriptorSet
-}
-
-pub type PushDescriptorSetWithTemplateInfo = C.VkPushDescriptorSetWithTemplateInfo
-
-@[typedef]
-pub struct C.VkPushDescriptorSetWithTemplateInfo {
-pub mut:
-	sType                    StructureType = StructureType.push_descriptor_set_with_template_info
-	pNext                    voidptr       = unsafe { nil }
-	descriptorUpdateTemplate DescriptorUpdateTemplate
-	layout                   PipelineLayout
-	set                      u32
-	pData                    voidptr
-}
-
-// PhysicalDevicePipelineProtectedAccessFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDevicePipelineProtectedAccessFeatures = C.VkPhysicalDevicePipelineProtectedAccessFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDevicePipelineProtectedAccessFeatures {
-pub mut:
-	sType                   StructureType = StructureType.physical_device_pipeline_protected_access_features
-	pNext                   voidptr       = unsafe { nil }
-	pipelineProtectedAccess Bool32
-}
-
-// PhysicalDevicePipelineRobustnessFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDevicePipelineRobustnessFeatures = C.VkPhysicalDevicePipelineRobustnessFeatures
-
-@[typedef]
-pub struct C.VkPhysicalDevicePipelineRobustnessFeatures {
-pub mut:
-	sType              StructureType = StructureType.physical_device_pipeline_robustness_features
-	pNext              voidptr       = unsafe { nil }
-	pipelineRobustness Bool32
-}
-
-// PhysicalDevicePipelineRobustnessProperties extends VkPhysicalDeviceProperties2
-pub type PhysicalDevicePipelineRobustnessProperties = C.VkPhysicalDevicePipelineRobustnessProperties
-
-@[typedef]
-pub struct C.VkPhysicalDevicePipelineRobustnessProperties {
-pub mut:
-	sType                           StructureType = StructureType.physical_device_pipeline_robustness_properties
-	pNext                           voidptr       = unsafe { nil }
-	defaultRobustnessStorageBuffers PipelineRobustnessBufferBehavior
-	defaultRobustnessUniformBuffers PipelineRobustnessBufferBehavior
-	defaultRobustnessVertexInputs   PipelineRobustnessBufferBehavior
-	defaultRobustnessImages         PipelineRobustnessImageBehavior
-}
-
-// PipelineRobustnessCreateInfo extends VkGraphicsPipelineCreateInfo,VkComputePipelineCreateInfo,VkPipelineShaderStageCreateInfo,VkRayTracingPipelineCreateInfoKHR
-pub type PipelineRobustnessCreateInfo = C.VkPipelineRobustnessCreateInfo
-
-@[typedef]
-pub struct C.VkPipelineRobustnessCreateInfo {
-pub mut:
-	sType          StructureType = StructureType.pipeline_robustness_create_info
-	pNext          voidptr       = unsafe { nil }
-	storageBuffers PipelineRobustnessBufferBehavior
-	uniformBuffers PipelineRobustnessBufferBehavior
-	vertexInputs   PipelineRobustnessBufferBehavior
-	images         PipelineRobustnessImageBehavior
 }
 
 // PhysicalDeviceHostImageCopyFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -10713,16 +10435,304 @@ pub mut:
 	identicalMemoryLayout Bool32
 }
 
-@[keep_args_alive]
-fn C.vkCmdSetLineStipple(command_buffer CommandBuffer, line_stipple_factor u32, line_stipple_pattern u16)
+// PhysicalDeviceShaderSubgroupRotateFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceShaderSubgroupRotateFeatures = C.VkPhysicalDeviceShaderSubgroupRotateFeatures
 
-pub type PFN_vkCmdSetLineStipple = fn (command_buffer CommandBuffer, line_stipple_factor u32, line_stipple_pattern u16)
+@[typedef]
+pub struct C.VkPhysicalDeviceShaderSubgroupRotateFeatures {
+pub mut:
+	sType                         StructureType = StructureType.physical_device_shader_subgroup_rotate_features
+	pNext                         voidptr       = unsafe { nil }
+	shaderSubgroupRotate          Bool32
+	shaderSubgroupRotateClustered Bool32
+}
 
-@[inline]
-pub fn cmd_set_line_stipple(command_buffer CommandBuffer,
-	line_stipple_factor u32,
-	line_stipple_pattern u16) {
-	C.vkCmdSetLineStipple(command_buffer, line_stipple_factor, line_stipple_pattern)
+// PhysicalDeviceShaderFloatControls2Features extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceShaderFloatControls2Features = C.VkPhysicalDeviceShaderFloatControls2Features
+
+@[typedef]
+pub struct C.VkPhysicalDeviceShaderFloatControls2Features {
+pub mut:
+	sType                StructureType = StructureType.physical_device_shader_float_controls2_features
+	pNext                voidptr       = unsafe { nil }
+	shaderFloatControls2 Bool32
+}
+
+// PhysicalDeviceShaderExpectAssumeFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceShaderExpectAssumeFeatures = C.VkPhysicalDeviceShaderExpectAssumeFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceShaderExpectAssumeFeatures {
+pub mut:
+	sType              StructureType = StructureType.physical_device_shader_expect_assume_features
+	pNext              voidptr       = unsafe { nil }
+	shaderExpectAssume Bool32
+}
+
+// PipelineCreateFlags2CreateInfo extends VkComputePipelineCreateInfo,VkGraphicsPipelineCreateInfo,VkRayTracingPipelineCreateInfoNV,VkRayTracingPipelineCreateInfoKHR
+pub type PipelineCreateFlags2CreateInfo = C.VkPipelineCreateFlags2CreateInfo
+
+@[typedef]
+pub struct C.VkPipelineCreateFlags2CreateInfo {
+pub mut:
+	sType StructureType = StructureType.pipeline_create_flags2_create_info
+	pNext voidptr       = unsafe { nil }
+	flags PipelineCreateFlags2
+}
+
+// PhysicalDevicePushDescriptorProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDevicePushDescriptorProperties = C.VkPhysicalDevicePushDescriptorProperties
+
+@[typedef]
+pub struct C.VkPhysicalDevicePushDescriptorProperties {
+pub mut:
+	sType              StructureType = StructureType.physical_device_push_descriptor_properties
+	pNext              voidptr       = unsafe { nil }
+	maxPushDescriptors u32
+}
+
+pub type BindDescriptorSetsInfo = C.VkBindDescriptorSetsInfo
+
+@[typedef]
+pub struct C.VkBindDescriptorSetsInfo {
+pub mut:
+	sType              StructureType = StructureType.bind_descriptor_sets_info
+	pNext              voidptr       = unsafe { nil }
+	stageFlags         ShaderStageFlags
+	layout             PipelineLayout
+	firstSet           u32
+	descriptorSetCount u32
+	pDescriptorSets    &DescriptorSet
+	dynamicOffsetCount u32
+	pDynamicOffsets    &u32
+}
+
+pub type PushConstantsInfo = C.VkPushConstantsInfo
+
+@[typedef]
+pub struct C.VkPushConstantsInfo {
+pub mut:
+	sType      StructureType = StructureType.push_constants_info
+	pNext      voidptr       = unsafe { nil }
+	layout     PipelineLayout
+	stageFlags ShaderStageFlags
+	offset     u32
+	size       u32
+	pValues    voidptr
+}
+
+pub type PushDescriptorSetInfo = C.VkPushDescriptorSetInfo
+
+@[typedef]
+pub struct C.VkPushDescriptorSetInfo {
+pub mut:
+	sType                StructureType = StructureType.push_descriptor_set_info
+	pNext                voidptr       = unsafe { nil }
+	stageFlags           ShaderStageFlags
+	layout               PipelineLayout
+	set                  u32
+	descriptorWriteCount u32
+	pDescriptorWrites    &WriteDescriptorSet
+}
+
+pub type PushDescriptorSetWithTemplateInfo = C.VkPushDescriptorSetWithTemplateInfo
+
+@[typedef]
+pub struct C.VkPushDescriptorSetWithTemplateInfo {
+pub mut:
+	sType                    StructureType = StructureType.push_descriptor_set_with_template_info
+	pNext                    voidptr       = unsafe { nil }
+	descriptorUpdateTemplate DescriptorUpdateTemplate
+	layout                   PipelineLayout
+	set                      u32
+	pData                    voidptr
+}
+
+// PhysicalDevicePipelineProtectedAccessFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDevicePipelineProtectedAccessFeatures = C.VkPhysicalDevicePipelineProtectedAccessFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDevicePipelineProtectedAccessFeatures {
+pub mut:
+	sType                   StructureType = StructureType.physical_device_pipeline_protected_access_features
+	pNext                   voidptr       = unsafe { nil }
+	pipelineProtectedAccess Bool32
+}
+
+// PhysicalDevicePipelineRobustnessFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDevicePipelineRobustnessFeatures = C.VkPhysicalDevicePipelineRobustnessFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDevicePipelineRobustnessFeatures {
+pub mut:
+	sType              StructureType = StructureType.physical_device_pipeline_robustness_features
+	pNext              voidptr       = unsafe { nil }
+	pipelineRobustness Bool32
+}
+
+// PhysicalDevicePipelineRobustnessProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDevicePipelineRobustnessProperties = C.VkPhysicalDevicePipelineRobustnessProperties
+
+@[typedef]
+pub struct C.VkPhysicalDevicePipelineRobustnessProperties {
+pub mut:
+	sType                           StructureType = StructureType.physical_device_pipeline_robustness_properties
+	pNext                           voidptr       = unsafe { nil }
+	defaultRobustnessStorageBuffers PipelineRobustnessBufferBehavior
+	defaultRobustnessUniformBuffers PipelineRobustnessBufferBehavior
+	defaultRobustnessVertexInputs   PipelineRobustnessBufferBehavior
+	defaultRobustnessImages         PipelineRobustnessImageBehavior
+}
+
+// PipelineRobustnessCreateInfo extends VkGraphicsPipelineCreateInfo,VkComputePipelineCreateInfo,VkPipelineShaderStageCreateInfo,VkRayTracingPipelineCreateInfoKHR
+pub type PipelineRobustnessCreateInfo = C.VkPipelineRobustnessCreateInfo
+
+@[typedef]
+pub struct C.VkPipelineRobustnessCreateInfo {
+pub mut:
+	sType          StructureType = StructureType.pipeline_robustness_create_info
+	pNext          voidptr       = unsafe { nil }
+	storageBuffers PipelineRobustnessBufferBehavior
+	uniformBuffers PipelineRobustnessBufferBehavior
+	vertexInputs   PipelineRobustnessBufferBehavior
+	images         PipelineRobustnessImageBehavior
+}
+
+// PhysicalDeviceLineRasterizationFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceLineRasterizationFeatures = C.VkPhysicalDeviceLineRasterizationFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceLineRasterizationFeatures {
+pub mut:
+	sType                    StructureType = StructureType.physical_device_line_rasterization_features
+	pNext                    voidptr       = unsafe { nil }
+	rectangularLines         Bool32
+	bresenhamLines           Bool32
+	smoothLines              Bool32
+	stippledRectangularLines Bool32
+	stippledBresenhamLines   Bool32
+	stippledSmoothLines      Bool32
+}
+
+// PhysicalDeviceLineRasterizationProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceLineRasterizationProperties = C.VkPhysicalDeviceLineRasterizationProperties
+
+@[typedef]
+pub struct C.VkPhysicalDeviceLineRasterizationProperties {
+pub mut:
+	sType                     StructureType = StructureType.physical_device_line_rasterization_properties
+	pNext                     voidptr       = unsafe { nil }
+	lineSubPixelPrecisionBits u32
+}
+
+// PipelineRasterizationLineStateCreateInfo extends VkPipelineRasterizationStateCreateInfo
+pub type PipelineRasterizationLineStateCreateInfo = C.VkPipelineRasterizationLineStateCreateInfo
+
+@[typedef]
+pub struct C.VkPipelineRasterizationLineStateCreateInfo {
+pub mut:
+	sType                 StructureType = StructureType.pipeline_rasterization_line_state_create_info
+	pNext                 voidptr       = unsafe { nil }
+	lineRasterizationMode LineRasterizationMode
+	stippledLineEnable    Bool32
+	lineStippleFactor     u32
+	lineStipplePattern    u16
+}
+
+// PhysicalDeviceVertexAttributeDivisorProperties extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceVertexAttributeDivisorProperties = C.VkPhysicalDeviceVertexAttributeDivisorProperties
+
+@[typedef]
+pub struct C.VkPhysicalDeviceVertexAttributeDivisorProperties {
+pub mut:
+	sType                        StructureType = StructureType.physical_device_vertex_attribute_divisor_properties
+	pNext                        voidptr       = unsafe { nil }
+	maxVertexAttribDivisor       u32
+	supportsNonZeroFirstInstance Bool32
+}
+
+pub type VertexInputBindingDivisorDescription = C.VkVertexInputBindingDivisorDescription
+
+@[typedef]
+pub struct C.VkVertexInputBindingDivisorDescription {
+pub mut:
+	binding u32
+	divisor u32
+}
+
+// PipelineVertexInputDivisorStateCreateInfo extends VkPipelineVertexInputStateCreateInfo
+pub type PipelineVertexInputDivisorStateCreateInfo = C.VkPipelineVertexInputDivisorStateCreateInfo
+
+@[typedef]
+pub struct C.VkPipelineVertexInputDivisorStateCreateInfo {
+pub mut:
+	sType                     StructureType = StructureType.pipeline_vertex_input_divisor_state_create_info
+	pNext                     voidptr       = unsafe { nil }
+	vertexBindingDivisorCount u32
+	pVertexBindingDivisors    &VertexInputBindingDivisorDescription
+}
+
+// PhysicalDeviceVertexAttributeDivisorFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceVertexAttributeDivisorFeatures = C.VkPhysicalDeviceVertexAttributeDivisorFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceVertexAttributeDivisorFeatures {
+pub mut:
+	sType                                  StructureType = StructureType.physical_device_vertex_attribute_divisor_features
+	pNext                                  voidptr       = unsafe { nil }
+	vertexAttributeInstanceRateDivisor     Bool32
+	vertexAttributeInstanceRateZeroDivisor Bool32
+}
+
+pub type RenderingAreaInfo = C.VkRenderingAreaInfo
+
+@[typedef]
+pub struct C.VkRenderingAreaInfo {
+pub mut:
+	sType                   StructureType = StructureType.rendering_area_info
+	pNext                   voidptr       = unsafe { nil }
+	viewMask                u32
+	colorAttachmentCount    u32
+	pColorAttachmentFormats &Format
+	depthAttachmentFormat   Format
+	stencilAttachmentFormat Format
+}
+
+// PhysicalDeviceDynamicRenderingLocalReadFeatures extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceDynamicRenderingLocalReadFeatures = C.VkPhysicalDeviceDynamicRenderingLocalReadFeatures
+
+@[typedef]
+pub struct C.VkPhysicalDeviceDynamicRenderingLocalReadFeatures {
+pub mut:
+	sType                     StructureType = StructureType.physical_device_dynamic_rendering_local_read_features
+	pNext                     voidptr       = unsafe { nil }
+	dynamicRenderingLocalRead Bool32
+}
+
+// RenderingAttachmentLocationInfo extends VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo
+pub type RenderingAttachmentLocationInfo = C.VkRenderingAttachmentLocationInfo
+
+@[typedef]
+pub struct C.VkRenderingAttachmentLocationInfo {
+pub mut:
+	sType                     StructureType = StructureType.rendering_attachment_location_info
+	pNext                     voidptr       = unsafe { nil }
+	colorAttachmentCount      u32
+	pColorAttachmentLocations &u32
+}
+
+// RenderingInputAttachmentIndexInfo extends VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo
+pub type RenderingInputAttachmentIndexInfo = C.VkRenderingInputAttachmentIndexInfo
+
+@[typedef]
+pub struct C.VkRenderingInputAttachmentIndexInfo {
+pub mut:
+	sType                        StructureType = StructureType.rendering_input_attachment_index_info
+	pNext                        voidptr       = unsafe { nil }
+	colorAttachmentCount         u32
+	pColorAttachmentInputIndices &u32
+	pDepthInputAttachmentIndex   &u32
+	pStencilInputAttachmentIndex &u32
 }
 
 @[keep_args_alive]
@@ -10749,32 +10759,6 @@ pub fn unmap_memory2(device Device,
 }
 
 @[keep_args_alive]
-fn C.vkCmdBindIndexBuffer2(command_buffer CommandBuffer, buffer Buffer, offset DeviceSize, size DeviceSize, index_type IndexType)
-
-pub type PFN_vkCmdBindIndexBuffer2 = fn (command_buffer CommandBuffer, buffer Buffer, offset DeviceSize, size DeviceSize, index_type IndexType)
-
-@[inline]
-pub fn cmd_bind_index_buffer2(command_buffer CommandBuffer,
-	buffer Buffer,
-	offset DeviceSize,
-	size DeviceSize,
-	index_type IndexType) {
-	C.vkCmdBindIndexBuffer2(command_buffer, buffer, offset, size, index_type)
-}
-
-@[keep_args_alive]
-fn C.vkGetRenderingAreaGranularity(device Device, p_rendering_area_info &RenderingAreaInfo, mut p_granularity Extent2D)
-
-pub type PFN_vkGetRenderingAreaGranularity = fn (device Device, p_rendering_area_info &RenderingAreaInfo, mut p_granularity Extent2D)
-
-@[inline]
-pub fn get_rendering_area_granularity(device Device,
-	p_rendering_area_info &RenderingAreaInfo,
-	mut p_granularity Extent2D) {
-	C.vkGetRenderingAreaGranularity(device, p_rendering_area_info, mut p_granularity)
-}
-
-@[keep_args_alive]
 fn C.vkGetDeviceImageSubresourceLayout(device Device, p_info &DeviceImageSubresourceInfo, mut p_layout SubresourceLayout2)
 
 pub type PFN_vkGetDeviceImageSubresourceLayout = fn (device Device, p_info &DeviceImageSubresourceInfo, mut p_layout SubresourceLayout2)
@@ -10797,6 +10781,51 @@ pub fn get_image_subresource_layout2(device Device,
 	p_subresource &ImageSubresource2,
 	mut p_layout SubresourceLayout2) {
 	C.vkGetImageSubresourceLayout2(device, image, p_subresource, mut p_layout)
+}
+
+@[keep_args_alive]
+fn C.vkCopyMemoryToImage(device Device, p_copy_memory_to_image_info &CopyMemoryToImageInfo) Result
+
+pub type PFN_vkCopyMemoryToImage = fn (device Device, p_copy_memory_to_image_info &CopyMemoryToImageInfo) Result
+
+@[inline]
+pub fn copy_memory_to_image(device Device,
+	p_copy_memory_to_image_info &CopyMemoryToImageInfo) Result {
+	return C.vkCopyMemoryToImage(device, p_copy_memory_to_image_info)
+}
+
+@[keep_args_alive]
+fn C.vkCopyImageToMemory(device Device, p_copy_image_to_memory_info &CopyImageToMemoryInfo) Result
+
+pub type PFN_vkCopyImageToMemory = fn (device Device, p_copy_image_to_memory_info &CopyImageToMemoryInfo) Result
+
+@[inline]
+pub fn copy_image_to_memory(device Device,
+	p_copy_image_to_memory_info &CopyImageToMemoryInfo) Result {
+	return C.vkCopyImageToMemory(device, p_copy_image_to_memory_info)
+}
+
+@[keep_args_alive]
+fn C.vkCopyImageToImage(device Device, p_copy_image_to_image_info &CopyImageToImageInfo) Result
+
+pub type PFN_vkCopyImageToImage = fn (device Device, p_copy_image_to_image_info &CopyImageToImageInfo) Result
+
+@[inline]
+pub fn copy_image_to_image(device Device,
+	p_copy_image_to_image_info &CopyImageToImageInfo) Result {
+	return C.vkCopyImageToImage(device, p_copy_image_to_image_info)
+}
+
+@[keep_args_alive]
+fn C.vkTransitionImageLayout(device Device, transition_count u32, p_transitions &HostImageLayoutTransitionInfo) Result
+
+pub type PFN_vkTransitionImageLayout = fn (device Device, transition_count u32, p_transitions &HostImageLayoutTransitionInfo) Result
+
+@[inline]
+pub fn transition_image_layout(device Device,
+	transition_count u32,
+	p_transitions &HostImageLayoutTransitionInfo) Result {
+	return C.vkTransitionImageLayout(device, transition_count, p_transitions)
 }
 
 @[keep_args_alive]
@@ -10828,28 +10857,6 @@ pub fn cmd_push_descriptor_set_with_template(command_buffer CommandBuffer,
 	p_data voidptr) {
 	C.vkCmdPushDescriptorSetWithTemplate(command_buffer, descriptor_update_template, layout,
 		set, p_data)
-}
-
-@[keep_args_alive]
-fn C.vkCmdSetRenderingAttachmentLocations(command_buffer CommandBuffer, p_location_info &RenderingAttachmentLocationInfo)
-
-pub type PFN_vkCmdSetRenderingAttachmentLocations = fn (command_buffer CommandBuffer, p_location_info &RenderingAttachmentLocationInfo)
-
-@[inline]
-pub fn cmd_set_rendering_attachment_locations(command_buffer CommandBuffer,
-	p_location_info &RenderingAttachmentLocationInfo) {
-	C.vkCmdSetRenderingAttachmentLocations(command_buffer, p_location_info)
-}
-
-@[keep_args_alive]
-fn C.vkCmdSetRenderingInputAttachmentIndices(command_buffer CommandBuffer, p_input_attachment_index_info &RenderingInputAttachmentIndexInfo)
-
-pub type PFN_vkCmdSetRenderingInputAttachmentIndices = fn (command_buffer CommandBuffer, p_input_attachment_index_info &RenderingInputAttachmentIndexInfo)
-
-@[inline]
-pub fn cmd_set_rendering_input_attachment_indices(command_buffer CommandBuffer,
-	p_input_attachment_index_info &RenderingInputAttachmentIndexInfo) {
-	C.vkCmdSetRenderingInputAttachmentIndices(command_buffer, p_input_attachment_index_info)
 }
 
 @[keep_args_alive]
@@ -10897,48 +10904,63 @@ pub fn cmd_push_descriptor_set_with_template2(command_buffer CommandBuffer,
 }
 
 @[keep_args_alive]
-fn C.vkCopyMemoryToImage(device Device, p_copy_memory_to_image_info &CopyMemoryToImageInfo) Result
+fn C.vkCmdSetLineStipple(command_buffer CommandBuffer, line_stipple_factor u32, line_stipple_pattern u16)
 
-pub type PFN_vkCopyMemoryToImage = fn (device Device, p_copy_memory_to_image_info &CopyMemoryToImageInfo) Result
+pub type PFN_vkCmdSetLineStipple = fn (command_buffer CommandBuffer, line_stipple_factor u32, line_stipple_pattern u16)
 
 @[inline]
-pub fn copy_memory_to_image(device Device,
-	p_copy_memory_to_image_info &CopyMemoryToImageInfo) Result {
-	return C.vkCopyMemoryToImage(device, p_copy_memory_to_image_info)
+pub fn cmd_set_line_stipple(command_buffer CommandBuffer,
+	line_stipple_factor u32,
+	line_stipple_pattern u16) {
+	C.vkCmdSetLineStipple(command_buffer, line_stipple_factor, line_stipple_pattern)
 }
 
 @[keep_args_alive]
-fn C.vkCopyImageToMemory(device Device, p_copy_image_to_memory_info &CopyImageToMemoryInfo) Result
+fn C.vkCmdBindIndexBuffer2(command_buffer CommandBuffer, buffer Buffer, offset DeviceSize, size DeviceSize, index_type IndexType)
 
-pub type PFN_vkCopyImageToMemory = fn (device Device, p_copy_image_to_memory_info &CopyImageToMemoryInfo) Result
+pub type PFN_vkCmdBindIndexBuffer2 = fn (command_buffer CommandBuffer, buffer Buffer, offset DeviceSize, size DeviceSize, index_type IndexType)
 
 @[inline]
-pub fn copy_image_to_memory(device Device,
-	p_copy_image_to_memory_info &CopyImageToMemoryInfo) Result {
-	return C.vkCopyImageToMemory(device, p_copy_image_to_memory_info)
+pub fn cmd_bind_index_buffer2(command_buffer CommandBuffer,
+	buffer Buffer,
+	offset DeviceSize,
+	size DeviceSize,
+	index_type IndexType) {
+	C.vkCmdBindIndexBuffer2(command_buffer, buffer, offset, size, index_type)
 }
 
 @[keep_args_alive]
-fn C.vkCopyImageToImage(device Device, p_copy_image_to_image_info &CopyImageToImageInfo) Result
+fn C.vkGetRenderingAreaGranularity(device Device, p_rendering_area_info &RenderingAreaInfo, mut p_granularity Extent2D)
 
-pub type PFN_vkCopyImageToImage = fn (device Device, p_copy_image_to_image_info &CopyImageToImageInfo) Result
+pub type PFN_vkGetRenderingAreaGranularity = fn (device Device, p_rendering_area_info &RenderingAreaInfo, mut p_granularity Extent2D)
 
 @[inline]
-pub fn copy_image_to_image(device Device,
-	p_copy_image_to_image_info &CopyImageToImageInfo) Result {
-	return C.vkCopyImageToImage(device, p_copy_image_to_image_info)
+pub fn get_rendering_area_granularity(device Device,
+	p_rendering_area_info &RenderingAreaInfo,
+	mut p_granularity Extent2D) {
+	C.vkGetRenderingAreaGranularity(device, p_rendering_area_info, mut p_granularity)
 }
 
 @[keep_args_alive]
-fn C.vkTransitionImageLayout(device Device, transition_count u32, p_transitions &HostImageLayoutTransitionInfo) Result
+fn C.vkCmdSetRenderingAttachmentLocations(command_buffer CommandBuffer, p_location_info &RenderingAttachmentLocationInfo)
 
-pub type PFN_vkTransitionImageLayout = fn (device Device, transition_count u32, p_transitions &HostImageLayoutTransitionInfo) Result
+pub type PFN_vkCmdSetRenderingAttachmentLocations = fn (command_buffer CommandBuffer, p_location_info &RenderingAttachmentLocationInfo)
 
 @[inline]
-pub fn transition_image_layout(device Device,
-	transition_count u32,
-	p_transitions &HostImageLayoutTransitionInfo) Result {
-	return C.vkTransitionImageLayout(device, transition_count, p_transitions)
+pub fn cmd_set_rendering_attachment_locations(command_buffer CommandBuffer,
+	p_location_info &RenderingAttachmentLocationInfo) {
+	C.vkCmdSetRenderingAttachmentLocations(command_buffer, p_location_info)
+}
+
+@[keep_args_alive]
+fn C.vkCmdSetRenderingInputAttachmentIndices(command_buffer CommandBuffer, p_input_attachment_index_info &RenderingInputAttachmentIndexInfo)
+
+pub type PFN_vkCmdSetRenderingInputAttachmentIndices = fn (command_buffer CommandBuffer, p_input_attachment_index_info &RenderingInputAttachmentIndexInfo)
+
+@[inline]
+pub fn cmd_set_rendering_input_attachment_indices(command_buffer CommandBuffer,
+	p_input_attachment_index_info &RenderingInputAttachmentIndexInfo) {
+	C.vkCmdSetRenderingInputAttachmentIndices(command_buffer, p_input_attachment_index_info)
 }
 
 // Pointer to VkSurfaceKHR_T
@@ -17369,6 +17391,92 @@ pub mut:
 	sType                      StructureType = StructureType.physical_device_present_mode_fifo_latest_ready_features_khr
 	pNext                      voidptr       = unsafe { nil }
 	presentModeFifoLatestReady Bool32
+}
+
+pub const khr_maintenance_10_spec_version = 1
+pub const khr_maintenance_10_extension_name = c'VK_KHR_maintenance10'
+
+pub enum RenderingAttachmentFlagBitsKHR as u32 {
+	input_attachment_feedback        = u32(0x00000001)
+	resolve_skip_transfer_function   = u32(0x00000002)
+	resolve_enable_transfer_function = u32(0x00000004)
+	max_enum_khr                     = max_int
+}
+pub type RenderingAttachmentFlagsKHR = u32
+
+pub enum ResolveImageFlagBitsKHR as u32 {
+	skip_transfer_function   = u32(0x00000001)
+	enable_transfer_function = u32(0x00000002)
+	max_enum_khr             = max_int
+}
+pub type ResolveImageFlagsKHR = u32
+
+// PhysicalDeviceMaintenance10FeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceMaintenance10FeaturesKHR = C.VkPhysicalDeviceMaintenance10FeaturesKHR
+
+@[typedef]
+pub struct C.VkPhysicalDeviceMaintenance10FeaturesKHR {
+pub mut:
+	sType         StructureType = StructureType.physical_device_maintenance10_features_khr
+	pNext         voidptr       = unsafe { nil }
+	maintenance10 Bool32
+}
+
+// PhysicalDeviceMaintenance10PropertiesKHR extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceMaintenance10PropertiesKHR = C.VkPhysicalDeviceMaintenance10PropertiesKHR
+
+@[typedef]
+pub struct C.VkPhysicalDeviceMaintenance10PropertiesKHR {
+pub mut:
+	sType                                            StructureType = StructureType.physical_device_maintenance10_properties_khr
+	pNext                                            voidptr       = unsafe { nil }
+	rgba4OpaqueBlackSwizzled                         Bool32
+	resolveSrgbFormatAppliesTransferFunction         Bool32
+	resolveSrgbFormatSupportsTransferFunctionControl Bool32
+}
+
+pub type RenderingEndInfoKHR = C.VkRenderingEndInfoKHR
+
+@[typedef]
+pub struct C.VkRenderingEndInfoKHR {
+pub mut:
+	sType StructureType = StructureType.rendering_end_info_khr
+	pNext voidptr       = unsafe { nil }
+}
+
+// RenderingAttachmentFlagsInfoKHR extends VkRenderingAttachmentInfo
+pub type RenderingAttachmentFlagsInfoKHR = C.VkRenderingAttachmentFlagsInfoKHR
+
+@[typedef]
+pub struct C.VkRenderingAttachmentFlagsInfoKHR {
+pub mut:
+	sType StructureType = StructureType.rendering_attachment_flags_info_khr
+	pNext voidptr       = unsafe { nil }
+	flags RenderingAttachmentFlagsKHR
+}
+
+// ResolveImageModeInfoKHR extends VkResolveImageInfo2
+pub type ResolveImageModeInfoKHR = C.VkResolveImageModeInfoKHR
+
+@[typedef]
+pub struct C.VkResolveImageModeInfoKHR {
+pub mut:
+	sType              StructureType = StructureType.resolve_image_mode_info_khr
+	pNext              voidptr       = unsafe { nil }
+	flags              ResolveImageFlagsKHR
+	resolveMode        ResolveModeFlagBits
+	stencilResolveMode ResolveModeFlagBits
+}
+
+@[keep_args_alive]
+fn C.vkCmdEndRendering2KHR(command_buffer CommandBuffer, p_rendering_end_info &RenderingEndInfoKHR)
+
+pub type PFN_vkCmdEndRendering2KHR = fn (command_buffer CommandBuffer, p_rendering_end_info &RenderingEndInfoKHR)
+
+@[inline]
+pub fn cmd_end_rendering2_khr(command_buffer CommandBuffer,
+	p_rendering_end_info &RenderingEndInfoKHR) {
+	C.vkCmdEndRendering2KHR(command_buffer, p_rendering_end_info)
 }
 
 // Pointer to VkDebugReportCallbackEXT_T
@@ -25370,7 +25478,7 @@ pub mut:
 
 pub type PhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM = C.VkPhysicalDeviceFragmentDensityMapOffsetPropertiesEXT
 
-// RenderPassFragmentDensityMapOffsetEndInfoEXT extends VkSubpassEndInfo,VkRenderingEndInfoEXT
+// RenderPassFragmentDensityMapOffsetEndInfoEXT extends VkSubpassEndInfo,VkRenderingEndInfoKHR
 pub type RenderPassFragmentDensityMapOffsetEndInfoEXT = C.VkRenderPassFragmentDensityMapOffsetEndInfoEXT
 
 @[typedef]
@@ -25437,11 +25545,15 @@ pub fn cmd_copy_memory_to_image_indirect_nv(command_buffer CommandBuffer,
 pub const nv_memory_decompression_spec_version = 1
 pub const nv_memory_decompression_extension_name = c'VK_NV_memory_decompression'
 
-// Flag bits for MemoryDecompressionMethodFlagBitsNV
+// Flag bits for MemoryDecompressionMethodFlagBitsEXT
+pub type MemoryDecompressionMethodFlagBitsEXT = u64
+
+pub const memory_decompression_method_gdeflate_1_0_bit_ext = u64(0x00000001)
+pub const memory_decompression_method_gdeflate_1_0_bit_nv = memory_decompression_method_gdeflate_1_0_bit_ext
+
 pub type MemoryDecompressionMethodFlagBitsNV = u64
 
-pub const memory_decompression_method_gdeflate_1_0_bit_nv = u64(0x00000001)
-
+pub type MemoryDecompressionMethodFlagsEXT = u64
 pub type MemoryDecompressionMethodFlagsNV = u64
 pub type DecompressMemoryRegionNV = C.VkDecompressMemoryRegionNV
 
@@ -25455,28 +25567,32 @@ pub mut:
 	decompressionMethod MemoryDecompressionMethodFlagsNV
 }
 
-// PhysicalDeviceMemoryDecompressionFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceMemoryDecompressionFeaturesNV = C.VkPhysicalDeviceMemoryDecompressionFeaturesNV
+// PhysicalDeviceMemoryDecompressionFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceMemoryDecompressionFeaturesEXT = C.VkPhysicalDeviceMemoryDecompressionFeaturesEXT
 
 @[typedef]
-pub struct C.VkPhysicalDeviceMemoryDecompressionFeaturesNV {
+pub struct C.VkPhysicalDeviceMemoryDecompressionFeaturesEXT {
 pub mut:
-	sType               StructureType = StructureType.physical_device_memory_decompression_features_nv
+	sType               StructureType = StructureType.physical_device_memory_decompression_features_ext
 	pNext               voidptr       = unsafe { nil }
 	memoryDecompression Bool32
 }
 
-// PhysicalDeviceMemoryDecompressionPropertiesNV extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceMemoryDecompressionPropertiesNV = C.VkPhysicalDeviceMemoryDecompressionPropertiesNV
+pub type PhysicalDeviceMemoryDecompressionFeaturesNV = C.VkPhysicalDeviceMemoryDecompressionFeaturesEXT
+
+// PhysicalDeviceMemoryDecompressionPropertiesEXT extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceMemoryDecompressionPropertiesEXT = C.VkPhysicalDeviceMemoryDecompressionPropertiesEXT
 
 @[typedef]
-pub struct C.VkPhysicalDeviceMemoryDecompressionPropertiesNV {
+pub struct C.VkPhysicalDeviceMemoryDecompressionPropertiesEXT {
 pub mut:
-	sType                         StructureType = StructureType.physical_device_memory_decompression_properties_nv
+	sType                         StructureType = StructureType.physical_device_memory_decompression_properties_ext
 	pNext                         voidptr       = unsafe { nil }
-	decompressionMethods          MemoryDecompressionMethodFlagsNV
+	decompressionMethods          MemoryDecompressionMethodFlagsEXT
 	maxDecompressionIndirectCount u64
 }
+
+pub type PhysicalDeviceMemoryDecompressionPropertiesNV = C.VkPhysicalDeviceMemoryDecompressionPropertiesEXT
 
 @[keep_args_alive]
 fn C.vkCmdDecompressMemoryNV(command_buffer CommandBuffer, decompress_region_count u32, p_decompress_memory_regions &DecompressMemoryRegionNV)
@@ -27235,6 +27351,7 @@ pub enum ShaderCreateFlagBitsEXT as u32 {
 	fragment_shading_rate_attachment = u32(0x00000020)
 	fragment_density_map_attachment  = u32(0x00000040)
 	indirect_bindable                = u32(0x00000080)
+	_64_bit_indexing                 = u32(0x00008000)
 	max_enum_ext                     = max_int
 }
 pub type ShaderCreateFlagsEXT = u32
@@ -28661,6 +28778,59 @@ pub fn cmd_bind_tile_memory_qcom(command_buffer CommandBuffer,
 	C.vkCmdBindTileMemoryQCOM(command_buffer, p_tile_memory_bind_info)
 }
 
+pub const ext_memory_decompression_spec_version = 1
+pub const ext_memory_decompression_extension_name = c'VK_EXT_memory_decompression'
+
+pub type DecompressMemoryRegionEXT = C.VkDecompressMemoryRegionEXT
+
+@[typedef]
+pub struct C.VkDecompressMemoryRegionEXT {
+pub mut:
+	srcAddress       DeviceAddress
+	dstAddress       DeviceAddress
+	compressedSize   DeviceSize
+	decompressedSize DeviceSize
+}
+
+pub type DecompressMemoryInfoEXT = C.VkDecompressMemoryInfoEXT
+
+@[typedef]
+pub struct C.VkDecompressMemoryInfoEXT {
+pub mut:
+	sType               StructureType = StructureType.decompress_memory_info_ext
+	pNext               voidptr       = unsafe { nil }
+	decompressionMethod MemoryDecompressionMethodFlagsEXT
+	regionCount         u32
+	pRegions            &DecompressMemoryRegionEXT
+}
+
+@[keep_args_alive]
+fn C.vkCmdDecompressMemoryEXT(command_buffer CommandBuffer, p_decompress_memory_info_ext &DecompressMemoryInfoEXT)
+
+pub type PFN_vkCmdDecompressMemoryEXT = fn (command_buffer CommandBuffer, p_decompress_memory_info_ext &DecompressMemoryInfoEXT)
+
+@[inline]
+pub fn cmd_decompress_memory_ext(command_buffer CommandBuffer,
+	p_decompress_memory_info_ext &DecompressMemoryInfoEXT) {
+	C.vkCmdDecompressMemoryEXT(command_buffer, p_decompress_memory_info_ext)
+}
+
+@[keep_args_alive]
+fn C.vkCmdDecompressMemoryIndirectCountEXT(command_buffer CommandBuffer, decompression_method MemoryDecompressionMethodFlagsEXT, indirect_commands_address DeviceAddress, indirect_commands_count_address DeviceAddress, max_decompression_count u32, stride u32)
+
+pub type PFN_vkCmdDecompressMemoryIndirectCountEXT = fn (command_buffer CommandBuffer, decompression_method MemoryDecompressionMethodFlagsEXT, indirect_commands_address DeviceAddress, indirect_commands_count_address DeviceAddress, max_decompression_count u32, stride u32)
+
+@[inline]
+pub fn cmd_decompress_memory_indirect_count_ext(command_buffer CommandBuffer,
+	decompression_method MemoryDecompressionMethodFlagsEXT,
+	indirect_commands_address DeviceAddress,
+	indirect_commands_count_address DeviceAddress,
+	max_decompression_count u32,
+	stride u32) {
+	C.vkCmdDecompressMemoryIndirectCountEXT(command_buffer, decompression_method, indirect_commands_address,
+		indirect_commands_count_address, max_decompression_count, stride)
+}
+
 pub const nv_display_stereo_spec_version = 1
 pub const nv_display_stereo_extension_name = c'VK_NV_display_stereo'
 
@@ -29877,6 +30047,95 @@ pub fn create_surface_ohos(instance Instance,
 	return C.vkCreateSurfaceOHOS(instance, p_create_info, p_allocator, p_surface)
 }
 
+pub type OHBufferHandle = C.OHBufferHandle
+
+@[typedef]
+pub struct C.OHBufferHandle {}
+
+pub const ohos_native_buffer_spec_version = 1
+pub const ohos_native_buffer_extension_name = c'VK_OHOS_native_buffer'
+
+pub enum SwapchainImageUsageFlagBitsOHOS as u32 {
+	shared        = u32(0x00000001)
+	max_enum_ohos = max_int
+}
+pub type SwapchainImageUsageFlagsOHOS = u32
+
+// NativeBufferOHOS extends VkImageCreateInfo,VkBindImageMemoryInfo
+pub type NativeBufferOHOS = C.VkNativeBufferOHOS
+
+@[typedef]
+pub struct C.VkNativeBufferOHOS {
+pub mut:
+	sType  StructureType = StructureType.native_buffer_ohos
+	pNext  voidptr       = unsafe { nil }
+	handle &OHBufferHandle
+}
+
+// SwapchainImageCreateInfoOHOS extends VkImageCreateInfo
+pub type SwapchainImageCreateInfoOHOS = C.VkSwapchainImageCreateInfoOHOS
+
+@[typedef]
+pub struct C.VkSwapchainImageCreateInfoOHOS {
+pub mut:
+	sType StructureType = StructureType.swapchain_image_create_info_ohos
+	pNext voidptr       = unsafe { nil }
+	usage SwapchainImageUsageFlagsOHOS
+}
+
+// PhysicalDevicePresentationPropertiesOHOS extends VkPhysicalDeviceProperties2
+pub type PhysicalDevicePresentationPropertiesOHOS = C.VkPhysicalDevicePresentationPropertiesOHOS
+
+@[typedef]
+pub struct C.VkPhysicalDevicePresentationPropertiesOHOS {
+pub mut:
+	sType       StructureType = StructureType.physical_device_presentation_properties_ohos
+	pNext       voidptr       = unsafe { nil }
+	sharedImage Bool32
+}
+
+@[keep_args_alive]
+fn C.vkGetSwapchainGrallocUsageOHOS(device Device, format Format, image_usage ImageUsageFlags, gralloc_usage &u64) Result
+
+pub type PFN_vkGetSwapchainGrallocUsageOHOS = fn (device Device, format Format, image_usage ImageUsageFlags, gralloc_usage &u64) Result
+
+@[inline]
+pub fn get_swapchain_gralloc_usage_ohos(device Device,
+	format Format,
+	image_usage ImageUsageFlags,
+	gralloc_usage &u64) Result {
+	return C.vkGetSwapchainGrallocUsageOHOS(device, format, image_usage, gralloc_usage)
+}
+
+@[keep_args_alive]
+fn C.vkAcquireImageOHOS(device Device, image Image, native_fence_fd i32, semaphore Semaphore, fence Fence) Result
+
+pub type PFN_vkAcquireImageOHOS = fn (device Device, image Image, native_fence_fd i32, semaphore Semaphore, fence Fence) Result
+
+@[inline]
+pub fn acquire_image_ohos(device Device,
+	image Image,
+	native_fence_fd i32,
+	semaphore Semaphore,
+	fence Fence) Result {
+	return C.vkAcquireImageOHOS(device, image, native_fence_fd, semaphore, fence)
+}
+
+@[keep_args_alive]
+fn C.vkQueueSignalReleaseImageOHOS(queue Queue, wait_semaphore_count u32, p_wait_semaphores &Semaphore, image Image, p_native_fence_fd &i32) Result
+
+pub type PFN_vkQueueSignalReleaseImageOHOS = fn (queue Queue, wait_semaphore_count u32, p_wait_semaphores &Semaphore, image Image, p_native_fence_fd &i32) Result
+
+@[inline]
+pub fn queue_signal_release_image_ohos(queue Queue,
+	wait_semaphore_count u32,
+	p_wait_semaphores &Semaphore,
+	image Image,
+	p_native_fence_fd &i32) Result {
+	return C.vkQueueSignalReleaseImageOHOS(queue, wait_semaphore_count, p_wait_semaphores,
+		image, p_native_fence_fd)
+}
+
 pub const huawei_hdr_vivid_spec_version = 1
 pub const huawei_hdr_vivid_extension_name = c'VK_HAWEI_hdr_vivid'
 // PhysicalDeviceHdrVividFeaturesHUAWEI extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -30129,23 +30388,16 @@ pub mut:
 pub const ext_fragment_density_map_offset_spec_version = 1
 pub const ext_fragment_density_map_offset_extension_name = c'VK_EXT_fragment_density_map_offset'
 
-pub type RenderingEndInfoEXT = C.VkRenderingEndInfoEXT
-
-@[typedef]
-pub struct C.VkRenderingEndInfoEXT {
-pub mut:
-	sType StructureType = StructureType.rendering_end_info_ext
-	pNext voidptr       = unsafe { nil }
-}
+pub type RenderingEndInfoEXT = C.VkRenderingEndInfoKHR
 
 @[keep_args_alive]
-fn C.vkCmdEndRendering2EXT(command_buffer CommandBuffer, p_rendering_end_info &RenderingEndInfoEXT)
+fn C.vkCmdEndRendering2EXT(command_buffer CommandBuffer, p_rendering_end_info &RenderingEndInfoKHR)
 
-pub type PFN_vkCmdEndRendering2EXT = fn (command_buffer CommandBuffer, p_rendering_end_info &RenderingEndInfoEXT)
+pub type PFN_vkCmdEndRendering2EXT = fn (command_buffer CommandBuffer, p_rendering_end_info &RenderingEndInfoKHR)
 
 @[inline]
 pub fn cmd_end_rendering2_ext(command_buffer CommandBuffer,
-	p_rendering_end_info &RenderingEndInfoEXT) {
+	p_rendering_end_info &RenderingEndInfoKHR) {
 	C.vkCmdEndRendering2EXT(command_buffer, p_rendering_end_info)
 }
 
@@ -30162,6 +30414,19 @@ pub mut:
 	zeroInitializeDeviceMemory Bool32
 }
 
+pub const ext_shader_64bit_indexing_spec_version = 1
+pub const ext_shader_64bit_indexing_extension_name = c'VK_EXT_shader_64bit_indexing'
+// PhysicalDeviceShader64BitIndexingFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceShader64BitIndexingFeaturesEXT = C.VkPhysicalDeviceShader64BitIndexingFeaturesEXT
+
+@[typedef]
+pub struct C.VkPhysicalDeviceShader64BitIndexingFeaturesEXT {
+pub mut:
+	sType               StructureType = StructureType.physical_device_shader64_bit_indexing_features_ext
+	pNext               voidptr       = unsafe { nil }
+	shader64BitIndexing Bool32
+}
+
 pub const sec_pipeline_cache_incremental_mode_spec_version = 1
 pub const sec_pipeline_cache_incremental_mode_extension_name = c'VK_SEC_pipeline_cache_incremental_mode'
 // PhysicalDevicePipelineCacheIncrementalModeFeaturesSEC extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -30173,6 +30438,19 @@ pub mut:
 	sType                        StructureType = StructureType.physical_device_pipeline_cache_incremental_mode_features_sec
 	pNext                        voidptr       = unsafe { nil }
 	pipelineCacheIncrementalMode Bool32
+}
+
+pub const ext_shader_uniform_buffer_unsized_array_spec_version = 1
+pub const ext_shader_uniform_buffer_unsized_array_extension_name = c'VK_EXT_shader_uniform_buffer_unsized_array'
+// PhysicalDeviceShaderUniformBufferUnsizedArrayFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceShaderUniformBufferUnsizedArrayFeaturesEXT = C.VkPhysicalDeviceShaderUniformBufferUnsizedArrayFeaturesEXT
+
+@[typedef]
+pub struct C.VkPhysicalDeviceShaderUniformBufferUnsizedArrayFeaturesEXT {
+pub mut:
+	sType                           StructureType = StructureType.physical_device_shader_uniform_buffer_unsized_array_features_ext
+	pNext                           voidptr       = unsafe { nil }
+	shaderUniformBufferUnsizedArray Bool32
 }
 
 pub const khr_acceleration_structure_spec_version = 13
