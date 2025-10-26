@@ -2830,15 +2830,15 @@ pub mut:
 	dstAccessMask AccessFlags
 }
 
-pub type PFN_vkAllocationFunction = fn (voidptr, usize, usize, SystemAllocationScope)
+pub type PFN_vkAllocationFunction = fn (pUserData voidptr, size usize, alignment usize, allocationScope SystemAllocationScope) voidptr
 
-pub type PFN_vkFreeFunction = fn (voidptr, voidptr)
+pub type PFN_vkFreeFunction = fn (pUserData voidptr, pMemory voidptr)
 
-pub type PFN_vkInternalAllocationNotification = fn (voidptr, usize, InternalAllocationType, SystemAllocationScope)
+pub type PFN_vkInternalAllocationNotification = fn (pUserData voidptr, size usize, allocationType InternalAllocationType, allocationScope SystemAllocationScope)
 
-pub type PFN_vkInternalFreeNotification = fn (voidptr, usize, InternalAllocationType, SystemAllocationScope)
+pub type PFN_vkInternalFreeNotification = fn (pUserData voidptr, size usize, allocationType InternalAllocationType, allocationScope SystemAllocationScope)
 
-pub type PFN_vkReallocationFunction = fn (voidptr, voidptr, usize, usize, SystemAllocationScope)
+pub type PFN_vkReallocationFunction = fn (pUserData voidptr, pOriginal voidptr, size usize, alignment usize, allocationScope SystemAllocationScope) voidptr
 
 pub type PFN_vkVoidFunction = fn ()
 
@@ -17539,7 +17539,7 @@ pub enum DebugReportFlagBitsEXT as u32 {
 	max_enum_ext        = max_int
 }
 pub type DebugReportFlagsEXT = u32
-pub type PFN_vkDebugReportCallbackEXT = fn (DebugReportFlagsEXT, DebugReportObjectTypeEXT, u64, usize, i32, &char, &char, voidptr)
+pub type PFN_vkDebugReportCallbackEXT = fn (flags DebugReportFlagsEXT, objectType DebugReportObjectTypeEXT, object u64, location usize, messageCode i32, pLayerPrefix &char, pMessage &char, pUserData voidptr) Bool32
 
 // DebugReportCallbackCreateInfoEXT extends VkInstanceCreateInfo
 pub type DebugReportCallbackCreateInfoEXT = C.VkDebugReportCallbackCreateInfoEXT
@@ -19049,7 +19049,7 @@ pub mut:
 	pObjects         &DebugUtilsObjectNameInfoEXT
 }
 
-pub type PFN_vkDebugUtilsMessengerCallbackEXT = fn (DebugUtilsMessageSeverityFlagBitsEXT, DebugUtilsMessageTypeFlagsEXT, &DebugUtilsMessengerCallbackDataEXT, voidptr)
+pub type PFN_vkDebugUtilsMessengerCallbackEXT = fn (messageSeverity DebugUtilsMessageSeverityFlagBitsEXT, messageTypes DebugUtilsMessageTypeFlagsEXT, pCallbackData &DebugUtilsMessengerCallbackDataEXT, pUserData voidptr) Bool32
 
 // DebugUtilsMessengerCreateInfoEXT extends VkInstanceCreateInfo
 pub type DebugUtilsMessengerCreateInfoEXT = C.VkDebugUtilsMessengerCreateInfoEXT
@@ -22514,7 +22514,7 @@ pub mut:
 	heapIndex      u32
 }
 
-pub type PFN_vkDeviceMemoryReportCallbackEXT = fn (&DeviceMemoryReportCallbackDataEXT, voidptr)
+pub type PFN_vkDeviceMemoryReportCallbackEXT = fn (pCallbackData &DeviceMemoryReportCallbackDataEXT, pUserData voidptr)
 
 // DeviceDeviceMemoryReportCreateInfoEXT extends VkDeviceCreateInfo
 pub type DeviceDeviceMemoryReportCreateInfoEXT = C.VkDeviceDeviceMemoryReportCreateInfoEXT
@@ -26405,7 +26405,7 @@ pub enum DirectDriverLoadingModeLUNARG as u32 {
 	max_enum_lunarg = max_int
 }
 pub type DirectDriverLoadingFlagsLUNARG = u32
-pub type PFN_vkGetInstanceProcAddrLUNARG = fn (Instance, &char)
+pub type PFN_vkGetInstanceProcAddrLUNARG = fn (instanceconst Instance, pName &char) PFN_vkVoidFunction
 
 pub type DirectDriverLoadingInfoLUNARG = C.VkDirectDriverLoadingInfoLUNARG
 
