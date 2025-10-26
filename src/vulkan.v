@@ -4371,7 +4371,7 @@ pub fn get_physical_device_memory_properties(physical_device PhysicalDevice,
 @[keep_args_alive]
 fn C.vkGetInstanceProcAddr(instance Instance, p_name &char) voidptr
 
-pub type PFN_vkGetInstanceProcAddr = fn (instance Instance, p_name &char)
+pub type PFN_vkGetInstanceProcAddr = fn (instance Instance, p_name &char) voidptr
 
 @[inline]
 pub fn get_instance_proc_addr(instance Instance,
@@ -4382,7 +4382,7 @@ pub fn get_instance_proc_addr(instance Instance,
 @[keep_args_alive]
 fn C.vkGetDeviceProcAddr(device Device, p_name &char) voidptr
 
-pub type PFN_vkGetDeviceProcAddr = fn (device Device, p_name &char)
+pub type PFN_vkGetDeviceProcAddr = fn (device Device, p_name &char) voidptr
 
 @[inline]
 pub fn get_device_proc_addr(device Device,
