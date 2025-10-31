@@ -29,7 +29,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // patch version should always be set to 0
-pub const header_version = 330
+pub const header_version = 331
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -1005,6 +1005,12 @@ pub enum StructureType as u32 {
 	image_view_sample_weight_create_info_qcom                             = 1000440002
 	physical_device_nested_command_buffer_features_ext                    = 1000451000
 	physical_device_nested_command_buffer_properties_ext                  = 1000451001
+	native_buffer_usage_ohos                                              = 1000452000
+	native_buffer_properties_ohos                                         = 1000452001
+	native_buffer_format_properties_ohos                                  = 1000452002
+	import_native_buffer_info_ohos                                        = 1000452003
+	memory_get_native_buffer_info_ohos                                    = 1000452004
+	external_format_ohos                                                  = 1000452005
 	external_memory_acquire_unmodified_ext                                = 1000453000
 	physical_device_extended_dynamic_state3_features_ext                  = 1000455000
 	physical_device_extended_dynamic_state3_properties_ext                = 1000455001
@@ -1291,6 +1297,11 @@ pub enum StructureType as u32 {
 	memory_metal_handle_properties_ext                                    = 1000602001
 	memory_get_metal_handle_info_ext                                      = 1000602002
 	physical_device_depth_clamp_zero_one_features_khr                     = 1000421000
+	physical_device_performance_counters_by_region_features_arm           = 1000605000
+	physical_device_performance_counters_by_region_properties_arm         = 1000605001
+	performance_counter_arm                                               = 1000605002
+	performance_counter_description_arm                                   = 1000605003
+	render_pass_performance_counters_by_region_begin_info_arm             = 1000605004
 	physical_device_vertex_attribute_robustness_features_ext              = 1000608000
 	physical_device_format_pack_features_arm                              = 1000609000
 	physical_device_fragment_density_map_layered_features_valve           = 1000611000
@@ -6124,6 +6135,7 @@ pub enum ExternalMemoryHandleTypeFlagBits as u32 {
 	host_mapped_foreign_memory_bit_ext  = u32(0x00000100)
 	zircon_vmo_bit_fuchsia              = u32(0x00000800)
 	rdma_address_bit_nv                 = u32(0x00001000)
+	oh_native_buffer_bit_ohos           = u32(0x00008000)
 	screen_buffer_bit_qnx               = u32(0x00004000)
 	mtlbuffer_bit_ext                   = u32(0x00010000)
 	mtltexture_bit_ext                  = u32(0x00020000)
@@ -25865,6 +25877,109 @@ pub mut:
 	maxCommandBufferNestingLevel u32
 }
 
+pub type OH_NativeBuffer = C.OH_NativeBuffer
+
+@[typedef]
+pub struct C.OH_NativeBuffer {}
+
+pub const ohos_external_memory_spec_version = 2
+pub const ohos_external_memory_extension_name = c'VK_OHOS_external_memory'
+// NativeBufferUsageOHOS extends VkImageFormatProperties2
+pub type NativeBufferUsageOHOS = C.VkNativeBufferUsageOHOS
+
+@[typedef]
+pub struct C.VkNativeBufferUsageOHOS {
+pub mut:
+	sType                 StructureType = StructureType.native_buffer_usage_ohos
+	pNext                 voidptr       = unsafe { nil }
+	OHOSNativeBufferUsage u64
+}
+
+pub type NativeBufferPropertiesOHOS = C.VkNativeBufferPropertiesOHOS
+
+@[typedef]
+pub struct C.VkNativeBufferPropertiesOHOS {
+pub mut:
+	sType          StructureType = StructureType.native_buffer_properties_ohos
+	pNext          voidptr       = unsafe { nil }
+	allocationSize DeviceSize
+	memoryTypeBits u32
+}
+
+// NativeBufferFormatPropertiesOHOS extends VkNativeBufferPropertiesOHOS
+pub type NativeBufferFormatPropertiesOHOS = C.VkNativeBufferFormatPropertiesOHOS
+
+@[typedef]
+pub struct C.VkNativeBufferFormatPropertiesOHOS {
+pub mut:
+	sType                            StructureType = StructureType.native_buffer_format_properties_ohos
+	pNext                            voidptr       = unsafe { nil }
+	format                           Format
+	externalFormat                   u64
+	formatFeatures                   FormatFeatureFlags
+	samplerYcbcrConversionComponents ComponentMapping
+	suggestedYcbcrModel              SamplerYcbcrModelConversion
+	suggestedYcbcrRange              SamplerYcbcrRange
+	suggestedXChromaOffset           ChromaLocation
+	suggestedYChromaOffset           ChromaLocation
+}
+
+// ImportNativeBufferInfoOHOS extends VkMemoryAllocateInfo
+pub type ImportNativeBufferInfoOHOS = C.VkImportNativeBufferInfoOHOS
+
+@[typedef]
+pub struct C.VkImportNativeBufferInfoOHOS {
+pub mut:
+	sType  StructureType = StructureType.import_native_buffer_info_ohos
+	pNext  voidptr       = unsafe { nil }
+	buffer &OH_NativeBuffer
+}
+
+pub type MemoryGetNativeBufferInfoOHOS = C.VkMemoryGetNativeBufferInfoOHOS
+
+@[typedef]
+pub struct C.VkMemoryGetNativeBufferInfoOHOS {
+pub mut:
+	sType  StructureType = StructureType.memory_get_native_buffer_info_ohos
+	pNext  voidptr       = unsafe { nil }
+	memory DeviceMemory
+}
+
+// ExternalFormatOHOS extends VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo,VkAttachmentDescription2,VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo
+pub type ExternalFormatOHOS = C.VkExternalFormatOHOS
+
+@[typedef]
+pub struct C.VkExternalFormatOHOS {
+pub mut:
+	sType          StructureType = StructureType.external_format_ohos
+	pNext          voidptr       = unsafe { nil }
+	externalFormat u64
+}
+
+@[keep_args_alive]
+fn C.vkGetNativeBufferPropertiesOHOS(device Device, buffer &OH_NativeBuffer, mut p_properties NativeBufferPropertiesOHOS) Result
+
+pub type PFN_vkGetNativeBufferPropertiesOHOS = fn (device Device, buffer &OH_NativeBuffer, mut p_properties NativeBufferPropertiesOHOS) Result
+
+@[inline]
+pub fn get_native_buffer_properties_ohos(device Device,
+	buffer &OH_NativeBuffer,
+	mut p_properties NativeBufferPropertiesOHOS) Result {
+	return C.vkGetNativeBufferPropertiesOHOS(device, buffer, mut p_properties)
+}
+
+@[keep_args_alive]
+fn C.vkGetMemoryNativeBufferOHOS(device Device, p_info &MemoryGetNativeBufferInfoOHOS, mut p_buffer OH_NativeBuffer) Result
+
+pub type PFN_vkGetMemoryNativeBufferOHOS = fn (device Device, p_info &MemoryGetNativeBufferInfoOHOS, mut p_buffer OH_NativeBuffer) Result
+
+@[inline]
+pub fn get_memory_native_buffer_ohos(device Device,
+	p_info &MemoryGetNativeBufferInfoOHOS,
+	mut p_buffer OH_NativeBuffer) Result {
+	return C.vkGetMemoryNativeBufferOHOS(device, p_info, mut p_buffer)
+}
+
 pub const ext_external_memory_acquire_unmodified_spec_version = 1
 pub const ext_external_memory_acquire_unmodified_extension_name = c'VK_EXT_external_memory_acquire_unmodified'
 // ExternalMemoryAcquireUnmodifiedEXT extends VkBufferMemoryBarrier,VkBufferMemoryBarrier2,VkImageMemoryBarrier,VkImageMemoryBarrier2
@@ -30297,6 +30412,88 @@ pub fn get_memory_metal_handle_properties_ext(device Device,
 	p_handle voidptr,
 	mut p_memory_metal_handle_properties MemoryMetalHandlePropertiesEXT) Result {
 	return C.vkGetMemoryMetalHandlePropertiesEXT(device, handle_type, p_handle, mut p_memory_metal_handle_properties)
+}
+
+pub const arm_performance_counters_by_region_spec_version = 1
+pub const arm_performance_counters_by_region_extension_name = c'VK_ARM_performance_counters_by_region'
+
+pub type PerformanceCounterDescriptionFlagsARM = u32
+
+// PhysicalDevicePerformanceCountersByRegionFeaturesARM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDevicePerformanceCountersByRegionFeaturesARM = C.VkPhysicalDevicePerformanceCountersByRegionFeaturesARM
+
+@[typedef]
+pub struct C.VkPhysicalDevicePerformanceCountersByRegionFeaturesARM {
+pub mut:
+	sType                       StructureType = StructureType.physical_device_performance_counters_by_region_features_arm
+	pNext                       voidptr       = unsafe { nil }
+	performanceCountersByRegion Bool32
+}
+
+// PhysicalDevicePerformanceCountersByRegionPropertiesARM extends VkPhysicalDeviceProperties2
+pub type PhysicalDevicePerformanceCountersByRegionPropertiesARM = C.VkPhysicalDevicePerformanceCountersByRegionPropertiesARM
+
+@[typedef]
+pub struct C.VkPhysicalDevicePerformanceCountersByRegionPropertiesARM {
+pub mut:
+	sType                           StructureType = StructureType.physical_device_performance_counters_by_region_properties_arm
+	pNext                           voidptr       = unsafe { nil }
+	maxPerRegionPerformanceCounters u32
+	performanceCounterRegionSize    Extent2D
+	rowStrideAlignment              u32
+	regionAlignment                 u32
+	identityTransformOrder          Bool32
+}
+
+pub type PerformanceCounterARM = C.VkPerformanceCounterARM
+
+@[typedef]
+pub struct C.VkPerformanceCounterARM {
+pub mut:
+	sType     StructureType = StructureType.performance_counter_arm
+	pNext     voidptr       = unsafe { nil }
+	counterID u32
+}
+
+pub type PerformanceCounterDescriptionARM = C.VkPerformanceCounterDescriptionARM
+
+@[typedef]
+pub struct C.VkPerformanceCounterDescriptionARM {
+pub mut:
+	sType StructureType = StructureType.performance_counter_description_arm
+	pNext voidptr       = unsafe { nil }
+	flags PerformanceCounterDescriptionFlagsARM
+	name  [max_description_size]char
+}
+
+// RenderPassPerformanceCountersByRegionBeginInfoARM extends VkRenderPassBeginInfo,VkRenderingInfo
+pub type RenderPassPerformanceCountersByRegionBeginInfoARM = C.VkRenderPassPerformanceCountersByRegionBeginInfoARM
+
+@[typedef]
+pub struct C.VkRenderPassPerformanceCountersByRegionBeginInfoARM {
+pub mut:
+	sType               StructureType = StructureType.render_pass_performance_counters_by_region_begin_info_arm
+	pNext               voidptr       = unsafe { nil }
+	counterAddressCount u32
+	pCounterAddresses   &DeviceAddress
+	serializeRegions    Bool32
+	counterIndexCount   u32
+	pCounterIndices     &u32
+}
+
+@[keep_args_alive]
+fn C.vkEnumeratePhysicalDeviceQueueFamilyPerformanceCountersByRegionARM(physical_device PhysicalDevice, queue_family_index u32, p_counter_count &u32, mut p_counters PerformanceCounterARM, mut p_counter_descriptions PerformanceCounterDescriptionARM) Result
+
+pub type PFN_vkEnumeratePhysicalDeviceQueueFamilyPerformanceCountersByRegionARM = fn (physical_device PhysicalDevice, queue_family_index u32, p_counter_count &u32, mut p_counters PerformanceCounterARM, mut p_counter_descriptions PerformanceCounterDescriptionARM) Result
+
+@[inline]
+pub fn enumerate_physical_device_queue_family_performance_counters_by_region_arm(physical_device PhysicalDevice,
+	queue_family_index u32,
+	p_counter_count &u32,
+	mut p_counters PerformanceCounterARM,
+	mut p_counter_descriptions PerformanceCounterDescriptionARM) Result {
+	return C.vkEnumeratePhysicalDeviceQueueFamilyPerformanceCountersByRegionARM(physical_device,
+		queue_family_index, p_counter_count, mut p_counters, mut p_counter_descriptions)
 }
 
 pub const ext_vertex_attribute_robustness_spec_version = 1
