@@ -29,7 +29,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // patch version should always be set to 0
-pub const header_version = 331
+pub const header_version = 332
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -1315,6 +1315,8 @@ pub enum StructureType as u32 {
 	physical_device_zero_initialize_device_memory_features_ext            = 1000620000
 	physical_device_present_mode_fifo_latest_ready_features_khr           = 1000361000
 	physical_device_shader64_bit_indexing_features_ext                    = 1000627000
+	physical_device_data_graph_model_features_qcom                        = 1000629000
+	data_graph_pipeline_builtin_model_create_info_qcom                    = 1000629001
 	physical_device_maintenance10_features_khr                            = 1000630000
 	physical_device_maintenance10_properties_khr                          = 1000630001
 	rendering_attachment_flags_info_khr                                   = 1000630002
@@ -1803,8 +1805,9 @@ pub enum IndexType as u32 {
 }
 
 pub enum PipelineCacheHeaderVersion as u32 {
-	one      = 1
-	max_enum = max_int
+	one             = 1
+	data_graph_qcom = 1000629000
+	max_enum        = max_int
 }
 
 pub enum BorderColor as u32 {
@@ -25882,7 +25885,7 @@ pub type OH_NativeBuffer = C.OH_NativeBuffer
 @[typedef]
 pub struct C.OH_NativeBuffer {}
 
-pub const ohos_external_memory_spec_version = 2
+pub const ohos_external_memory_spec_version = 1
 pub const ohos_external_memory_extension_name = c'VK_OHOS_external_memory'
 // NativeBufferUsageOHOS extends VkImageFormatProperties2
 pub type NativeBufferUsageOHOS = C.VkNativeBufferUsageOHOS
@@ -28181,11 +28184,15 @@ pub enum DataGraphPipelinePropertyARM as u32 {
 
 pub enum PhysicalDeviceDataGraphProcessingEngineTypeARM as u32 {
 	default      = 0
+	neural_qcom  = 1000629000
+	compute_qcom = 1000629001
 	max_enum_arm = max_int
 }
 
 pub enum PhysicalDeviceDataGraphOperationTypeARM as u32 {
 	spirv_extended_instruction_set = 0
+	neural_model_qcom              = 1000629000
+	builtin_model_qcom             = 1000629001
 	max_enum_arm                   = max_int
 }
 pub type DataGraphPipelineSessionCreateFlagsARM = u64
@@ -30622,6 +30629,48 @@ pub mut:
 	sType               StructureType = StructureType.physical_device_shader64_bit_indexing_features_ext
 	pNext               voidptr       = unsafe { nil }
 	shader64BitIndexing Bool32
+}
+
+pub const data_graph_model_toolchain_version_length_qcom = u32(3)
+pub const qcom_data_graph_model_spec_version = 1
+pub const qcom_data_graph_model_extension_name = c'VK_QCOM_data_graph_model'
+
+pub enum DataGraphModelCacheTypeQCOM as u32 {
+	generic_binary = 0
+	max_enum_qcom  = max_int
+}
+pub type PipelineCacheHeaderVersionDataGraphQCOM = C.VkPipelineCacheHeaderVersionDataGraphQCOM
+
+@[typedef]
+pub struct C.VkPipelineCacheHeaderVersionDataGraphQCOM {
+pub mut:
+	headerSize       u32
+	headerVersion    PipelineCacheHeaderVersion
+	cacheType        DataGraphModelCacheTypeQCOM
+	cacheVersion     u32
+	toolchainVersion [data_graph_model_toolchain_version_length_qcom]u32
+}
+
+// DataGraphPipelineBuiltinModelCreateInfoQCOM extends VkDataGraphPipelineCreateInfoARM
+pub type DataGraphPipelineBuiltinModelCreateInfoQCOM = C.VkDataGraphPipelineBuiltinModelCreateInfoQCOM
+
+@[typedef]
+pub struct C.VkDataGraphPipelineBuiltinModelCreateInfoQCOM {
+pub mut:
+	sType      StructureType = StructureType.data_graph_pipeline_builtin_model_create_info_qcom
+	pNext      voidptr       = unsafe { nil }
+	pOperation &PhysicalDeviceDataGraphOperationSupportARM
+}
+
+// PhysicalDeviceDataGraphModelFeaturesQCOM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceDataGraphModelFeaturesQCOM = C.VkPhysicalDeviceDataGraphModelFeaturesQCOM
+
+@[typedef]
+pub struct C.VkPhysicalDeviceDataGraphModelFeaturesQCOM {
+pub mut:
+	sType          StructureType = StructureType.physical_device_data_graph_model_features_qcom
+	pNext          voidptr       = unsafe { nil }
+	dataGraphModel Bool32
 }
 
 pub const sec_pipeline_cache_incremental_mode_spec_version = 1
