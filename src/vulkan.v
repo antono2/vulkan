@@ -29,7 +29,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // patch version should always be set to 0
-pub const header_version = 332
+pub const header_version = 333
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -1097,7 +1097,6 @@ pub enum StructureType as u32 {
 	swapchain_present_scaling_create_info_khr                             = 1000275004
 	release_swapchain_images_info_khr                                     = 1000275005
 	physical_device_multiview_per_view_viewports_features_qcom            = 1000488000
-	physical_device_ray_tracing_invocation_reorder_features_nv            = 1000490000
 	physical_device_ray_tracing_invocation_reorder_properties_nv          = 1000490001
 	physical_device_cooperative_vector_features_nv                        = 1000491000
 	physical_device_cooperative_vector_properties_nv                      = 1000491001
@@ -1274,6 +1273,8 @@ pub enum StructureType as u32 {
 	physical_device_image_alignment_control_properties_mesa               = 1000575001
 	image_alignment_control_create_info_mesa                              = 1000575002
 	physical_device_shader_fma_features_khr                               = 1000579000
+	physical_device_ray_tracing_invocation_reorder_features_ext           = 1000581000
+	physical_device_ray_tracing_invocation_reorder_properties_ext         = 1000581001
 	physical_device_depth_clamp_control_features_ext                      = 1000582000
 	pipeline_viewport_depth_clamp_control_create_info_ext                 = 1000582001
 	physical_device_maintenance9_features_khr                             = 1000584000
@@ -1315,6 +1316,9 @@ pub enum StructureType as u32 {
 	physical_device_zero_initialize_device_memory_features_ext            = 1000620000
 	physical_device_present_mode_fifo_latest_ready_features_khr           = 1000361000
 	physical_device_shader64_bit_indexing_features_ext                    = 1000627000
+	physical_device_custom_resolve_features_ext                           = 1000628000
+	begin_custom_resolve_info_ext                                         = 1000628001
+	custom_resolve_create_info_ext                                        = 1000628002
 	physical_device_data_graph_model_features_qcom                        = 1000629000
 	data_graph_pipeline_builtin_model_create_info_qcom                    = 1000629001
 	physical_device_maintenance10_features_khr                            = 1000630000
@@ -2705,13 +2709,13 @@ pub type RenderPassCreateFlags = u32
 pub enum SubpassDescriptionFlagBits as u32 {
 	per_view_attributes_bit_nvx                           = u32(0x00000001)
 	per_view_position_x_only_bit_nvx                      = u32(0x00000002)
-	fragment_region_bit_qcom                              = u32(0x00000004)
-	shader_resolve_bit_qcom                               = u32(0x00000008)
 	tile_shading_apron_bit_qcom                           = u32(0x00000100)
 	rasterization_order_attachment_color_access_bit_ext   = u32(0x00000010)
 	rasterization_order_attachment_depth_access_bit_ext   = u32(0x00000020)
 	rasterization_order_attachment_stencil_access_bit_ext = u32(0x00000040)
 	enable_legacy_dithering_bit_ext                       = u32(0x00000080)
+	fragment_region_bit_ext                               = u32(0x00000004)
+	custom_resolve_bit_ext                                = u32(0x00000008)
 	max_enum                                              = max_int
 }
 pub type SubpassDescriptionFlags = u32
@@ -7432,6 +7436,7 @@ pub enum ResolveModeFlagBits as u32 {
 	min                                    = u32(0x00000004)
 	max                                    = u32(0x00000008)
 	external_format_downsample_bit_android = u32(0x00000010)
+	custom_bit_ext                         = u32(0x00000020)
 	max_enum                               = max_int
 }
 pub type ResolveModeFlags = u32
@@ -8708,6 +8713,8 @@ pub enum RenderingFlagBits as u32 {
 	enable_legacy_dithering_bit_ext      = u32(0x00000008)
 	contents_inline                      = u32(0x00000010)
 	per_layer_fragment_density_bit_valve = u32(0x00000020)
+	fragment_region_bit_ext              = u32(0x00000040)
+	custom_resolve_bit_ext               = u32(0x00000080)
 	local_read_concurrent_access_control = u32(0x00000100)
 	max_enum                             = max_int
 }
@@ -27686,11 +27693,13 @@ pub mut:
 pub const nv_ray_tracing_invocation_reorder_spec_version = 1
 pub const nv_ray_tracing_invocation_reorder_extension_name = c'VK_NV_ray_tracing_invocation_reorder'
 
-pub enum RayTracingInvocationReorderModeNV as u32 {
-	none        = 0
-	reorder     = 1
-	max_enum_nv = max_int
+pub enum RayTracingInvocationReorderModeEXT as u32 {
+	none         = 0
+	reorder      = 1
+	max_enum_ext = max_int
 }
+pub type RayTracingInvocationReorderModeNV = RayTracingInvocationReorderModeEXT
+
 // PhysicalDeviceRayTracingInvocationReorderPropertiesNV extends VkPhysicalDeviceProperties2
 pub type PhysicalDeviceRayTracingInvocationReorderPropertiesNV = C.VkPhysicalDeviceRayTracingInvocationReorderPropertiesNV
 
@@ -27699,19 +27708,21 @@ pub struct C.VkPhysicalDeviceRayTracingInvocationReorderPropertiesNV {
 pub mut:
 	sType                                     StructureType = StructureType.physical_device_ray_tracing_invocation_reorder_properties_nv
 	pNext                                     voidptr       = unsafe { nil }
-	rayTracingInvocationReorderReorderingHint RayTracingInvocationReorderModeNV
+	rayTracingInvocationReorderReorderingHint RayTracingInvocationReorderModeEXT
 }
 
-// PhysicalDeviceRayTracingInvocationReorderFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceRayTracingInvocationReorderFeaturesNV = C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesNV
+// PhysicalDeviceRayTracingInvocationReorderFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceRayTracingInvocationReorderFeaturesEXT = C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT
 
 @[typedef]
-pub struct C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesNV {
+pub struct C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT {
 pub mut:
-	sType                       StructureType = StructureType.physical_device_ray_tracing_invocation_reorder_features_nv
+	sType                       StructureType = StructureType.physical_device_ray_tracing_invocation_reorder_features_ext
 	pNext                       voidptr       = unsafe { nil }
 	rayTracingInvocationReorder Bool32
 }
+
+pub type PhysicalDeviceRayTracingInvocationReorderFeaturesNV = C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT
 
 pub const nv_cooperative_vector_spec_version = 4
 pub const nv_cooperative_vector_extension_name = c'VK_NV_cooperative_vector'
@@ -30111,6 +30122,20 @@ pub mut:
 	maximumRequestedAlignment u32
 }
 
+pub const ext_ray_tracing_invocation_reorder_spec_version = 1
+pub const ext_ray_tracing_invocation_reorder_extension_name = c'VK_EXT_ray_tracing_invocation_reorder'
+// PhysicalDeviceRayTracingInvocationReorderPropertiesEXT extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceRayTracingInvocationReorderPropertiesEXT = C.VkPhysicalDeviceRayTracingInvocationReorderPropertiesEXT
+
+@[typedef]
+pub struct C.VkPhysicalDeviceRayTracingInvocationReorderPropertiesEXT {
+pub mut:
+	sType                                     StructureType = StructureType.physical_device_ray_tracing_invocation_reorder_properties_ext
+	pNext                                     voidptr       = unsafe { nil }
+	rayTracingInvocationReorderReorderingHint RayTracingInvocationReorderModeEXT
+	maxShaderBindingTableRecordIndex          u32
+}
+
 pub const ext_depth_clamp_control_spec_version = 1
 pub const ext_depth_clamp_control_extension_name = c'VK_EXT_depth_clamp_control'
 // PhysicalDeviceDepthClampControlFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -30629,6 +30654,54 @@ pub mut:
 	sType               StructureType = StructureType.physical_device_shader64_bit_indexing_features_ext
 	pNext               voidptr       = unsafe { nil }
 	shader64BitIndexing Bool32
+}
+
+pub const ext_custom_resolve_spec_version = 1
+pub const ext_custom_resolve_extension_name = c'VK_EXT_custom_resolve'
+// PhysicalDeviceCustomResolveFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceCustomResolveFeaturesEXT = C.VkPhysicalDeviceCustomResolveFeaturesEXT
+
+@[typedef]
+pub struct C.VkPhysicalDeviceCustomResolveFeaturesEXT {
+pub mut:
+	sType         StructureType = StructureType.physical_device_custom_resolve_features_ext
+	pNext         voidptr       = unsafe { nil }
+	customResolve Bool32
+}
+
+pub type BeginCustomResolveInfoEXT = C.VkBeginCustomResolveInfoEXT
+
+@[typedef]
+pub struct C.VkBeginCustomResolveInfoEXT {
+pub mut:
+	sType StructureType = StructureType.begin_custom_resolve_info_ext
+	pNext voidptr       = unsafe { nil }
+}
+
+// CustomResolveCreateInfoEXT extends VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo,VkShaderCreateInfoEXT
+pub type CustomResolveCreateInfoEXT = C.VkCustomResolveCreateInfoEXT
+
+@[typedef]
+pub struct C.VkCustomResolveCreateInfoEXT {
+pub mut:
+	sType                   StructureType = StructureType.custom_resolve_create_info_ext
+	pNext                   voidptr       = unsafe { nil }
+	customResolve           Bool32
+	colorAttachmentCount    u32
+	pColorAttachmentFormats &Format
+	depthAttachmentFormat   Format
+	stencilAttachmentFormat Format
+}
+
+@[keep_args_alive]
+fn C.vkCmdBeginCustomResolveEXT(command_buffer CommandBuffer, p_begin_custom_resolve_info &BeginCustomResolveInfoEXT)
+
+pub type PFN_vkCmdBeginCustomResolveEXT = fn (command_buffer CommandBuffer, p_begin_custom_resolve_info &BeginCustomResolveInfoEXT)
+
+@[inline]
+pub fn cmd_begin_custom_resolve_ext(command_buffer CommandBuffer,
+	p_begin_custom_resolve_info &BeginCustomResolveInfoEXT) {
+	C.vkCmdBeginCustomResolveEXT(command_buffer, p_begin_custom_resolve_info)
 }
 
 pub const data_graph_model_toolchain_version_length_qcom = u32(3)
