@@ -29,7 +29,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // patch version should always be set to 0
-pub const header_version = 333
+pub const header_version = 334
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -1097,6 +1097,7 @@ pub enum StructureType as u32 {
 	swapchain_present_scaling_create_info_khr                             = 1000275004
 	release_swapchain_images_info_khr                                     = 1000275005
 	physical_device_multiview_per_view_viewports_features_qcom            = 1000488000
+	physical_device_ray_tracing_invocation_reorder_features_nv            = 1000490000
 	physical_device_ray_tracing_invocation_reorder_properties_nv          = 1000490001
 	physical_device_cooperative_vector_features_nv                        = 1000491000
 	physical_device_cooperative_vector_properties_nv                      = 1000491001
@@ -27711,18 +27712,16 @@ pub mut:
 	rayTracingInvocationReorderReorderingHint RayTracingInvocationReorderModeEXT
 }
 
-// PhysicalDeviceRayTracingInvocationReorderFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceRayTracingInvocationReorderFeaturesEXT = C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT
+// PhysicalDeviceRayTracingInvocationReorderFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceRayTracingInvocationReorderFeaturesNV = C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesNV
 
 @[typedef]
-pub struct C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT {
+pub struct C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesNV {
 pub mut:
-	sType                       StructureType = StructureType.physical_device_ray_tracing_invocation_reorder_features_ext
+	sType                       StructureType = StructureType.physical_device_ray_tracing_invocation_reorder_features_nv
 	pNext                       voidptr       = unsafe { nil }
 	rayTracingInvocationReorder Bool32
 }
-
-pub type PhysicalDeviceRayTracingInvocationReorderFeaturesNV = C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT
 
 pub const nv_cooperative_vector_spec_version = 4
 pub const nv_cooperative_vector_extension_name = c'VK_NV_cooperative_vector'
@@ -30134,6 +30133,17 @@ pub mut:
 	pNext                                     voidptr       = unsafe { nil }
 	rayTracingInvocationReorderReorderingHint RayTracingInvocationReorderModeEXT
 	maxShaderBindingTableRecordIndex          u32
+}
+
+// PhysicalDeviceRayTracingInvocationReorderFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceRayTracingInvocationReorderFeaturesEXT = C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT
+
+@[typedef]
+pub struct C.VkPhysicalDeviceRayTracingInvocationReorderFeaturesEXT {
+pub mut:
+	sType                       StructureType = StructureType.physical_device_ray_tracing_invocation_reorder_features_ext
+	pNext                       voidptr       = unsafe { nil }
+	rayTracingInvocationReorder Bool32
 }
 
 pub const ext_depth_clamp_control_spec_version = 1
