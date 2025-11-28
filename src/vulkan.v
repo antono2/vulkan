@@ -29,7 +29,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // patch version should always be set to 0
-pub const header_version = 334
+pub const header_version = 335
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -203,6 +203,7 @@ pub enum Result {
 	error_video_profile_codec_not_supported_khr        = -1000023004
 	error_video_std_version_not_supported_khr          = -1000023005
 	error_invalid_drm_format_modifier_plane_layout_ext = -1000158000
+	error_present_timing_queue_full_ext                = -1000208000
 	error_full_screen_exclusive_mode_lost_ext          = -1000255000
 	thread_idle_khr                                    = 1000268000
 	thread_done_khr                                    = 1000268001
@@ -739,6 +740,16 @@ pub enum StructureType as u32 {
 	queue_family_checkpoint_properties_nv                                 = 1000206001
 	queue_family_checkpoint_properties2_nv                                = 1000314008
 	checkpoint_data2_nv                                                   = 1000314009
+	physical_device_present_timing_features_ext                           = 1000208000
+	swapchain_timing_properties_ext                                       = 1000208001
+	swapchain_time_domain_properties_ext                                  = 1000208002
+	present_timings_info_ext                                              = 1000208003
+	present_timing_info_ext                                               = 1000208004
+	past_presentation_timing_info_ext                                     = 1000208005
+	past_presentation_timing_properties_ext                               = 1000208006
+	past_presentation_timing_ext                                          = 1000208007
+	present_timing_surface_capabilities_ext                               = 1000208008
+	swapchain_calibrated_timestamp_info_ext                               = 1000208009
 	physical_device_shader_integer_functions2_features_intel              = 1000209000
 	query_pool_performance_query_create_info_intel                        = 1000210000
 	initialize_performance_api_info_intel                                 = 1000210001
@@ -11148,6 +11159,7 @@ pub enum SwapchainCreateFlagBitsKHR as u32 {
 	split_instance_bind_regions = u32(0x00000001)
 	protected                   = u32(0x00000002)
 	mutable_format              = u32(0x00000004)
+	present_timing_bit_ext      = u32(0x00000200)
 	present_id2                 = u32(0x00000040)
 	present_wait2               = u32(0x00000080)
 	deferred_memory_allocation  = u32(0x00000008)
@@ -16675,6 +16687,8 @@ pub enum TimeDomainKHR as u32 {
 	clock_monotonic           = 1
 	clock_monotonic_raw       = 2
 	query_performance_counter = 3
+	present_stage_local_ext   = 1000208000
+	swapchain_local_ext       = 1000208001
 	max_enum_khr              = max_int
 }
 pub type CalibratedTimestampInfoKHR = C.VkCalibratedTimestampInfoKHR
@@ -20886,6 +20900,223 @@ pub fn get_queue_checkpoint_data2_nv(queue Queue,
 	p_checkpoint_data_count &u32,
 	mut p_checkpoint_data CheckpointData2NV) {
 	C.vkGetQueueCheckpointData2NV(queue, p_checkpoint_data_count, mut p_checkpoint_data)
+}
+
+pub const ext_present_timing_spec_version = 3
+pub const ext_present_timing_extension_name = c'VK_EXT_present_timing'
+
+pub type PresentStageFlagsEXT = u32
+
+pub enum PresentStageFlagBitsEXT as u32 {
+	queue_operations_end      = u32(0x00000001)
+	request_dequeued          = u32(0x00000002)
+	image_first_pixel_out     = u32(0x00000004)
+	image_first_pixel_visible = u32(0x00000008)
+	max_enum_ext              = max_int
+}
+pub type PastPresentationTimingFlagsEXT = u32
+
+pub enum PastPresentationTimingFlagBitsEXT as u32 {
+	allow_partial_results      = u32(0x00000001)
+	allow_out_of_order_results = u32(0x00000002)
+	max_enum_ext               = max_int
+}
+pub type PresentTimingInfoFlagsEXT = u32
+
+pub enum PresentTimingInfoFlagBitsEXT as u32 {
+	present_at_relative_time         = u32(0x00000001)
+	present_at_nearest_refresh_cycle = u32(0x00000002)
+	max_enum_ext                     = max_int
+}
+// PhysicalDevicePresentTimingFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDevicePresentTimingFeaturesEXT = C.VkPhysicalDevicePresentTimingFeaturesEXT
+
+@[typedef]
+pub struct C.VkPhysicalDevicePresentTimingFeaturesEXT {
+pub mut:
+	sType                 StructureType = StructureType.physical_device_present_timing_features_ext
+	pNext                 voidptr       = unsafe { nil }
+	presentTiming         Bool32
+	presentAtAbsoluteTime Bool32
+	presentAtRelativeTime Bool32
+}
+
+// PresentTimingSurfaceCapabilitiesEXT extends VkSurfaceCapabilities2KHR
+pub type PresentTimingSurfaceCapabilitiesEXT = C.VkPresentTimingSurfaceCapabilitiesEXT
+
+@[typedef]
+pub struct C.VkPresentTimingSurfaceCapabilitiesEXT {
+pub mut:
+	sType                          StructureType = StructureType.present_timing_surface_capabilities_ext
+	pNext                          voidptr       = unsafe { nil }
+	presentTimingSupported         Bool32
+	presentAtAbsoluteTimeSupported Bool32
+	presentAtRelativeTimeSupported Bool32
+	presentStageQueries            PresentStageFlagsEXT
+}
+
+// SwapchainCalibratedTimestampInfoEXT extends VkCalibratedTimestampInfoKHR
+pub type SwapchainCalibratedTimestampInfoEXT = C.VkSwapchainCalibratedTimestampInfoEXT
+
+@[typedef]
+pub struct C.VkSwapchainCalibratedTimestampInfoEXT {
+pub mut:
+	sType        StructureType = StructureType.swapchain_calibrated_timestamp_info_ext
+	pNext        voidptr       = unsafe { nil }
+	swapchain    SwapchainKHR
+	presentStage PresentStageFlagsEXT
+	timeDomainId u64
+}
+
+pub type SwapchainTimingPropertiesEXT = C.VkSwapchainTimingPropertiesEXT
+
+@[typedef]
+pub struct C.VkSwapchainTimingPropertiesEXT {
+pub mut:
+	sType           StructureType = StructureType.swapchain_timing_properties_ext
+	pNext           voidptr       = unsafe { nil }
+	refreshDuration u64
+	refreshInterval u64
+}
+
+pub type SwapchainTimeDomainPropertiesEXT = C.VkSwapchainTimeDomainPropertiesEXT
+
+@[typedef]
+pub struct C.VkSwapchainTimeDomainPropertiesEXT {
+pub mut:
+	sType           StructureType = StructureType.swapchain_time_domain_properties_ext
+	pNext           voidptr       = unsafe { nil }
+	timeDomainCount u32
+	pTimeDomains    &TimeDomainKHR
+	pTimeDomainIds  &u64
+}
+
+pub type PastPresentationTimingInfoEXT = C.VkPastPresentationTimingInfoEXT
+
+@[typedef]
+pub struct C.VkPastPresentationTimingInfoEXT {
+pub mut:
+	sType     StructureType = StructureType.past_presentation_timing_info_ext
+	pNext     voidptr       = unsafe { nil }
+	flags     PastPresentationTimingFlagsEXT
+	swapchain SwapchainKHR
+}
+
+pub type PresentStageTimeEXT = C.VkPresentStageTimeEXT
+
+@[typedef]
+pub struct C.VkPresentStageTimeEXT {
+pub mut:
+	stage PresentStageFlagsEXT
+	time  u64
+}
+
+pub type PastPresentationTimingEXT = C.VkPastPresentationTimingEXT
+
+@[typedef]
+pub struct C.VkPastPresentationTimingEXT {
+pub mut:
+	sType             StructureType = StructureType.past_presentation_timing_ext
+	pNext             voidptr       = unsafe { nil }
+	presentId         u64
+	targetTime        u64
+	presentStageCount u32
+	pPresentStages    &PresentStageTimeEXT
+	timeDomain        TimeDomainKHR
+	timeDomainId      u64
+	reportComplete    Bool32
+}
+
+pub type PastPresentationTimingPropertiesEXT = C.VkPastPresentationTimingPropertiesEXT
+
+@[typedef]
+pub struct C.VkPastPresentationTimingPropertiesEXT {
+pub mut:
+	sType                   StructureType = StructureType.past_presentation_timing_properties_ext
+	pNext                   voidptr       = unsafe { nil }
+	timingPropertiesCounter u64
+	timeDomainsCounter      u64
+	presentationTimingCount u32
+	pPresentationTimings    &PastPresentationTimingEXT
+}
+
+pub type PresentTimingInfoEXT = C.VkPresentTimingInfoEXT
+
+@[typedef]
+pub struct C.VkPresentTimingInfoEXT {
+pub mut:
+	sType                        StructureType = StructureType.present_timing_info_ext
+	pNext                        voidptr       = unsafe { nil }
+	flags                        PresentTimingInfoFlagsEXT
+	targetTime                   u64
+	timeDomainId                 u64
+	presentStageQueries          PresentStageFlagsEXT
+	targetTimeDomainPresentStage PresentStageFlagsEXT
+}
+
+// PresentTimingsInfoEXT extends VkPresentInfoKHR
+pub type PresentTimingsInfoEXT = C.VkPresentTimingsInfoEXT
+
+@[typedef]
+pub struct C.VkPresentTimingsInfoEXT {
+pub mut:
+	sType          StructureType = StructureType.present_timings_info_ext
+	pNext          voidptr       = unsafe { nil }
+	swapchainCount u32
+	pTimingInfos   &PresentTimingInfoEXT
+}
+
+@[keep_args_alive]
+fn C.vkSetSwapchainPresentTimingQueueSizeEXT(device Device, swapchain SwapchainKHR, size u32) Result
+
+pub type PFN_vkSetSwapchainPresentTimingQueueSizeEXT = fn (device Device, swapchain SwapchainKHR, size u32) Result
+
+@[inline]
+pub fn set_swapchain_present_timing_queue_size_ext(device Device,
+	swapchain SwapchainKHR,
+	size u32) Result {
+	return C.vkSetSwapchainPresentTimingQueueSizeEXT(device, swapchain, size)
+}
+
+@[keep_args_alive]
+fn C.vkGetSwapchainTimingPropertiesEXT(device Device, swapchain SwapchainKHR, mut p_swapchain_timing_properties SwapchainTimingPropertiesEXT, p_swapchain_timing_properties_counter &u64) Result
+
+pub type PFN_vkGetSwapchainTimingPropertiesEXT = fn (device Device, swapchain SwapchainKHR, mut p_swapchain_timing_properties SwapchainTimingPropertiesEXT, p_swapchain_timing_properties_counter &u64) Result
+
+@[inline]
+pub fn get_swapchain_timing_properties_ext(device Device,
+	swapchain SwapchainKHR,
+	mut p_swapchain_timing_properties SwapchainTimingPropertiesEXT,
+	p_swapchain_timing_properties_counter &u64) Result {
+	return C.vkGetSwapchainTimingPropertiesEXT(device, swapchain, mut p_swapchain_timing_properties,
+		p_swapchain_timing_properties_counter)
+}
+
+@[keep_args_alive]
+fn C.vkGetSwapchainTimeDomainPropertiesEXT(device Device, swapchain SwapchainKHR, mut p_swapchain_time_domain_properties SwapchainTimeDomainPropertiesEXT, p_time_domains_counter &u64) Result
+
+pub type PFN_vkGetSwapchainTimeDomainPropertiesEXT = fn (device Device, swapchain SwapchainKHR, mut p_swapchain_time_domain_properties SwapchainTimeDomainPropertiesEXT, p_time_domains_counter &u64) Result
+
+@[inline]
+pub fn get_swapchain_time_domain_properties_ext(device Device,
+	swapchain SwapchainKHR,
+	mut p_swapchain_time_domain_properties SwapchainTimeDomainPropertiesEXT,
+	p_time_domains_counter &u64) Result {
+	return C.vkGetSwapchainTimeDomainPropertiesEXT(device, swapchain, mut p_swapchain_time_domain_properties,
+		p_time_domains_counter)
+}
+
+@[keep_args_alive]
+fn C.vkGetPastPresentationTimingEXT(device Device, p_past_presentation_timing_info &PastPresentationTimingInfoEXT, mut p_past_presentation_timing_properties PastPresentationTimingPropertiesEXT) Result
+
+pub type PFN_vkGetPastPresentationTimingEXT = fn (device Device, p_past_presentation_timing_info &PastPresentationTimingInfoEXT, mut p_past_presentation_timing_properties PastPresentationTimingPropertiesEXT) Result
+
+@[inline]
+pub fn get_past_presentation_timing_ext(device Device,
+	p_past_presentation_timing_info &PastPresentationTimingInfoEXT,
+	mut p_past_presentation_timing_properties PastPresentationTimingPropertiesEXT) Result {
+	return C.vkGetPastPresentationTimingEXT(device, p_past_presentation_timing_info, mut
+		p_past_presentation_timing_properties)
 }
 
 pub const intel_shader_integer_functions_2_spec_version = 1
