@@ -26,18 +26,6 @@ module vulkan
 
 import vulkan.c as _
 
-// Vulkan commands are Volk dispatch-table variables when VK_NO_PROTOTYPES is
-// enabled. Include Volk in this module so generated C call sites see those
-// variables instead of synthesizing incompatible direct function prototypes.
-#flag linux -I$env('VULKAN_SDK')/include
-#flag linux -I$env('VULKAN_SDK')/include/volk
-#flag darwin -I$env('VULKAN_SDK')/include
-#flag darwin -I$env('VULKAN_SDK')/include/volk
-#flag windows -I$env('VULKAN_SDK')/Include
-#flag windows -I$env('VULKAN_SDK')/Include/volk
-#flag -D VK_NO_PROTOTYPES
-#include <volk.h>
-
 // Volk owns the Vulkan loader dispatch table used by this binding.  Keep the
 // declarations next to the public Vulkan types, while the implementation is
 // compiled exactly once in c/volk.c.v.
