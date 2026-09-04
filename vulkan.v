@@ -35,7 +35,7 @@ import vulkan.c as _
 #flag darwin -I$env('VULKAN_SDK')/include/volk
 #flag windows -I$env('VULKAN_SDK')/Include
 #flag windows -I$env('VULKAN_SDK')/Include/volk
-#define VK_NO_PROTOTYPES
+#flag -D VK_NO_PROTOTYPES
 #include <volk.h>
 
 // Volk owns the Vulkan loader dispatch table used by this binding.  Keep the
