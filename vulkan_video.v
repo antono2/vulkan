@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright Anton Oreskin | https://gosudev.de
+Copyright Anton Oreskin | https://oreskin.de
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
