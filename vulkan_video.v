@@ -49,6 +49,8 @@ pub enum StdVideoH264ProfileIdc as u32 {
 	baseline           = 66
 	main               = 77
 	high               = 100
+	high10             = 110
+	high422            = 122
 	high444_predictive = 244
 	invalid            = u32(0x7FFFFFFF)
 }
@@ -329,8 +331,7 @@ pub mut:
 	pScalingLists                        &StdVideoH264ScalingLists
 }
 
-pub const std_vulkan_video_codec_h264_decode_api_version_1_0_0 = make_video_std_version(1,
-	0, 0)
+pub const std_vulkan_video_codec_h264_decode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
 pub const std_video_decode_h264_field_order_count_list_size = u32(2)
 pub const std_vulkan_video_codec_h264_decode_spec_version = std_vulkan_video_codec_h264_decode_api_version_1_0_0
 pub const std_vulkan_video_codec_h264_decode_extension_name = c'VK_STD_vulkan_video_codec_h264_decode'
@@ -390,8 +391,7 @@ pub mut:
 	PicOrderCnt [std_video_decode_h264_field_order_count_list_size]i32
 }
 
-pub const std_vulkan_video_codec_h264_encode_api_version_1_0_0 = make_video_std_version(1,
-	0, 0)
+pub const std_vulkan_video_codec_h264_encode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
 pub const std_vulkan_video_codec_h264_encode_spec_version = std_vulkan_video_codec_h264_encode_api_version_1_0_0
 pub const std_vulkan_video_codec_h264_encode_extension_name = c'VK_STD_vulkan_video_codec_h264_encode'
 
@@ -1041,8 +1041,7 @@ pub mut:
 	pPredictorPaletteEntries                  &StdVideoH265PredictorPaletteEntries
 }
 
-pub const std_vulkan_video_codec_h265_decode_api_version_1_0_0 = make_video_std_version(1,
-	0, 0)
+pub const std_vulkan_video_codec_h265_decode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
 pub const std_video_decode_h265_ref_pic_set_list_size = u32(8)
 pub const std_vulkan_video_codec_h265_decode_spec_version = std_vulkan_video_codec_h265_decode_api_version_1_0_0
 pub const std_vulkan_video_codec_h265_decode_extension_name = c'VK_STD_vulkan_video_codec_h265_decode'
@@ -1094,8 +1093,7 @@ pub mut:
 	PicOrderCntVal i32
 }
 
-pub const std_vulkan_video_codec_h265_encode_api_version_1_0_0 = make_video_std_version(1,
-	0, 0)
+pub const std_vulkan_video_codec_h265_encode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
 pub const std_vulkan_video_codec_h265_encode_spec_version = std_vulkan_video_codec_h265_encode_api_version_1_0_0
 pub const std_vulkan_video_codec_h265_encode_extension_name = c'VK_STD_vulkan_video_codec_h265_encode'
 
@@ -1688,8 +1686,7 @@ pub mut:
 	pTimingInfo                        &StdVideoAV1TimingInfo
 }
 
-pub const std_vulkan_video_codec_av1_decode_api_version_1_0_0 = make_video_std_version(1,
-	0, 0)
+pub const std_vulkan_video_codec_av1_decode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
 pub const std_vulkan_video_codec_av1_decode_spec_version = std_vulkan_video_codec_av1_decode_api_version_1_0_0
 pub const std_vulkan_video_codec_av1_decode_extension_name = c'VK_STD_vulkan_video_codec_av1_decode'
 
@@ -1783,8 +1780,7 @@ pub mut:
 	SavedOrderHints  [std_video_av1_num_ref_frames]u8
 }
 
-pub const std_vulkan_video_codec_av1_encode_api_version_1_0_0 = make_video_std_version(1,
-	0, 0)
+pub const std_vulkan_video_codec_av1_encode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
 pub const std_vulkan_video_codec_av1_encode_spec_version = std_vulkan_video_codec_av1_encode_api_version_1_0_0
 pub const std_vulkan_video_codec_av1_encode_extension_name = c'VK_STD_vulkan_video_codec_av1_encode'
 
@@ -2067,8 +2063,7 @@ pub mut:
 	FeatureData             [std_video_vp9_max_segments][std_video_vp9_seg_lvl_max]i16
 }
 
-pub const std_vulkan_video_codec_vp9_decode_api_version_1_0_0 = make_video_std_version(1,
-	0, 0)
+pub const std_vulkan_video_codec_vp9_decode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
 pub const std_vulkan_video_codec_vp9_decode_spec_version = std_vulkan_video_codec_vp9_decode_api_version_1_0_0
 pub const std_vulkan_video_codec_vp9_decode_extension_name = c'VK_STD_vulkan_video_codec_vp9_decode'
 
