@@ -1,0 +1,114 @@
+name: Validate Vulkan bindings
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-vulkan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generated-change-scope:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Accept only generated binding files
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "$BASE_REF"
+          mapfile -t changed < <(git diff --name-only "origin/$BASE_REF...HEAD")
+          ((${#changed[@]} > 0)) || {
+            echo "The generated update contains no changed files" >&2
+            exit 1
+          }
+
+          version_changed=false
+          for path in "${changed[@]}"; do
+            [[ "$path" == VERSION ]] && version_changed=true
+          done
+
+          if [[ "$version_changed" == true && "$HEAD_REF" != generated/* ]]; then
+            echo "VERSION may only change through a generated/* update branch" >&2
+            exit 1
+          fi
+          if [[ "$HEAD_REF" != generated/* ]]; then
+            exit 0
+          fi
+          [[ "$version_changed" == true ]] || {
+            echo "A generated update must change VERSION" >&2
+            exit 1
+          }
+          for path in "${changed[@]}"; do
+            case "$path" in
+              VERSION|vulkan.v|vulkan_video.v) ;;
+              *)
+                echo "Unexpected file in generated update: $path" >&2
+                exit 1
+                ;;
+            esac
+          done
+
+  compile-smoke-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: antono2/v_vulkan_bindings
+          path: generator
+      - uses: prantlf/setup-v-action@v4
+      - uses: NcStudios/VulkanCI@v1.2
+        with:
+          sdkVersion: 1.4.309.0
+      - name: Download Volk and compile smoke test
+        run: |
+          set -euo pipefail
+          install -d "$VULKAN_SDK/include/volk" "$HOME/.vmodules"
+          curl --fail --silent --show-error --location \
+            https://raw.githubusercontent.com/zeux/volk/master/volk.h \
+            --output "$VULKAN_SDK/include/volk/volk.h"
+          curl --fail --silent --show-error --location \
+            https://raw.githubusercontent.com/zeux/volk/master/volk.c \
+            --output "$VULKAN_SDK/include/volk/volk.c"
+          ln -s "$GITHUB_WORKSPACE" "$HOME/.vmodules/vulkan"
+          v -cc gcc run generator/test
+
+  tag-release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: compile-smoke-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Tag the validated published version
+        run: |
+          set -euo pipefail
+          version=$(cat VERSION)
+          [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+            echo "Invalid VERSION: $version" >&2
+            exit 1
+          }
+          if git rev-parse --verify --quiet "refs/tags/$version" >/dev/null; then
+            echo "Tag $version already exists"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$version" -m "V bindings for Vulkan-Docs $version"
+          git push origin "refs/tags/$version"
