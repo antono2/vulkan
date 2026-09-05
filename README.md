@@ -7,10 +7,27 @@
 Please install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home) and set the [environment variables](https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html)
 
 ## Install
- Download this repository to your local .vmodules
+Download the latest bindings to your local `.vmodules` directory:
+
 ```
 v install https://github.com/antono2/vulkan
 ```
+
+### Historical Vulkan versions
+
+The original tags from `v1.3.290` through `v1.4.335` are preserved exactly as
+published. They use a source layout accepted by the V compiler available at the
+time, but not by current V releases. For a historical Vulkan version with a
+current V compiler, install its matching `+vcompat.1` tag instead:
+
+```
+v install https://github.com/antono2/vulkan@v1.4.335+vcompat.1
+```
+
+Compatibility tags contain bindings regenerated from the same tagged
+Khronos Vulkan registry. They do not move or replace the original tags.
+`v1.4.362` and later tags already use the current layout and need no
+compatibility suffix.
 
 ## Examples
 An example can be found at  [antono2/v_vulkan_bindings/test](https://github.com/antono2/v_vulkan_bindings/tree/master/test)</br>
@@ -23,5 +40,4 @@ The generator is located at [antono2/v_vulkan_bindings](https://github.com/anton
 Big thanks to [@spytheman](https://github.com/spytheman) for fixing my bugs in times of need.</br>
 To [@JalonSolov](https://github.com/JalonSolov) for quick and solid answers to obscure questions.</br>
 The awesome team at [V](https://vlang.io/) for making this possible.
-
 
