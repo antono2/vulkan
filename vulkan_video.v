@@ -49,8 +49,6 @@ pub enum StdVideoH264ProfileIdc as u32 {
 	baseline           = 66
 	main               = 77
 	high               = 100
-	high10             = 110
-	high422            = 122
 	high444_predictive = 244
 	invalid            = u32(0x7FFFFFFF)
 }
