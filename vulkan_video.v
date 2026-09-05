@@ -28,14 +28,14 @@ pub fn make_video_std_version(major u32, minor u32, patch u32) u32 {
 	return (major << 22) | (minor << 12) | patch
 }
 
-pub const std_video_h264_cpb_cnt_list_size = u32(32)
-pub const std_video_h264_scaling_list_4x4_num_lists = u32(6)
-pub const std_video_h264_scaling_list_4x4_num_elements = u32(16)
-pub const std_video_h264_scaling_list_8x8_num_lists = u32(6)
-pub const std_video_h264_scaling_list_8x8_num_elements = u32(64)
-pub const std_video_h264_max_num_list_ref = u32(32)
-pub const std_video_h264_max_chroma_planes = u32(2)
-pub const std_video_h264_no_reference_picture = u8(0xff)
+pub const std_video_h264_cpb_cnt_list_size = 32
+pub const std_video_h264_scaling_list_4x4_num_lists = 6
+pub const std_video_h264_scaling_list_4x4_num_elements = 16
+pub const std_video_h264_scaling_list_8x8_num_lists = 6
+pub const std_video_h264_scaling_list_8x8_num_elements = 64
+pub const std_video_h264_max_num_list_ref = 32
+pub const std_video_h264_max_chroma_planes = 2
+pub const std_video_h264_no_reference_picture = 0xff
 
 pub enum StdVideoH264ChromaFormatIdc as u32 {
 	monochrome = 0
@@ -49,8 +49,6 @@ pub enum StdVideoH264ProfileIdc as u32 {
 	baseline           = 66
 	main               = 77
 	high               = 100
-	high10             = 110
-	high422            = 122
 	high444_predictive = 244
 	invalid            = u32(0x7FFFFFFF)
 }
@@ -332,7 +330,7 @@ pub mut:
 }
 
 pub const std_vulkan_video_codec_h264_decode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
-pub const std_video_decode_h264_field_order_count_list_size = u32(2)
+pub const std_video_decode_h264_field_order_count_list_size = 2
 pub const std_vulkan_video_codec_h264_decode_spec_version = std_vulkan_video_codec_h264_decode_api_version_1_0_0
 pub const std_vulkan_video_codec_h264_decode_extension_name = c'VK_STD_vulkan_video_codec_h264_decode'
 
@@ -555,29 +553,29 @@ pub mut:
 	pWeightTable                  &StdVideoEncodeH264WeightTable
 }
 
-pub const std_video_h265_sublayers_list_size = u32(7)
-pub const std_video_h265_cpb_cnt_list_size = u32(32)
-pub const std_video_h265_scaling_list_4x4_num_lists = u32(6)
-pub const std_video_h265_scaling_list_4x4_num_elements = u32(16)
-pub const std_video_h265_scaling_list_8x8_num_lists = u32(6)
-pub const std_video_h265_scaling_list_8x8_num_elements = u32(64)
-pub const std_video_h265_scaling_list_16x16_num_lists = u32(6)
-pub const std_video_h265_scaling_list_16x16_num_elements = u32(64)
-pub const std_video_h265_scaling_list_32x32_num_lists = u32(2)
-pub const std_video_h265_scaling_list_32x32_num_elements = u32(64)
-pub const std_video_h265_predictor_palette_components_list_size = u32(3)
-pub const std_video_h265_predictor_palette_comp_entries_list_size = u32(128)
-pub const std_video_h265_max_dpb_size = u32(16)
-pub const std_video_h265_max_long_term_ref_pics_sps = u32(32)
-pub const std_video_h265_chroma_qp_offset_list_size = u32(6)
-pub const std_video_h265_chroma_qp_offset_tile_cols_list_size = u32(19)
-pub const std_video_h265_chroma_qp_offset_tile_rows_list_size = u32(21)
-pub const std_video_h265_max_num_list_ref = u32(15)
-pub const std_video_h265_max_chroma_planes = u32(2)
-pub const std_video_h265_max_short_term_ref_pic_sets = u32(64)
-pub const std_video_h265_max_long_term_pics = u32(16)
-pub const std_video_h265_max_delta_poc = u32(48)
-pub const std_video_h265_no_reference_picture = u8(0xff)
+pub const std_video_h265_sublayers_list_size = 7
+pub const std_video_h265_cpb_cnt_list_size = 32
+pub const std_video_h265_scaling_list_4x4_num_lists = 6
+pub const std_video_h265_scaling_list_4x4_num_elements = 16
+pub const std_video_h265_scaling_list_8x8_num_lists = 6
+pub const std_video_h265_scaling_list_8x8_num_elements = 64
+pub const std_video_h265_scaling_list_16x16_num_lists = 6
+pub const std_video_h265_scaling_list_16x16_num_elements = 64
+pub const std_video_h265_scaling_list_32x32_num_lists = 2
+pub const std_video_h265_scaling_list_32x32_num_elements = 64
+pub const std_video_h265_predictor_palette_components_list_size = 3
+pub const std_video_h265_predictor_palette_comp_entries_list_size = 128
+pub const std_video_h265_max_dpb_size = 16
+pub const std_video_h265_max_long_term_ref_pics_sps = 32
+pub const std_video_h265_chroma_qp_offset_list_size = 6
+pub const std_video_h265_chroma_qp_offset_tile_cols_list_size = 19
+pub const std_video_h265_chroma_qp_offset_tile_rows_list_size = 21
+pub const std_video_h265_max_num_list_ref = 15
+pub const std_video_h265_max_chroma_planes = 2
+pub const std_video_h265_max_short_term_ref_pic_sets = 64
+pub const std_video_h265_max_long_term_pics = 16
+pub const std_video_h265_max_delta_poc = 48
+pub const std_video_h265_no_reference_picture = 0xff
 
 pub enum StdVideoH265ChromaFormatIdc as u32 {
 	monochrome = 0
@@ -1042,7 +1040,7 @@ pub mut:
 }
 
 pub const std_vulkan_video_codec_h265_decode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
-pub const std_video_decode_h265_ref_pic_set_list_size = u32(8)
+pub const std_video_decode_h265_ref_pic_set_list_size = 8
 pub const std_vulkan_video_codec_h265_decode_spec_version = std_vulkan_video_codec_h265_decode_api_version_1_0_0
 pub const std_vulkan_video_codec_h265_decode_extension_name = c'VK_STD_vulkan_video_codec_h265_decode'
 
@@ -1263,27 +1261,27 @@ pub mut:
 	TemporalId     u8
 }
 
-pub const std_video_av1_max_loop_filter_strengths = u32(4)
-pub const std_video_av1_total_refs_per_frame = u32(8)
-pub const std_video_av1_loop_filter_adjustments = u32(2)
-pub const std_video_av1_max_segments = u32(8)
-pub const std_video_av1_seg_lvl_max = u32(8)
-pub const std_video_av1_max_cdef_filter_strengths = u32(8)
-pub const std_video_av1_max_num_planes = u32(3)
-pub const std_video_av1_num_ref_frames = u32(8)
-pub const std_video_av1_global_motion_params = u32(6)
-pub const std_video_av1_max_num_y_points = u32(14)
-pub const std_video_av1_max_num_cb_points = u32(10)
-pub const std_video_av1_max_num_cr_points = u32(10)
-pub const std_video_av1_max_num_pos_luma = u32(24)
-pub const std_video_av1_max_num_pos_chroma = u32(25)
-pub const std_video_av1_refs_per_frame = u32(7)
-pub const std_video_av1_max_tile_cols = u32(64)
-pub const std_video_av1_max_tile_rows = u32(64)
-pub const std_video_av1_primary_ref_none = u8(7)
-pub const std_video_av1_select_integer_mv = u8(2)
-pub const std_video_av1_select_screen_content_tools = u32(2)
-pub const std_video_av1_skip_mode_frames = u32(2)
+pub const std_video_av1_max_loop_filter_strengths = 4
+pub const std_video_av1_total_refs_per_frame = 8
+pub const std_video_av1_loop_filter_adjustments = 2
+pub const std_video_av1_max_segments = 8
+pub const std_video_av1_seg_lvl_max = 8
+pub const std_video_av1_max_cdef_filter_strengths = 8
+pub const std_video_av1_max_num_planes = 3
+pub const std_video_av1_num_ref_frames = 8
+pub const std_video_av1_global_motion_params = 6
+pub const std_video_av1_max_num_y_points = 14
+pub const std_video_av1_max_num_cb_points = 10
+pub const std_video_av1_max_num_cr_points = 10
+pub const std_video_av1_max_num_pos_luma = 24
+pub const std_video_av1_max_num_pos_chroma = 25
+pub const std_video_av1_refs_per_frame = 7
+pub const std_video_av1_max_tile_cols = 64
+pub const std_video_av1_max_tile_rows = 64
+pub const std_video_av1_primary_ref_none = 7
+pub const std_video_av1_select_integer_mv = 2
+pub const std_video_av1_select_screen_content_tools = 2
+pub const std_video_av1_skip_mode_frames = 2
 
 pub enum StdVideoAV1Profile as u32 {
 	main         = 0
@@ -1365,19 +1363,19 @@ pub enum StdVideoAV1FrameRestorationType as u32 {
 }
 
 pub enum StdVideoAV1ColorPrimaries as u32 {
-	bt709        = 1
-	unspecified  = 2
-	bt470_m      = 4
-	bt470_b_g    = 5
-	bt601        = 6
-	smpte240     = 7
-	generic_film = 8
-	bt2020       = 9
-	xyz          = 10
-	smpte431     = 11
-	smpte432     = 12
-	ebu3213      = 22
-	invalid      = u32(0x7FFFFFFF)
+	bt709          = 1
+	bt_unspecified = 2
+	bt470_m        = 4
+	bt470_b_g      = 5
+	bt601          = 6
+	smpte240       = 7
+	generic_film   = 8
+	bt2020         = 9
+	xyz            = 10
+	smpte431       = 11
+	smpte432       = 12
+	ebu3213        = 22
+	invalid        = u32(0x7FFFFFFF)
 }
 
 pub enum StdVideoAV1TransferCharacteristics as u32 {
@@ -1778,332 +1776,4 @@ pub mut:
 	RefFrameSignBias u8
 	OrderHint        u8
 	SavedOrderHints  [std_video_av1_num_ref_frames]u8
-}
-
-pub const std_vulkan_video_codec_av1_encode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
-pub const std_vulkan_video_codec_av1_encode_spec_version = std_vulkan_video_codec_av1_encode_api_version_1_0_0
-pub const std_vulkan_video_codec_av1_encode_extension_name = c'VK_STD_vulkan_video_codec_av1_encode'
-
-pub type StdVideoEncodeAV1DecoderModelInfo = C.StdVideoEncodeAV1DecoderModelInfo
-
-@[typedef]
-pub struct C.StdVideoEncodeAV1DecoderModelInfo {
-pub mut:
-	buffer_delay_length_minus_1            u8
-	buffer_removal_time_length_minus_1     u8
-	frame_presentation_time_length_minus_1 u8
-	reserved1                              u8
-	num_units_in_decoding_tick             u32
-}
-
-pub type StdVideoEncodeAV1ExtensionHeader = C.StdVideoEncodeAV1ExtensionHeader
-
-@[typedef]
-pub struct C.StdVideoEncodeAV1ExtensionHeader {
-pub mut:
-	temporal_id u8
-	spatial_id  u8
-}
-
-pub type StdVideoEncodeAV1OperatingPointInfoFlags = C.StdVideoEncodeAV1OperatingPointInfoFlags
-
-@[typedef]
-pub struct C.StdVideoEncodeAV1OperatingPointInfoFlags {
-pub mut:
-	decoder_model_present_for_this_op         u32
-	low_delay_mode_flag                       u32
-	initial_display_delay_present_for_this_op u32
-	reserved                                  u32
-}
-
-pub type StdVideoEncodeAV1OperatingPointInfo = C.StdVideoEncodeAV1OperatingPointInfo
-
-@[typedef]
-pub struct C.StdVideoEncodeAV1OperatingPointInfo {
-pub mut:
-	flags                         StdVideoEncodeAV1OperatingPointInfoFlags
-	operating_point_idc           u16
-	seq_level_idx                 u8
-	seq_tier                      u8
-	decoder_buffer_delay          u32
-	encoder_buffer_delay          u32
-	initial_display_delay_minus_1 u8
-}
-
-pub type StdVideoEncodeAV1PictureInfoFlags = C.StdVideoEncodeAV1PictureInfoFlags
-
-@[typedef]
-pub struct C.StdVideoEncodeAV1PictureInfoFlags {
-pub mut:
-	error_resilient_mode             u32
-	disable_cdf_update               u32
-	use_superres                     u32
-	render_and_frame_size_different  u32
-	allow_screen_content_tools       u32
-	is_filter_switchable             u32
-	force_integer_mv                 u32
-	frame_size_override_flag         u32
-	buffer_removal_time_present_flag u32
-	allow_intrabc                    u32
-	frame_refs_short_signaling       u32
-	allow_high_precision_mv          u32
-	is_motion_mode_switchable        u32
-	use_ref_frame_mvs                u32
-	disable_frame_end_update_cdf     u32
-	allow_warped_motion              u32
-	reduced_tx_set                   u32
-	skip_mode_present                u32
-	delta_q_present                  u32
-	delta_lf_present                 u32
-	delta_lf_multi                   u32
-	segmentation_enabled             u32
-	segmentation_update_map          u32
-	segmentation_temporal_update     u32
-	segmentation_update_data         u32
-	UsesLr                           u32
-	usesChromaLr                     u32
-	show_frame                       u32
-	showable_frame                   u32
-	reserved                         u32
-}
-
-pub type StdVideoEncodeAV1PictureInfo = C.StdVideoEncodeAV1PictureInfo
-
-@[typedef]
-pub struct C.StdVideoEncodeAV1PictureInfo {
-pub mut:
-	flags                   StdVideoEncodeAV1PictureInfoFlags
-	frame_type              StdVideoAV1FrameType
-	frame_presentation_time u32
-	current_frame_id        u32
-	order_hint              u8
-	primary_ref_frame       u8
-	refresh_frame_flags     u8
-	coded_denom             u8
-	render_width_minus_1    u16
-	render_height_minus_1   u16
-	interpolation_filter    StdVideoAV1InterpolationFilter
-	TxMode                  StdVideoAV1TxMode
-	delta_q_res             u8
-	delta_lf_res            u8
-	ref_order_hint          [std_video_av1_num_ref_frames]u8
-	ref_frame_idx           [std_video_av1_refs_per_frame]i8
-	reserved1               [3]u8
-	delta_frame_id_minus_1  [std_video_av1_refs_per_frame]u32
-	pTileInfo               &StdVideoAV1TileInfo
-	pQuantization           &StdVideoAV1Quantization
-	pSegmentation           &StdVideoAV1Segmentation
-	pLoopFilter             &StdVideoAV1LoopFilter
-	pCDEF                   &StdVideoAV1CDEF
-	pLoopRestoration        &StdVideoAV1LoopRestoration
-	pGlobalMotion           &StdVideoAV1GlobalMotion
-	pExtensionHeader        &StdVideoEncodeAV1ExtensionHeader
-	pBufferRemovalTimes     &u32
-}
-
-pub type StdVideoEncodeAV1ReferenceInfoFlags = C.StdVideoEncodeAV1ReferenceInfoFlags
-
-@[typedef]
-pub struct C.StdVideoEncodeAV1ReferenceInfoFlags {
-pub mut:
-	disable_frame_end_update_cdf u32
-	segmentation_enabled         u32
-	reserved                     u32
-}
-
-pub type StdVideoEncodeAV1ReferenceInfo = C.StdVideoEncodeAV1ReferenceInfo
-
-@[typedef]
-pub struct C.StdVideoEncodeAV1ReferenceInfo {
-pub mut:
-	flags            StdVideoEncodeAV1ReferenceInfoFlags
-	RefFrameId       u32
-	frame_type       StdVideoAV1FrameType
-	OrderHint        u8
-	reserved1        [3]u8
-	pExtensionHeader &StdVideoEncodeAV1ExtensionHeader
-}
-
-pub const std_video_vp9_max_ref_frames = u32(4)
-pub const std_video_vp9_loop_filter_adjustments = u32(2)
-pub const std_video_vp9_max_segmentation_tree_probs = u32(7)
-pub const std_video_vp9_max_segmentation_pred_prob = u32(3)
-pub const std_video_vp9_max_segments = u32(8)
-pub const std_video_vp9_seg_lvl_max = u32(4)
-pub const std_video_vp9_num_ref_frames = u32(8)
-pub const std_video_vp9_refs_per_frame = u32(3)
-
-pub enum StdVideoVP9Profile as u32 {
-	_0      = 0
-	_1      = 1
-	_2      = 2
-	_3      = 3
-	invalid = u32(0x7FFFFFFF)
-}
-
-pub enum StdVideoVP9Level as u32 {
-	_1_0    = 0
-	_1_1    = 1
-	_2_0    = 2
-	_2_1    = 3
-	_3_0    = 4
-	_3_1    = 5
-	_4_0    = 6
-	_4_1    = 7
-	_5_0    = 8
-	_5_1    = 9
-	_5_2    = 10
-	_6_0    = 11
-	_6_1    = 12
-	_6_2    = 13
-	invalid = u32(0x7FFFFFFF)
-}
-
-pub enum StdVideoVP9FrameType as u32 {
-	key     = 0
-	non_key = 1
-	invalid = u32(0x7FFFFFFF)
-}
-
-pub enum StdVideoVP9ReferenceName as u32 {
-	intra_frame  = 0
-	last_frame   = 1
-	golden_frame = 2
-	altref_frame = 3
-	invalid      = u32(0x7FFFFFFF)
-}
-
-pub enum StdVideoVP9InterpolationFilter as u32 {
-	eighttap        = 0
-	eighttap_smooth = 1
-	eighttap_sharp  = 2
-	bilinear        = 3
-	switchable      = 4
-	invalid         = u32(0x7FFFFFFF)
-}
-
-pub enum StdVideoVP9ColorSpace as u32 {
-	unknown  = 0
-	bt601    = 1
-	bt709    = 2
-	smpte170 = 3
-	smpte240 = 4
-	bt2020   = 5
-	reserved = 6
-	rgb      = 7
-	invalid  = u32(0x7FFFFFFF)
-}
-pub type StdVideoVP9ColorConfigFlags = C.StdVideoVP9ColorConfigFlags
-
-@[typedef]
-pub struct C.StdVideoVP9ColorConfigFlags {
-pub mut:
-	color_range u32
-	reserved    u32
-}
-
-pub type StdVideoVP9ColorConfig = C.StdVideoVP9ColorConfig
-
-@[typedef]
-pub struct C.StdVideoVP9ColorConfig {
-pub mut:
-	flags         StdVideoVP9ColorConfigFlags
-	BitDepth      u8
-	subsampling_x u8
-	subsampling_y u8
-	reserved1     u8
-	color_space   StdVideoVP9ColorSpace
-}
-
-pub type StdVideoVP9LoopFilterFlags = C.StdVideoVP9LoopFilterFlags
-
-@[typedef]
-pub struct C.StdVideoVP9LoopFilterFlags {
-pub mut:
-	loop_filter_delta_enabled u32
-	loop_filter_delta_update  u32
-	reserved                  u32
-}
-
-pub type StdVideoVP9LoopFilter = C.StdVideoVP9LoopFilter
-
-@[typedef]
-pub struct C.StdVideoVP9LoopFilter {
-pub mut:
-	flags                   StdVideoVP9LoopFilterFlags
-	loop_filter_level       u8
-	loop_filter_sharpness   u8
-	update_ref_delta        u8
-	loop_filter_ref_deltas  [std_video_vp9_max_ref_frames]i8
-	update_mode_delta       u8
-	loop_filter_mode_deltas [std_video_vp9_loop_filter_adjustments]i8
-}
-
-pub type StdVideoVP9SegmentationFlags = C.StdVideoVP9SegmentationFlags
-
-@[typedef]
-pub struct C.StdVideoVP9SegmentationFlags {
-pub mut:
-	segmentation_update_map          u32
-	segmentation_temporal_update     u32
-	segmentation_update_data         u32
-	segmentation_abs_or_delta_update u32
-	reserved                         u32
-}
-
-pub type StdVideoVP9Segmentation = C.StdVideoVP9Segmentation
-
-@[typedef]
-pub struct C.StdVideoVP9Segmentation {
-pub mut:
-	flags                   StdVideoVP9SegmentationFlags
-	segmentation_tree_probs [std_video_vp9_max_segmentation_tree_probs]u8
-	segmentation_pred_prob  [std_video_vp9_max_segmentation_pred_prob]u8
-	FeatureEnabled          [std_video_vp9_max_segments]u8
-	FeatureData             [std_video_vp9_max_segments][std_video_vp9_seg_lvl_max]i16
-}
-
-pub const std_vulkan_video_codec_vp9_decode_api_version_1_0_0 = make_video_std_version(1, 0, 0)
-pub const std_vulkan_video_codec_vp9_decode_spec_version = std_vulkan_video_codec_vp9_decode_api_version_1_0_0
-pub const std_vulkan_video_codec_vp9_decode_extension_name = c'VK_STD_vulkan_video_codec_vp9_decode'
-
-pub type StdVideoDecodeVP9PictureInfoFlags = C.StdVideoDecodeVP9PictureInfoFlags
-
-@[typedef]
-pub struct C.StdVideoDecodeVP9PictureInfoFlags {
-pub mut:
-	error_resilient_mode         u32
-	intra_only                   u32
-	allow_high_precision_mv      u32
-	refresh_frame_context        u32
-	frame_parallel_decoding_mode u32
-	segmentation_enabled         u32
-	show_frame                   u32
-	UsePrevFrameMvs              u32
-	reserved                     u32
-}
-
-pub type StdVideoDecodeVP9PictureInfo = C.StdVideoDecodeVP9PictureInfo
-
-@[typedef]
-pub struct C.StdVideoDecodeVP9PictureInfo {
-pub mut:
-	flags                    StdVideoDecodeVP9PictureInfoFlags
-	profile                  StdVideoVP9Profile
-	frame_type               StdVideoVP9FrameType
-	frame_context_idx        u8
-	reset_frame_context      u8
-	refresh_frame_flags      u8
-	ref_frame_sign_bias_mask u8
-	interpolation_filter     StdVideoVP9InterpolationFilter
-	base_q_idx               u8
-	delta_q_y_dc             i8
-	delta_q_uv_dc            i8
-	delta_q_uv_ac            i8
-	tile_cols_log2           u8
-	tile_rows_log2           u8
-	reserved1                [3]u16
-	pColorConfig             &StdVideoVP9ColorConfig
-	pLoopFilter              &StdVideoVP9LoopFilter
-	pSegmentation            &StdVideoVP9Segmentation
 }
