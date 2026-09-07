@@ -1,9 +1,11 @@
 module vulkan
 
+fn C.v_vulkan_initialize_loader() Result
+
 // initialize_loader loads the Vulkan loader and populates the global commands.
 // Call this before create_instance().
 pub fn initialize_loader() Result {
-	return C.volkInitialize()
+	return C.v_vulkan_initialize_loader()
 }
 
 // load_instance_commands populates commands that are scoped to an instance.
