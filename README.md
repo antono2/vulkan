@@ -49,6 +49,13 @@ compatibility suffix.
 An example can be found at  [antono2/v_vulkan_bindings/test](https://github.com/antono2/v_vulkan_bindings/tree/master/test)</br>
 Using GLFW and Dear ImGui [antono2/v_imgui_examples](https://github.com/antono2/v_imgui_examples)
 
+## Ergonomic API (opt in)
+
+The generated module remains the complete low-level binding. The opt-in
+`antono2.vulkan.ergonomic` submodule adds typed errors, instance lifecycle
+helpers, and physical-device discovery without modifying generated files.
+See [the ergonomic API design](API_DESIGN.md).
+
 ## Generate
 The generator is located at [antono2/v_vulkan_bindings](https://github.com/antono2/v_vulkan_bindings)
 
