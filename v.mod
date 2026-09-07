@@ -1,5 +1,5 @@
 Module {
-	name: 'vulkan'
+	name: 'antono2.vulkan'
 	author: 'Anton Oreskin'
 	description: 'V Vulkan Bindings'
 	version: '1.0.0'

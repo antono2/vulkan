@@ -76,14 +76,14 @@ jobs:
       - name: Download Volk and compile smoke test
         run: |
           set -euo pipefail
-          install -d "$VULKAN_SDK/include/volk" "$HOME/.vmodules"
+          install -d "$VULKAN_SDK/include/volk" "$HOME/.vmodules/antono2"
           curl --fail --silent --show-error --location \
             https://raw.githubusercontent.com/zeux/volk/master/volk.h \
             --output "$VULKAN_SDK/include/volk/volk.h"
           curl --fail --silent --show-error --location \
             https://raw.githubusercontent.com/zeux/volk/master/volk.c \
             --output "$VULKAN_SDK/include/volk/volk.c"
-          ln -s "$GITHUB_WORKSPACE" "$HOME/.vmodules/vulkan"
+          ln -s "$GITHUB_WORKSPACE" "$HOME/.vmodules/antono2/vulkan"
           v -cc gcc run generator/test
 
   tag-release:
