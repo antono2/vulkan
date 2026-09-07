@@ -260,7 +260,7 @@ pub fn (pool CommandPool) reset(flags vk.CommandPoolResetFlags) ! {
 pub struct PrimaryCommandBuffer {
 	device       vk.Device
 	command_pool vk.CommandPool
-pub:
+pub mut:
 	handle vk.CommandBuffer
 }
 
