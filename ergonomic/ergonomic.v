@@ -396,6 +396,92 @@ pub fn (buffer OwnedBuffer) destroy() {
 	vk.free_memory(buffer.device, buffer.memory, unsafe { nil })
 }
 
+// OwnedImage owns a two-dimensional VkImage and its bound VkDeviceMemory.
+// The image uses one mip level, one array layer, and one sample.
+pub struct OwnedImage {
+	device vk.Device
+pub:
+	handle            vk.Image
+	memory            vk.DeviceMemory
+	format            vk.Format
+	extent            vk.Extent3D
+	tiling            vk.ImageTiling
+	usage             vk.ImageUsageFlags
+	allocation_size   vk.DeviceSize
+	memory_type_index u32
+}
+
+// new_image_2d creates an exclusive-sharing 2D image, chooses memory satisfying
+// all required properties, allocates it, and binds it at offset zero.
+pub fn (device Device) new_image_2d(width u32, height u32, format vk.Format, tiling vk.ImageTiling,
+	usage vk.ImageUsageFlags, required_memory_properties vk.MemoryPropertyFlags) !OwnedImage {
+	if width == 0 || height == 0 {
+		return error('image width and height must be greater than zero')
+	}
+	if usage == 0 {
+		return error('image usage must not be empty')
+	}
+	extent := vk.Extent3D{
+		width: width
+		height: height
+		depth: 1
+	}
+	create_info := vk.ImageCreateInfo{
+		imageType: ._2d
+		format: format
+		extent: extent
+		mipLevels: 1
+		arrayLayers: 1
+		samples: ._1
+		tiling: tiling
+		usage: usage
+		sharingMode: .exclusive
+		initialLayout: .undefined
+	}
+	mut handle := vk.Image(unsafe { nil })
+	require_success(vk.create_image(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateImage')!
+
+	mut requirements := vk.MemoryRequirements{}
+	vk.get_image_memory_requirements(device.handle, handle, mut requirements)
+	memory_type_index := device.physical_device.find_memory_type(requirements.memoryTypeBits, required_memory_properties) or {
+		vk.destroy_image(device.handle, handle, unsafe { nil })
+		return error('no compatible memory type for image')
+	}
+	allocate_info := vk.MemoryAllocateInfo{
+		allocationSize: requirements.size
+		memoryTypeIndex: memory_type_index
+	}
+	mut memory := vk.DeviceMemory(unsafe { nil })
+	require_success(vk.allocate_memory(device.handle, &allocate_info, unsafe { nil }, &memory), 'vkAllocateMemory') or {
+		vk.destroy_image(device.handle, handle, unsafe { nil })
+		return err
+	}
+	require_success(vk.bind_image_memory(device.handle, handle, memory, 0), 'vkBindImageMemory') or {
+		vk.destroy_image(device.handle, handle, unsafe { nil })
+		vk.free_memory(device.handle, memory, unsafe { nil })
+		return err
+	}
+
+	return OwnedImage{
+		device: device.handle
+		handle: handle
+		memory: memory
+		format: format
+		extent: extent
+		tiling: tiling
+		usage: usage
+		allocation_size: requirements.size
+		memory_type_index: memory_type_index
+	}
+}
+
+// destroy first destroys the image, then frees its bound memory. Call it
+// exactly once before destroying the parent Device.
+pub fn (image OwnedImage) destroy() {
+	vk.destroy_image(image.device, image.handle, unsafe { nil })
+	vk.free_memory(image.device, image.memory, unsafe { nil })
+}
+
 // Fence owns a VkFence created by one Device. Its parent device must outlive
 // it. The raw handle remains public for queue submission.
 pub struct Fence {

@@ -220,3 +220,50 @@ fn test_select_memory_type_ignores_compatible_disallowed_type() {
 	select_memory_type(properties, u32(0b10), host_visible) or { return }
 	assert false
 }
+
+fn test_new_image_2d_rejects_empty_extent_before_calling_vulkan() {
+	device := Device{
+		handle: vk.Device(unsafe { nil })
+	}
+	usage := u32(vk.ImageUsageFlagBits.sampled)
+	device.new_image_2d(0, 1, .r8g8b8a8_unorm, .optimal, usage, 0) or {
+		assert err.msg() == 'image width and height must be greater than zero'
+		return
+	}
+	assert false
+}
+
+fn test_new_image_2d_rejects_empty_usage_before_calling_vulkan() {
+	device := Device{
+		handle: vk.Device(unsafe { nil })
+	}
+	device.new_image_2d(1, 1, .r8g8b8a8_unorm, .optimal, 0, 0) or {
+		assert err.msg() == 'image usage must not be empty'
+		return
+	}
+	assert false
+}
+
+fn test_owned_image_exposes_creation_and_allocation_metadata() {
+	extent := vk.Extent3D{
+		width: 640
+		height: 480
+		depth: 1
+	}
+	image := OwnedImage{
+		device: vk.Device(unsafe { nil })
+		handle: vk.Image(unsafe { nil })
+		memory: vk.DeviceMemory(unsafe { nil })
+		format: .r8g8b8a8_unorm
+		extent: extent
+		tiling: .optimal
+		usage: u32(vk.ImageUsageFlagBits.sampled)
+		allocation_size: 4096
+		memory_type_index: 2
+	}
+	assert image.format == .r8g8b8a8_unorm
+	assert image.extent.width == 640
+	assert image.extent.height == 480
+	assert image.allocation_size == 4096
+	assert image.memory_type_index == 2
+}

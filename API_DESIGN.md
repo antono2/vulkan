@@ -75,6 +75,8 @@ println('${physical_device.name()}: queue family ${device.queue.family_index}')
 
 `Fence` exposes status, timeout-aware waiting, and reset while preserving positive Vulkan statuses such as `VK_NOT_READY` and `VK_TIMEOUT`. `Fence` and `Semaphore` expose their raw handles for submission structures, clear those handles during idempotent destruction, and must be destroyed before their parent device.
 
+`OwnedImage` creates a simple exclusive-sharing 2D image with one mip level, one array layer, and one sample. It exposes the raw image and memory handles plus its format, extent, tiling, usage, allocation size, and selected memory type. Destruction releases the image before its bound allocation, and must happen before destroying the parent device. More specialized image creation remains available through the raw layer.
+
 Custom allocation callbacks, concurrent-sharing buffers, queue priorities other than 1.0, enabled features, and device extensions deliberately remain in the raw layer for now. A future configurable owning wrapper must retain the allocator used at creation so the same callbacks are supplied during destruction.
 
 ## Next slices
@@ -83,5 +85,5 @@ Custom allocation callbacks, concurrent-sharing buffers, queue priorities other 
 2. Presentation-support selection layered onto the core queue-flag helper.
 3. Configurable queue requests, extension validation, and enabled features.
 4. Owned fences and binary semaphores with explicit parent ownership and destruction ordering. (Implemented.)
-5. Owned images with explicit parent ownership and destruction ordering.
+5. Owned 2D images with explicit parent ownership and destruction ordering. (Implemented.)
 6. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.
