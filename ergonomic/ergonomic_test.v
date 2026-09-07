@@ -174,6 +174,64 @@ fn test_sync_destroy_is_idempotent_for_cleared_handles() {
 	assert isnil(semaphore.handle)
 }
 
+fn test_queue_submit_rejects_empty_command_list_before_calling_vulkan() {
+	queue := Queue{
+		handle: vk.Queue(unsafe { nil })
+	}
+	queue.submit([], SubmitOptions{}) or {
+		assert err.msg() == 'queue submission requires at least one command buffer'
+		return
+	}
+	assert false
+}
+
+fn test_queue_submit_rejects_mismatched_waits_and_stage_masks() {
+	queue := Queue{
+		handle: vk.Queue(unsafe { nil })
+	}
+	command_buffer := PrimaryCommandBuffer{
+		handle: vk.CommandBuffer(unsafe { nil })
+	}
+	wait_semaphore := Semaphore{
+		handle: vk.Semaphore(unsafe { nil })
+	}
+	options := SubmitOptions{
+		wait_semaphores: [wait_semaphore]
+	}
+	queue.submit([command_buffer], options) or {
+		assert err.msg() == 'wait semaphore count must match wait stage mask count'
+		return
+	}
+	assert false
+}
+
+fn test_submit_options_accept_matching_waits_signals_and_optional_fence() {
+	wait_semaphore := Semaphore{
+		handle: vk.Semaphore(unsafe { nil })
+	}
+	signal_semaphore := Semaphore{
+		handle: vk.Semaphore(unsafe { nil })
+	}
+	fence := Fence{
+		handle: vk.Fence(unsafe { nil })
+	}
+	stage := u32(vk.PipelineStageFlagBits.color_attachment_output)
+	options := SubmitOptions{
+		wait_semaphores: [wait_semaphore]
+		wait_stage_masks: [stage]
+		signal_semaphores: [signal_semaphore]
+		fence: fence
+	}
+	assert options.wait_semaphores.len == 1
+	assert options.wait_stage_masks == [stage]
+	assert options.signal_semaphores.len == 1
+	if configured_fence := options.fence {
+		assert configured_fence.handle == fence.handle
+	} else {
+		assert false
+	}
+}
+
 fn memory_properties(types []vk.MemoryPropertyFlags) vk.PhysicalDeviceMemoryProperties {
 	mut properties := vk.PhysicalDeviceMemoryProperties{
 		memoryTypeCount: u32(types.len)
