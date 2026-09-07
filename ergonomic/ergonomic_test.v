@@ -91,3 +91,50 @@ fn test_empty_flag_mask_selects_first_available_queue() {
 	}
 	assert selected.index == 1
 }
+
+fn memory_properties(types []vk.MemoryPropertyFlags) vk.PhysicalDeviceMemoryProperties {
+	mut properties := vk.PhysicalDeviceMemoryProperties{
+		memoryTypeCount: u32(types.len)
+	}
+	for index, flags in types {
+		properties.memoryTypes[index] = vk.MemoryType{
+			propertyFlags: flags
+		}
+	}
+	return properties
+}
+
+fn test_select_memory_type_requires_allowed_bit_and_all_properties() {
+	host_visible := u32(vk.MemoryPropertyFlagBits.host_visible)
+	host_coherent := u32(vk.MemoryPropertyFlagBits.host_coherent)
+	properties := memory_properties([
+		host_visible,
+		host_coherent,
+		host_visible | host_coherent,
+	])
+
+	selected := select_memory_type(properties, u32(0b110), host_visible | host_coherent) or {
+		assert false
+		return
+	}
+	assert selected == 2
+}
+
+fn test_select_memory_type_returns_none_without_compatible_type() {
+	properties := memory_properties([
+		u32(vk.MemoryPropertyFlagBits.device_local),
+		u32(vk.MemoryPropertyFlagBits.host_visible),
+	])
+	required := u32(vk.MemoryPropertyFlagBits.host_visible) | u32(vk.MemoryPropertyFlagBits.host_coherent)
+
+	select_memory_type(properties, u32(0b11), required) or { return }
+	assert false
+}
+
+fn test_select_memory_type_ignores_compatible_disallowed_type() {
+	host_visible := u32(vk.MemoryPropertyFlagBits.host_visible)
+	properties := memory_properties([host_visible, 0])
+
+	select_memory_type(properties, u32(0b10), host_visible) or { return }
+	assert false
+}
