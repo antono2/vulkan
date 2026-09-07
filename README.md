@@ -55,7 +55,8 @@ The generated module remains the complete low-level binding. The opt-in
 `antono2.vulkan.ergonomic` submodule adds typed errors, instance lifecycle
 helpers, physical-device and queue-family discovery, and single-queue logical
 device ownership. It also provides explicit memory-type selection and owned
-buffer/device-memory allocation without modifying generated files.
+buffer/device-memory allocation, plus owned command pools and primary command
+buffer lifecycle helpers, without modifying generated files.
 See [the ergonomic API design](API_DESIGN.md).
 
 ## Generate

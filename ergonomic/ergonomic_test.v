@@ -92,6 +92,41 @@ fn test_empty_flag_mask_selects_first_available_queue() {
 	assert selected.index == 1
 }
 
+fn test_command_pool_and_primary_buffer_expose_raw_handles_and_ownership_metadata() {
+	pool_handle := vk.CommandPool(unsafe { nil })
+	buffer_handle := vk.CommandBuffer(unsafe { nil })
+	flags := u32(vk.CommandPoolCreateFlagBits.reset_command_buffer)
+	pool := CommandPool{
+		device: vk.Device(unsafe { nil })
+		handle: pool_handle
+		queue_family_index: 4
+		flags: flags
+	}
+	buffer := PrimaryCommandBuffer{
+		device: vk.Device(unsafe { nil })
+		command_pool: pool.handle
+		handle: buffer_handle
+	}
+
+	assert pool.handle == pool_handle
+	assert pool.queue_family_index == 4
+	assert pool.flags == flags
+	assert buffer.handle == buffer_handle
+	assert buffer.command_pool == pool.handle
+}
+
+fn test_allocate_primary_rejects_zero_count_before_calling_vulkan() {
+	pool := CommandPool{
+		device: vk.Device(unsafe { nil })
+		handle: vk.CommandPool(unsafe { nil })
+	}
+	pool.allocate_primary(0) or {
+		assert err.msg() == 'command buffer count must be greater than zero'
+		return
+	}
+	assert false
+}
+
 fn memory_properties(types []vk.MemoryPropertyFlags) vk.PhysicalDeviceMemoryProperties {
 	mut properties := vk.PhysicalDeviceMemoryProperties{
 		memoryTypeCount: u32(types.len)
