@@ -10,7 +10,7 @@ Please install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home) and set the 
 Download the latest bindings to your local `.vmodules` directory:
 
 ```
-v install https://github.com/antono2/vulkan
+v install antono2.vulkan
 ```
 
 Applications using the binding directly must initialize Volk before the first
@@ -18,13 +18,15 @@ Vulkan call, then load instance- and device-level commands after creating the
 corresponding handles:
 
 ```v
-if vulkan.initialize_loader() != .success {
+import antono2.vulkan as vk
+
+if vk.initialize_loader() != .success {
 	panic('Vulkan loader initialization failed')
 }
 // create the Vulkan instance
-vulkan.load_instance_commands(instance)
+vk.load_instance_commands(instance)
 // create the Vulkan device
-vulkan.load_device_commands(device)
+vk.load_device_commands(device)
 ```
 
 ### Historical Vulkan versions
