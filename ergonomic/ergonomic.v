@@ -82,6 +82,34 @@ pub fn (device PhysicalDevice) name() string {
 	return unsafe { cstring_to_vstring(&device.properties.deviceName[0]) }
 }
 
+// memory_properties returns an owned snapshot of the physical device's core
+// memory heaps and types.
+pub fn (device PhysicalDevice) memory_properties() vk.PhysicalDeviceMemoryProperties {
+	mut properties := vk.PhysicalDeviceMemoryProperties{}
+	vk.get_physical_device_memory_properties(device.handle, mut properties)
+	return properties
+}
+
+// select_memory_type returns the first memory type which is both present in
+// allowed_type_bits and contains every required property flag.
+pub fn select_memory_type(properties vk.PhysicalDeviceMemoryProperties, allowed_type_bits u32, required_properties vk.MemoryPropertyFlags) ?u32 {
+	for index in 0 .. int(properties.memoryTypeCount) {
+		allowed := allowed_type_bits & (u32(1) << u32(index)) != 0
+		flags := properties.memoryTypes[index].propertyFlags
+		if allowed && flags & required_properties == required_properties {
+			return u32(index)
+		}
+	}
+	return none
+}
+
+// find_memory_type queries the physical device and returns the first memory
+// type allowed by a resource's memoryTypeBits which contains every required
+// property flag.
+pub fn (device PhysicalDevice) find_memory_type(allowed_type_bits u32, required_properties vk.MemoryPropertyFlags) ?u32 {
+	return select_memory_type(device.memory_properties(), allowed_type_bits, required_properties)
+}
+
 // QueueFamily pairs a queue-family index with its core property snapshot.
 pub struct QueueFamily {
 pub:
@@ -146,6 +174,7 @@ pub:
 // Device owns a logical VkDevice and exposes its single requested queue. It
 // does not destroy itself implicitly; call destroy exactly once.
 pub struct Device {
+	physical_device PhysicalDevice
 pub:
 	handle vk.Device
 	queue  Queue
@@ -177,6 +206,7 @@ pub fn (physical_device PhysicalDevice) new_device(queue_family QueueFamily) !De
 	mut queue_handle := vk.Queue(unsafe { nil })
 	vk.get_device_queue(handle, queue_family.index, 0, &queue_handle)
 	return Device{
+		physical_device: physical_device
 		handle: handle
 		queue: Queue{
 			handle: queue_handle
@@ -190,6 +220,75 @@ pub fn (physical_device PhysicalDevice) new_device(queue_family QueueFamily) !De
 // becomes invalid at the same time.
 pub fn (device Device) destroy() {
 	vk.destroy_device(device.handle, unsafe { nil })
+}
+
+// OwnedBuffer owns a VkBuffer and its bound VkDeviceMemory allocation. Both
+// raw handles remain public for commands and interoperability. Destroy the
+// buffer before destroying its parent Device.
+pub struct OwnedBuffer {
+	device vk.Device
+pub:
+	handle            vk.Buffer
+	memory            vk.DeviceMemory
+	size              vk.DeviceSize
+	allocation_size   vk.DeviceSize
+	memory_type_index u32
+}
+
+// new_buffer creates an exclusive-sharing buffer, selects a compatible memory
+// type containing every required property, allocates memory, and binds it at
+// offset zero.
+pub fn (device Device) new_buffer(size vk.DeviceSize, usage vk.BufferUsageFlags, required_memory_properties vk.MemoryPropertyFlags) !OwnedBuffer {
+	if size == 0 {
+		return error('buffer size must be greater than zero')
+	}
+
+	create_info := vk.BufferCreateInfo{
+		size: size
+		usage: usage
+		sharingMode: .exclusive
+	}
+	mut handle := vk.Buffer(unsafe { nil })
+	require_success(vk.create_buffer(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateBuffer')!
+
+	mut requirements := vk.MemoryRequirements{}
+	vk.get_buffer_memory_requirements(device.handle, handle, mut requirements)
+	memory_type_index := device.physical_device.find_memory_type(requirements.memoryTypeBits, required_memory_properties) or {
+		vk.destroy_buffer(device.handle, handle, unsafe { nil })
+		return error('no compatible memory type for buffer')
+	}
+
+	allocate_info := vk.MemoryAllocateInfo{
+		allocationSize: requirements.size
+		memoryTypeIndex: memory_type_index
+	}
+	mut memory := vk.DeviceMemory(unsafe { nil })
+	require_success(vk.allocate_memory(device.handle, &allocate_info, unsafe { nil }, &memory), 'vkAllocateMemory') or {
+		vk.destroy_buffer(device.handle, handle, unsafe { nil })
+		return err
+	}
+
+	require_success(vk.bind_buffer_memory(device.handle, handle, memory, 0), 'vkBindBufferMemory') or {
+		vk.destroy_buffer(device.handle, handle, unsafe { nil })
+		vk.free_memory(device.handle, memory, unsafe { nil })
+		return err
+	}
+
+	return OwnedBuffer{
+		device: device.handle
+		handle: handle
+		memory: memory
+		size: size
+		allocation_size: requirements.size
+		memory_type_index: memory_type_index
+	}
+}
+
+// destroy first destroys the buffer, then frees its bound memory. Call it
+// exactly once for every successfully created OwnedBuffer.
+pub fn (buffer OwnedBuffer) destroy() {
+	vk.destroy_buffer(buffer.device, buffer.handle, unsafe { nil })
+	vk.free_memory(buffer.device, buffer.memory, unsafe { nil })
 }
 
 // physical_devices performs Vulkan's count/fill enumeration pattern and
