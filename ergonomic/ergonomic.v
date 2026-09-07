@@ -482,6 +482,107 @@ pub fn (image OwnedImage) destroy() {
 	vk.free_memory(image.device, image.memory, unsafe { nil })
 }
 
+fn single_image_subresource_range(aspect_mask vk.ImageAspectFlags) vk.ImageSubresourceRange {
+	return vk.ImageSubresourceRange{
+		aspectMask: aspect_mask
+		baseMipLevel: 0
+		levelCount: 1
+		baseArrayLayer: 0
+		layerCount: 1
+	}
+}
+
+// OwnedImageView owns a two-dimensional view of one OwnedImage. The view must
+// be destroyed before its image and parent Device.
+pub struct OwnedImageView {
+	device vk.Device
+pub:
+	handle            vk.ImageView
+	image             vk.Image
+	format            vk.Format
+	view_type         vk.ImageViewType
+	subresource_range vk.ImageSubresourceRange
+}
+
+// new_view creates an identity-swizzled 2D view over the image's single mip
+// level and array layer. The aspect mask remains explicit because it depends
+// on how the image format will be used.
+pub fn (image OwnedImage) new_view(aspect_mask vk.ImageAspectFlags) !OwnedImageView {
+	if aspect_mask == 0 {
+		return error('image view aspect mask must not be empty')
+	}
+	subresource_range := single_image_subresource_range(aspect_mask)
+	create_info := vk.ImageViewCreateInfo{
+		image: image.handle
+		viewType: ._2d
+		format: image.format
+		components: vk.ComponentMapping{
+			r: .identity
+			g: .identity
+			b: .identity
+			a: .identity
+		}
+		subresourceRange: subresource_range
+	}
+	mut handle := vk.ImageView(unsafe { nil })
+	require_success(vk.create_image_view(image.device, &create_info, unsafe { nil }, &handle), 'vkCreateImageView')!
+	return OwnedImageView{
+		device: image.device
+		handle: handle
+		image: image.handle
+		format: image.format
+		view_type: ._2d
+		subresource_range: subresource_range
+	}
+}
+
+// destroy releases the view. Call it exactly once before destroying its image
+// or parent Device.
+pub fn (view OwnedImageView) destroy() {
+	vk.destroy_image_view(view.device, view.handle, unsafe { nil })
+}
+
+// ImageLayoutTransition describes one synchronization-1 image barrier. Stage
+// masks, access masks, layouts, dependency flags, and aspects all remain
+// explicit. Queue-family ownership transfers are intentionally out of scope.
+pub struct ImageLayoutTransition {
+pub:
+	old_layout       vk.ImageLayout
+	new_layout       vk.ImageLayout
+	src_stage_mask   vk.PipelineStageFlags
+	dst_stage_mask   vk.PipelineStageFlags
+	src_access_mask  vk.AccessFlags
+	dst_access_mask  vk.AccessFlags
+	dependency_flags vk.DependencyFlags
+	aspect_mask      vk.ImageAspectFlags
+}
+
+// image_memory_barrier builds the raw barrier used by transition_image_layout.
+// It covers the OwnedImage's single mip level and array layer.
+pub fn (transition ImageLayoutTransition) image_memory_barrier(image OwnedImage) vk.ImageMemoryBarrier {
+	return vk.ImageMemoryBarrier{
+		srcAccessMask: transition.src_access_mask
+		dstAccessMask: transition.dst_access_mask
+		oldLayout: transition.old_layout
+		newLayout: transition.new_layout
+		srcQueueFamilyIndex: vk.queue_family_ignored
+		dstQueueFamilyIndex: vk.queue_family_ignored
+		image: image.handle
+		subresourceRange: single_image_subresource_range(transition.aspect_mask)
+	}
+}
+
+// transition_image_layout records one vkCmdPipelineBarrier for an OwnedImage.
+// The command buffer must be recording. This helper does not track image state
+// or perform queue-family ownership transfer.
+pub fn (buffer PrimaryCommandBuffer) transition_image_layout(image OwnedImage, transition ImageLayoutTransition) ! {
+	if transition.aspect_mask == 0 {
+		return error('image transition aspect mask must not be empty')
+	}
+	barrier := transition.image_memory_barrier(image)
+	vk.cmd_pipeline_barrier(buffer.handle, transition.src_stage_mask, transition.dst_stage_mask, transition.dependency_flags, 0, unsafe { nil }, 0, unsafe { nil }, 1, &barrier)
+}
+
 // Fence owns a VkFence created by one Device. Its parent device must outlive
 // it. The raw handle remains public for queue submission.
 pub struct Fence {

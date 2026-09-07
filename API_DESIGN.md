@@ -11,9 +11,9 @@ The generated `vulkan.v` and `vulkan_video.v` files remain the complete, low-lev
 - Two-call enumerations return V arrays and internally retry `VK_INCOMPLETE`.
 - Generated names and signatures are never edited to improve ergonomics. New wrappers compose them from the submodule.
 
-## Discovery through queue submission
+## Discovery through resources and queue submission
 
-The first slice covers loader initialization, default-allocator instance creation and destruction, physical-device enumeration, core property snapshots, and owned device-name strings. Later slices add queue-family and logical-device selection, owned memory-backed buffers and images, command pools and primary command buffers, fences and binary semaphores, and checked queue submission:
+The first slice covers loader initialization, default-allocator instance creation and destruction, physical-device enumeration, core property snapshots, and owned device-name strings. Later slices add queue-family and logical-device selection, owned memory-backed buffers and images, image views and explicit layout-transition recording, command pools and primary command buffers, fences and binary semaphores, and checked queue submission:
 
 ```v
 import antono2.vulkan as vk
@@ -45,6 +45,16 @@ buffer := device.new_buffer(4096, usage, memory_properties)!
 defer {
 	buffer.destroy()
 }
+image_usage := u32(vk.ImageUsageFlagBits.sampled) | u32(vk.ImageUsageFlagBits.transfer_dst)
+image := device.new_image_2d(640, 480, .r8g8b8a8_unorm, .optimal, image_usage,
+	memory_properties)!
+defer {
+	image.destroy()
+}
+view := image.new_view(u32(vk.ImageAspectFlagBits.color))!
+defer {
+	view.destroy()
+}
 pool_flags := u32(vk.CommandPoolCreateFlagBits.reset_command_buffer)
 pool := device.new_command_pool(pool_flags)!
 defer {
@@ -55,7 +65,17 @@ defer {
 	command_buffer.free()
 }
 command_buffer.begin(u32(vk.CommandBufferUsageFlagBits.one_time_submit))!
-// Record commands with command_buffer.handle.
+transition := vke.ImageLayoutTransition{
+	old_layout: .undefined
+	new_layout: .transfer_dst_optimal
+	src_stage_mask: u32(vk.PipelineStageFlagBits.top_of_pipe)
+	dst_stage_mask: u32(vk.PipelineStageFlagBits.transfer)
+	src_access_mask: 0
+	dst_access_mask: u32(vk.AccessFlagBits.transfer_write)
+	dependency_flags: 0
+	aspect_mask: u32(vk.ImageAspectFlagBits.color)
+}
+command_buffer.transition_image_layout(image, transition)!
 command_buffer.end()!
 mut fence := device.new_fence(false)!
 defer {
@@ -89,6 +109,10 @@ println('${physical_device.name()}: queue family ${device.queue.family_index}')
 
 `OwnedImage` creates a simple exclusive-sharing 2D image with one mip level, one array layer, and one sample. It exposes the raw image and memory handles plus its format, extent, tiling, usage, allocation size, and selected memory type. Destruction releases the image before its bound allocation, and must happen before destroying the parent device. More specialized image creation remains available through the raw layer.
 
+`OwnedImageView` creates an identity-swizzled 2D view using the image's format and explicit aspect mask. It exposes the raw view and parent-image handles, view type, format, and complete subresource range. Every view must be destroyed before its image.
+
+`ImageLayoutTransition` keeps the synchronization-1 source/destination stage masks, access masks, old/new layouts, dependency flags, and aspect mask explicit. `PrimaryCommandBuffer.transition_image_layout()` records one image-only `vkCmdPipelineBarrier` over the owned image's single mip level and array layer. It does not infer synchronization, track layout state, or perform queue-family ownership transfers; use the raw API for broader ranges, ownership transfers, or synchronization-2 barriers.
+
 Custom allocation callbacks, concurrent-sharing buffers, queue priorities other than 1.0, enabled features, and device extensions deliberately remain in the raw layer for now. A future configurable owning wrapper must retain the allocator used at creation so the same callbacks are supplied during destruction.
 
 ## Next slices
@@ -99,4 +123,5 @@ Custom allocation callbacks, concurrent-sharing buffers, queue priorities other 
 4. Owned fences and binary semaphores with explicit parent ownership and destruction ordering. (Implemented.)
 5. Owned 2D images with explicit parent ownership and destruction ordering. (Implemented.)
 6. Checked primary command-buffer queue submission with explicit synchronization. (Implemented.)
-7. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.
+7. Owned 2D image views and focused synchronization-1 layout-transition recording. (Implemented.)
+8. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.
