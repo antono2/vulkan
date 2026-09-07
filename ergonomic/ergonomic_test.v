@@ -223,7 +223,8 @@ fn test_submit_options_accept_matching_waits_signals_and_optional_fence() {
 		fence: fence
 	}
 	assert options.wait_semaphores.len == 1
-	assert options.wait_stage_masks == [stage]
+	assert options.wait_stage_masks.len == 1
+	assert options.wait_stage_masks[0] == stage
 	assert options.signal_semaphores.len == 1
 	if configured_fence := options.fence {
 		assert configured_fence.handle == fence.handle
