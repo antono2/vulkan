@@ -53,7 +53,8 @@ Using GLFW and Dear ImGui [antono2/v_imgui_examples](https://github.com/antono2/
 
 The generated module remains the complete low-level binding. The opt-in
 `antono2.vulkan.ergonomic` submodule adds typed errors, instance lifecycle
-helpers, and physical-device discovery without modifying generated files.
+helpers, physical-device and queue-family discovery, and single-queue logical
+device ownership without modifying generated files.
 See [the ergonomic API design](API_DESIGN.md).
 
 ## Generate

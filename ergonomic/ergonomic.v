@@ -82,6 +82,116 @@ pub fn (device PhysicalDevice) name() string {
 	return unsafe { cstring_to_vstring(&device.properties.deviceName[0]) }
 }
 
+// QueueFamily pairs a queue-family index with its core property snapshot.
+pub struct QueueFamily {
+pub:
+	index      u32
+	properties vk.QueueFamilyProperties
+}
+
+// supports reports whether this family has at least one queue and includes all
+// required queue capability bits.
+pub fn (family QueueFamily) supports(required_flags vk.QueueFlags) bool {
+	return family.properties.queueCount > 0
+		&& family.properties.queueFlags & required_flags == required_flags
+}
+
+// select_queue_family returns the first queue family supporting every required
+// flag. An empty flag mask selects the first family with an available queue.
+pub fn select_queue_family(families []QueueFamily, required_flags vk.QueueFlags) ?QueueFamily {
+	for family in families {
+		if family.supports(required_flags) {
+			return family
+		}
+	}
+	return none
+}
+
+// queue_families returns owned snapshots of the physical device's core queue
+// family properties.
+pub fn (device PhysicalDevice) queue_families() []QueueFamily {
+	mut count := u32(0)
+	mut no_properties := unsafe { nil }
+	vk.get_physical_device_queue_family_properties(device.handle, &count, mut no_properties)
+	if count == 0 {
+		return []QueueFamily{}
+	}
+
+	mut properties := []vk.QueueFamilyProperties{len: int(count)}
+	vk.get_physical_device_queue_family_properties(device.handle, &count, mut properties[0])
+	mut families := []QueueFamily{cap: int(count)}
+	for index, property in properties[..int(count)] {
+		families << QueueFamily{
+			index: u32(index)
+			properties: property
+		}
+	}
+	return families
+}
+
+// find_queue_family discovers and selects the first family supporting every
+// required queue capability bit.
+pub fn (device PhysicalDevice) find_queue_family(required_flags vk.QueueFlags) ?QueueFamily {
+	return select_queue_family(device.queue_families(), required_flags)
+}
+
+// Queue is a borrowed queue handle owned by its parent Device.
+pub struct Queue {
+pub:
+	handle       vk.Queue
+	family_index u32
+	index        u32
+}
+
+// Device owns a logical VkDevice and exposes its single requested queue. It
+// does not destroy itself implicitly; call destroy exactly once.
+pub struct Device {
+pub:
+	handle vk.Device
+	queue  Queue
+}
+
+// new_device creates a logical device with one queue at priority 1.0 from the
+// selected family, then loads Volk's device-level commands.
+//
+// queue_family must have been discovered from this PhysicalDevice.
+pub fn (physical_device PhysicalDevice) new_device(queue_family QueueFamily) !Device {
+	if queue_family.properties.queueCount == 0 {
+		return error('queue family ${queue_family.index} has no queues')
+	}
+
+	mut priority := f32(1.0)
+	queue_info := vk.DeviceQueueCreateInfo{
+		queueFamilyIndex: queue_family.index
+		queueCount: 1
+		pQueuePriorities: &priority
+	}
+	create_info := vk.DeviceCreateInfo{
+		queueCreateInfoCount: 1
+		pQueueCreateInfos: &queue_info
+	}
+	mut handle := vk.Device(unsafe { nil })
+	require_success(vk.create_device(physical_device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateDevice')!
+	vk.load_device_commands(handle)
+
+	mut queue_handle := vk.Queue(unsafe { nil })
+	vk.get_device_queue(handle, queue_family.index, 0, &queue_handle)
+	return Device{
+		handle: handle
+		queue: Queue{
+			handle: queue_handle
+			family_index: queue_family.index
+			index: 0
+		}
+	}
+}
+
+// destroy destroys a logical device created by new_device. Its queue handle
+// becomes invalid at the same time.
+pub fn (device Device) destroy() {
+	vk.destroy_device(device.handle, unsafe { nil })
+}
+
 // physical_devices performs Vulkan's count/fill enumeration pattern and
 // retries when the available device set changes and VK_INCOMPLETE is returned.
 pub fn (instance Instance) physical_devices() ![]PhysicalDevice {
