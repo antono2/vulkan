@@ -57,12 +57,23 @@ defer {
 command_buffer.begin(u32(vk.CommandBufferUsageFlagBits.one_time_submit))!
 // Record commands with command_buffer.handle.
 command_buffer.end()!
+mut fence := device.new_fence(false)!
+defer {
+	fence.destroy()
+}
+mut image_ready := device.new_semaphore()!
+defer {
+	image_ready.destroy()
+}
+// Submit using fence.handle and image_ready.handle.
 println('${physical_device.name()}: queue family ${device.queue.family_index}')
 ```
 
 `Queue` is borrowed from its parent `Device` and becomes invalid when that device is destroyed. `OwnedBuffer` exposes its raw buffer and memory handles, requested size, allocation size, and selected memory-type index. Its `destroy()` method always destroys the buffer before freeing its memory; callers must destroy every buffer before destroying the parent device. `PhysicalDevice.find_memory_type()` applies both the resource's allowed-memory-type bit mask and the complete required property mask.
 
 `CommandPool` belongs to its parent `Device` and is fixed to that device's selected queue-family index. `PrimaryCommandBuffer` retains the exact device and pool handles needed by `free()`, while its public raw `handle` remains available for recording and submission. `free()` is idempotent and clears that raw handle. Reset, begin, and end failures are returned as typed `VulkanError` values. Destroying a command pool implicitly frees and invalidates all command buffers still allocated from it; callers may either free buffers explicitly before pool destruction or rely on that Vulkan lifetime rule, but must never use or free a buffer after its pool is destroyed. Every command pool must be destroyed before its parent device.
+
+`Fence` exposes status, timeout-aware waiting, and reset while preserving positive Vulkan statuses such as `VK_NOT_READY` and `VK_TIMEOUT`. `Fence` and `Semaphore` expose their raw handles for submission structures, clear those handles during idempotent destruction, and must be destroyed before their parent device.
 
 Custom allocation callbacks, concurrent-sharing buffers, queue priorities other than 1.0, enabled features, and device extensions deliberately remain in the raw layer for now. A future configurable owning wrapper must retain the allocator used at creation so the same callbacks are supplied during destruction.
 
@@ -71,5 +82,6 @@ Custom allocation callbacks, concurrent-sharing buffers, queue priorities other 
 1. Instance extension and layer enumeration with owned V strings.
 2. Presentation-support selection layered onto the core queue-flag helper.
 3. Configurable queue requests, extension validation, and enabled features.
-4. Owned images and synchronization objects, each with explicit parent ownership and destruction ordering.
-5. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.
+4. Owned fences and binary semaphores with explicit parent ownership and destruction ordering. (Implemented.)
+5. Owned images with explicit parent ownership and destruction ordering.
+6. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.
