@@ -85,6 +85,7 @@ jobs:
             --output "$VULKAN_SDK/include/volk/volk.c"
           ln -s "$GITHUB_WORKSPACE" "$HOME/.vmodules/antono2/vulkan"
           v -cc gcc run generator/test
+          v -cc gcc test ergonomic
 
   tag-release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
