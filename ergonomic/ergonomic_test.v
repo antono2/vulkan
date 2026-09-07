@@ -138,6 +138,42 @@ fn test_free_is_idempotent_for_an_already_cleared_command_buffer() {
 	assert isnil(buffer.handle)
 }
 
+fn test_fence_and_semaphore_retain_parent_device_and_raw_handles() {
+	device_handle := vk.Device(unsafe { nil })
+	fence_handle := vk.Fence(unsafe { nil })
+	semaphore_handle := vk.Semaphore(unsafe { nil })
+	fence := Fence{
+		device: device_handle
+		handle: fence_handle
+	}
+	semaphore := Semaphore{
+		device: device_handle
+		handle: semaphore_handle
+	}
+
+	assert fence.device == device_handle
+	assert fence.handle == fence_handle
+	assert semaphore.device == device_handle
+	assert semaphore.handle == semaphore_handle
+}
+
+fn test_sync_destroy_is_idempotent_for_cleared_handles() {
+	mut fence := Fence{
+		device: vk.Device(unsafe { nil })
+		handle: vk.Fence(unsafe { nil })
+	}
+	mut semaphore := Semaphore{
+		device: vk.Device(unsafe { nil })
+		handle: vk.Semaphore(unsafe { nil })
+	}
+	fence.destroy()
+	fence.destroy()
+	semaphore.destroy()
+	semaphore.destroy()
+	assert isnil(fence.handle)
+	assert isnil(semaphore.handle)
+}
+
 fn memory_properties(types []vk.MemoryPropertyFlags) vk.PhysicalDeviceMemoryProperties {
 	mut properties := vk.PhysicalDeviceMemoryProperties{
 		memoryTypeCount: u32(types.len)

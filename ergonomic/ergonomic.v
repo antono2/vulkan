@@ -396,6 +396,88 @@ pub fn (buffer OwnedBuffer) destroy() {
 	vk.free_memory(buffer.device, buffer.memory, unsafe { nil })
 }
 
+// Fence owns a VkFence created by one Device. Its parent device must outlive
+// it. The raw handle remains public for queue submission.
+pub struct Fence {
+	device vk.Device
+pub mut:
+	handle vk.Fence
+}
+
+// new_fence creates a fence, optionally in the signaled state.
+pub fn (device Device) new_fence(signaled bool) !Fence {
+	flags := if signaled { u32(vk.FenceCreateFlagBits.signaled) } else { vk.FenceCreateFlags(0) }
+	create_info := vk.FenceCreateInfo{
+		flags: flags
+	}
+	mut handle := vk.Fence(unsafe { nil })
+	require_success(vk.create_fence(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateFence')!
+	return Fence{
+		device: device.handle
+		handle: handle
+	}
+}
+
+// status returns VK_SUCCESS when signaled and VK_NOT_READY otherwise.
+pub fn (fence Fence) status() !vk.Result {
+	return check(vk.get_fence_status(fence.device, fence.handle), 'vkGetFenceStatus')
+}
+
+// is_signaled reports the current fence state.
+pub fn (fence Fence) is_signaled() !bool {
+	return fence.status()! == .success
+}
+
+// wait blocks for at most timeout nanoseconds and returns VK_SUCCESS or
+// VK_TIMEOUT so callers can distinguish completion from expiration.
+pub fn (fence Fence) wait(timeout u64) !vk.Result {
+	return check(vk.wait_for_fences(fence.device, 1, &fence.handle, vk.Bool32(1), timeout), 'vkWaitForFences')
+}
+
+// reset returns the fence to the unsignaled state.
+pub fn (fence Fence) reset() ! {
+	require_success(vk.reset_fences(fence.device, 1, &fence.handle), 'vkResetFences')!
+}
+
+// destroy releases the fence and clears its handle. Repeated calls are
+// harmless, but the parent Device must still be alive.
+pub fn (mut fence Fence) destroy() {
+	if isnil(fence.handle) {
+		return
+	}
+	vk.destroy_fence(fence.device, fence.handle, unsafe { nil })
+	fence.handle = vk.Fence(unsafe { nil })
+}
+
+// Semaphore owns a binary VkSemaphore created by one Device. Its raw handle
+// remains public for submission and presentation structures.
+pub struct Semaphore {
+	device vk.Device
+pub mut:
+	handle vk.Semaphore
+}
+
+// new_semaphore creates a core binary semaphore.
+pub fn (device Device) new_semaphore() !Semaphore {
+	create_info := vk.SemaphoreCreateInfo{}
+	mut handle := vk.Semaphore(unsafe { nil })
+	require_success(vk.create_semaphore(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateSemaphore')!
+	return Semaphore{
+		device: device.handle
+		handle: handle
+	}
+}
+
+// destroy releases the semaphore and clears its handle. Repeated calls are
+// harmless, but the parent Device must still be alive.
+pub fn (mut semaphore Semaphore) destroy() {
+	if isnil(semaphore.handle) {
+		return
+	}
+	vk.destroy_semaphore(semaphore.device, semaphore.handle, unsafe { nil })
+	semaphore.handle = vk.Semaphore(unsafe { nil })
+}
+
 // physical_devices performs Vulkan's count/fill enumeration pattern and
 // retries when the available device set changes and VK_INCOMPLETE is returned.
 pub fn (instance Instance) physical_devices() ![]PhysicalDevice {
