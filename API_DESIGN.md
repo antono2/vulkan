@@ -11,9 +11,9 @@ The generated `vulkan.v` and `vulkan_video.v` files remain the complete, low-lev
 - Two-call enumerations return V arrays and internally retry `VK_INCOMPLETE`.
 - Generated names and signatures are never edited to improve ergonomics. New wrappers compose them from the submodule.
 
-## Discovery, device, buffer, and command slices
+## Discovery through queue submission
 
-The first slice covers loader initialization, default-allocator instance creation and destruction, physical-device enumeration, core property snapshots, and owned device-name strings. The second slice adds queue-family discovery and selection by required `QueueFlags`, plus logical-device creation with one priority-1.0 queue. The third slice adds memory-type selection and buffers which own their bound device-memory allocation. The fourth slice adds owned command pools and primary command buffers:
+The first slice covers loader initialization, default-allocator instance creation and destruction, physical-device enumeration, core property snapshots, and owned device-name strings. Later slices add queue-family and logical-device selection, owned memory-backed buffers and images, command pools and primary command buffers, fences and binary semaphores, and checked queue submission:
 
 ```v
 import antono2.vulkan as vk
@@ -65,7 +65,17 @@ mut image_ready := device.new_semaphore()!
 defer {
 	image_ready.destroy()
 }
-// Submit using fence.handle and image_ready.handle.
+mut render_finished := device.new_semaphore()!
+defer {
+	render_finished.destroy()
+}
+submit_options := vke.SubmitOptions{
+	wait_semaphores: [image_ready]
+	wait_stage_masks: [u32(vk.PipelineStageFlagBits.color_attachment_output)]
+	signal_semaphores: [render_finished]
+	fence: fence
+}
+device.queue.submit([command_buffer], submit_options)!
 println('${physical_device.name()}: queue family ${device.queue.family_index}')
 ```
 
@@ -74,6 +84,8 @@ println('${physical_device.name()}: queue family ${device.queue.family_index}')
 `CommandPool` belongs to its parent `Device` and is fixed to that device's selected queue-family index. `PrimaryCommandBuffer` retains the exact device and pool handles needed by `free()`, while its public raw `handle` remains available for recording and submission. `free()` is idempotent and clears that raw handle. Reset, begin, and end failures are returned as typed `VulkanError` values. Destroying a command pool implicitly frees and invalidates all command buffers still allocated from it; callers may either free buffers explicitly before pool destruction or rely on that Vulkan lifetime rule, but must never use or free a buffer after its pool is destroyed. Every command pool must be destroyed before its parent device.
 
 `Fence` exposes status, timeout-aware waiting, and reset while preserving positive Vulkan statuses such as `VK_NOT_READY` and `VK_TIMEOUT`. `Fence` and `Semaphore` expose their raw handles for submission structures, clear those handles during idempotent destruction, and must be destroyed before their parent device.
+
+`Queue.submit()` accepts a non-empty primary-command-buffer batch plus optional wait semaphores, signal semaphores, and a fence. Every wait semaphore requires a pipeline-stage mask at the same array index; mismatched counts are rejected before Vulkan is called. The helper keeps all temporary raw-handle arrays alive through `vkQueueSubmit`, passes a null fence when none is supplied, returns non-negative Vulkan statuses unchanged, and converts failures to `VulkanError`.
 
 `OwnedImage` creates a simple exclusive-sharing 2D image with one mip level, one array layer, and one sample. It exposes the raw image and memory handles plus its format, extent, tiling, usage, allocation size, and selected memory type. Destruction releases the image before its bound allocation, and must happen before destroying the parent device. More specialized image creation remains available through the raw layer.
 
@@ -86,4 +98,5 @@ Custom allocation callbacks, concurrent-sharing buffers, queue priorities other 
 3. Configurable queue requests, extension validation, and enabled features.
 4. Owned fences and binary semaphores with explicit parent ownership and destruction ordering. (Implemented.)
 5. Owned 2D images with explicit parent ownership and destruction ordering. (Implemented.)
-6. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.
+6. Checked primary command-buffer queue submission with explicit synchronization. (Implemented.)
+7. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.

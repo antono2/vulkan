@@ -564,6 +564,57 @@ pub fn (mut semaphore Semaphore) destroy() {
 	semaphore.handle = vk.Semaphore(unsafe { nil })
 }
 
+// SubmitOptions describes the synchronization attached to one queue
+// submission. Each wait semaphore must have a stage mask at the same index.
+// An absent fence passes VK_NULL_HANDLE to Vulkan.
+pub struct SubmitOptions {
+pub:
+	wait_semaphores   []Semaphore
+	wait_stage_masks  []vk.PipelineStageFlags
+	signal_semaphores []Semaphore
+	fence             ?Fence
+}
+
+// submit submits one non-empty batch of primary command buffers. It owns the
+// temporary raw-handle arrays for the duration of vkQueueSubmit and preserves
+// both typed Vulkan failures and non-negative result statuses.
+pub fn (queue Queue) submit(command_buffers []PrimaryCommandBuffer, options SubmitOptions) !vk.Result {
+	if command_buffers.len == 0 {
+		return error('queue submission requires at least one command buffer')
+	}
+	if options.wait_semaphores.len != options.wait_stage_masks.len {
+		return error('wait semaphore count must match wait stage mask count')
+	}
+
+	mut command_handles := []vk.CommandBuffer{cap: command_buffers.len}
+	for command_buffer in command_buffers {
+		command_handles << command_buffer.handle
+	}
+	mut wait_handles := []vk.Semaphore{cap: options.wait_semaphores.len}
+	for semaphore in options.wait_semaphores {
+		wait_handles << semaphore.handle
+	}
+	mut signal_handles := []vk.Semaphore{cap: options.signal_semaphores.len}
+	for semaphore in options.signal_semaphores {
+		signal_handles << semaphore.handle
+	}
+
+	submit_info := vk.SubmitInfo{
+		waitSemaphoreCount: u32(wait_handles.len)
+		pWaitSemaphores: wait_handles.data
+		pWaitDstStageMask: options.wait_stage_masks.data
+		commandBufferCount: u32(command_handles.len)
+		pCommandBuffers: command_handles.data
+		signalSemaphoreCount: u32(signal_handles.len)
+		pSignalSemaphores: signal_handles.data
+	}
+	mut fence_handle := vk.Fence(unsafe { nil })
+	if fence := options.fence {
+		fence_handle = fence.handle
+	}
+	return check(vk.queue_submit(queue.handle, 1, &submit_info, fence_handle), 'vkQueueSubmit')
+}
+
 // physical_devices performs Vulkan's count/fill enumeration pattern and
 // retries when the available device set changes and VK_INCOMPLETE is returned.
 pub fn (instance Instance) physical_devices() ![]PhysicalDevice {
