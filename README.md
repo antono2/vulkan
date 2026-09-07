@@ -56,8 +56,9 @@ The generated module remains the complete low-level binding. The opt-in
 helpers, physical-device and queue-family discovery, and single-queue logical
 device ownership. It also provides explicit memory-type selection and owned
 buffer/device-memory allocation, owned command pools and primary command-buffer
-lifecycle helpers, synchronization objects, and checked queue submission without
-modifying generated files.
+lifecycle helpers, synchronization objects, checked queue submission, owned 2D
+images and views, and explicit image-layout transition recording without modifying
+generated files.
 See [the ergonomic API design](API_DESIGN.md).
 
 ## Generate

@@ -326,3 +326,86 @@ fn test_owned_image_exposes_creation_and_allocation_metadata() {
 	assert image.allocation_size == 4096
 	assert image.memory_type_index == 2
 }
+
+fn test_new_image_view_rejects_empty_aspect_before_calling_vulkan() {
+	image := OwnedImage{
+		device: vk.Device(unsafe { nil })
+		handle: vk.Image(unsafe { nil })
+		format: .r8g8b8a8_unorm
+	}
+	image.new_view(0) or {
+		assert err.msg() == 'image view aspect mask must not be empty'
+		return
+	}
+	assert false
+}
+
+fn test_owned_image_view_exposes_parent_and_subresource_metadata() {
+	color := u32(vk.ImageAspectFlagBits.color)
+	view_handle := vk.ImageView(unsafe { nil })
+	image_handle := vk.Image(unsafe { nil })
+	view := OwnedImageView{
+		device: vk.Device(unsafe { nil })
+		handle: view_handle
+		image: image_handle
+		format: .r8g8b8a8_unorm
+		view_type: ._2d
+		subresource_range: single_image_subresource_range(color)
+	}
+
+	assert view.handle == view_handle
+	assert view.image == image_handle
+	assert view.format == .r8g8b8a8_unorm
+	assert view.view_type == ._2d
+	assert view.subresource_range.aspectMask == color
+	assert view.subresource_range.baseMipLevel == 0
+	assert view.subresource_range.levelCount == 1
+	assert view.subresource_range.baseArrayLayer == 0
+	assert view.subresource_range.layerCount == 1
+}
+
+fn test_image_layout_transition_builds_explicit_single_subresource_barrier() {
+	image := OwnedImage{
+		handle: vk.Image(unsafe { nil })
+	}
+	transition := ImageLayoutTransition{
+		old_layout: .undefined
+		new_layout: .transfer_dst_optimal
+		src_stage_mask: u32(vk.PipelineStageFlagBits.top_of_pipe)
+		dst_stage_mask: u32(vk.PipelineStageFlagBits.transfer)
+		src_access_mask: 0
+		dst_access_mask: u32(vk.AccessFlagBits.transfer_write)
+		dependency_flags: u32(vk.DependencyFlagBits.by_region)
+		aspect_mask: u32(vk.ImageAspectFlagBits.color)
+	}
+	barrier := transition.image_memory_barrier(image)
+
+	assert barrier.image == image.handle
+	assert barrier.oldLayout == .undefined
+	assert barrier.newLayout == .transfer_dst_optimal
+	assert barrier.srcAccessMask == 0
+	assert barrier.dstAccessMask == u32(vk.AccessFlagBits.transfer_write)
+	assert barrier.srcQueueFamilyIndex == vk.queue_family_ignored
+	assert barrier.dstQueueFamilyIndex == vk.queue_family_ignored
+	assert barrier.subresourceRange.aspectMask == u32(vk.ImageAspectFlagBits.color)
+	assert barrier.subresourceRange.levelCount == 1
+	assert barrier.subresourceRange.layerCount == 1
+}
+
+fn test_transition_image_layout_rejects_empty_aspect_before_calling_vulkan() {
+	buffer := PrimaryCommandBuffer{
+		handle: vk.CommandBuffer(unsafe { nil })
+	}
+	image := OwnedImage{
+		handle: vk.Image(unsafe { nil })
+	}
+	transition := ImageLayoutTransition{
+		old_layout: .undefined
+		new_layout: .general
+	}
+	buffer.transition_image_layout(image, transition) or {
+		assert err.msg() == 'image transition aspect mask must not be empty'
+		return
+	}
+	assert false
+}
