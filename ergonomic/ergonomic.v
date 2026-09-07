@@ -222,6 +222,111 @@ pub fn (device Device) destroy() {
 	vk.destroy_device(device.handle, unsafe { nil })
 }
 
+// CommandPool owns a VkCommandPool for the queue family requested when its
+// parent Device was created. The parent Device must outlive the pool.
+pub struct CommandPool {
+	device vk.Device
+pub:
+	handle             vk.CommandPool
+	queue_family_index u32
+	flags              vk.CommandPoolCreateFlags
+}
+
+// new_command_pool creates a command pool for the Device's queue family with
+// Vulkan's default allocator.
+pub fn (device Device) new_command_pool(flags vk.CommandPoolCreateFlags) !CommandPool {
+	create_info := vk.CommandPoolCreateInfo{
+		flags: flags
+		queueFamilyIndex: device.queue.family_index
+	}
+	mut handle := vk.CommandPool(unsafe { nil })
+	require_success(vk.create_command_pool(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateCommandPool')!
+	return CommandPool{
+		device: device.handle
+		handle: handle
+		queue_family_index: device.queue.family_index
+		flags: flags
+	}
+}
+
+// reset resets the pool and every command buffer allocated from it.
+pub fn (pool CommandPool) reset(flags vk.CommandPoolResetFlags) ! {
+	require_success(vk.reset_command_pool(pool.device, pool.handle, flags), 'vkResetCommandPool')!
+}
+
+// PrimaryCommandBuffer is allocated from one CommandPool and retains the exact
+// device and pool handles required to free it. Its raw handle remains public
+// for recording and submission commands.
+pub struct PrimaryCommandBuffer {
+	device       vk.Device
+	command_pool vk.CommandPool
+pub mut:
+	handle vk.CommandBuffer
+}
+
+// allocate_primary allocates count primary command buffers from the pool.
+pub fn (pool CommandPool) allocate_primary(count u32) ![]PrimaryCommandBuffer {
+	if count == 0 {
+		return error('command buffer count must be greater than zero')
+	}
+
+	allocate_info := vk.CommandBufferAllocateInfo{
+		commandPool: pool.handle
+		level: .primary
+		commandBufferCount: count
+	}
+	mut handles := unsafe { []vk.CommandBuffer{len: int(count)} }
+	require_success(vk.allocate_command_buffers(pool.device, &allocate_info, handles.data), 'vkAllocateCommandBuffers')!
+
+	mut buffers := []PrimaryCommandBuffer{cap: int(count)}
+	for handle in handles {
+		buffers << PrimaryCommandBuffer{
+			device: pool.device
+			command_pool: pool.handle
+			handle: handle
+		}
+	}
+	return buffers
+}
+
+// free returns this command buffer to the pool which allocated it and clears
+// its handle. Repeated calls are harmless, but it must not be called after
+// destroying the parent pool.
+pub fn (mut buffer PrimaryCommandBuffer) free() {
+	if isnil(buffer.handle) {
+		return
+	}
+	vk.free_command_buffers(buffer.device, buffer.command_pool, 1, &buffer.handle)
+	buffer.handle = vk.CommandBuffer(unsafe { nil })
+}
+
+// reset returns this command buffer to its initial state. Its pool must have
+// been created with VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT.
+pub fn (buffer PrimaryCommandBuffer) reset(flags vk.CommandBufferResetFlags) ! {
+	require_success(vk.reset_command_buffer(buffer.handle, flags), 'vkResetCommandBuffer')!
+}
+
+// begin starts recording this primary command buffer. Inheritance information
+// is intentionally null because it is only meaningful for secondary buffers.
+pub fn (buffer PrimaryCommandBuffer) begin(flags vk.CommandBufferUsageFlags) ! {
+	begin_info := vk.CommandBufferBeginInfo{
+		flags: flags
+		pInheritanceInfo: unsafe { nil }
+	}
+	require_success(vk.begin_command_buffer(buffer.handle, &begin_info), 'vkBeginCommandBuffer')!
+}
+
+// end finishes recording this command buffer.
+pub fn (buffer PrimaryCommandBuffer) end() ! {
+	require_success(vk.end_command_buffer(buffer.handle), 'vkEndCommandBuffer')!
+}
+
+// destroy destroys the command pool and implicitly frees every command buffer
+// still allocated from it. Those wrappers must not be used afterwards.
+pub fn (pool CommandPool) destroy() {
+	vk.destroy_command_pool(pool.device, pool.handle, unsafe { nil })
+}
+
 // OwnedBuffer owns a VkBuffer and its bound VkDeviceMemory allocation. Both
 // raw handles remain public for commands and interoperability. Destroy the
 // buffer before destroying its parent Device.
