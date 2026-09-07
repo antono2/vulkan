@@ -13,6 +13,20 @@ Download the latest bindings to your local `.vmodules` directory:
 v install https://github.com/antono2/vulkan
 ```
 
+Applications using the binding directly must initialize Volk before the first
+Vulkan call, then load instance- and device-level commands after creating the
+corresponding handles:
+
+```v
+if vulkan.initialize_loader() != .success {
+	panic('Vulkan loader initialization failed')
+}
+// create the Vulkan instance
+vulkan.load_instance_commands(instance)
+// create the Vulkan device
+vulkan.load_device_commands(device)
+```
+
 ### Historical Vulkan versions
 
 The original tags from `v1.3.290` through `v1.4.335` are preserved exactly as
@@ -40,4 +54,3 @@ The generator is located at [antono2/v_vulkan_bindings](https://github.com/anton
 Big thanks to [@spytheman](https://github.com/spytheman) for fixing my bugs in times of need.</br>
 To [@JalonSolov](https://github.com/JalonSolov) for quick and solid answers to obscure questions.</br>
 The awesome team at [V](https://vlang.io/) for making this possible.
-
