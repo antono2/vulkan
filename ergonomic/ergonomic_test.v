@@ -127,6 +127,17 @@ fn test_allocate_primary_rejects_zero_count_before_calling_vulkan() {
 	assert false
 }
 
+fn test_free_is_idempotent_for_an_already_cleared_command_buffer() {
+	mut buffer := PrimaryCommandBuffer{
+		device: vk.Device(unsafe { nil })
+		command_pool: vk.CommandPool(unsafe { nil })
+		handle: vk.CommandBuffer(unsafe { nil })
+	}
+	buffer.free()
+	buffer.free()
+	assert isnil(buffer.handle)
+}
+
 fn memory_properties(types []vk.MemoryPropertyFlags) vk.PhysicalDeviceMemoryProperties {
 	mut properties := vk.PhysicalDeviceMemoryProperties{
 		memoryTypeCount: u32(types.len)

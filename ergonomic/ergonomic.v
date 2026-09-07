@@ -289,10 +289,15 @@ pub fn (pool CommandPool) allocate_primary(count u32) ![]PrimaryCommandBuffer {
 	return buffers
 }
 
-// free returns this command buffer to the pool which allocated it. Call it at
-// most once, and never after destroying its parent pool.
-pub fn (buffer &PrimaryCommandBuffer) free() {
+// free returns this command buffer to the pool which allocated it and clears
+// its handle. Repeated calls are harmless, but it must not be called after
+// destroying the parent pool.
+pub fn (mut buffer PrimaryCommandBuffer) free() {
+	if isnil(buffer.handle) {
+		return
+	}
 	vk.free_command_buffers(buffer.device, buffer.command_pool, 1, &buffer.handle)
+	buffer.handle = vk.CommandBuffer(unsafe { nil })
 }
 
 // reset returns this command buffer to its initial state. Its pool must have
