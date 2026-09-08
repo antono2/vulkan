@@ -80,7 +80,7 @@ jobs:
           - os: ubuntu-24.04
             compiler: gcc
             v-channel: stable
-            v-version: 73287062e9a11bd807b1cc437890a3a6aed8b696
+            v-version: 0.5.2
           - os: ubuntu-24.04
             compiler: gcc
             v-channel: master
@@ -88,11 +88,11 @@ jobs:
           - os: macos-14
             compiler: clang
             v-channel: stable
-            v-version: 73287062e9a11bd807b1cc437890a3a6aed8b696
+            v-version: 0.5.2
           - os: windows-2022
             compiler: msvc
             v-channel: stable
-            v-version: 73287062e9a11bd807b1cc437890a3a6aed8b696
+            v-version: 0.5.2
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
