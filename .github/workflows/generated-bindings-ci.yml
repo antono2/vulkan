@@ -68,7 +68,7 @@ jobs:
             esac
           done
 
-  compile-smoke-test:
+  compile-smoke-matrix:
     name: compile-smoke-test (${{ matrix.os }}, ${{ matrix.compiler }}, ${{ matrix.v-channel }})
     strategy:
       fail-fast: false
@@ -176,6 +176,17 @@ jobs:
             echo "Vulkan validation reported a problem" >&2
             exit 1
           fi
+
+  compile-smoke-test:
+    name: compile-smoke-test
+    if: always()
+    needs: compile-smoke-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require the cross-platform matrix to pass
+        env:
+          MATRIX_RESULT: ${{ needs.compile-smoke-matrix.result }}
+        run: test "$MATRIX_RESULT" = success
 
   tag-release:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
