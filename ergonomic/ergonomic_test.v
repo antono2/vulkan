@@ -340,6 +340,45 @@ fn test_new_image_view_rejects_empty_aspect_before_calling_vulkan() {
 	assert false
 }
 
+fn test_new_image_view_rejects_transfer_only_usage_before_calling_vulkan() {
+	image := OwnedImage{
+		device: vk.Device(unsafe { nil })
+		handle: vk.Image(unsafe { nil })
+		format: .r8g8b8a8_unorm
+		usage: u32(vk.ImageUsageFlagBits.transfer_dst)
+	}
+	image.new_view(u32(vk.ImageAspectFlagBits.color)) or {
+		assert err.msg() == 'image usage does not support image views'
+		return
+	}
+	assert false
+}
+
+fn test_image_view_accepts_every_usage_permitted_by_vuid_04441() {
+	compatible_usages := [
+		u32(vk.ImageUsageFlagBits.sampled),
+		u32(vk.ImageUsageFlagBits.storage),
+		u32(vk.ImageUsageFlagBits.color_attachment),
+		u32(vk.ImageUsageFlagBits.depth_stencil_attachment),
+		u32(vk.ImageUsageFlagBits.input_attachment),
+		u32(vk.ImageUsageFlagBits.transient_attachment),
+		u32(vk.ImageUsageFlagBits.fragment_shading_rate_attachment),
+		u32(vk.ImageUsageFlagBits.fragment_density_map_bit_ext),
+		u32(vk.ImageUsageFlagBits.video_decode_dst),
+		u32(vk.ImageUsageFlagBits.video_decode_dpb),
+		u32(vk.ImageUsageFlagBits.video_encode_src),
+		u32(vk.ImageUsageFlagBits.video_encode_dpb),
+		u32(vk.ImageUsageFlagBits.sample_weight_bit_qcom),
+		u32(vk.ImageUsageFlagBits.sample_block_match_bit_qcom),
+		u32(vk.ImageUsageFlagBits.video_encode_quantization_delta_map),
+		u32(vk.ImageUsageFlagBits.video_encode_emphasis_map),
+	]
+	for usage in compatible_usages {
+		assert image_usage_supports_view(usage)
+	}
+	assert !image_usage_supports_view(u32(vk.ImageUsageFlagBits.transfer_src) | u32(vk.ImageUsageFlagBits.transfer_dst))
+}
+
 fn test_owned_image_view_exposes_parent_and_subresource_metadata() {
 	color := u32(vk.ImageAspectFlagBits.color)
 	view_handle := vk.ImageView(unsafe { nil })

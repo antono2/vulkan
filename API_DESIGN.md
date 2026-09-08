@@ -8,6 +8,7 @@ The generated `vulkan.v` and `vulkan_video.v` files remain the complete, low-lev
 - A negative `VkResult` becomes a typed `VulkanError` containing both the original result and the operation name. `check` preserves non-negative statuses; `require_success` enforces exact success where that is the operation's contract.
 - Constructors return V results (`!T`) and perform required loader/dispatch setup.
 - Vulkan objects use explicit `destroy()` methods. There are no implicit finalizers, and each successfully created owned object must be destroyed exactly once.
+- V value structs are copyable. Copying an owning wrapper does not transfer ownership; exactly one copy may perform destruction. A future breaking release should move ownership state behind a shared control block so copied wrappers cannot double-destroy a native handle.
 - Two-call enumerations return V arrays and internally retry `VK_INCOMPLETE`.
 - Generated names and signatures are never edited to improve ergonomics. New wrappers compose them from the submodule.
 
@@ -113,13 +114,13 @@ println('${physical_device.name()}: queue family ${device.queue.family_index}')
 
 `ImageLayoutTransition` keeps the synchronization-1 source/destination stage masks, access masks, old/new layouts, dependency flags, and aspect mask explicit. `PrimaryCommandBuffer.transition_image_layout()` records one image-only `vkCmdPipelineBarrier` over the owned image's single mip level and array layer. It does not infer synchronization, track layout state, or perform queue-family ownership transfers; use the raw API for broader ranges, ownership transfers, or synchronization-2 barriers.
 
-Custom allocation callbacks, concurrent-sharing buffers, queue priorities other than 1.0, enabled features, and device extensions deliberately remain in the raw layer for now. A future configurable owning wrapper must retain the allocator used at creation so the same callbacks are supplied during destruction.
+`InstanceOptions` validates and owns instance layer/extension name pointers through creation. `DeviceOptions` configures one queue index and priority plus device extensions, core features, and an application-owned feature `pNext` chain. `PhysicalDevice.find_present_queue_family()` layers surface support over the existing queue-flag selection. Multiple queue requests, custom allocation callbacks, and concurrent-sharing resources remain in the raw layer. A future allocator-aware owning wrapper must retain the allocator used at creation so the same callbacks are supplied during destruction.
 
 ## Next slices
 
-1. Instance extension and layer enumeration with owned V strings.
-2. Presentation-support selection layered onto the core queue-flag helper.
-3. Configurable queue requests, extension validation, and enabled features.
+1. Instance extension and layer enumeration with owned V strings. (Implemented.)
+2. Presentation-support selection layered onto the core queue-flag helper. (Implemented.)
+3. Configurable queue requests, extension validation, and enabled features. (Single-queue configuration implemented; multiple queue requests remain.)
 4. Owned fences and binary semaphores with explicit parent ownership and destruction ordering. (Implemented.)
 5. Owned 2D images with explicit parent ownership and destruction ordering. (Implemented.)
 6. Checked primary command-buffer queue submission with explicit synchronization. (Implemented.)

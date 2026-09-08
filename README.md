@@ -1,7 +1,11 @@
 
 
 # Vulkan Bindings for [V](https://vlang.io/)
-`src/vulkan.v` and `src/vulkan_video.v` were generated using the current [KhronosGroup](https://github.com/KhronosGroup/) [API description](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml)
+`vulkan.v` and `vulkan_video.v` are generated from Khronos' canonical
+[Vulkan API registry](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml).
+The package follows the semantic version in `v.mod`; `VERSION` records the
+Vulkan registry snapshot, while `REGISTRY_COMMIT` and `VOLK_COMMIT` make the
+CI header and loader inputs reproducible.
 
 ## Dependencies
 Please install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home) and set the [environment variables](https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html)
@@ -60,6 +64,33 @@ lifecycle helpers, synchronization objects, checked queue submission, owned 2D
 images and views, and explicit image-layout transition recording without modifying
 generated files.
 See [the ergonomic API design](API_DESIGN.md).
+
+Instance and device configuration can validate requested names before Vulkan is
+called:
+
+```v
+instance := vke.new_instance_with_options(vke.InstanceOptions{
+	application_name: 'my app'
+	extensions: ['VK_KHR_surface']
+})!
+
+family := physical_device.find_queue_family(u32(vk.QueueFlagBits.graphics)) or {
+	return error('no graphics queue')
+}
+device := physical_device.new_device_with_options(vke.DeviceOptions{
+	queue_family: family
+	extensions: ['VK_KHR_swapchain']
+})!
+```
+
+The CI lifecycle smoke test runs the ergonomic path from instance creation
+through queue submission and cleanup under `VK_LAYER_KHRONOS_validation`.
+Run it locally with:
+
+```sh
+VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
+  v run examples/ergonomic_lifecycle
+```
 
 ## Generate
 The generator is located at [antono2/v_vulkan_bindings](https://github.com/antono2/v_vulkan_bindings)
