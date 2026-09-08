@@ -70,9 +70,6 @@ jobs:
 
   compile-smoke-test:
     name: compile-smoke-test (${{ matrix.os }}, ${{ matrix.compiler }}, ${{ matrix.v-channel }})
-    # V master is an early-warning lane. It must not block releases when V
-    # itself cannot bootstrap; the stable lanes remain required.
-    continue-on-error: ${{ matrix.v-channel == 'master' }}
     strategy:
       fail-fast: false
       matrix:
@@ -102,12 +99,16 @@ jobs:
           ref: 2700e4f4c58e9e625657b80f4f44b0584d7c6096
           path: generator
       - uses: prantlf/setup-v-action@v4
+        id: setup_v
+        continue-on-error: ${{ matrix.v-channel == 'master' }}
         with:
           version: ${{ matrix.v-version }}
       - uses: NcStudios/VulkanCI@v1.2
+        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
         with:
           sdkVersion: 1.4.309.0
       - name: Install registry-matched headers and pinned Volk
+        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
         shell: bash
         run: |
           set -euo pipefail
@@ -130,6 +131,7 @@ jobs:
             "https://raw.githubusercontent.com/zeux/volk/$volk_commit/volk.c" \
             --output "$VULKAN_SDK/include/volk/volk.c"
       - name: Assemble isolated module
+        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
         shell: bash
         run: |
           set -euo pipefail
@@ -141,11 +143,17 @@ jobs:
             "$module_root/ergonomic/"
           echo "VMODULES=$RUNNER_TEMP/vmodules" >> "$GITHUB_ENV"
       - name: Compile smoke test and ergonomic unit tests
+        id: compile
+        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
+        continue-on-error: ${{ matrix.v-channel == 'master' }}
         shell: bash
         run: |
           set -euo pipefail
           v -cc "${{ matrix.compiler }}" run generator/test
           v -cc "${{ matrix.compiler }}" test ergonomic
+      - name: Report V master compatibility warning
+        if: always() && matrix.v-channel == 'master' && (steps.setup_v.outcome == 'failure' || steps.compile.outcome == 'failure')
+        run: echo "::warning::The live V master compatibility lane failed; stable V 0.5.2 remains authoritative."
       - name: Run lifecycle under validation
         if: runner.os == 'Linux' && matrix.v-channel == 'stable'
         shell: bash
