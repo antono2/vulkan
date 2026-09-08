@@ -99,7 +99,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: antono2/v_vulkan_bindings
-          ref: d9dc5009c59b11bb5216e3c2890699a92c15be53
+          ref: 2700e4f4c58e9e625657b80f4f44b0584d7c6096
           path: generator
       - uses: prantlf/setup-v-action@v4
         with:
