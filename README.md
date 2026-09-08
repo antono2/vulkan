@@ -10,6 +10,18 @@ CI header and loader inputs reproducible.
 ## Dependencies
 Please install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home) and set the [environment variables](https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html)
 
+After installing the module, `setup.vsh` can optionally download the current
+SDK archive or installer for your platform:
+
+```sh
+v run ~/.vmodules/antono2/vulkan/setup.vsh
+```
+
+The helper only downloads (and, on Linux, unpacks) the SDK. It does not install
+the SDK or configure the required environment variables for you. CI does not
+use this helper; it installs the registry-matched headers and pinned Volk
+revision recorded by this repository.
+
 ## Install
 Download the latest bindings to your local `.vmodules` directory:
 
