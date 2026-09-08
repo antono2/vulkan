@@ -69,6 +69,9 @@ jobs:
           done
 
   compile-smoke-test:
+    # V master is an early-warning lane. It must not block releases when V
+    # itself cannot bootstrap; the stable lanes remain required.
+    continue-on-error: ${{ matrix.v-version == 'master' }}
     strategy:
       fail-fast: false
       matrix:
