@@ -99,16 +99,36 @@ jobs:
           ref: 2700e4f4c58e9e625657b80f4f44b0584d7c6096
           path: generator
       - uses: prantlf/setup-v-action@v4
-        id: setup_v
-        continue-on-error: ${{ matrix.v-channel == 'master' }}
+        if: matrix.v-channel != 'master'
         with:
           version: ${{ matrix.v-version }}
+      # V master currently builds a separate v1_fallback executable for tool
+      # commands such as `v test`. Keep the complete source build together;
+      # setup-v-action@v4's reduced cache bundle omits that executable.
+      - name: Check out V master
+        if: matrix.v-channel == 'master'
+        uses: actions/checkout@v7
+        id: checkout_v_master
+        continue-on-error: true
+        with:
+          repository: vlang/v
+          path: .ci-v-master
+          fetch-depth: 1
+      - name: Build V master
+        if: matrix.v-channel == 'master' && steps.checkout_v_master.outcome == 'success'
+        id: setup_v_master
+        continue-on-error: true
+        shell: bash
+        run: |
+          make -C .ci-v-master
+          echo "$GITHUB_WORKSPACE/.ci-v-master" >> "$GITHUB_PATH"
+          .ci-v-master/v -V
       - uses: NcStudios/VulkanCI@v1.2
-        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
+        if: matrix.v-channel != 'master' || steps.setup_v_master.outcome == 'success'
         with:
           sdkVersion: 1.4.309.0
       - name: Install registry-matched headers and pinned Volk
-        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
+        if: matrix.v-channel != 'master' || steps.setup_v_master.outcome == 'success'
         shell: bash
         run: |
           set -euo pipefail
@@ -131,7 +151,7 @@ jobs:
             "https://raw.githubusercontent.com/zeux/volk/$volk_commit/volk.c" \
             --output "$VULKAN_SDK/include/volk/volk.c"
       - name: Assemble isolated module
-        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
+        if: matrix.v-channel != 'master' || steps.setup_v_master.outcome == 'success'
         shell: bash
         run: |
           set -euo pipefail
@@ -144,7 +164,7 @@ jobs:
           echo "VMODULES=$RUNNER_TEMP/vmodules" >> "$GITHUB_ENV"
       - name: Compile smoke test and ergonomic unit tests
         id: compile
-        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
+        if: matrix.v-channel != 'master' || steps.setup_v_master.outcome == 'success'
         continue-on-error: ${{ matrix.v-channel == 'master' }}
         shell: bash
         run: |
@@ -156,7 +176,7 @@ jobs:
           fi
           v -cc "${{ matrix.compiler }}" test ergonomic
       - name: Report V master compatibility warning
-        if: always() && matrix.v-channel == 'master' && (steps.setup_v.outcome == 'failure' || steps.compile.outcome == 'failure')
+        if: always() && matrix.v-channel == 'master' && (steps.checkout_v_master.outcome == 'failure' || steps.setup_v_master.outcome == 'failure' || steps.compile.outcome == 'failure')
         run: echo "::warning::The live V master compatibility lane failed; stable V 0.5.2 remains authoritative."
       - name: Run lifecycle under validation
         if: runner.os == 'Linux' && matrix.v-channel == 'stable'
