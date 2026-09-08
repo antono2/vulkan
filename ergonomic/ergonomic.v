@@ -185,35 +185,9 @@ pub:
 //
 // queue_family must have been discovered from this PhysicalDevice.
 pub fn (physical_device PhysicalDevice) new_device(queue_family QueueFamily) !Device {
-	if queue_family.properties.queueCount == 0 {
-		return error('queue family ${queue_family.index} has no queues')
-	}
-
-	mut priority := f32(1.0)
-	queue_info := vk.DeviceQueueCreateInfo{
-		queueFamilyIndex: queue_family.index
-		queueCount: 1
-		pQueuePriorities: &priority
-	}
-	create_info := vk.DeviceCreateInfo{
-		queueCreateInfoCount: 1
-		pQueueCreateInfos: &queue_info
-	}
-	mut handle := vk.Device(unsafe { nil })
-	require_success(vk.create_device(physical_device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateDevice')!
-	vk.load_device_commands(handle)
-
-	mut queue_handle := vk.Queue(unsafe { nil })
-	vk.get_device_queue(handle, queue_family.index, 0, &queue_handle)
-	return Device{
-		physical_device: physical_device
-		handle: handle
-		queue: Queue{
-			handle: queue_handle
-			family_index: queue_family.index
-			index: 0
-		}
-	}
+	return physical_device.new_device_with_options(DeviceOptions{
+		queue_family: queue_family
+	})
 }
 
 // destroy destroys a logical device created by new_device. Its queue handle
@@ -492,6 +466,11 @@ fn single_image_subresource_range(aspect_mask vk.ImageAspectFlags) vk.ImageSubre
 	}
 }
 
+fn image_usage_supports_view(usage vk.ImageUsageFlags) bool {
+	compatible_usage := u32(vk.ImageUsageFlagBits.sampled) | u32(vk.ImageUsageFlagBits.storage) | u32(vk.ImageUsageFlagBits.color_attachment) | u32(vk.ImageUsageFlagBits.depth_stencil_attachment) | u32(vk.ImageUsageFlagBits.input_attachment) | u32(vk.ImageUsageFlagBits.transient_attachment) | u32(vk.ImageUsageFlagBits.fragment_shading_rate_attachment) | u32(vk.ImageUsageFlagBits.fragment_density_map_bit_ext) | u32(vk.ImageUsageFlagBits.video_decode_dst) | u32(vk.ImageUsageFlagBits.video_decode_dpb) | u32(vk.ImageUsageFlagBits.video_encode_src) | u32(vk.ImageUsageFlagBits.video_encode_dpb) | u32(vk.ImageUsageFlagBits.sample_weight_bit_qcom) | u32(vk.ImageUsageFlagBits.sample_block_match_bit_qcom) | u32(vk.ImageUsageFlagBits.video_encode_quantization_delta_map) | u32(vk.ImageUsageFlagBits.video_encode_emphasis_map)
+	return usage & compatible_usage != 0
+}
+
 // OwnedImageView owns a two-dimensional view of one OwnedImage. The view must
 // be destroyed before its image and parent Device.
 pub struct OwnedImageView {
@@ -510,6 +489,9 @@ pub:
 pub fn (image OwnedImage) new_view(aspect_mask vk.ImageAspectFlags) !OwnedImageView {
 	if aspect_mask == 0 {
 		return error('image view aspect mask must not be empty')
+	}
+	if !image_usage_supports_view(image.usage) {
+		return error('image usage does not support image views')
 	}
 	subresource_range := single_image_subresource_range(aspect_mask)
 	create_info := vk.ImageViewCreateInfo{

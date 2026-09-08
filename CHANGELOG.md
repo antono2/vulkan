@@ -4,6 +4,29 @@ This changelog tracks the semantic version of the V module in `v.mod`.
 Generated binding snapshots continue to use the Vulkan registry version stored
 in `VERSION`.
 
+## 1.5.0 - 2026-09-08
+
+### Added
+
+- A validation-enabled end-to-end lifecycle smoke test covering instance,
+  device, buffer, image, image view, command pool, command buffer, fence,
+  semaphore, queue submission, and ordered cleanup.
+- Owned instance layer/extension and physical-device extension discovery.
+- Validated instance options and configurable single-queue device creation with
+  queue index, priority, extensions, core features, and a feature `pNext` chain.
+- Presentation-support queries and graphics/presentation queue-family selection.
+- Linux, macOS, and Windows CI coverage, with both released and master V tested
+  on Linux.
+- Immutable Vulkan-Headers and Volk source revisions used by CI.
+
+### Changed
+
+- Package releases now use the semantic version in `v.mod`; `VERSION` remains
+  the generated Vulkan registry version.
+- Image-view creation rejects image usage masks which violate
+  `VUID-VkImageViewCreateInfo-image-04441` before calling Vulkan.
+- Releases are created only from an explicitly pushed matching package tag.
+
 ## 1.1.0 - 2026-09-07
 
 ### Added

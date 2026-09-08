@@ -5,6 +5,7 @@ on:
     branches: [master]
   push:
     branches: [master]
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -36,8 +37,10 @@ jobs:
           }
 
           version_changed=false
+          registry_commit_changed=false
           for path in "${changed[@]}"; do
             [[ "$path" == VERSION ]] && version_changed=true
+            [[ "$path" == REGISTRY_COMMIT ]] && registry_commit_changed=true
           done
 
           if [[ "$version_changed" == true && "$HEAD_REF" != generated/* ]]; then
@@ -51,9 +54,13 @@ jobs:
             echo "A generated update must change VERSION" >&2
             exit 1
           }
+          [[ "$registry_commit_changed" == true ]] || {
+            echo "A generated update must change REGISTRY_COMMIT" >&2
+            exit 1
+          }
           for path in "${changed[@]}"; do
             case "$path" in
-              VERSION|vulkan.v|vulkan_video.v) ;;
+              VERSION|REGISTRY_COMMIT|vulkan.v|vulkan_video.v) ;;
               *)
                 echo "Unexpected file in generated update: $path" >&2
                 exit 1
@@ -61,34 +68,128 @@ jobs:
             esac
           done
 
-  compile-smoke-test:
-    runs-on: ubuntu-24.04
+  compile-smoke-matrix:
+    name: compile-smoke-test (${{ matrix.os }}, ${{ matrix.compiler }}, ${{ matrix.v-channel }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            compiler: gcc
+            v-channel: stable
+            v-version: 0.5.2
+          - os: ubuntu-24.04
+            compiler: gcc
+            v-channel: master
+            v-version: master
+          - os: macos-14
+            compiler: clang
+            v-channel: stable
+            v-version: 0.5.2
+          - os: windows-2022
+            compiler: msvc
+            v-channel: stable
+            v-version: 0.5.2
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/checkout@v7
         with:
           repository: antono2/v_vulkan_bindings
+          ref: 2700e4f4c58e9e625657b80f4f44b0584d7c6096
           path: generator
       - uses: prantlf/setup-v-action@v4
+        id: setup_v
+        continue-on-error: ${{ matrix.v-channel == 'master' }}
+        with:
+          version: ${{ matrix.v-version }}
       - uses: NcStudios/VulkanCI@v1.2
+        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
         with:
           sdkVersion: 1.4.309.0
-      - name: Download Volk and compile smoke test
+      - name: Install registry-matched headers and pinned Volk
+        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
+        shell: bash
         run: |
           set -euo pipefail
-          install -d "$VULKAN_SDK/include/volk" "$HOME/.vmodules/antono2"
+          registry_commit=$(tr -d '\r\n' < REGISTRY_COMMIT)
+          registry_checkout="$RUNNER_TEMP/Vulkan-Headers"
+          git init "$registry_checkout"
+          git -C "$registry_checkout" remote add origin https://github.com/KhronosGroup/Vulkan-Headers.git
+          git -C "$registry_checkout" fetch --depth 1 origin "$registry_commit"
+          git -C "$registry_checkout" checkout --detach FETCH_HEAD
+          test "$(git -C "$registry_checkout" rev-parse HEAD)" = "$registry_commit"
+          mkdir -p "$VULKAN_SDK/include" "$VULKAN_SDK/include/volk"
+          cp -R "$registry_checkout/include/." "$VULKAN_SDK/include/"
+          grep -F "#define VK_HEADER_VERSION 362" "$VULKAN_SDK/include/vulkan/vulkan_core.h"
+
+          volk_commit=$(tr -d '\r\n' < VOLK_COMMIT)
           curl --fail --silent --show-error --location \
-            https://raw.githubusercontent.com/zeux/volk/master/volk.h \
+            "https://raw.githubusercontent.com/zeux/volk/$volk_commit/volk.h" \
             --output "$VULKAN_SDK/include/volk/volk.h"
           curl --fail --silent --show-error --location \
-            https://raw.githubusercontent.com/zeux/volk/master/volk.c \
+            "https://raw.githubusercontent.com/zeux/volk/$volk_commit/volk.c" \
             --output "$VULKAN_SDK/include/volk/volk.c"
-          ln -s "$GITHUB_WORKSPACE" "$HOME/.vmodules/antono2/vulkan"
-          v -cc gcc run generator/test
-          v -cc gcc test ergonomic
+      - name: Assemble isolated module
+        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          module_root="$RUNNER_TEMP/vmodules/antono2/vulkan"
+          mkdir -p "$module_root/c" "$module_root/ergonomic"
+          cp vulkan.v vulkan_video.v loader.v v.mod VERSION REGISTRY_COMMIT VOLK_COMMIT "$module_root/"
+          cp c/loader_bridge.h c/volk.c.v "$module_root/c/"
+          cp ergonomic/ergonomic.v ergonomic/discovery.v ergonomic/configuration.v \
+            "$module_root/ergonomic/"
+          echo "VMODULES=$RUNNER_TEMP/vmodules" >> "$GITHUB_ENV"
+      - name: Compile smoke test and ergonomic unit tests
+        id: compile
+        if: matrix.v-channel != 'master' || steps.setup_v.outcome == 'success'
+        continue-on-error: ${{ matrix.v-channel == 'master' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ runner.os }}" == macOS ]]; then
+            v -cc "${{ matrix.compiler }}" -o "$RUNNER_TEMP/vulkan-smoke" generator/test
+          else
+            v -cc "${{ matrix.compiler }}" run generator/test
+          fi
+          v -cc "${{ matrix.compiler }}" test ergonomic
+      - name: Report V master compatibility warning
+        if: always() && matrix.v-channel == 'master' && (steps.setup_v.outcome == 'failure' || steps.compile.outcome == 'failure')
+        run: echo "::warning::The live V master compatibility lane failed; stable V 0.5.2 remains authoritative."
+      - name: Run lifecycle under validation
+        if: runner.os == 'Linux' && matrix.v-channel == 'stable'
+        shell: bash
+        run: |
+          set -euo pipefail
+          lifecycle_log="$RUNNER_TEMP/vulkan-lifecycle.log"
+          set +e
+          VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
+            v -cc "${{ matrix.compiler }}" run examples/ergonomic_lifecycle \
+            >"$lifecycle_log" 2>&1
+          lifecycle_status=$?
+          set -e
+          cat "$lifecycle_log"
+          test "$lifecycle_status" -eq 0
+          if grep -Eiq 'Validation (Error|Warning)|VUID-' "$lifecycle_log"; then
+            echo "Vulkan validation reported a problem" >&2
+            exit 1
+          fi
+
+  compile-smoke-test:
+    name: compile-smoke-test
+    if: always()
+    needs: compile-smoke-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require the cross-platform matrix to pass
+        env:
+          MATRIX_RESULT: ${{ needs.compile-smoke-matrix.result }}
+        run: test "$MATRIX_RESULT" = success
 
   tag-release:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     needs: compile-smoke-test
     runs-on: ubuntu-latest
     permissions:
@@ -97,19 +198,18 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Tag the validated published version
+      - name: Validate and publish the package release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          version=$(cat VERSION)
-          [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
-            echo "Invalid VERSION: $version" >&2
+          package_version=$(sed -n "s/^[[:space:]]*version: '\([^']*\)'.*/\1/p" v.mod)
+          [[ "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+            echo "Invalid package version: $package_version" >&2
             exit 1
           }
-          if git rev-parse --verify --quiet "refs/tags/$version" >/dev/null; then
-            echo "Tag $version already exists"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "$version" -m "V bindings for Vulkan-Docs $version"
-          git push origin "refs/tags/$version"
+          test "$GITHUB_REF_NAME" = "v$package_version"
+          registry_version=$(tr -d '\r\n' < VERSION)
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
+            gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes \
+              --title "antono2.vulkan $GITHUB_REF_NAME (registry $registry_version)"
