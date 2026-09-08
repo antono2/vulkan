@@ -149,7 +149,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          v -cc "${{ matrix.compiler }}" run generator/test
+          if [[ "${{ runner.os }}" == macOS ]]; then
+            v -cc "${{ matrix.compiler }}" -o "$RUNNER_TEMP/vulkan-smoke" generator/test
+          else
+            v -cc "${{ matrix.compiler }}" run generator/test
+          fi
           v -cc "${{ matrix.compiler }}" test ergonomic
       - name: Report V master compatibility warning
         if: always() && matrix.v-channel == 'master' && (steps.setup_v.outcome == 'failure' || steps.compile.outcome == 'failure')
