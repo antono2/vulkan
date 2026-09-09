@@ -165,19 +165,22 @@ pub fn (device PhysicalDevice) find_queue_family(required_flags vk.QueueFlags) ?
 
 // Queue is a borrowed queue handle owned by its parent Device.
 pub struct Queue {
+	device vk.Device
 pub:
 	handle       vk.Queue
 	family_index u32
 	index        u32
 }
 
-// Device owns a logical VkDevice and exposes its single requested queue. It
+// Device owns a logical VkDevice and exposes all requested queues. queue is
+// the selected legacy queue or the first queue in a multi-queue request. It
 // does not destroy itself implicitly; call destroy exactly once.
 pub struct Device {
 	physical_device PhysicalDevice
 pub:
 	handle vk.Device
 	queue  Queue
+	queues []Queue
 }
 
 // new_device creates a logical device with one queue at priority 1.0 from the
@@ -190,8 +193,8 @@ pub fn (physical_device PhysicalDevice) new_device(queue_family QueueFamily) !De
 	})
 }
 
-// destroy destroys a logical device created by new_device. Its queue handle
-// becomes invalid at the same time.
+// destroy destroys a logical device created by new_device. All of its queue
+// handles become invalid at the same time.
 pub fn (device Device) destroy() {
 	vk.destroy_device(device.handle, unsafe { nil })
 }
@@ -209,16 +212,25 @@ pub:
 // new_command_pool creates a command pool for the Device's queue family with
 // Vulkan's default allocator.
 pub fn (device Device) new_command_pool(flags vk.CommandPoolCreateFlags) !CommandPool {
+	return device.new_command_pool_for_queue(device.queue, flags)
+}
+
+// new_command_pool_for_queue creates a command pool for one of this Device's
+// requested queues. Passing a queue borrowed from another device is rejected.
+pub fn (device Device) new_command_pool_for_queue(queue Queue, flags vk.CommandPoolCreateFlags) !CommandPool {
+	if queue.device != device.handle {
+		return error('queue does not belong to this device')
+	}
 	create_info := vk.CommandPoolCreateInfo{
 		flags: flags
-		queueFamilyIndex: device.queue.family_index
+		queueFamilyIndex: queue.family_index
 	}
 	mut handle := vk.CommandPool(unsafe { nil })
 	require_success(vk.create_command_pool(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateCommandPool')!
 	return CommandPool{
 		device: device.handle
 		handle: handle
-		queue_family_index: device.queue.family_index
+		queue_family_index: queue.family_index
 		flags: flags
 	}
 }

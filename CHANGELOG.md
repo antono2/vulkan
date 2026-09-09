@@ -4,6 +4,19 @@ This changelog tracks the semantic version of the V module in `v.mod`.
 Generated binding snapshots continue to use the Vulkan registry version stored
 in `VERSION`.
 
+## Unreleased
+
+### Added
+
+- Multiple logical-device queue requests across distinct queue families, with
+  per-queue priorities, all borrowed queues exposed through `Device.queues`,
+  and queue-specific command-pool creation.
+
+### Fixed
+
+- Legacy nonzero queue indices now request every Vulkan queue through the
+  selected index before retrieving that queue.
+
 ## 1.5.0 - 2026-09-08
 
 ### Added

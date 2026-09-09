@@ -69,12 +69,12 @@ Using GLFW and Dear ImGui [antono2/v_imgui_examples](https://github.com/antono2/
 
 The generated module remains the complete low-level binding. The opt-in
 `antono2.vulkan.ergonomic` submodule adds typed errors, instance lifecycle
-helpers, physical-device and queue-family discovery, and single-queue logical
-device ownership. It also provides explicit memory-type selection and owned
-buffer/device-memory allocation, owned command pools and primary command-buffer
-lifecycle helpers, synchronization objects, checked queue submission, owned 2D
-images and views, and explicit image-layout transition recording without modifying
-generated files.
+helpers, physical-device and queue-family discovery, and validated single- or
+multi-queue logical-device ownership. It also provides explicit memory-type
+selection and owned buffer/device-memory allocation, owned command pools and
+primary command-buffer lifecycle helpers, synchronization objects, checked queue
+submission, owned 2D images and views, and explicit image-layout transition
+recording without modifying generated files.
 See [the ergonomic API design](API_DESIGN.md).
 
 Instance and device configuration can validate requested names before Vulkan is
@@ -90,10 +90,17 @@ family := physical_device.find_queue_family(u32(vk.QueueFlagBits.graphics)) or {
 	return error('no graphics queue')
 }
 device := physical_device.new_device_with_options(vke.DeviceOptions{
-	queue_family: family
+	queue_requests: [vke.DeviceQueueRequest{
+		queue_family: family
+		priorities: [f32(1.0)]
+	}]
 	extensions: ['VK_KHR_swapchain']
 })!
 ```
+
+Each priority requests the queue at the same zero-based index in its family.
+Use one `DeviceQueueRequest` per distinct family; `device.queues` exposes the
+created queues in request order and `device.queue` remains the first one.
 
 The CI lifecycle smoke test runs the ergonomic path from instance creation
 through queue submission and cleanup under `VK_LAYER_KHRONOS_validation`.

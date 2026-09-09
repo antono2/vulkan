@@ -115,6 +115,20 @@ fn test_command_pool_and_primary_buffer_expose_raw_handles_and_ownership_metadat
 	assert buffer.command_pool == pool.handle
 }
 
+fn test_command_pool_rejects_queue_from_another_device_before_vulkan_call() {
+	device := Device{
+		handle: vk.Device(unsafe { voidptr(1) })
+	}
+	foreign_queue := Queue{
+		device: vk.Device(unsafe { voidptr(2) })
+	}
+	device.new_command_pool_for_queue(foreign_queue, 0) or {
+		assert err.msg() == 'queue does not belong to this device'
+		return
+	}
+	assert false
+}
+
 fn test_allocate_primary_rejects_zero_count_before_calling_vulkan() {
 	pool := CommandPool{
 		device: vk.Device(unsafe { nil })
