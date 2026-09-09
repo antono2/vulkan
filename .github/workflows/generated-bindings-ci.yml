@@ -123,10 +123,10 @@ jobs:
           make -C .ci-v-master
           echo "$GITHUB_WORKSPACE/.ci-v-master" >> "$GITHUB_PATH"
           .ci-v-master/v -V
-      - uses: NcStudios/VulkanCI@v1.2
+      - name: Install Vulkan SDK and SwiftShader test artifacts
         if: matrix.v-channel != 'master' || steps.setup_v_master.outcome == 'success'
-        with:
-          sdkVersion: 1.4.309.0
+        shell: bash
+        run: bash .github/scripts/setup-vulkan-ci.sh 1.4.309.0 v1.2
       - name: Install registry-matched headers and pinned Volk
         if: matrix.v-channel != 'master' || steps.setup_v_master.outcome == 'success'
         shell: bash

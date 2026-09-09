@@ -17,6 +17,11 @@ in `VERSION`.
 - Legacy nonzero queue indices now request every Vulkan queue through the
   selected index before retrieving that queue.
 
+### Changed
+
+- Install the pinned Vulkan SDK and SwiftShader CI artifacts without the
+  deprecated Node 20 release-downloader action.
+
 ## 1.5.0 - 2026-09-08
 
 ### Added
