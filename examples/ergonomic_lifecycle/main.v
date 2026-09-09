@@ -22,12 +22,33 @@ fn main() {
 	queue_family := physical_device.find_queue_family(required_queue_flags) or {
 		panic('no graphics/compute queue family was found')
 	}
+	if queue_family.properties.queueCount >= 2 {
+		legacy_device := physical_device.new_device_with_options(vke.DeviceOptions{
+			queue_family: queue_family
+			queue_index: 1
+		}) or { panic(err) }
+		if legacy_device.queue.index != 1 || legacy_device.queues.len != 2 {
+			panic('legacy nonzero queue selection did not create the required queue range')
+		}
+		legacy_device.destroy()
+	}
+	requested_queue_count := if queue_family.properties.queueCount >= 2 { 2 } else { 1 }
 	device := physical_device.new_device_with_options(vke.DeviceOptions{
-		queue_family: queue_family
+		queue_requests: [
+			vke.DeviceQueueRequest{
+				queue_family: queue_family
+				priorities: []f32{len: requested_queue_count, init: 1.0}
+			},
+		]
 	}) or { panic(err) }
 	defer {
 		device.destroy()
 	}
+	if device.queues.len != requested_queue_count || device.queue.family_index != queue_family.index
+		|| device.queue.index != 0 {
+		panic('multi-queue creation returned unexpected queue metadata')
+	}
+	work_queue := device.queues[device.queues.len - 1]
 
 	memory_properties := u32(vk.MemoryPropertyFlagBits.device_local)
 	buffer_usage := u32(vk.BufferUsageFlagBits.vertex_buffer) | u32(vk.BufferUsageFlagBits.transfer_dst)
@@ -37,7 +58,9 @@ fn main() {
 	}
 
 	image_usage := u32(vk.ImageUsageFlagBits.sampled) | u32(vk.ImageUsageFlagBits.transfer_dst)
-	image := device.new_image_2d(64, 64, .r8g8b8a8_unorm, .optimal, image_usage, memory_properties) or { panic(err) }
+	image := device.new_image_2d(64, 64, .r8g8b8a8_unorm, .optimal, image_usage, memory_properties) or {
+		panic(err)
+	}
 	defer {
 		image.destroy()
 	}
@@ -47,7 +70,7 @@ fn main() {
 	}
 
 	pool_flags := u32(vk.CommandPoolCreateFlagBits.reset_command_buffer)
-	pool := device.new_command_pool(pool_flags) or { panic(err) }
+	pool := device.new_command_pool_for_queue(work_queue, pool_flags) or { panic(err) }
 	defer {
 		pool.destroy()
 	}
@@ -75,12 +98,12 @@ fn main() {
 	defer {
 		semaphore.destroy()
 	}
-	device.queue.submit([command_buffer], vke.SubmitOptions{
+	work_queue.submit([command_buffer], vke.SubmitOptions{
 		fence: fence
 	}) or { panic(err) }
 	if fence.wait(5_000_000_000) or { panic(err) } != .success {
 		panic('queue submission did not complete before the smoke-test timeout')
 	}
 
-	println('Vulkan ergonomic lifecycle passed on ${physical_device.name()}')
+	println('Vulkan ergonomic lifecycle passed on ${physical_device.name()} with ${device.queues.len} queue(s)')
 }

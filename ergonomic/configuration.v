@@ -53,31 +53,109 @@ pub fn new_instance_with_options(options InstanceOptions) !Instance {
 	return new_instance(&create_info)
 }
 
-// DeviceOptions configures the single queue exposed by Device together with
-// device extensions, core features, and an optional feature pNext chain.
+// DeviceQueueRequest requests consecutive queues from one family. Each
+// priority maps to the queue at the same zero-based index in that family.
+pub struct DeviceQueueRequest {
+pub:
+	queue_family QueueFamily
+	priorities   []f32 = [f32(1.0)]
+}
+
+// DeviceOptions configures logical-device queues together with device
+// extensions, core features, and an optional feature pNext chain.
+//
+// queue_family, queue_index, and queue_priority preserve the original
+// single-queue API. Set queue_requests to request queues from one or more
+// families; it cannot be combined with those legacy fields. The first queue
+// in queue_requests becomes Device.queue.
 pub struct DeviceOptions {
 pub:
 	queue_family     QueueFamily
 	queue_index      u32
 	queue_priority   f32 = 1.0
+	queue_requests   []DeviceQueueRequest
 	extensions       []string
 	enabled_features &vk.PhysicalDeviceFeatures = unsafe { nil }
 	p_next           voidptr = unsafe { nil }
 }
 
-// new_device_with_options validates the queue request and device extensions,
-// then creates a logical device while retaining all temporary pointer arrays
-// through vkCreateDevice.
+struct DeviceQueuePlan {
+	requests             []DeviceQueueRequest
+	primary_family_index u32
+	primary_queue_index  u32
+}
+
+fn validate_device_queue_request(request DeviceQueueRequest) ! {
+	if request.queue_family.properties.queueCount == 0 {
+		return error('queue family ${request.queue_family.index} has no queues')
+	}
+	if request.priorities.len == 0 {
+		return error('queue family ${request.queue_family.index} must request at least one queue')
+	}
+	if request.priorities.len > int(request.queue_family.properties.queueCount) {
+		return error('requested ${request.priorities.len} queues from family ${request.queue_family.index}, which exposes ${request.queue_family.properties.queueCount}')
+	}
+	for queue_index, priority in request.priorities {
+		// Express this as an accepted range so NaN is rejected as well.
+		if !(priority >= 0.0 && priority <= 1.0) {
+			return error('queue priority for family ${request.queue_family.index} index ${queue_index} must be between 0.0 and 1.0')
+		}
+	}
+}
+
+fn device_queue_plan(options DeviceOptions) !DeviceQueuePlan {
+	if options.queue_requests.len == 0 {
+		if options.queue_family.properties.queueCount == 0 {
+			return error('queue family ${options.queue_family.index} has no queues')
+		}
+		if options.queue_index >= options.queue_family.properties.queueCount {
+			return error('queue index ${options.queue_index} is outside queue family ${options.queue_family.index}')
+		}
+		if !(options.queue_priority >= 0.0 && options.queue_priority <= 1.0) {
+			return error('queue priority must be between 0.0 and 1.0')
+		}
+
+		// Vulkan creates queues consecutively from index zero. Request every
+		// index through the selected legacy queue so vkGetDeviceQueue never
+		// targets a queue which was not created.
+		priorities := []f32{len: int(options.queue_index) + 1, init: options.queue_priority}
+		return DeviceQueuePlan{
+			requests: [
+				DeviceQueueRequest{
+					queue_family: options.queue_family
+					priorities: priorities
+				},
+			]
+			primary_family_index: options.queue_family.index
+			primary_queue_index: options.queue_index
+		}
+	}
+
+	if options.queue_family.properties.queueCount != 0 || options.queue_index != 0
+		|| options.queue_priority != 1.0 {
+		return error('queue_requests cannot be combined with queue_family, queue_index, or queue_priority')
+	}
+
+	mut seen_families := map[u32]bool{}
+	for request in options.queue_requests {
+		validate_device_queue_request(request)!
+		if seen_families[request.queue_family.index] {
+			return error('queue family ${request.queue_family.index} is requested more than once')
+		}
+		seen_families[request.queue_family.index] = true
+	}
+	return DeviceQueuePlan{
+		requests: options.queue_requests.clone()
+		primary_family_index: options.queue_requests[0].queue_family.index
+		primary_queue_index: 0
+	}
+}
+
+// new_device_with_options validates queue requests and device extensions,
+// then creates a logical device while retaining all temporary priority and
+// pointer arrays through vkCreateDevice.
 pub fn (physical_device PhysicalDevice) new_device_with_options(options DeviceOptions) !Device {
-	if options.queue_family.properties.queueCount == 0 {
-		return error('queue family ${options.queue_family.index} has no queues')
-	}
-	if options.queue_index >= options.queue_family.properties.queueCount {
-		return error('queue index ${options.queue_index} is outside queue family ${options.queue_family.index}')
-	}
-	if options.queue_priority < 0.0 || options.queue_priority > 1.0 {
-		return error('queue priority must be between 0.0 and 1.0')
-	}
+	queue_plan := device_queue_plan(options)!
 	available_extensions := extension_names(physical_device.extensions()!)
 	validate_requested_names('device extensions', options.extensions, available_extensions)!
 
@@ -85,16 +163,22 @@ pub fn (physical_device PhysicalDevice) new_device_with_options(options DeviceOp
 	for extension in options.extensions {
 		extension_pointers << extension.str
 	}
-	priority := options.queue_priority
-	queue_info := vk.DeviceQueueCreateInfo{
-		queueFamilyIndex: options.queue_family.index
-		queueCount: 1
-		pQueuePriorities: &priority
+	mut priority_groups := [][]f32{cap: queue_plan.requests.len}
+	for request in queue_plan.requests {
+		priority_groups << request.priorities.clone()
+	}
+	mut queue_infos := []vk.DeviceQueueCreateInfo{cap: queue_plan.requests.len}
+	for request_index, request in queue_plan.requests {
+		queue_infos << vk.DeviceQueueCreateInfo{
+			queueFamilyIndex: request.queue_family.index
+			queueCount: u32(priority_groups[request_index].len)
+			pQueuePriorities: priority_groups[request_index].data
+		}
 	}
 	create_info := vk.DeviceCreateInfo{
 		pNext: options.p_next
-		queueCreateInfoCount: 1
-		pQueueCreateInfos: &queue_info
+		queueCreateInfoCount: u32(queue_infos.len)
+		pQueueCreateInfos: queue_infos.data
 		enabledExtensionCount: u32(extension_pointers.len)
 		ppEnabledExtensionNames: extension_pointers.data
 		pEnabledFeatures: options.enabled_features
@@ -103,16 +187,30 @@ pub fn (physical_device PhysicalDevice) new_device_with_options(options DeviceOp
 	require_success(vk.create_device(physical_device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateDevice')!
 	vk.load_device_commands(handle)
 
-	mut queue_handle := vk.Queue(unsafe { nil })
-	vk.get_device_queue(handle, options.queue_family.index, options.queue_index, &queue_handle)
+	mut queues := []Queue{}
+	mut primary_queue := Queue{}
+	for request in queue_plan.requests {
+		for queue_index in 0 .. request.priorities.len {
+			mut queue_handle := vk.Queue(unsafe { nil })
+			vk.get_device_queue(handle, request.queue_family.index, u32(queue_index), &queue_handle)
+			queue := Queue{
+				device: handle
+				handle: queue_handle
+				family_index: request.queue_family.index
+				index: u32(queue_index)
+			}
+			queues << queue
+			if queue.family_index == queue_plan.primary_family_index
+				&& queue.index == queue_plan.primary_queue_index {
+				primary_queue = queue
+			}
+		}
+	}
 	return Device{
 		physical_device: physical_device
 		handle: handle
-		queue: Queue{
-			handle: queue_handle
-			family_index: options.queue_family.index
-			index: options.queue_index
-		}
+		queue: primary_queue
+		queues: queues
 	}
 }
 
