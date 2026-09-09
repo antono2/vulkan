@@ -6,6 +6,8 @@ in `VERSION`.
 
 ## Unreleased
 
+## 1.7.0 - 2026-09-09
+
 ### Added
 
 - Owned SPIR-V shader modules with byte-count, alignment, and magic validation.
