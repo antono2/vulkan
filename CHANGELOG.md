@@ -4,7 +4,7 @@ This changelog tracks the semantic version of the V module in `v.mod`.
 Generated binding snapshots continue to use the Vulkan registry version stored
 in `VERSION`.
 
-## Unreleased
+## 1.6.0 - 2026-09-09
 
 ### Added
 
