@@ -1,7 +1,7 @@
 
 
 # Vulkan Bindings for [V](https://vlang.io/)
-[Project portfolio](https://oreskin.de/projects_en.php) · [Support independent development](https://oreskin.de/dono_en.php)
+[Project portfolio](https://oreskin.de/projects_en.php)
 
 [![Validate Vulkan bindings](https://github.com/antono2/vulkan/actions/workflows/generated-bindings-ci.yml/badge.svg)](https://github.com/antono2/vulkan/actions/workflows/generated-bindings-ci.yml)
 
