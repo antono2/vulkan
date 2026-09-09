@@ -160,6 +160,7 @@ jobs:
           cp vulkan.v vulkan_video.v loader.v v.mod VERSION REGISTRY_COMMIT VOLK_COMMIT "$module_root/"
           cp c/loader_bridge.h c/volk.c.v "$module_root/c/"
           cp ergonomic/ergonomic.v ergonomic/discovery.v ergonomic/configuration.v \
+            ergonomic/presentation.v ergonomic/resources.v \
             "$module_root/ergonomic/"
           echo "VMODULES=$RUNNER_TEMP/vmodules" >> "$GITHUB_ENV"
       - name: Compile smoke test and ergonomic unit tests
@@ -175,6 +176,14 @@ jobs:
             v -cc "${{ matrix.compiler }}" run generator/test
           fi
           v -cc "${{ matrix.compiler }}" test ergonomic
+      - name: Validate TinyCC loader and ergonomic API
+        if: runner.os == 'Linux' && matrix.v-channel == 'stable'
+        shell: bash
+        run: |
+          set -euo pipefail
+          v -cc tcc test ergonomic
+          VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
+            v -cc tcc run examples/ergonomic_lifecycle
       - name: Report V master compatibility warning
         if: always() && matrix.v-channel == 'master' && (steps.checkout_v_master.outcome == 'failure' || steps.setup_v_master.outcome == 'failure' || steps.compile.outcome == 'failure')
         run: echo "::warning::The live V master compatibility lane failed; stable V 0.5.2 remains authoritative."

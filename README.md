@@ -74,7 +74,11 @@ multi-queue logical-device ownership. It also provides explicit memory-type
 selection and owned buffer/device-memory allocation, owned command pools and
 primary command-buffer lifecycle helpers, synchronization objects, checked queue
 submission, owned 2D images and views, and explicit image-layout transition
-recording without modifying generated files.
+recording without modifying generated files. Presentation helpers collect and
+select surface formats, present modes, extents, image counts, and composite
+alpha modes. Host-visible buffers support checked persistent mappings and
+coherent uploads, while owned shader modules accept validated SPIR-V words or
+bytes.
 See [the ergonomic API design](API_DESIGN.md).
 
 Instance and device configuration can validate requested names before Vulkan is

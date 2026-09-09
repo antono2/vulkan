@@ -324,6 +324,7 @@ pub:
 	size              vk.DeviceSize
 	allocation_size   vk.DeviceSize
 	memory_type_index u32
+	memory_properties vk.MemoryPropertyFlags
 }
 
 // new_buffer creates an exclusive-sharing buffer, selects a compatible memory
@@ -344,7 +345,8 @@ pub fn (device Device) new_buffer(size vk.DeviceSize, usage vk.BufferUsageFlags,
 
 	mut requirements := vk.MemoryRequirements{}
 	vk.get_buffer_memory_requirements(device.handle, handle, mut requirements)
-	memory_type_index := device.physical_device.find_memory_type(requirements.memoryTypeBits, required_memory_properties) or {
+	physical_memory := device.physical_device.memory_properties()
+	memory_type_index := select_memory_type(physical_memory, requirements.memoryTypeBits, required_memory_properties) or {
 		vk.destroy_buffer(device.handle, handle, unsafe { nil })
 		return error('no compatible memory type for buffer')
 	}
@@ -372,6 +374,7 @@ pub fn (device Device) new_buffer(size vk.DeviceSize, usage vk.BufferUsageFlags,
 		size: size
 		allocation_size: requirements.size
 		memory_type_index: memory_type_index
+		memory_properties: physical_memory.memoryTypes[memory_type_index].propertyFlags
 	}
 }
 

@@ -4,6 +4,23 @@ This changelog tracks the semantic version of the V module in `v.mod`.
 Generated binding snapshots continue to use the Vulkan registry version stored
 in `VERSION`.
 
+## Unreleased
+
+### Added
+
+- Owned SPIR-V shader modules with byte-count, alignment, and magic validation.
+- Checked host-visible buffer mappings, persistent coherent byte writes, and
+  one-shot map/copy/unmap uploads.
+- Owned surface-support discovery plus reusable format, present-mode, extent,
+  image-count, and composite-alpha selection helpers.
+- Typed device and queue idle waits.
+- TinyCC loader and lifecycle coverage on Linux.
+
+### Fixed
+
+- Use a deep-bound Vulkan loader handle under TinyCC so Volk's exported global
+  dispatch variables cannot shadow loader entry points.
+
 ## 1.6.0 - 2026-09-09
 
 ### Added
