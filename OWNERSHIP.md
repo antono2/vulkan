@@ -7,9 +7,15 @@ in the reverse order of creation.
 V structs are values and can be copied. A copied `Instance`, `Device`,
 `CommandPool`, `OwnedBuffer`, `OwnedImage`, or `OwnedImageView` refers to the
 same native allocation; destroying more than one copy is invalid. `Fence`,
-`Semaphore`, and `PrimaryCommandBuffer` clear their handle when a mutable value
-is destroyed or freed, but a previously made copy is still independent and can
-retain the old handle.
+`Semaphore`, `PrimaryCommandBuffer`, `MappedBufferMemory`, and
+`OwnedShaderModule` clear their handle or pointer when a mutable value is
+destroyed, freed, or unmapped, but a previously made copy is still independent
+and can retain the old value.
+
+A mapped range borrows its `OwnedBuffer`; unmap it before destroying the buffer.
+An `OwnedShaderModule` must be destroyed before its parent device. A successful
+`new_shader_module*` call copies or consumes SPIR-V only during creation, so the
+input slice need not outlive the call.
 
 Until a breaking ownership redesign, follow these rules:
 

@@ -112,6 +112,25 @@ println('${physical_device.name()}: queue family ${device.queue.family_index}')
 
 `OwnedImageView` creates an identity-swizzled 2D view using the image's format and explicit aspect mask. It exposes the raw view and parent-image handles, view type, format, and complete subresource range. Every view must be destroyed before its image.
 
+`PhysicalDevice.surface_support()` owns the three presentation queries needed
+for swapchain negotiation. The accompanying selection helpers keep policy
+explicit through ordered preference arrays while correctly handling Vulkan's
+undefined-format sentinel, FIFO fallback, fixed versus variable extents,
+bounded image counts, and composite-alpha masks.
+
+`OwnedBuffer.map()` validates the range and host-visible property before
+returning a borrowed `MappedBufferMemory`. Its `write_bytes()` helper is
+restricted to host-coherent memory so a successful return means the bytes are
+visible without a separate flush. Use the public pointer plus raw flush and
+invalidate commands for non-coherent memory. `upload_bytes()` provides the
+common one-shot map, copy, and unmap sequence.
+
+`OwnedShaderModule` validates SPIR-V size, alignment, and magic before calling
+Vulkan. Byte input is copied to aligned words for the duration of creation.
+Shader modules and mappings must be destroyed or unmapped before their parent
+resource or device. Device and queue `wait_idle()` helpers preserve typed
+Vulkan errors.
+
 `ImageLayoutTransition` keeps the synchronization-1 source/destination stage masks, access masks, old/new layouts, dependency flags, and aspect mask explicit. `PrimaryCommandBuffer.transition_image_layout()` records one image-only `vkCmdPipelineBarrier` over the owned image's single mip level and array layer. It does not infer synchronization, track layout state, or perform queue-family ownership transfers; use the raw API for broader ranges, ownership transfers, or synchronization-2 barriers.
 
 `InstanceOptions` validates and owns instance layer/extension name pointers through creation. `DeviceOptions` accepts either its compatible single-queue fields or `DeviceQueueRequest` values for multiple queues and families, plus device extensions, core features, and an application-owned feature `pNext` chain. `PhysicalDevice.find_present_queue_family()` layers surface support over the existing queue-flag selection. Custom allocation callbacks and concurrent-sharing resources remain in the raw layer. A future allocator-aware owning wrapper must retain the allocator used at creation so the same callbacks are supplied during destruction.
@@ -125,4 +144,6 @@ println('${physical_device.name()}: queue family ${device.queue.family_index}')
 5. Owned 2D images with explicit parent ownership and destruction ordering. (Implemented.)
 6. Checked primary command-buffer queue submission with explicit synchronization. (Implemented.)
 7. Owned 2D image views and focused synchronization-1 layout-transition recording. (Implemented.)
-8. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.
+8. Surface-support snapshots and explicit swapchain-choice helpers. (Implemented.)
+9. Checked host-visible buffer mappings, coherent byte uploads, and owned SPIR-V shader modules. (Implemented.)
+10. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.

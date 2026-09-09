@@ -56,6 +56,15 @@ fn main() {
 	defer {
 		buffer.destroy()
 	}
+	host_memory_properties := u32(vk.MemoryPropertyFlagBits.host_visible) | u32(vk.MemoryPropertyFlagBits.host_coherent)
+	host_buffer := device.new_buffer(64, u32(vk.BufferUsageFlagBits.transfer_src), host_memory_properties) or { panic(err) }
+	defer {
+		host_buffer.destroy()
+	}
+	host_buffer.upload_bytes(0, [u8(1), 2, 3, 4]) or { panic(err) }
+	mut mapped := host_buffer.map(4, 4, 0) or { panic(err) }
+	mapped.write_bytes(0, [u8(5), 6, 7, 8]) or { panic(err) }
+	mapped.unmap()
 
 	image_usage := u32(vk.ImageUsageFlagBits.sampled) | u32(vk.ImageUsageFlagBits.transfer_dst)
 	image := device.new_image_2d(64, 64, .r8g8b8a8_unorm, .optimal, image_usage, memory_properties) or {
@@ -104,6 +113,8 @@ fn main() {
 	if fence.wait(5_000_000_000) or { panic(err) } != .success {
 		panic('queue submission did not complete before the smoke-test timeout')
 	}
+	work_queue.wait_idle() or { panic(err) }
+	device.wait_idle() or { panic(err) }
 
 	println('Vulkan ergonomic lifecycle passed on ${physical_device.name()} with ${device.queues.len} queue(s)')
 }

@@ -34,7 +34,7 @@ pub fn new_instance_with_options(options InstanceOptions) !Instance {
 	for extension in options.extensions {
 		extension_pointers << extension.str
 	}
-	application := vk.ApplicationInfo{
+	mut application := vk.ApplicationInfo{
 		pApplicationName: options.application_name.str
 		applicationVersion: options.application_version
 		pEngineName: options.engine_name.str
