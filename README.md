@@ -1,6 +1,10 @@
 
 
 # Vulkan Bindings for [V](https://vlang.io/)
+[![Validate Vulkan bindings](https://github.com/antono2/vulkan/actions/workflows/generated-bindings-ci.yml/badge.svg)](https://github.com/antono2/vulkan/actions/workflows/generated-bindings-ci.yml)
+
+[Available as `antono2.vulkan` on VPM](https://vpm.vlang.io/packages/antono2.vulkan).
+
 `vulkan.v` and `vulkan_video.v` are generated from Khronos' canonical
 [Vulkan API registry](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml).
 The package follows the semantic version in `v.mod`; `VERSION` records the
@@ -21,6 +25,19 @@ The helper only downloads (and, on Linux, unpacks) the SDK. It does not install
 the SDK or configure the required environment variables for you. CI does not
 use this helper; it installs the registry-matched headers and pinned Volk
 revision recorded by this repository.
+
+## Supported toolchains
+
+| Platform | V compiler | C compiler | Validation level |
+| --- | --- | --- | --- |
+| Ubuntu 24.04 | V 0.5.2 | GCC and TinyCC | Compile, unit tests, and validation-layer lifecycle run |
+| macOS 14 | V 0.5.2 | Clang | Compile and unit tests |
+| Windows Server 2022 | V 0.5.2 | MSVC | Compile and unit tests |
+| Ubuntu 24.04 | Current V master | GCC | Advisory compatibility lane |
+
+V 0.5.2 is the supported baseline. The generated registry snapshot determines
+which declarations are available; the installed Vulkan loader and driver must
+still support every command, extension, and feature an application requests.
 
 ## Install
 Download the latest bindings to your local `.vmodules` directory:
