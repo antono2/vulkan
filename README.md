@@ -81,8 +81,22 @@ Khronos Vulkan registry. They do not move or replace the original tags.
 compatibility suffix.
 
 ## Examples
-An example can be found at  [antono2/v_vulkan_bindings/test](https://github.com/antono2/v_vulkan_bindings/tree/master/test)</br>
-Using GLFW and Dear ImGui [antono2/v_imgui_examples](https://github.com/antono2/v_imgui_examples)
+
+[`examples/ergonomic_lifecycle`](examples/ergonomic_lifecycle) exercises the
+opt-in convenience API from instance creation through queue submission and
+ordered cleanup. It is a headless validation smoke test and does not open a
+window:
+
+```sh
+v run examples/ergonomic_lifecycle
+```
+
+For windowed rendering, see the tested GLFW/Vulkan example in
+[`antono2/v_imgui_examples`](https://github.com/antono2/v_imgui_examples) and
+the Vulkan/OpenCL particle renderer in
+[`antono2/opencl`](https://github.com/antono2/opencl/tree/master/examples/vulkan_particles).
+The canonical binding-generator tests remain in
+[`antono2/v_vulkan_bindings`](https://github.com/antono2/v_vulkan_bindings/tree/master/test).
 
 ## Ergonomic API (opt in)
 

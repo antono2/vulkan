@@ -6,6 +6,11 @@ in `VERSION`.
 
 ## Unreleased
 
+### Changed
+
+- Clarify which examples are headless versus windowed and ignore local native
+  compiler products created while running examples.
+
 ## 1.7.0 - 2026-09-09
 
 ### Added

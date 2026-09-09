@@ -6,13 +6,17 @@ Thumbs.db
 *.swp
 *~
 
-# Native build outputs
-*.dll
-*.dylib
-*.exe
+# Native compiler output
 *.o
 *.obj
+*.exe
+*.dll
+*.dylib
 *.so
+*.tmp.c
+
+# Extensionless V example binaries
+/examples/ergonomic_lifecycle/ergonomic_lifecycle
 
 # setup.vsh outputs
 setup
