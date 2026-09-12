@@ -170,7 +170,9 @@ fn check() bool {
 		println('[ok]       Volk header: ${volk}')
 	}
 	if command_exists('vulkaninfo') {
-		result := os.execute('vulkaninfo --summary')
+		// Some SDK builds write their update manifest into the process working
+		// directory. Keep diagnostics from leaving residue in the user's repo.
+		result := os.execute('cd ${os.quoted_path(os.temp_dir())} && vulkaninfo --summary')
 		if result.exit_code == 0 {
 			println('[ok]       Vulkan loader enumerated a physical device')
 		} else {
