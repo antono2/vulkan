@@ -150,6 +150,10 @@ jobs:
           curl --fail --silent --show-error --location \
             "https://raw.githubusercontent.com/zeux/volk/$volk_commit/volk.c" \
             --output "$VULKAN_SDK/include/volk/volk.c"
+      - name: Verify the public setup diagnostics
+        if: matrix.v-channel != 'master' || steps.setup_v_master.outcome == 'success'
+        shell: bash
+        run: v run setup.vsh --check
       - name: Assemble isolated module
         if: matrix.v-channel != 'master' || steps.setup_v_master.outcome == 'success'
         shell: bash

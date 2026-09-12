@@ -1,154 +1,213 @@
-#!/usr/bin/env -S v
+#!/usr/bin/env -S v run
 
-/*
-  This script will download the current Vulkan Software Development Kit for your Operating System.
-  It will not setup the required environment variables.
-  Plase take a look at https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html
-*/
+// Installs and verifies the native prerequisites used by antono2.vulkan.
+// Running without arguments performs the installation. Use --check for a
+// read-only diagnostic pass suitable for support requests and CI.
 
-import net.http as web
-import json2
+import os
 
-struct VulkanVersions {
-mut:
-	linux   string
-	mac     string
-	windows string
-	warm    string
+const usage = 'Usage: v run setup.vsh [--install|--check]\n\n' + '  --install  Install native Vulkan development tools and this V module (default).\n' + '  --check    Only report whether the compiler, SDK/headers, loader, and device work.\n'
+
+fn command_exists(name string) bool {
+	os.find_abs_path_of_executable(name) or { return false }
+	return true
 }
 
-enum CurOS {
-	linux
-	macos
-	windows
-	warm
-	other
-}
-
-// print command then execute it
-fn sh(cmd string) {
-	println('❯ ${cmd}')
-	print(execute_or_exit(cmd).output)
-}
-
-versions_path := 'AvailableVulkanVersions.json'
-
-web.download_file('https://vulkan.lunarg.com/sdk/latest.json', versions_path) or { panic('Could not download the latest Vulkan SDK version. ${err}') }
-
-versions_json := read_file(versions_path) or { panic('Could not read file ${versions_path}. ${err}') }
-
-println('Got current versions:')
-println(versions_json)
-
-versions := json2.decode[VulkanVersions](versions_json) or { panic('Could not decode json for latest Vulkan SDK version. ${err}') }
-
-mut version := 'none'
-
-mut cur_os := CurOS.other
-
-mut download_url := 'none'
-
-$if linux {
-	version = versions.linux
-	cur_os = CurOS.linux
-	download_url = 'https://sdk.lunarg.com/sdk/download/${version}/linux/vulkan_sdk.tar.xz'
-}
-
-$if macos {
-	version = versions.mac
-	cur_os = CurOS.macos
-	download_url = 'https://sdk.lunarg.com/sdk/download/${version}/mac/vulkansdk-macos-${version}.zip'
-}
-
-$if windows {
-	version = versions.windows
-	cur_os = CurOS.windows
-	download_url = 'https://sdk.lunarg.com/sdk/download/${version}/windows/vulkansdk-windows-X64-${version}.exe'
-}
-
-// Any other os/platform. Assuming windows arm
-if version == 'none' {
-	version = versions.warm
-	cur_os = CurOS.warm
-	download_url = 'https://sdk.lunarg.com/sdk/download/${version}/warm/vulkansdk-windows-ARM64-${version}.exe'
-}
-
-// splits the string into an array of strings at the given delimiter, starting from the right. If delim is empty the string is split by it"s characters.
-file_name := download_url.rsplit('/')[0]
-
-download_dir := vmodules_dir()
-
-file_path := join_path_single(download_dir, file_name)
-
-println('Downloading to ${file_path}')
-println('from')
-println('${download_url}')
-web.download_file(download_url, file_path) or { panic('Could not download Vulkan SDK from ${download_url}. ${err}') }
-println('Saved Vulkan Software Development Kit to')
-println(file_path)
-
-match cur_os {
-	.linux {
-		println('Unpacking to ${download_dir}')
-		sh('tar xf ${file_path} -C ${download_dir}')
-		println('Got all the files, but thats not enough.')
-		println('Please take a look at ${download_dir}/${version}/README.txt')
-		println('Manually append this to your ~/.bashrc to make required environment variables permanent:')
-		println('source ${download_dir}/${version}/setup-env.sh')
+fn run(command string) ! {
+	println('\n> ${command}')
+	result := os.execute(command)
+	if result.output.trim_space() != '' {
+		println(result.output.trim_right('\r\n'))
 	}
-	.windows {
-		println('Go double click ${file_path}. It will run the setup and configure your environment variables.')
-	}
-	.macos {
-		println('SDK available to unpack at ${file_path}')
-	}
-	.warm {
-		println('SDK available at ${file_path}')
-	}
-	else {
-		println('SDK available at ${file_path}')
+	if result.exit_code != 0 {
+		return error('command failed with exit code ${result.exit_code}')
 	}
 }
 
-println('')
-println('Checking which environment variables are already set:')
+fn install_linux() ! {
+	if command_exists('apt-get') {
+		run('sudo apt-get update')!
+		run('sudo apt-get install -y build-essential libvulkan-dev libvulkan-volk-dev mesa-vulkan-drivers vulkan-tools')!
+		return
+	}
+	if command_exists('dnf') {
+		run('sudo dnf install -y gcc gcc-c++ vulkan-headers vulkan-loader-devel volk-devel vulkan-tools mesa-vulkan-drivers')!
+		return
+	}
+	if command_exists('pacman') {
+		run('sudo pacman -S --needed --noconfirm base-devel vulkan-headers vulkan-icd-loader vulkan-tools volk')!
+		return
+	}
+	if command_exists('zypper') {
+		run('sudo zypper --non-interactive install -y gcc gcc-c++ vulkan-devel vulkan-tools volk-devel')!
+		return
+	}
+	return error('unsupported Linux package manager; install Vulkan headers, the loader, Volk, vulkaninfo, and a Vulkan ICD, then rerun with --check')
+}
 
-env_vk_sdk := $env("VULKAN_SDK")
+fn install_macos() ! {
+	if !command_exists('curl') || !command_exists('ditto') {
+		return error('curl and ditto are required for automatic macOS setup')
+	}
+	cache_root := os.join_path(os.cache_dir(), 'antono2', 'vulkan-sdk')
+	archive := os.join_path(cache_root, 'vulkan_sdk.zip')
+	unpacked := os.join_path(cache_root, 'unpacked')
+	os.mkdir_all(unpacked)!
+	run('curl --fail --location --output ${os.quoted_path(archive)} https://sdk.lunarg.com/sdk/download/latest/mac/vulkan_sdk.zip')!
+	run('ditto -x -k ${os.quoted_path(archive)} ${os.quoted_path(unpacked)}')!
+	found := os.execute('find ${os.quoted_path(unpacked)} -type f -path "*/InstallVulkan*.app/Contents/MacOS/InstallVulkan*" -print -quit')
+	installer := found.output.trim_space()
+	if found.exit_code != 0 || installer == '' {
+		return error('the downloaded Vulkan SDK did not contain the expected macOS installer')
+	}
+	install_root := os.join_path(os.home_dir(), 'VulkanSDK')
+	run('sudo ${os.quoted_path(installer)} --root ${os.quoted_path(install_root)} --accept-licenses --default-answer --confirm-command install com.lunarg.vulkan.core com.lunarg.vulkan.usr com.lunarg.vulkan.volk')!
+}
 
-if env_vk_sdk != '' {
-	println('VULKAN_SDK is GOOD.')
-	env_path := $env("PATH")
-	if env_path.contains('${env_vk_sdk}') {
-		println('PATH is GOOD.')
+fn install_windows() ! {
+	if !command_exists('winget') {
+		return error('winget is required for automatic Windows setup; install Microsoft App Installer, then try again')
+	}
+	run('winget install --id KhronosGroup.VulkanSDK --exact --accept-package-agreements --accept-source-agreements')!
+	value := os.execute('powershell -NoProfile -Command "[Environment]::GetEnvironmentVariable(\'VULKAN_SDK\', \'Machine\')"')
+	if value.exit_code == 0 && value.output.trim_space() != '' {
+		os.setenv('VULKAN_SDK', value.output.trim_space(), true)
+	}
+	println('\nThe Vulkan SDK installer updates VULKAN_SDK and PATH for new terminals.')
+}
+
+fn install_native() ! {
+	$if linux {
+		install_linux()!
+	} $else $if macos {
+		install_macos()!
+	} $else $if windows {
+		install_windows()!
+	} $else {
+		return error('automatic setup is not supported on this operating system')
+	}
+}
+
+fn find_vulkan_header() string {
+	mut roots := []string{}
+	if sdk := os.getenv_opt('VULKAN_SDK') {
+		roots << sdk
+	}
+	$if windows {
+		if program_files := os.getenv_opt('ProgramFiles') {
+			roots << os.join_path(program_files, 'VulkanSDK')
+		}
+	} $else {
+		roots << ['/usr', '/usr/local', '/opt/homebrew']
+	}
+	for root in roots {
+		for relative in ['include/vulkan/vulkan.h', 'Include/vulkan/vulkan.h'] {
+			candidate := os.join_path(root, relative)
+			if os.is_file(candidate) {
+				return candidate
+			}
+		}
+	}
+	return ''
+}
+
+fn find_volk_header() string {
+	mut roots := []string{}
+	if sdk := os.getenv_opt('VULKAN_SDK') {
+		roots << sdk
+	}
+	$if windows {
+		if program_files := os.getenv_opt('ProgramFiles') {
+			roots << os.join_path(program_files, 'VulkanSDK')
+		}
+	} $else {
+		roots << ['/usr', '/usr/local', '/opt/homebrew']
+	}
+	for root in roots {
+		for relative in ['include/volk.h', 'include/volk/volk.h', 'Include/volk.h',
+			'Include/volk/volk.h'] {
+			candidate := os.join_path(root, relative)
+			if os.is_file(candidate) {
+				return candidate
+			}
+		}
+	}
+	return ''
+}
+
+fn report_command(name string, required bool) bool {
+	if path := os.find_abs_path_of_executable(name) {
+		println('[ok]       ${name}: ${path}')
+		return true
+	}
+	label := if required { 'missing' } else { 'optional' }
+	println('[${label}] ${name}')
+	return !required
+}
+
+fn check() bool {
+	println('\nVulkan setup check')
+	println('------------------')
+	mut ok := true
+	ok = report_command('v', true) && ok
+	$if windows {
+		report_command('cl', false)
+	} $else {
+		ok = report_command('cc', true) && ok
+	}
+	header := find_vulkan_header()
+	if header == '' {
+		println('[missing] Vulkan headers')
+		ok = false
 	} else {
-		println('PATH is NOT SET for vulkan.')
-		println('Should be something like ${env_vk_sdk}/bin')
+		println('[ok]       Vulkan header: ${header}')
 	}
-} else {
-	println('VULKAN_SDK is NOT SET.')
+	volk := find_volk_header()
+	if volk == '' {
+		println('[missing] Volk header')
+		ok = false
+	} else {
+		println('[ok]       Volk header: ${volk}')
+	}
+	if command_exists('vulkaninfo') {
+		result := os.execute('vulkaninfo --summary')
+		if result.exit_code == 0 {
+			println('[ok]       Vulkan loader enumerated a physical device')
+		} else {
+			println('[warning]  vulkaninfo is installed, but no usable device was enumerated')
+			println('           Install or update the GPU vendor driver; the SDK does not provide a hardware driver.')
+		}
+	} else {
+		println('[warning]  vulkaninfo is unavailable; SDK/loader runtime verification was skipped')
+	}
+	return ok
 }
 
-if $env("LD_LIBRARY_PATH") != ''
-	&& $env("LD_LIBRARY_PATH").contains($env("VULKAN_SDK")) {
-	println('LD_LIBRARY_PATH is GOOD.')
-} else {
-	println('LD_LIBRARY_PATH is NOT SET.')
-}
-
-if $env("VK_LAYER_PATH") != '' {
-	println('VK_LAYER_PATH is GOOD.')
-} else {
-	println('VK_LAYER_PATH is NOT SET.')
-}
-
-if $env("VK_ADD_LAYER_PATH") != '' {
-	println('VK_ADD_LAYER_PATH is GOOD.')
-} else {
-	println('VK_ADD_LAYER_PATH is NOT SET.')
-}
-
-if $env("PKG_CONFIG_PATH") != '' {
-	println('PKG_CONFIG_PATH is GOOD.')
-} else {
-	println('PKG_CONFIG_PATH is NOT SET.')
+fn main() {
+	if os.args.len > 2 || (os.args.len == 2 && os.args[1] !in ['--install', '--check', '-h', '--help']) {
+		eprintln(usage)
+		exit(2)
+	}
+	if os.args.len == 2 && os.args[1] in ['-h', '--help'] {
+		println(usage)
+		return
+	}
+	install := os.args.len == 1 || os.args[1] == '--install'
+	if install {
+		install_native() or {
+			eprintln('Setup failed: ${err}')
+			exit(1)
+		}
+		if command_exists('v') {
+			run('v install antono2.vulkan') or {
+				eprintln('Could not install the V module: ${err}')
+				exit(1)
+			}
+		}
+	}
+	if !check() {
+		eprintln('\nSetup is incomplete. Resolve the missing items above and rerun with --check.')
+		exit(1)
+	}
+	println('\nVulkan development prerequisites are ready.')
 }

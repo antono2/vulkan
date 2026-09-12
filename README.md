@@ -13,20 +13,27 @@ The package follows the semantic version in `v.mod`; `VERSION` records the
 Vulkan registry snapshot, while `REGISTRY_COMMIT` and `VOLK_COMMIT` make the
 CI header and loader inputs reproducible.
 
-## Dependencies
-Please install the [Vulkan SDK](https://vulkan.lunarg.com/sdk/home) and set the [environment variables](https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html)
+## One-command setup
 
-After installing the module, `setup.vsh` can optionally download the current
-SDK archive or installer for your platform:
+Install the native Vulkan development prerequisites and this V module:
 
 ```sh
 v run ~/.vmodules/antono2/vulkan/setup.vsh
 ```
 
-The helper only downloads (and, on Linux, unpacks) the SDK. It does not install
-the SDK or configure the required environment variables for you. CI does not
-use this helper; it installs the registry-matched headers and pinned Volk
-revision recorded by this repository.
+From a source checkout, use `v run setup.vsh`. The script supports Ubuntu and
+Debian, Fedora, Arch, openSUSE, macOS, and Windows with winget.
+It installs headers, the Vulkan loader, Volk, diagnostic tools, and the VPM
+module, then verifies the result. For a read-only support check, run:
+
+```sh
+v run setup.vsh --check
+```
+
+The SDK and loader cannot supply a hardware Vulkan implementation. If
+`vulkaninfo` cannot enumerate a device after setup, install or update the GPU
+vendor's driver. CI uses registry-matched headers and the pinned Volk revision
+recorded by this repository rather than this convenience installer.
 
 ## Supported toolchains
 
