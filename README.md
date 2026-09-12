@@ -153,5 +153,6 @@ The generator is located at [antono2/v_vulkan_bindings](https://github.com/anton
 
 # Thanks
 Big thanks to [@spytheman](https://github.com/spytheman) for fixing my bugs in times of need.</br>
+Big thanks to [Alexander Medvednikov (@medvednikov)](https://github.com/medvednikov) for creating V and for his relentless productivity.</br>
 To [@JalonSolov](https://github.com/JalonSolov) for quick and solid answers to obscure questions.</br>
 The awesome team at [V](https://vlang.io/) for making this possible.
