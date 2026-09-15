@@ -126,6 +126,14 @@ jobs:
           ref: be46d432d93a61e79bff9e5ba4ed3f8547586708
           path: .ci-v-source/vc
           fetch-depth: 1
+      - name: Check out the matching v3 TinyCC runtime
+        if: matrix.v-channel == 'v3' && steps.checkout_v_source.outcome == 'success'
+        uses: actions/checkout@v7
+        with:
+          repository: vlang/tccbin
+          ref: d6e7ac1b1bcc98aed734a6ecbfa8509f24606c74
+          path: .ci-v-source/thirdparty/tcc
+          fetch-depth: 1
       - name: Build source V compiler
         if: matrix.v-channel != 'stable' && steps.checkout_v_source.outcome == 'success'
         id: setup_v_source
