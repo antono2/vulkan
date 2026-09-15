@@ -64,15 +64,41 @@ fn install_macos() ! {
 	run('sudo ${os.quoted_path(installer)} --root ${os.quoted_path(install_root)} --accept-licenses --default-answer --confirm-command install com.lunarg.vulkan.core com.lunarg.vulkan.usr com.lunarg.vulkan.volk')!
 }
 
+fn windows_vulkan_sdk() string {
+	mut candidates := [os.getenv('VULKAN_SDK')]
+	machine_value := os.execute('powershell -NoProfile -Command "[Environment]::GetEnvironmentVariable(\'VULKAN_SDK\', \'Machine\')"')
+	if machine_value.exit_code == 0 {
+		candidates << machine_value.output.trim_space()
+	}
+	for candidate in candidates {
+		if candidate == '' {
+			continue
+		}
+		for relative in ['include/vulkan/vulkan.h', 'Include/vulkan/vulkan.h'] {
+			if os.is_file(os.join_path(candidate, relative)) {
+				return candidate
+			}
+		}
+	}
+	return ''
+}
+
 fn install_windows() ! {
+	installed_sdk := windows_vulkan_sdk()
+	if installed_sdk != '' {
+		os.setenv('VULKAN_SDK', installed_sdk, true)
+		println('Using the installed Vulkan SDK at ${installed_sdk}.')
+		return
+	}
 	if !command_exists('winget') {
 		return error('winget is required for automatic Windows setup; install Microsoft App Installer, then try again')
 	}
 	run('winget install --id KhronosGroup.VulkanSDK --exact --accept-package-agreements --accept-source-agreements')!
-	value := os.execute('powershell -NoProfile -Command "[Environment]::GetEnvironmentVariable(\'VULKAN_SDK\', \'Machine\')"')
-	if value.exit_code == 0 && value.output.trim_space() != '' {
-		os.setenv('VULKAN_SDK', value.output.trim_space(), true)
+	sdk_root := windows_vulkan_sdk()
+	if sdk_root == '' {
+		return error('the Vulkan SDK installer completed, but no installation containing Vulkan headers was found')
 	}
+	os.setenv('VULKAN_SDK', sdk_root, true)
 	println('\nThe Vulkan SDK installer updates VULKAN_SDK and PATH for new terminals.')
 }
 
