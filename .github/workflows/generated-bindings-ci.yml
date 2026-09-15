@@ -118,13 +118,25 @@ jobs:
           ref: ${{ matrix.v-version }}
           path: .ci-v-source
           fetch-depth: 1
+      - name: Check out the matching v3 bootstrap source
+        if: matrix.v-channel == 'v3' && steps.checkout_v_source.outcome == 'success'
+        uses: actions/checkout@v7
+        with:
+          repository: vlang/vc
+          ref: be46d432d93a61e79bff9e5ba4ed3f8547586708
+          path: .ci-v-source/vc
+          fetch-depth: 1
       - name: Build source V compiler
         if: matrix.v-channel != 'stable' && steps.checkout_v_source.outcome == 'success'
         id: setup_v_source
         continue-on-error: ${{ matrix.v-channel == 'master' }}
         shell: bash
         run: |
-          make -C .ci-v-source
+          if [[ "${{ matrix.v-channel }}" == v3 ]]; then
+            make -C .ci-v-source local=1
+          else
+            make -C .ci-v-source
+          fi
           echo "$GITHUB_WORKSPACE/.ci-v-source" >> "$GITHUB_PATH"
           .ci-v-source/v -V
       - name: Install Vulkan SDK and SwiftShader test artifacts
