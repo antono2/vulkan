@@ -6,10 +6,30 @@ in `VERSION`.
 
 ## Unreleased
 
+## 1.8.0 - 2026-09-22
+
+### Added
+
+- A pinned, source-built strict V3 advisory lane alongside the released-V and
+  moving-master compatibility checks.
+
 ### Changed
 
+- Refresh the generated bindings to Vulkan registry snapshot `v1.4.363` and
+  record the exact Vulkan-Headers revision used to produce them.
+- Reuse an installed Vulkan SDK from the cross-platform one-command
+  `setup.vsh` flow and keep its diagnostics outside project directories.
+- Derive the expected Vulkan header patch from `VERSION` instead of maintaining
+  a second hard-coded value in CI.
 - Clarify which examples are headless versus windowed and ignore local native
   compiler products created while running examples.
+
+### Fixed
+
+- Preserve and compile the Vulkan loader bridge with generated updates and
+  current V toolchains.
+- Keep Volk implementation inclusion idempotent when strict V3 concatenates the
+  module's C helper more than once.
 
 ## 1.7.0 - 2026-09-09
 
