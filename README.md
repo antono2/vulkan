@@ -51,8 +51,8 @@ still support every command, extension, and feature an application requests.
 Current V master selects V3 by default and can fall back to its V 0.5.2
 compatibility compiler. CI therefore requires the pinned strict
 `-new-compiler` frontend to parse and type-check the public module. Its full C
-backend remains advisory while it emits unused platform-only Vulkan callback
-types on unsupported hosts. The unpinned moving-master lane is also advisory
+backend remains advisory while compiler compatibility is being verified.
+The unpinned moving-master lane is also advisory
 so an unrelated upstream compiler regression cannot block Vulkan maintenance.
 
 ## Install
@@ -77,6 +77,21 @@ vk.load_instance_commands(instance)
 // create the Vulkan device
 vk.load_device_commands(device)
 ```
+
+### Platform extensions
+
+Enable a platform extension when building code that uses its raw types or
+commands. The V flag also enables the matching Vulkan C header macro:
+
+```sh
+v -d vulkan_xlib run your_app.v
+```
+
+For XCB or Wayland, use `vulkan_xcb` or `vulkan_wayland` instead. Other flags
+follow the registry platform names, such as `vulkan_win32`, `vulkan_android`,
+and `vulkan_metal`. Install the native headers for the selected platform.
+Extension name and spec-version constants are available without these flags,
+so applications can still query extension support before selecting a backend.
 
 ### Historical Vulkan versions
 
