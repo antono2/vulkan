@@ -7,6 +7,4 @@ module c
 #flag darwin -I$env('VULKAN_SDK')/include/volk
 #flag windows -I$env('VULKAN_SDK')/Include
 #flag windows -I$env('VULKAN_SDK')/Include/volk
-#define VK_NO_PROTOTYPES
-#define VOLK_IMPLEMENTATION
-#include <volk.h>
+#include "@VMODROOT/c/volk_impl.h"
