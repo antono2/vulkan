@@ -100,6 +100,11 @@ device.queue.submit([command_buffer], submit_options)!
 println('${physical_device.name()}: queue family ${device.queue.family_index}')
 ```
 
+For steady-state render loops, prepare raw handle slices once and use
+`queue.submit_handles(command_buffers, options)`. That additive path borrows
+the slices for the duration of `vkQueueSubmit` and performs no wrapper-side
+allocations. The typed `submit()` call remains the convenient checked default.
+
 `Queue` is borrowed from its parent `Device` and becomes invalid when that device is destroyed. `Device.queues` contains every requested queue in request and queue-index order, while `Device.queue` remains the selected legacy queue or the first multi-queue request for compatibility. Queue requests are grouped by distinct family, and each priority maps to the same zero-based queue index in that family. The convenience API creates ordinary queues with zero `VkDeviceQueueCreateFlags`; protected or otherwise flagged queue configurations remain available through the raw API. `OwnedBuffer` exposes its raw buffer and memory handles, requested size, allocation size, and selected memory-type index. Its `destroy()` method always destroys the buffer before freeing its memory; callers must destroy every buffer before destroying the parent device. `PhysicalDevice.find_memory_type()` applies both the resource's allowed-memory-type bit mask and the complete required property mask.
 
 `CommandPool` belongs to its parent `Device` and is fixed to one requested queue-family index. `new_command_pool()` uses `Device.queue`; `new_command_pool_for_queue()` accepts any queue borrowed from that device and rejects foreign queues. `PrimaryCommandBuffer` retains the exact device and pool handles needed by `free()`, while its public raw `handle` remains available for recording and submission. `free()` is idempotent and clears that raw handle. Reset, begin, and end failures are returned as typed `VulkanError` values. Destroying a command pool implicitly frees and invalidates all command buffers still allocated from it; callers may either free buffers explicitly before pool destruction or rely on that Vulkan lifetime rule, but must never use or free a buffer after its pool is destroyed. Every command pool must be destroyed before its parent device.
