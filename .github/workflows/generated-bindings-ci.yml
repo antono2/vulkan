@@ -198,6 +198,16 @@ jobs:
             ergonomic/presentation.v ergonomic/resources.v \
             "$module_root/ergonomic/"
           echo "VMODULES=$RUNNER_TEMP/vmodules" >> "$GITHUB_ENV"
+      - name: Type-check with the strict V3 frontend
+        if: matrix.v-channel == 'v3'
+        shell: bash
+        run: |
+          set -euo pipefail
+          v \
+            -new-compiler \
+            -check \
+            -cflags "-I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include -I$VULKAN_SDK/include/volk" \
+            generator/test/main.c.v
       - name: Compile smoke test and ergonomic unit tests
         id: compile
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
@@ -234,7 +244,7 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ matrix.v-channel }}" == v3 ]]; then
-            echo "::warning::Strict V3 remains advisory while its C backend emits platform-specific Vulkan callback types on unsupported hosts."
+            echo "::warning::The required strict V3 frontend passed, but its advisory C backend still emits platform-specific callback types on unsupported hosts."
           else
             echo "::warning::The moving V master compatibility lane failed; stable V 0.5.2 remains authoritative."
           fi
