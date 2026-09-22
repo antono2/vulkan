@@ -40,7 +40,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 362
+pub const header_version = 363
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -1468,6 +1468,7 @@ pub enum StructureType as u32 {
 	image_tiling_control_create_info_ext                                        = 1000687001
 	physical_device_cooperative_matrix_decode_vector_features_nv                = 1000689000
 	physical_device_private_data_base_handle_features_nv                        = 1000707000
+	physical_device_info_properties_intel                                       = 1000708000
 	physical_device_buffer_device_address_allocation_alignment_features_valve   = 1000709000
 	physical_device_buffer_device_address_allocation_alignment_properties_valve = 1000709001
 	buffer_device_address_alignment_allocate_info_valve                         = 1000709002
@@ -38239,6 +38240,21 @@ pub mut:
 	sType                 StructureType = StructureType.physical_device_private_data_base_handle_features_nv
 	pNext                 voidptr       = unsafe { nil }
 	privateDataBaseHandle Bool32
+}
+
+pub const intel_device_info_spec_version = 1
+pub const intel_device_info_extension_name = c'VK_INTEL_device_info'
+// PhysicalDeviceInfoPropertiesINTEL extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceInfoPropertiesINTEL = C.VkPhysicalDeviceInfoPropertiesINTEL
+
+@[typedef]
+pub struct C.VkPhysicalDeviceInfoPropertiesINTEL {
+pub mut:
+	sType                   StructureType = StructureType.physical_device_info_properties_intel
+	pNext                   voidptr       = unsafe { nil }
+	deviceIpVersionArch     u32
+	deviceIpVersionRelease  u32
+	deviceIpVersionRevision u32
 }
 
 pub const valve_buffer_device_address_allocation_alignment_spec_version = 1
