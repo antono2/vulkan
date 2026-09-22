@@ -20,7 +20,7 @@ pub:
 
 // new_instance_with_options validates requested layers and extensions, owns
 // their temporary C pointer arrays, and creates a loader-ready instance.
-pub fn new_instance_with_options(options InstanceOptions) !Instance {
+pub fn new_instance_with_options(options InstanceOptions) !&OwnedInstance {
 	available_extensions := extension_names(instance_extensions()!)
 	validate_requested_names('instance extensions', options.extensions, available_extensions)!
 	available_layers := layer_names(instance_layers()!)
@@ -35,19 +35,19 @@ pub fn new_instance_with_options(options InstanceOptions) !Instance {
 		extension_pointers << extension.str
 	}
 	mut application := vk.ApplicationInfo{
-		pApplicationName: options.application_name.str
+		pApplicationName:   options.application_name.str
 		applicationVersion: options.application_version
-		pEngineName: options.engine_name.str
-		engineVersion: options.engine_version
-		apiVersion: options.api_version
+		pEngineName:        options.engine_name.str
+		engineVersion:      options.engine_version
+		apiVersion:         options.api_version
 	}
 	create_info := vk.InstanceCreateInfo{
-		pNext: options.p_next
-		flags: options.flags
-		pApplicationInfo: &application
-		enabledLayerCount: u32(layer_pointers.len)
-		ppEnabledLayerNames: layer_pointers.data
-		enabledExtensionCount: u32(extension_pointers.len)
+		pNext:                   options.p_next
+		flags:                   options.flags
+		pApplicationInfo:        &application
+		enabledLayerCount:       u32(layer_pointers.len)
+		ppEnabledLayerNames:     layer_pointers.data
+		enabledExtensionCount:   u32(extension_pointers.len)
 		ppEnabledExtensionNames: extension_pointers.data
 	}
 	return new_instance(&create_info)
@@ -67,7 +67,7 @@ pub:
 // queue_family, queue_index, and queue_priority preserve the original
 // single-queue API. Set queue_requests to request queues from one or more
 // families; it cannot be combined with those legacy fields. The first queue
-// in queue_requests becomes Device.queue.
+// in queue_requests becomes OwnedDevice.queue.
 pub struct DeviceOptions {
 pub:
 	queue_family     QueueFamily
@@ -76,7 +76,7 @@ pub:
 	queue_requests   []DeviceQueueRequest
 	extensions       []string
 	enabled_features &vk.PhysicalDeviceFeatures = unsafe { nil }
-	p_next           voidptr = unsafe { nil }
+	p_next           voidptr                    = unsafe { nil }
 }
 
 struct DeviceQueuePlan {
@@ -120,14 +120,14 @@ fn device_queue_plan(options DeviceOptions) !DeviceQueuePlan {
 		// targets a queue which was not created.
 		priorities := []f32{len: int(options.queue_index) + 1, init: options.queue_priority}
 		return DeviceQueuePlan{
-			requests: [
+			requests:             [
 				DeviceQueueRequest{
 					queue_family: options.queue_family
-					priorities: priorities
+					priorities:   priorities
 				},
 			]
 			primary_family_index: options.queue_family.index
-			primary_queue_index: options.queue_index
+			primary_queue_index:  options.queue_index
 		}
 	}
 
@@ -145,16 +145,16 @@ fn device_queue_plan(options DeviceOptions) !DeviceQueuePlan {
 		seen_families[request.queue_family.index] = true
 	}
 	return DeviceQueuePlan{
-		requests: options.queue_requests.clone()
+		requests:             options.queue_requests.clone()
 		primary_family_index: options.queue_requests[0].queue_family.index
-		primary_queue_index: 0
+		primary_queue_index:  0
 	}
 }
 
 // new_device_with_options validates queue requests and device extensions,
 // then creates a logical device while retaining all temporary priority and
 // pointer arrays through vkCreateDevice.
-pub fn (physical_device PhysicalDevice) new_device_with_options(options DeviceOptions) !Device {
+pub fn (physical_device PhysicalDevice) new_device_with_options(options DeviceOptions) !&OwnedDevice {
 	queue_plan := device_queue_plan(options)!
 	available_extensions := extension_names(physical_device.extensions()!)
 	validate_requested_names('device extensions', options.extensions, available_extensions)!
@@ -171,17 +171,17 @@ pub fn (physical_device PhysicalDevice) new_device_with_options(options DeviceOp
 	for request_index, request in queue_plan.requests {
 		queue_infos << vk.DeviceQueueCreateInfo{
 			queueFamilyIndex: request.queue_family.index
-			queueCount: u32(priority_groups[request_index].len)
+			queueCount:       u32(priority_groups[request_index].len)
 			pQueuePriorities: priority_groups[request_index].data
 		}
 	}
 	create_info := vk.DeviceCreateInfo{
-		pNext: options.p_next
-		queueCreateInfoCount: u32(queue_infos.len)
-		pQueueCreateInfos: queue_infos.data
-		enabledExtensionCount: u32(extension_pointers.len)
+		pNext:                   options.p_next
+		queueCreateInfoCount:    u32(queue_infos.len)
+		pQueueCreateInfos:       queue_infos.data
+		enabledExtensionCount:   u32(extension_pointers.len)
 		ppEnabledExtensionNames: extension_pointers.data
-		pEnabledFeatures: options.enabled_features
+		pEnabledFeatures:        options.enabled_features
 	}
 	mut handle := vk.Device(unsafe { nil })
 	require_success(vk.create_device(physical_device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateDevice')!
@@ -194,10 +194,10 @@ pub fn (physical_device PhysicalDevice) new_device_with_options(options DeviceOp
 			mut queue_handle := vk.Queue(unsafe { nil })
 			vk.get_device_queue(handle, request.queue_family.index, u32(queue_index), &queue_handle)
 			queue := Queue{
-				device: handle
-				handle: queue_handle
+				device:       handle
+				handle:       queue_handle
 				family_index: request.queue_family.index
-				index: u32(queue_index)
+				index:        u32(queue_index)
 			}
 			queues << queue
 			if queue.family_index == queue_plan.primary_family_index
@@ -206,11 +206,11 @@ pub fn (physical_device PhysicalDevice) new_device_with_options(options DeviceOp
 			}
 		}
 	}
-	return Device{
+	return &OwnedDevice{
 		physical_device: physical_device
-		handle: handle
-		queue: primary_queue
-		queues: queues
+		handle:          handle
+		queue:           primary_queue
+		queues:          queues
 	}
 }
 

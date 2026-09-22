@@ -6,9 +6,9 @@ The generated `vulkan.v` and `vulkan_video.v` files remain the complete, low-lev
 
 - Raw Vulkan handles remain available through a public `handle` field. Wrappers do not hide escape hatches needed for extensions or interoperability.
 - A negative `VkResult` becomes a typed `VulkanError` containing both the original result and the operation name. `check` preserves non-negative statuses; `require_success` enforces exact success where that is the operation's contract.
-- Constructors return V results (`!T`) and perform required loader/dispatch setup.
-- Vulkan objects use explicit `destroy()` methods. There are no implicit finalizers, and each successfully created owned object must be destroyed exactly once.
-- V value structs are copyable. Copying an owning wrapper does not transfer ownership; exactly one copy may perform destruction. A future breaking release should move ownership state behind a shared control block so copied wrappers cannot double-destroy a native handle.
+- Constructors return owned pointers in V results (`!&T`) and perform required loader/dispatch setup.
+- Vulkan objects use explicit `destroy()` methods. There are no implicit finalizers. Cleanup is mutable and idempotent, and each successfully created child must be destroyed before its parent.
+- Owning wrappers are `@[nocopy]`: keep their returned pointers in `mut` variables and pass those pointers directly instead of copying values or adding another `&`. Borrowed handles and discovery snapshots remain copyable.
 - Two-call enumerations return V arrays and internally retry `VK_INCOMPLETE`.
 - Generated names and signatures are never edited to improve ergonomics. New wrappers compose them from the submodule.
 
@@ -27,7 +27,7 @@ app := vk.ApplicationInfo{
 info := vk.InstanceCreateInfo{
 	pApplicationInfo: &app
 }
-instance := vke.new_instance(&info)!
+mut instance := vke.new_instance(&info)!
 defer {
 	instance.destroy()
 }
@@ -36,28 +36,28 @@ required := u32(vk.QueueFlagBits.graphics) | u32(vk.QueueFlagBits.compute)
 queue_family := physical_device.find_queue_family(required) or {
 	return error('no graphics/compute queue family')
 }
-device := physical_device.new_device(queue_family)!
+mut device := physical_device.new_device(queue_family)!
 defer {
 	device.destroy()
 }
 usage := u32(vk.BufferUsageFlagBits.vertex_buffer) | u32(vk.BufferUsageFlagBits.transfer_dst)
 memory_properties := u32(vk.MemoryPropertyFlagBits.device_local)
-buffer := device.new_buffer(4096, usage, memory_properties)!
+mut buffer := device.new_buffer(4096, usage, memory_properties)!
 defer {
 	buffer.destroy()
 }
 image_usage := u32(vk.ImageUsageFlagBits.sampled) | u32(vk.ImageUsageFlagBits.transfer_dst)
-image := device.new_image_2d(640, 480, .r8g8b8a8_unorm, .optimal, image_usage,
+mut image := device.new_image_2d(640, 480, .r8g8b8a8_unorm, .optimal, image_usage,
 	memory_properties)!
 defer {
 	image.destroy()
 }
-view := image.new_view(u32(vk.ImageAspectFlagBits.color))!
+mut view := image.new_view(u32(vk.ImageAspectFlagBits.color))!
 defer {
 	view.destroy()
 }
 pool_flags := u32(vk.CommandPoolCreateFlagBits.reset_command_buffer)
-pool := device.new_command_pool(pool_flags)!
+mut pool := device.new_command_pool(pool_flags)!
 defer {
 	pool.destroy()
 }
@@ -91,10 +91,10 @@ defer {
 	render_finished.destroy()
 }
 submit_options := vke.SubmitOptions{
-	wait_semaphores: [image_ready]
+	wait_semaphores: [image_ready.handle]
 	wait_stage_masks: [u32(vk.PipelineStageFlagBits.color_attachment_output)]
-	signal_semaphores: [render_finished]
-	fence: fence
+	signal_semaphores: [render_finished.handle]
+	fence: fence.handle
 }
 device.queue.submit([command_buffer], submit_options)!
 println('${physical_device.name()}: queue family ${device.queue.family_index}')
@@ -105,13 +105,13 @@ For steady-state render loops, prepare raw handle slices once and use
 the slices for the duration of `vkQueueSubmit` and performs no wrapper-side
 allocations. The typed `submit()` call remains the convenient checked default.
 
-`Queue` is borrowed from its parent `Device` and becomes invalid when that device is destroyed. `Device.queues` contains every requested queue in request and queue-index order, while `Device.queue` remains the selected legacy queue or the first multi-queue request for compatibility. Queue requests are grouped by distinct family, and each priority maps to the same zero-based queue index in that family. The convenience API creates ordinary queues with zero `VkDeviceQueueCreateFlags`; protected or otherwise flagged queue configurations remain available through the raw API. `OwnedBuffer` exposes its raw buffer and memory handles, requested size, allocation size, and selected memory-type index. Its `destroy()` method always destroys the buffer before freeing its memory; callers must destroy every buffer before destroying the parent device. `PhysicalDevice.find_memory_type()` applies both the resource's allowed-memory-type bit mask and the complete required property mask.
+`Queue` is borrowed from its parent `OwnedDevice` and becomes invalid when that device is destroyed. `OwnedDevice.queues` contains every requested queue in request and queue-index order, while `OwnedDevice.queue` remains the selected legacy queue or the first multi-queue request for compatibility. Queue requests are grouped by distinct family, and each priority maps to the same zero-based queue index in that family. The convenience API creates ordinary queues with zero `VkDeviceQueueCreateFlags`; protected or otherwise flagged queue configurations remain available through the raw API. `OwnedBuffer` exposes its raw buffer and memory handles, requested size, allocation size, and selected memory-type index. Its `destroy()` method always destroys the buffer before freeing its memory; callers must destroy every buffer before destroying the parent device. `PhysicalDevice.find_memory_type()` applies both the resource's allowed-memory-type bit mask and the complete required property mask.
 
-`CommandPool` belongs to its parent `Device` and is fixed to one requested queue-family index. `new_command_pool()` uses `Device.queue`; `new_command_pool_for_queue()` accepts any queue borrowed from that device and rejects foreign queues. `PrimaryCommandBuffer` retains the exact device and pool handles needed by `free()`, while its public raw `handle` remains available for recording and submission. `free()` is idempotent and clears that raw handle. Reset, begin, and end failures are returned as typed `VulkanError` values. Destroying a command pool implicitly frees and invalidates all command buffers still allocated from it; callers may either free buffers explicitly before pool destruction or rely on that Vulkan lifetime rule, but must never use or free a buffer after its pool is destroyed. Every command pool must be destroyed before its parent device.
+`OwnedCommandPool` belongs to its parent `OwnedDevice` and is fixed to one requested queue-family index. `new_command_pool()` uses `OwnedDevice.queue`; `new_command_pool_for_queue()` accepts any queue borrowed from that device and rejects foreign queues. `PrimaryCommandBuffer` retains the exact device and pool handles needed by `free()`, while its public raw `handle` remains available for recording and submission. `free()` is idempotent and clears that raw handle. Reset, begin, and end failures are returned as typed `VulkanError` values. Destroying a command pool implicitly frees and invalidates all command buffers still allocated from it; callers may either free buffers explicitly before pool destruction or rely on that Vulkan lifetime rule, but must never use or free a buffer after its pool is destroyed. Every command pool must be destroyed before its parent device.
 
-`Fence` exposes status, timeout-aware waiting, and reset while preserving positive Vulkan statuses such as `VK_NOT_READY` and `VK_TIMEOUT`. `Fence` and `Semaphore` expose their raw handles for submission structures, clear those handles during idempotent destruction, and must be destroyed before their parent device.
+`OwnedFence` exposes status, timeout-aware waiting, and reset while preserving positive Vulkan statuses such as `VK_NOT_READY` and `VK_TIMEOUT`. `OwnedFence` and `OwnedSemaphore` expose their raw handles for submission structures, clear those handles during idempotent destruction, and must be destroyed before their parent device.
 
-`Queue.submit()` accepts a non-empty primary-command-buffer batch plus optional wait semaphores, signal semaphores, and a fence. Every wait semaphore requires a pipeline-stage mask at the same array index; mismatched counts are rejected before Vulkan is called. The helper keeps all temporary raw-handle arrays alive through `vkQueueSubmit`, passes a null fence when none is supplied, returns non-negative Vulkan statuses unchanged, and converts failures to `VulkanError`.
+`Queue.submit()` accepts a non-empty primary-command-buffer batch plus raw wait semaphore handles, signal semaphore handles, and an optional raw fence handle in `SubmitOptions`. Every wait semaphore requires a pipeline-stage mask at the same array index; mismatched counts are rejected before Vulkan is called. Owners expose these handles publicly, so the options stay copyable while the owner wrappers remain `@[nocopy]`. The helper keeps the temporary command-handle array alive through `vkQueueSubmit`, returns non-negative Vulkan statuses unchanged, and converts failures to `VulkanError`.
 
 `OwnedImage` creates a simple exclusive-sharing 2D image with one mip level, one array layer, and one sample. It exposes the raw image and memory handles plus its format, extent, tiling, usage, allocation size, and selected memory type. Destruction releases the image before its bound allocation, and must happen before destroying the parent device. More specialized image creation remains available through the raw layer.
 
@@ -140,7 +140,7 @@ common one-shot map, copy, and unmap sequence.
 `OwnedShaderModule` validates SPIR-V size, alignment, and magic before calling
 Vulkan. Byte input is copied to aligned words for the duration of creation.
 Shader modules and mappings must be destroyed or unmapped before their parent
-resource or device. Device and queue `wait_idle()` helpers preserve typed
+resource or device. Owned-device and queue `wait_idle()` helpers preserve typed
 Vulkan errors.
 
 `ImageLayoutTransition` keeps the synchronization-1 source/destination stage masks, access masks, old/new layouts, dependency flags, and aspect mask explicit. `PrimaryCommandBuffer.transition_image_layout()` records one image-only `vkCmdPipelineBarrier` over the owned image's single mip level and array layer. It does not infer synchronization, track layout state, or perform queue-family ownership transfers; use the raw API for broader ranges, ownership transfers, or synchronization-2 barriers.

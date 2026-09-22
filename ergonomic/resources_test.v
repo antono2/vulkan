@@ -15,7 +15,7 @@ fn test_validate_buffer_range_rejects_empty_and_overflowing_ranges() {
 
 fn test_map_rejects_non_host_visible_memory_before_vulkan_call() {
 	buffer := OwnedBuffer{
-		size: 64
+		size:              64
 		memory_properties: u32(vk.MemoryPropertyFlagBits.device_local)
 	}
 	buffer.map(0, 64, 0) or {
@@ -29,8 +29,8 @@ fn test_write_bytes_checks_range_and_copies_to_coherent_mapping() ! {
 	mut storage := []u8{len: 8}
 	mapping := MappedBufferMemory{
 		memory_properties: u32(vk.MemoryPropertyFlagBits.host_visible) | u32(vk.MemoryPropertyFlagBits.host_coherent)
-		size: 8
-		data: storage.data
+		size:              8
+		data:              storage.data
 	}
 	mapping.write_bytes(2, [u8(7), 8, 9])!
 	assert storage == [u8(0), 0, 7, 8, 9, 0, 0, 0]
@@ -45,8 +45,8 @@ fn test_write_bytes_rejects_noncoherent_mapping() {
 	mut storage := []u8{len: 4}
 	mapping := MappedBufferMemory{
 		memory_properties: u32(vk.MemoryPropertyFlagBits.host_visible)
-		size: 4
-		data: storage.data
+		size:              4
+		data:              storage.data
 	}
 	mapping.write_bytes(0, [u8(1)]) or {
 		assert err.msg() == 'write_bytes requires host-coherent buffer memory'
@@ -66,7 +66,7 @@ fn test_upload_bytes_validates_empty_write_offset_without_vulkan_call() ! {
 }
 
 fn test_shader_validation_rejects_invalid_input_before_vulkan_call() {
-	device := Device{}
+	device := OwnedDevice{}
 	device.new_shader_module([]) or {
 		assert err.msg() == 'SPIR-V code must not be empty'
 		device.new_shader_module([u32(1)]) or {
