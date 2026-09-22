@@ -27,7 +27,7 @@ pub fn is_error(result vk.Result) bool {
 pub fn check(result vk.Result, operation string) !vk.Result {
 	if is_error(result) {
 		return VulkanError{
-			result: result
+			result:    result
 			operation: operation
 		}
 	}
@@ -39,7 +39,7 @@ pub fn check(result vk.Result, operation string) !vk.Result {
 pub fn require_success(result vk.Result, operation string) ! {
 	if result != .success {
 		return VulkanError{
-			result: result
+			result:    result
 			operation: operation
 		}
 	}
@@ -150,7 +150,7 @@ pub fn (device PhysicalDevice) queue_families() []QueueFamily {
 	mut families := []QueueFamily{cap: int(count)}
 	for index, property in properties[..int(count)] {
 		families << QueueFamily{
-			index: u32(index)
+			index:      u32(index)
 			properties: property
 		}
 	}
@@ -222,16 +222,17 @@ pub fn (device Device) new_command_pool_for_queue(queue Queue, flags vk.CommandP
 		return error('queue does not belong to this device')
 	}
 	create_info := vk.CommandPoolCreateInfo{
-		flags: flags
+		flags:            flags
 		queueFamilyIndex: queue.family_index
 	}
 	mut handle := vk.CommandPool(unsafe { nil })
-	require_success(vk.create_command_pool(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateCommandPool')!
+	require_success(vk.create_command_pool(device.handle, &create_info, unsafe { nil }, &handle),
+		'vkCreateCommandPool')!
 	return CommandPool{
-		device: device.handle
-		handle: handle
+		device:             device.handle
+		handle:             handle
 		queue_family_index: queue.family_index
-		flags: flags
+		flags:              flags
 	}
 }
 
@@ -257,19 +258,20 @@ pub fn (pool CommandPool) allocate_primary(count u32) ![]PrimaryCommandBuffer {
 	}
 
 	allocate_info := vk.CommandBufferAllocateInfo{
-		commandPool: pool.handle
-		level: .primary
+		commandPool:        pool.handle
+		level:              .primary
 		commandBufferCount: count
 	}
 	mut handles := unsafe { []vk.CommandBuffer{len: int(count)} }
-	require_success(vk.allocate_command_buffers(pool.device, &allocate_info, handles.data), 'vkAllocateCommandBuffers')!
+	require_success(vk.allocate_command_buffers(pool.device, &allocate_info, handles.data),
+		'vkAllocateCommandBuffers')!
 
 	mut buffers := []PrimaryCommandBuffer{cap: int(count)}
 	for handle in handles {
 		buffers << PrimaryCommandBuffer{
-			device: pool.device
+			device:       pool.device
 			command_pool: pool.handle
-			handle: handle
+			handle:       handle
 		}
 	}
 	return buffers
@@ -296,7 +298,7 @@ pub fn (buffer PrimaryCommandBuffer) reset(flags vk.CommandBufferResetFlags) ! {
 // is intentionally null because it is only meaningful for secondary buffers.
 pub fn (buffer PrimaryCommandBuffer) begin(flags vk.CommandBufferUsageFlags) ! {
 	begin_info := vk.CommandBufferBeginInfo{
-		flags: flags
+		flags:            flags
 		pInheritanceInfo: unsafe { nil }
 	}
 	require_success(vk.begin_command_buffer(buffer.handle, &begin_info), 'vkBeginCommandBuffer')!
@@ -336,27 +338,30 @@ pub fn (device Device) new_buffer(size vk.DeviceSize, usage vk.BufferUsageFlags,
 	}
 
 	create_info := vk.BufferCreateInfo{
-		size: size
-		usage: usage
+		size:        size
+		usage:       usage
 		sharingMode: .exclusive
 	}
 	mut handle := vk.Buffer(unsafe { nil })
-	require_success(vk.create_buffer(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateBuffer')!
+	require_success(vk.create_buffer(device.handle, &create_info, unsafe { nil }, &handle),
+		'vkCreateBuffer')!
 
 	mut requirements := vk.MemoryRequirements{}
 	vk.get_buffer_memory_requirements(device.handle, handle, mut requirements)
 	physical_memory := device.physical_device.memory_properties()
-	memory_type_index := select_memory_type(physical_memory, requirements.memoryTypeBits, required_memory_properties) or {
+	memory_type_index := select_memory_type(physical_memory, requirements.memoryTypeBits,
+		required_memory_properties) or {
 		vk.destroy_buffer(device.handle, handle, unsafe { nil })
 		return error('no compatible memory type for buffer')
 	}
 
 	allocate_info := vk.MemoryAllocateInfo{
-		allocationSize: requirements.size
+		allocationSize:  requirements.size
 		memoryTypeIndex: memory_type_index
 	}
 	mut memory := vk.DeviceMemory(unsafe { nil })
-	require_success(vk.allocate_memory(device.handle, &allocate_info, unsafe { nil }, &memory), 'vkAllocateMemory') or {
+	require_success(vk.allocate_memory(device.handle, &allocate_info, unsafe { nil }, &memory),
+		'vkAllocateMemory') or {
 		vk.destroy_buffer(device.handle, handle, unsafe { nil })
 		return err
 	}
@@ -368,11 +373,11 @@ pub fn (device Device) new_buffer(size vk.DeviceSize, usage vk.BufferUsageFlags,
 	}
 
 	return OwnedBuffer{
-		device: device.handle
-		handle: handle
-		memory: memory
-		size: size
-		allocation_size: requirements.size
+		device:            device.handle
+		handle:            handle
+		memory:            memory
+		size:              size
+		allocation_size:   requirements.size
 		memory_type_index: memory_type_index
 		memory_properties: physical_memory.memoryTypes[memory_type_index].propertyFlags
 	}
@@ -411,37 +416,40 @@ pub fn (device Device) new_image_2d(width u32, height u32, format vk.Format, til
 		return error('image usage must not be empty')
 	}
 	extent := vk.Extent3D{
-		width: width
+		width:  width
 		height: height
-		depth: 1
+		depth:  1
 	}
 	create_info := vk.ImageCreateInfo{
-		imageType: ._2d
-		format: format
-		extent: extent
-		mipLevels: 1
-		arrayLayers: 1
-		samples: ._1
-		tiling: tiling
-		usage: usage
-		sharingMode: .exclusive
+		imageType:     ._2d
+		format:        format
+		extent:        extent
+		mipLevels:     1
+		arrayLayers:   1
+		samples:       ._1
+		tiling:        tiling
+		usage:         usage
+		sharingMode:   .exclusive
 		initialLayout: .undefined
 	}
 	mut handle := vk.Image(unsafe { nil })
-	require_success(vk.create_image(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateImage')!
+	require_success(vk.create_image(device.handle, &create_info, unsafe { nil }, &handle),
+		'vkCreateImage')!
 
 	mut requirements := vk.MemoryRequirements{}
 	vk.get_image_memory_requirements(device.handle, handle, mut requirements)
-	memory_type_index := device.physical_device.find_memory_type(requirements.memoryTypeBits, required_memory_properties) or {
+	memory_type_index := device.physical_device.find_memory_type(requirements.memoryTypeBits,
+		required_memory_properties) or {
 		vk.destroy_image(device.handle, handle, unsafe { nil })
 		return error('no compatible memory type for image')
 	}
 	allocate_info := vk.MemoryAllocateInfo{
-		allocationSize: requirements.size
+		allocationSize:  requirements.size
 		memoryTypeIndex: memory_type_index
 	}
 	mut memory := vk.DeviceMemory(unsafe { nil })
-	require_success(vk.allocate_memory(device.handle, &allocate_info, unsafe { nil }, &memory), 'vkAllocateMemory') or {
+	require_success(vk.allocate_memory(device.handle, &allocate_info, unsafe { nil }, &memory),
+		'vkAllocateMemory') or {
 		vk.destroy_image(device.handle, handle, unsafe { nil })
 		return err
 	}
@@ -452,14 +460,14 @@ pub fn (device Device) new_image_2d(width u32, height u32, format vk.Format, til
 	}
 
 	return OwnedImage{
-		device: device.handle
-		handle: handle
-		memory: memory
-		format: format
-		extent: extent
-		tiling: tiling
-		usage: usage
-		allocation_size: requirements.size
+		device:            device.handle
+		handle:            handle
+		memory:            memory
+		format:            format
+		extent:            extent
+		tiling:            tiling
+		usage:             usage
+		allocation_size:   requirements.size
 		memory_type_index: memory_type_index
 	}
 }
@@ -473,11 +481,11 @@ pub fn (image OwnedImage) destroy() {
 
 fn single_image_subresource_range(aspect_mask vk.ImageAspectFlags) vk.ImageSubresourceRange {
 	return vk.ImageSubresourceRange{
-		aspectMask: aspect_mask
-		baseMipLevel: 0
-		levelCount: 1
+		aspectMask:     aspect_mask
+		baseMipLevel:   0
+		levelCount:     1
 		baseArrayLayer: 0
-		layerCount: 1
+		layerCount:     1
 	}
 }
 
@@ -510,10 +518,10 @@ pub fn (image OwnedImage) new_view(aspect_mask vk.ImageAspectFlags) !OwnedImageV
 	}
 	subresource_range := single_image_subresource_range(aspect_mask)
 	create_info := vk.ImageViewCreateInfo{
-		image: image.handle
-		viewType: ._2d
-		format: image.format
-		components: vk.ComponentMapping{
+		image:            image.handle
+		viewType:         ._2d
+		format:           image.format
+		components:       vk.ComponentMapping{
 			r: .identity
 			g: .identity
 			b: .identity
@@ -522,13 +530,14 @@ pub fn (image OwnedImage) new_view(aspect_mask vk.ImageAspectFlags) !OwnedImageV
 		subresourceRange: subresource_range
 	}
 	mut handle := vk.ImageView(unsafe { nil })
-	require_success(vk.create_image_view(image.device, &create_info, unsafe { nil }, &handle), 'vkCreateImageView')!
+	require_success(vk.create_image_view(image.device, &create_info, unsafe { nil }, &handle),
+		'vkCreateImageView')!
 	return OwnedImageView{
-		device: image.device
-		handle: handle
-		image: image.handle
-		format: image.format
-		view_type: ._2d
+		device:            image.device
+		handle:            handle
+		image:             image.handle
+		format:            image.format
+		view_type:         ._2d
 		subresource_range: subresource_range
 	}
 }
@@ -558,14 +567,14 @@ pub:
 // It covers the OwnedImage's single mip level and array layer.
 pub fn (transition ImageLayoutTransition) image_memory_barrier(image OwnedImage) vk.ImageMemoryBarrier {
 	return vk.ImageMemoryBarrier{
-		srcAccessMask: transition.src_access_mask
-		dstAccessMask: transition.dst_access_mask
-		oldLayout: transition.old_layout
-		newLayout: transition.new_layout
+		srcAccessMask:       transition.src_access_mask
+		dstAccessMask:       transition.dst_access_mask
+		oldLayout:           transition.old_layout
+		newLayout:           transition.new_layout
 		srcQueueFamilyIndex: vk.queue_family_ignored
 		dstQueueFamilyIndex: vk.queue_family_ignored
-		image: image.handle
-		subresourceRange: single_image_subresource_range(transition.aspect_mask)
+		image:               image.handle
+		subresourceRange:    single_image_subresource_range(transition.aspect_mask)
 	}
 }
 
@@ -577,7 +586,8 @@ pub fn (buffer PrimaryCommandBuffer) transition_image_layout(image OwnedImage, t
 		return error('image transition aspect mask must not be empty')
 	}
 	barrier := transition.image_memory_barrier(image)
-	vk.cmd_pipeline_barrier(buffer.handle, transition.src_stage_mask, transition.dst_stage_mask, transition.dependency_flags, 0, unsafe { nil }, 0, unsafe { nil }, 1, &barrier)
+	vk.cmd_pipeline_barrier(buffer.handle, transition.src_stage_mask, transition.dst_stage_mask,
+		transition.dependency_flags, 0, unsafe { nil }, 0, unsafe { nil }, 1, &barrier)
 }
 
 // Fence owns a VkFence created by one Device. Its parent device must outlive
@@ -595,7 +605,8 @@ pub fn (device Device) new_fence(signaled bool) !Fence {
 		flags: flags
 	}
 	mut handle := vk.Fence(unsafe { nil })
-	require_success(vk.create_fence(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateFence')!
+	require_success(vk.create_fence(device.handle, &create_info, unsafe { nil }, &handle),
+		'vkCreateFence')!
 	return Fence{
 		device: device.handle
 		handle: handle
@@ -615,7 +626,8 @@ pub fn (fence Fence) is_signaled() !bool {
 // wait blocks for at most timeout nanoseconds and returns VK_SUCCESS or
 // VK_TIMEOUT so callers can distinguish completion from expiration.
 pub fn (fence Fence) wait(timeout u64) !vk.Result {
-	return check(vk.wait_for_fences(fence.device, 1, &fence.handle, vk.Bool32(1), timeout), 'vkWaitForFences')
+	return check(vk.wait_for_fences(fence.device, 1, &fence.handle, vk.Bool32(1), timeout),
+		'vkWaitForFences')
 }
 
 // reset returns the fence to the unsignaled state.
@@ -645,7 +657,8 @@ pub mut:
 pub fn (device Device) new_semaphore() !Semaphore {
 	create_info := vk.SemaphoreCreateInfo{}
 	mut handle := vk.Semaphore(unsafe { nil })
-	require_success(vk.create_semaphore(device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateSemaphore')!
+	require_success(vk.create_semaphore(device.handle, &create_info, unsafe { nil }, &handle),
+		'vkCreateSemaphore')!
 	return Semaphore{
 		device: device.handle
 		handle: handle
@@ -673,6 +686,40 @@ pub:
 	fence             ?Fence
 }
 
+// SubmitHandleOptions describes synchronization using raw Vulkan handles.
+// The slices are borrowed only for the duration of submit_handles and are not
+// copied, making repeated submissions allocation-free when callers reuse them.
+pub struct SubmitHandleOptions {
+pub:
+	wait_semaphores   []vk.Semaphore
+	wait_stage_masks  []vk.PipelineStageFlags
+	signal_semaphores []vk.Semaphore
+	fence             vk.Fence
+}
+
+// submit_handles submits caller-owned raw handle slices without allocating.
+// Keep every supplied slice alive until this call returns.
+pub fn (queue Queue) submit_handles(command_buffers []vk.CommandBuffer,
+	options SubmitHandleOptions) !vk.Result {
+	if command_buffers.len == 0 {
+		return error('queue submission requires at least one command buffer')
+	}
+	if options.wait_semaphores.len != options.wait_stage_masks.len {
+		return error('wait semaphore count must match wait stage mask count')
+	}
+
+	submit_info := vk.SubmitInfo{
+		waitSemaphoreCount:   u32(options.wait_semaphores.len)
+		pWaitSemaphores:      options.wait_semaphores.data
+		pWaitDstStageMask:    options.wait_stage_masks.data
+		commandBufferCount:   u32(command_buffers.len)
+		pCommandBuffers:      command_buffers.data
+		signalSemaphoreCount: u32(options.signal_semaphores.len)
+		pSignalSemaphores:    options.signal_semaphores.data
+	}
+	return check(vk.queue_submit(queue.handle, 1, &submit_info, options.fence), 'vkQueueSubmit')
+}
+
 // submit submits one non-empty batch of primary command buffers. It owns the
 // temporary raw-handle arrays for the duration of vkQueueSubmit and preserves
 // both typed Vulkan failures and non-negative result statuses.
@@ -697,20 +744,16 @@ pub fn (queue Queue) submit(command_buffers []PrimaryCommandBuffer, options Subm
 		signal_handles << semaphore.handle
 	}
 
-	submit_info := vk.SubmitInfo{
-		waitSemaphoreCount: u32(wait_handles.len)
-		pWaitSemaphores: wait_handles.data
-		pWaitDstStageMask: options.wait_stage_masks.data
-		commandBufferCount: u32(command_handles.len)
-		pCommandBuffers: command_handles.data
-		signalSemaphoreCount: u32(signal_handles.len)
-		pSignalSemaphores: signal_handles.data
-	}
 	mut fence_handle := vk.Fence(unsafe { nil })
 	if fence := options.fence {
 		fence_handle = fence.handle
 	}
-	return check(vk.queue_submit(queue.handle, 1, &submit_info, fence_handle), 'vkQueueSubmit')
+	return queue.submit_handles(command_handles, SubmitHandleOptions{
+		wait_semaphores:   wait_handles
+		wait_stage_masks:  options.wait_stage_masks
+		signal_semaphores: signal_handles
+		fence:             fence_handle
+	})
 }
 
 // physical_devices performs Vulkan's count/fill enumeration pattern and
@@ -737,7 +780,7 @@ pub fn (instance Instance) physical_devices() ![]PhysicalDevice {
 			mut properties := vk.PhysicalDeviceProperties{}
 			vk.get_physical_device_properties(handle, mut properties)
 			devices << PhysicalDevice{
-				handle: handle
+				handle:     handle
 				properties: properties
 			}
 		}

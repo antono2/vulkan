@@ -40,7 +40,7 @@ fn test_is_error_uses_vulkan_result_sign() {
 
 fn queue_family(index u32, flags vk.QueueFlags, count u32) QueueFamily {
 	return QueueFamily{
-		index: index
+		index:      index
 		properties: vk.QueueFamilyProperties{
 			queueFlags: flags
 			queueCount: count
@@ -97,15 +97,15 @@ fn test_command_pool_and_primary_buffer_expose_raw_handles_and_ownership_metadat
 	buffer_handle := vk.CommandBuffer(unsafe { nil })
 	flags := u32(vk.CommandPoolCreateFlagBits.reset_command_buffer)
 	pool := CommandPool{
-		device: vk.Device(unsafe { nil })
-		handle: pool_handle
+		device:             vk.Device(unsafe { nil })
+		handle:             pool_handle
 		queue_family_index: 4
-		flags: flags
+		flags:              flags
 	}
 	buffer := PrimaryCommandBuffer{
-		device: vk.Device(unsafe { nil })
+		device:       vk.Device(unsafe { nil })
 		command_pool: pool.handle
-		handle: buffer_handle
+		handle:       buffer_handle
 	}
 
 	assert pool.handle == pool_handle
@@ -143,9 +143,9 @@ fn test_allocate_primary_rejects_zero_count_before_calling_vulkan() {
 
 fn test_free_is_idempotent_for_an_already_cleared_command_buffer() {
 	mut buffer := PrimaryCommandBuffer{
-		device: vk.Device(unsafe { nil })
+		device:       vk.Device(unsafe { nil })
 		command_pool: vk.CommandPool(unsafe { nil })
-		handle: vk.CommandBuffer(unsafe { nil })
+		handle:       vk.CommandBuffer(unsafe { nil })
 	}
 	buffer.free()
 	buffer.free()
@@ -219,6 +219,32 @@ fn test_queue_submit_rejects_mismatched_waits_and_stage_masks() {
 	assert false
 }
 
+fn test_queue_submit_handles_rejects_empty_command_list_before_calling_vulkan() {
+	queue := Queue{
+		handle: vk.Queue(unsafe { nil })
+	}
+	queue.submit_handles([], SubmitHandleOptions{}) or {
+		assert err.msg() == 'queue submission requires at least one command buffer'
+		return
+	}
+	assert false
+}
+
+fn test_queue_submit_handles_rejects_mismatched_waits_and_stage_masks() {
+	queue := Queue{
+		handle: vk.Queue(unsafe { nil })
+	}
+	command_buffers := [vk.CommandBuffer(unsafe { nil })]
+	wait_semaphores := [vk.Semaphore(unsafe { nil })]
+	queue.submit_handles(command_buffers, SubmitHandleOptions{
+		wait_semaphores: wait_semaphores
+	}) or {
+		assert err.msg() == 'wait semaphore count must match wait stage mask count'
+		return
+	}
+	assert false
+}
+
 fn test_submit_options_accept_matching_waits_signals_and_optional_fence() {
 	wait_semaphore := Semaphore{
 		handle: vk.Semaphore(unsafe { nil })
@@ -231,10 +257,10 @@ fn test_submit_options_accept_matching_waits_signals_and_optional_fence() {
 	}
 	stage := u32(vk.PipelineStageFlagBits.color_attachment_output)
 	options := SubmitOptions{
-		wait_semaphores: [wait_semaphore]
-		wait_stage_masks: [stage]
+		wait_semaphores:   [wait_semaphore]
+		wait_stage_masks:  [stage]
 		signal_semaphores: [signal_semaphore]
-		fence: fence
+		fence:             fence
 	}
 	assert options.wait_semaphores.len == 1
 	assert options.wait_stage_masks.len == 1
@@ -319,19 +345,19 @@ fn test_new_image_2d_rejects_empty_usage_before_calling_vulkan() {
 
 fn test_owned_image_exposes_creation_and_allocation_metadata() {
 	extent := vk.Extent3D{
-		width: 640
+		width:  640
 		height: 480
-		depth: 1
+		depth:  1
 	}
 	image := OwnedImage{
-		device: vk.Device(unsafe { nil })
-		handle: vk.Image(unsafe { nil })
-		memory: vk.DeviceMemory(unsafe { nil })
-		format: .r8g8b8a8_unorm
-		extent: extent
-		tiling: .optimal
-		usage: u32(vk.ImageUsageFlagBits.sampled)
-		allocation_size: 4096
+		device:            vk.Device(unsafe { nil })
+		handle:            vk.Image(unsafe { nil })
+		memory:            vk.DeviceMemory(unsafe { nil })
+		format:            .r8g8b8a8_unorm
+		extent:            extent
+		tiling:            .optimal
+		usage:             u32(vk.ImageUsageFlagBits.sampled)
+		allocation_size:   4096
 		memory_type_index: 2
 	}
 	assert image.format == .r8g8b8a8_unorm
@@ -359,7 +385,7 @@ fn test_new_image_view_rejects_transfer_only_usage_before_calling_vulkan() {
 		device: vk.Device(unsafe { nil })
 		handle: vk.Image(unsafe { nil })
 		format: .r8g8b8a8_unorm
-		usage: u32(vk.ImageUsageFlagBits.transfer_dst)
+		usage:  u32(vk.ImageUsageFlagBits.transfer_dst)
 	}
 	image.new_view(u32(vk.ImageAspectFlagBits.color)) or {
 		assert err.msg() == 'image usage does not support image views'
@@ -398,11 +424,11 @@ fn test_owned_image_view_exposes_parent_and_subresource_metadata() {
 	view_handle := vk.ImageView(unsafe { nil })
 	image_handle := vk.Image(unsafe { nil })
 	view := OwnedImageView{
-		device: vk.Device(unsafe { nil })
-		handle: view_handle
-		image: image_handle
-		format: .r8g8b8a8_unorm
-		view_type: ._2d
+		device:            vk.Device(unsafe { nil })
+		handle:            view_handle
+		image:             image_handle
+		format:            .r8g8b8a8_unorm
+		view_type:         ._2d
 		subresource_range: single_image_subresource_range(color)
 	}
 
@@ -422,14 +448,14 @@ fn test_image_layout_transition_builds_explicit_single_subresource_barrier() {
 		handle: vk.Image(unsafe { nil })
 	}
 	transition := ImageLayoutTransition{
-		old_layout: .undefined
-		new_layout: .transfer_dst_optimal
-		src_stage_mask: u32(vk.PipelineStageFlagBits.top_of_pipe)
-		dst_stage_mask: u32(vk.PipelineStageFlagBits.transfer)
-		src_access_mask: 0
-		dst_access_mask: u32(vk.AccessFlagBits.transfer_write)
+		old_layout:       .undefined
+		new_layout:       .transfer_dst_optimal
+		src_stage_mask:   u32(vk.PipelineStageFlagBits.top_of_pipe)
+		dst_stage_mask:   u32(vk.PipelineStageFlagBits.transfer)
+		src_access_mask:  0
+		dst_access_mask:  u32(vk.AccessFlagBits.transfer_write)
 		dependency_flags: u32(vk.DependencyFlagBits.by_region)
-		aspect_mask: u32(vk.ImageAspectFlagBits.color)
+		aspect_mask:      u32(vk.ImageAspectFlagBits.color)
 	}
 	barrier := transition.image_memory_barrier(image)
 
