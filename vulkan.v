@@ -2242,7 +2242,7 @@ pub enum LogicOp as u32 {
 	and_inverted  = 4
 	no            = 5
 	xor           = 6
-	or            = 7
+	or_           = 7
 	nor           = 8
 	equivalent    = 9
 	invert        = 10
@@ -28563,7 +28563,7 @@ pub struct C.VkExportMetalDeviceInfoEXT {
 pub mut:
 	sType     StructureType = StructureType.export_metal_device_info_ext
 	pNext     voidptr       = unsafe { nil }
-	mtlDevice MTLDevice_id
+	mtlDevice voidptr
 }
 
 // ExportMetalCommandQueueInfoEXT extends VkExportMetalObjectsInfoEXT
@@ -28575,7 +28575,7 @@ pub mut:
 	sType           StructureType = StructureType.export_metal_command_queue_info_ext
 	pNext           voidptr       = unsafe { nil }
 	queue           Queue
-	mtlCommandQueue MTLCommandQueue_id
+	mtlCommandQueue voidptr
 }
 
 // ExportMetalBufferInfoEXT extends VkExportMetalObjectsInfoEXT
@@ -28587,7 +28587,7 @@ pub mut:
 	sType     StructureType = StructureType.export_metal_buffer_info_ext
 	pNext     voidptr       = unsafe { nil }
 	memory    DeviceMemory
-	mtlBuffer MTLBuffer_id
+	mtlBuffer voidptr
 }
 
 // ImportMetalBufferInfoEXT extends VkMemoryAllocateInfo
@@ -28598,7 +28598,7 @@ pub struct C.VkImportMetalBufferInfoEXT {
 pub mut:
 	sType     StructureType = StructureType.import_metal_buffer_info_ext
 	pNext     voidptr       = unsafe { nil }
-	mtlBuffer MTLBuffer_id
+	mtlBuffer voidptr
 }
 
 // ExportMetalTextureInfoEXT extends VkExportMetalObjectsInfoEXT
@@ -28613,7 +28613,7 @@ pub mut:
 	imageView  ImageView
 	bufferView BufferView
 	plane      ImageAspectFlagBits
-	mtlTexture MTLTexture_id
+	mtlTexture voidptr
 }
 
 // ImportMetalTextureInfoEXT extends VkImageCreateInfo
@@ -28625,7 +28625,7 @@ pub mut:
 	sType      StructureType = StructureType.import_metal_texture_info_ext
 	pNext      voidptr       = unsafe { nil }
 	plane      ImageAspectFlagBits
-	mtlTexture MTLTexture_id
+	mtlTexture voidptr
 }
 
 // ExportMetalIOSurfaceInfoEXT extends VkExportMetalObjectsInfoEXT
@@ -28637,7 +28637,7 @@ pub mut:
 	sType     StructureType = StructureType.export_metal_io_surface_info_ext
 	pNext     voidptr       = unsafe { nil }
 	image     Image
-	ioSurface IOSurfaceRef
+	ioSurface voidptr
 }
 
 // ImportMetalIOSurfaceInfoEXT extends VkImageCreateInfo
@@ -28648,7 +28648,7 @@ pub struct C.VkImportMetalIOSurfaceInfoEXT {
 pub mut:
 	sType     StructureType = StructureType.import_metal_io_surface_info_ext
 	pNext     voidptr       = unsafe { nil }
-	ioSurface IOSurfaceRef
+	ioSurface voidptr
 }
 
 // ExportMetalSharedEventInfoEXT extends VkExportMetalObjectsInfoEXT
@@ -28661,7 +28661,7 @@ pub mut:
 	pNext          voidptr       = unsafe { nil }
 	semaphore      Semaphore
 	event          Event
-	mtlSharedEvent MTLSharedEvent_id
+	mtlSharedEvent voidptr
 }
 
 // ImportMetalSharedEventInfoEXT extends VkSemaphoreCreateInfo,VkEventCreateInfo
@@ -28672,7 +28672,7 @@ pub struct C.VkImportMetalSharedEventInfoEXT {
 pub mut:
 	sType          StructureType = StructureType.import_metal_shared_event_info_ext
 	pNext          voidptr       = unsafe { nil }
-	mtlSharedEvent MTLSharedEvent_id
+	mtlSharedEvent voidptr
 }
 
 @[keep_args_alive]

@@ -4,6 +4,15 @@ This changelog tracks the semantic version of the V module in `v.mod`.
 Generated binding snapshots continue to use the Vulkan registry version stored
 in `VERSION`.
 
+## Unreleased
+
+### Fixed
+
+- Spell `LogicOp.or_` with a trailing underscore because `or` is a V3 keyword.
+  Its Vulkan value remains 7.
+- Represent opaque Metal and IOSurface handle fields as `voidptr`, matching
+  their pointer-sized C ABI while satisfying the strict V3 frontend.
+
 ## 2.0.0 - 2026-09-22
 
 ### Changed
