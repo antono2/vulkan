@@ -43,15 +43,16 @@ recorded by this repository rather than this convenience installer.
 | macOS 14 | V 0.5.2 | Clang | Compile and unit tests |
 | Windows Server 2022 | V 0.5.2 | MSVC | Compile and unit tests |
 | Ubuntu 24.04 | Current V master | GCC | Advisory compatibility lane |
-| Ubuntu 24.04 | Pinned strict V3 | GCC | Advisory compiler-backend lane |
+| Ubuntu 24.04 | Pinned strict V3 | GCC | Required compiler lane |
 
 V 0.5.2 is the supported baseline. The generated registry snapshot determines
 which declarations are available; the installed Vulkan loader and driver must
 still support every command, extension, and feature an application requests.
 Current V master selects V3 by default and can fall back to its V 0.5.2
-compatibility compiler. A strict `-new-compiler` build remains advisory while
-V3 emits platform-specific Vulkan callback types on unsupported hosts and does
-not yet accept every generated Vulkan Video declaration.
+compatibility compiler. CI therefore requires both stable V and a pinned
+strict `-new-compiler` revision. The unpinned moving-master lane remains
+advisory so an unrelated upstream compiler regression cannot block Vulkan
+maintenance.
 
 ## Install
 Download the latest bindings to your local `.vmodules` directory:
