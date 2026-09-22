@@ -146,7 +146,7 @@ jobs:
             make -C .ci-v-source
           fi
           echo "$GITHUB_WORKSPACE/.ci-v-source" >> "$GITHUB_PATH"
-          .ci-v-source/v -V
+          .ci-v-source/v version
       - name: Install Vulkan SDK and SwiftShader test artifacts
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash
