@@ -115,6 +115,13 @@ allocations. The typed `submit()` call remains the convenient checked default.
 
 `OwnedImage` creates a simple exclusive-sharing 2D image with one mip level, one array layer, and one sample. It exposes the raw image and memory handles plus its format, extent, tiling, usage, allocation size, and selected memory type. Destruction releases the image before its bound allocation, and must happen before destroying the parent device. More specialized image creation remains available through the raw layer.
 
+The owned buffer and image helpers intentionally make dedicated allocations;
+they optimize for transparent lifetime rules, not allocation density. Use
+[`antono2.vkmemalloc`](https://github.com/antono2/vulkan_memory_allocator) for
+shared memory blocks, allocation policy, mapping, and diagnostics. The
+allocator depends on this package, so importing it back into the ergonomic
+submodule would create a dependency cycle.
+
 `OwnedImageView` creates an identity-swizzled 2D view using the image's format and explicit aspect mask. It exposes the raw view and parent-image handles, view type, format, and complete subresource range. Every view must be destroyed before its image.
 
 `PhysicalDevice.surface_support()` owns the three presentation queries needed

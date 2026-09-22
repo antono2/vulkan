@@ -128,6 +128,14 @@ coherent uploads, while owned shader modules accept validated SPIR-V words or
 bytes.
 See [the ergonomic API design](API_DESIGN.md).
 
+`OwnedBuffer` and `OwnedImage` deliberately use one Vulkan memory allocation
+per resource so their ownership stays obvious in small programs. Applications
+that create many resources should use the companion
+[`antono2.vkmemalloc`](https://github.com/antono2/vulkan_memory_allocator)
+module, which provides policy-based memory selection and class-safe block
+suballocation. It depends on this binding and remains separate to avoid a
+circular dependency in the low-level Vulkan package.
+
 Instance and device configuration can validate requested names before Vulkan is
 called:
 
