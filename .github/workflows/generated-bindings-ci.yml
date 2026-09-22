@@ -193,7 +193,7 @@ jobs:
           module_root="$RUNNER_TEMP/vmodules/antono2/vulkan"
           mkdir -p "$module_root/c" "$module_root/ergonomic"
           cp vulkan.v vulkan_video.v loader.v v.mod VERSION REGISTRY_COMMIT VOLK_COMMIT "$module_root/"
-          cp c/loader_bridge.h c/volk.c.v "$module_root/c/"
+          cp c/loader_bridge.h c/volk.c.v c/volk_impl.h "$module_root/c/"
           cp ergonomic/ergonomic.v ergonomic/discovery.v ergonomic/configuration.v \
             ergonomic/presentation.v ergonomic/resources.v \
             "$module_root/ergonomic/"
@@ -206,7 +206,15 @@ jobs:
         run: |
           set -euo pipefail
           v_flags=(-cc "${{ matrix.compiler }}")
-          if [[ "${{ matrix.v-channel }}" == v3 ]]; then v_flags=(-new-compiler "${v_flags[@]}"); fi
+          if [[ "${{ matrix.v-channel }}" == v3 ]]; then
+            # Strict V3 does not yet expand module-relative or environment-
+            # derived #flag include paths, so pass the verified paths explicitly.
+            v_flags=(
+              -new-compiler
+              "${v_flags[@]}"
+              -cflags "-I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include -I$VULKAN_SDK/include/volk"
+            )
+          fi
           if [[ "${{ runner.os }}" == macOS ]]; then
             v "${v_flags[@]}" -o "$RUNNER_TEMP/vulkan-smoke" generator/test
           else
@@ -223,7 +231,13 @@ jobs:
             v -cc tcc run examples/ergonomic_lifecycle
       - name: Report source compiler compatibility warning
         if: always() && matrix.v-channel != 'stable' && (steps.checkout_v_source.outcome == 'failure' || steps.setup_v_source.outcome == 'failure' || steps.compile.outcome == 'failure')
-        run: echo "::warning::The ${{ matrix.v-channel }} compatibility lane failed; stable V 0.5.2 remains authoritative."
+        shell: bash
+        run: |
+          if [[ "${{ matrix.v-channel }}" == v3 ]]; then
+            echo "::warning::Strict V3 remains advisory while its C backend emits platform-specific Vulkan callback types on unsupported hosts."
+          else
+            echo "::warning::The moving V master compatibility lane failed; stable V 0.5.2 remains authoritative."
+          fi
       - name: Run lifecycle under validation
         if: runner.os == 'Linux' && matrix.v-channel == 'stable'
         shell: bash
