@@ -143,6 +143,14 @@ coherent uploads, while owned shader modules accept validated SPIR-V words or
 bytes.
 See [the ergonomic API design](API_DESIGN.md).
 
+For Vulkan host allocations, `InstanceOptions.allocator` and
+`DeviceOptions.allocator` accept optional `&vk.AllocationCallbacks`. The owner
+copies the callback structure and passes it to matching destruction calls;
+device child owners inherit the device's allocator. Keep callback functions and
+`pUserData` state alive until the corresponding owners are destroyed. Instance
+and device allocators are independent. These callbacks do not replace Vulkan
+device-memory allocation or the companion memory allocator module.
+
 Owning ergonomic wrappers are `@[nocopy]`, and constructors return owned
 pointers. Store them in `mut` variables so they can be destroyed, pass those
 pointers directly without adding another `&`, and destroy children before

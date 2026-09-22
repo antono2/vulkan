@@ -4,7 +4,9 @@ import antono2.vulkan as vk
 
 // InstanceOptions owns the V strings used to assemble an InstanceCreateInfo.
 // p_next may point to an application-owned feature structure which must remain
-// alive until new_instance_with_options returns.
+// alive until new_instance_with_options returns. allocator is copied into the
+// owner, but its callback functions and pUserData must remain valid until
+// instance.destroy() and all child objects have completed destruction.
 pub struct InstanceOptions {
 pub:
 	application_name    string = 'V application'
@@ -15,7 +17,8 @@ pub:
 	flags               vk.InstanceCreateFlags
 	layers              []string
 	extensions          []string
-	p_next              voidptr = unsafe { nil }
+	p_next              voidptr                 = unsafe { nil }
+	allocator           &vk.AllocationCallbacks = unsafe { nil }
 }
 
 // new_instance_with_options validates requested layers and extensions, owns
@@ -50,7 +53,7 @@ pub fn new_instance_with_options(options InstanceOptions) !&OwnedInstance {
 		enabledExtensionCount:   u32(extension_pointers.len)
 		ppEnabledExtensionNames: extension_pointers.data
 	}
-	return new_instance(&create_info)
+	return new_instance_with_allocator(&create_info, options.allocator)
 }
 
 // DeviceQueueRequest requests consecutive queues from one family. Each
@@ -63,6 +66,10 @@ pub:
 
 // DeviceOptions configures logical-device queues together with device
 // extensions, core features, and an optional feature pNext chain.
+//
+// allocator is copied into the device and inherited by its ergonomic child
+// owners. Its callback functions and pUserData must remain valid until all
+// children and the device have been destroyed.
 //
 // queue_family, queue_index, and queue_priority preserve the original
 // single-queue API. Set queue_requests to request queues from one or more
@@ -77,6 +84,7 @@ pub:
 	extensions       []string
 	enabled_features &vk.PhysicalDeviceFeatures = unsafe { nil }
 	p_next           voidptr                    = unsafe { nil }
+	allocator        &vk.AllocationCallbacks    = unsafe { nil }
 }
 
 struct DeviceQueuePlan {
@@ -183,8 +191,9 @@ pub fn (physical_device PhysicalDevice) new_device_with_options(options DeviceOp
 		ppEnabledExtensionNames: extension_pointers.data
 		pEnabledFeatures:        options.enabled_features
 	}
+	host_allocator := new_host_allocator(options.allocator)
 	mut handle := vk.Device(unsafe { nil })
-	require_success(vk.create_device(physical_device.handle, &create_info, unsafe { nil }, &handle), 'vkCreateDevice')!
+	require_success(vk.create_device(physical_device.handle, &create_info, allocator_ptr(host_allocator), &handle), 'vkCreateDevice')!
 	vk.load_device_commands(handle)
 
 	mut queues := []Queue{}
@@ -208,6 +217,7 @@ pub fn (physical_device PhysicalDevice) new_device_with_options(options DeviceOp
 	}
 	return &OwnedDevice{
 		physical_device: physical_device
+		allocator:       host_allocator
 		handle:          handle
 		queue:           primary_queue
 		queues:          queues
