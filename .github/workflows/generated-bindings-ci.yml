@@ -20,7 +20,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
       - name: Accept only generated binding files
@@ -96,13 +96,13 @@ jobs:
             v-version: 0.5.2
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: antono2/v_vulkan_bindings
           ref: 2700e4f4c58e9e625657b80f4f44b0584d7c6096
           path: generator
-      - uses: prantlf/setup-v-action@v4
+      - uses: prantlf/setup-v-action@92f20bea50d2c9931a28c96bb4997a3c7357baf0 # v4
         if: matrix.v-channel == 'stable'
         with:
           version: ${{ matrix.v-version }}
@@ -110,7 +110,7 @@ jobs:
       # tool commands such as `v test`; setup-v-action@v4 omits it from cache.
       - name: Check out source-built V
         if: matrix.v-channel != 'stable'
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         id: checkout_v_source
         continue-on-error: ${{ matrix.v-channel == 'master' }}
         with:
@@ -120,7 +120,7 @@ jobs:
           fetch-depth: 1
       - name: Check out the matching v3 bootstrap source
         if: matrix.v-channel == 'v3' && steps.checkout_v_source.outcome == 'success'
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: vlang/vc
           ref: 4598bc7e4894c154b27391e4442005fff2fbbd68
@@ -128,7 +128,7 @@ jobs:
           fetch-depth: 1
       - name: Check out the matching v3 TinyCC runtime
         if: matrix.v-channel == 'v3' && steps.checkout_v_source.outcome == 'success'
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: vlang/tccbin
           ref: d6e7ac1b1bcc98aed734a6ecbfa8509f24606c74
@@ -285,7 +285,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
       - name: Validate and publish the package release
