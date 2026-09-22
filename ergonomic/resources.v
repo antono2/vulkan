@@ -98,7 +98,8 @@ pub fn (buffer &OwnedBuffer) upload_bytes(offset vk.DeviceSize, bytes []u8) ! {
 // Its parent OwnedDevice must outlive it.
 @[nocopy]
 pub struct OwnedShaderModule {
-	device vk.Device
+	device    vk.Device
+	allocator &HostAllocator = unsafe { nil }
 pub mut:
 	handle vk.ShaderModule
 }
@@ -120,10 +121,11 @@ pub fn (device &OwnedDevice) new_shader_module(words []u32) !&OwnedShaderModule 
 		pCode:    words.data
 	}
 	mut handle := vk.ShaderModule(unsafe { nil })
-	require_success(vk.create_shader_module(device.handle, &info, unsafe { nil }, &handle), 'vkCreateShaderModule')!
+	require_success(vk.create_shader_module(device.handle, &info, allocator_ptr(device.allocator), &handle), 'vkCreateShaderModule')!
 	return &OwnedShaderModule{
-		device: device.handle
-		handle: handle
+		device:    device.handle
+		allocator: device.allocator
+		handle:    handle
 	}
 }
 
@@ -150,7 +152,7 @@ pub fn (mut shader OwnedShaderModule) destroy() {
 	if isnil(shader.handle) {
 		return
 	}
-	vk.destroy_shader_module(shader.device, shader.handle, unsafe { nil })
+	vk.destroy_shader_module(shader.device, shader.handle, allocator_ptr(shader.allocator))
 	shader.handle = vk.ShaderModule(unsafe { nil })
 }
 

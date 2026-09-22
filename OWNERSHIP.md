@@ -33,6 +33,11 @@ Follow these rules:
 4. Do not use an owner after cleanup, or a borrowed value after its owner is
    destroyed.
 
-Custom allocation callbacks are not yet supported by the ergonomic owners.
-Any future allocator-aware owner must retain the allocator used at creation so
-the same callbacks are supplied during destruction.
+Pass optional Vulkan host allocation callbacks through `InstanceOptions.allocator`,
+`DeviceOptions.allocator`, or `new_instance_with_allocator()`. Each root owner
+copies the callback structure; device child owners inherit that copy and use it
+for creation, failure cleanup, and destruction. Keep the callback functions and
+anything referenced by `pUserData` valid until all affected children and their
+parent owner have been destroyed. Instance and device allocators are chosen
+independently. These callbacks control Vulkan host allocations; they do not
+replace `VkDeviceMemory` selection or suballocation.
