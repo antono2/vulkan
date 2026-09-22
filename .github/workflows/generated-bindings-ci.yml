@@ -165,7 +165,14 @@ jobs:
           test "$(git -C "$registry_checkout" rev-parse HEAD)" = "$registry_commit"
           mkdir -p "$VULKAN_SDK/include" "$VULKAN_SDK/include/volk"
           cp -R "$registry_checkout/include/." "$VULKAN_SDK/include/"
-          grep -F "#define VK_HEADER_VERSION 362" "$VULKAN_SDK/include/vulkan/vulkan_core.h"
+          registry_version=$(tr -d '\r\n' < VERSION)
+          [[ "$registry_version" =~ ^v[0-9]+\.[0-9]+\.([0-9]+)$ ]] || {
+            echo "Invalid Vulkan registry version: $registry_version" >&2
+            exit 1
+          }
+          header_version=${BASH_REMATCH[1]}
+          grep -F "#define VK_HEADER_VERSION $header_version" \
+            "$VULKAN_SDK/include/vulkan/vulkan_core.h"
 
           volk_commit=$(tr -d '\r\n' < VOLK_COMMIT)
           curl --fail --silent --show-error --location \
