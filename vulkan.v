@@ -12540,242 +12540,267 @@ pub fn create_shared_swapchains_khr(
 pub const khr_xlib_surface_spec_version = 6
 pub const khr_xlib_surface_extension_name = c'VK_KHR_xlib_surface'
 
-pub type XlibSurfaceCreateFlagsKHR = u32
-pub type XlibSurfaceCreateInfoKHR = C.VkXlibSurfaceCreateInfoKHR
-
-@[typedef]
-pub struct C.VkXlibSurfaceCreateInfoKHR {
-pub mut:
-	sType  StructureType = StructureType.xlib_surface_create_info_khr
-	pNext  voidptr       = unsafe { nil }
-	flags  XlibSurfaceCreateFlagsKHR
-	dpy    &voidptr
-	window usize
+$if vulkan_xlib ? {
+	#flag -DVK_USE_PLATFORM_XLIB_KHR
 }
+$if vulkan_xlib ? {
+	pub type XlibSurfaceCreateFlagsKHR = u32
+	pub type XlibSurfaceCreateInfoKHR = C.VkXlibSurfaceCreateInfoKHR
 
-@[keep_args_alive]
-fn C.vkCreateXlibSurfaceKHR(
+	@[typedef]
+	pub struct C.VkXlibSurfaceCreateInfoKHR {
+	pub mut:
+		sType  StructureType = StructureType.xlib_surface_create_info_khr
+		pNext  voidptr       = unsafe { nil }
+		flags  XlibSurfaceCreateFlagsKHR
+		dpy    &voidptr
+		window usize
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateXlibSurfaceKHR(
 	instance Instance, const_pCreateInfo &XlibSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateXlibSurfaceKHR = fn (instance Instance, const_pCreateInfo &XlibSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateXlibSurfaceKHR = fn (instance Instance, const_pCreateInfo &XlibSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_xlib_surface_khr(
+	@[inline]
+	pub fn create_xlib_surface_khr(
 	instance Instance,
 	const_pCreateInfo &XlibSurfaceCreateInfoKHR,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateXlibSurfaceKHR(instance, const_pCreateInfo, const_pAllocator, pSurface)
-}
+		return C.vkCreateXlibSurfaceKHR(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 
-@[keep_args_alive]
-fn C.vkGetPhysicalDeviceXlibPresentationSupportKHR(
+	@[keep_args_alive]
+	fn C.vkGetPhysicalDeviceXlibPresentationSupportKHR(
 	physicalDevice PhysicalDevice, queueFamilyIndex u32, dpy &voidptr, visualID usize) Bool32
 
-pub type PFN_vkGetPhysicalDeviceXlibPresentationSupportKHR = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, dpy &voidptr, visualID usize) Bool32
+	pub type PFN_vkGetPhysicalDeviceXlibPresentationSupportKHR = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, dpy &voidptr, visualID usize) Bool32
 
-@[inline]
-pub fn get_physical_device_xlib_presentation_support_khr(
+	@[inline]
+	pub fn get_physical_device_xlib_presentation_support_khr(
 	physicalDevice PhysicalDevice,
 	queueFamilyIndex u32,
 	dpy &voidptr,
 	visualID usize) Bool32 {
-	return C.vkGetPhysicalDeviceXlibPresentationSupportKHR(physicalDevice, queueFamilyIndex, dpy,
-		visualID)
+		return C.vkGetPhysicalDeviceXlibPresentationSupportKHR(physicalDevice, queueFamilyIndex,
+			dpy, visualID)
+	}
 }
 
 pub const khr_xcb_surface_spec_version = 6
 pub const khr_xcb_surface_extension_name = c'VK_KHR_xcb_surface'
 
-pub type XcbSurfaceCreateFlagsKHR = u32
-
-@[typedef]
-pub struct C.xcb_connection_t {}
-
-@[typedef]
-pub struct C.xcb_window_t {}
-
-pub type XcbSurfaceCreateInfoKHR = C.VkXcbSurfaceCreateInfoKHR
-
-@[typedef]
-pub struct C.VkXcbSurfaceCreateInfoKHR {
-pub mut:
-	sType      StructureType = StructureType.xcb_surface_create_info_khr
-	pNext      voidptr       = unsafe { nil }
-	flags      XcbSurfaceCreateFlagsKHR
-	connection &voidptr
-	window     u32
+$if vulkan_xcb ? {
+	#flag -DVK_USE_PLATFORM_XCB_KHR
 }
+$if vulkan_xcb ? {
+	pub type XcbSurfaceCreateFlagsKHR = u32
 
-@[typedef]
-pub struct C.xcb_visualid_t {}
+	@[typedef]
+	pub struct C.xcb_connection_t {}
 
-@[keep_args_alive]
-fn C.vkCreateXcbSurfaceKHR(
+	@[typedef]
+	pub struct C.xcb_window_t {}
+
+	pub type XcbSurfaceCreateInfoKHR = C.VkXcbSurfaceCreateInfoKHR
+
+	@[typedef]
+	pub struct C.VkXcbSurfaceCreateInfoKHR {
+	pub mut:
+		sType      StructureType = StructureType.xcb_surface_create_info_khr
+		pNext      voidptr       = unsafe { nil }
+		flags      XcbSurfaceCreateFlagsKHR
+		connection &voidptr
+		window     u32
+	}
+
+	@[typedef]
+	pub struct C.xcb_visualid_t {}
+
+	@[keep_args_alive]
+	fn C.vkCreateXcbSurfaceKHR(
 	instance Instance, const_pCreateInfo &XcbSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateXcbSurfaceKHR = fn (instance Instance, const_pCreateInfo &XcbSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateXcbSurfaceKHR = fn (instance Instance, const_pCreateInfo &XcbSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_xcb_surface_khr(
+	@[inline]
+	pub fn create_xcb_surface_khr(
 	instance Instance,
 	const_pCreateInfo &XcbSurfaceCreateInfoKHR,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateXcbSurfaceKHR(instance, const_pCreateInfo, const_pAllocator, pSurface)
-}
+		return C.vkCreateXcbSurfaceKHR(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 
-@[keep_args_alive]
-fn C.vkGetPhysicalDeviceXcbPresentationSupportKHR(
+	@[keep_args_alive]
+	fn C.vkGetPhysicalDeviceXcbPresentationSupportKHR(
 	physicalDevice PhysicalDevice, queueFamilyIndex u32, connection &voidptr, visual_id u32) Bool32
 
-pub type PFN_vkGetPhysicalDeviceXcbPresentationSupportKHR = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, connection &voidptr, visual_id u32) Bool32
+	pub type PFN_vkGetPhysicalDeviceXcbPresentationSupportKHR = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, connection &voidptr, visual_id u32) Bool32
 
-@[inline]
-pub fn get_physical_device_xcb_presentation_support_khr(
+	@[inline]
+	pub fn get_physical_device_xcb_presentation_support_khr(
 	physicalDevice PhysicalDevice,
 	queueFamilyIndex u32,
 	connection &voidptr,
 	visual_id u32) Bool32 {
-	return C.vkGetPhysicalDeviceXcbPresentationSupportKHR(physicalDevice, queueFamilyIndex,
-		connection, visual_id)
+		return C.vkGetPhysicalDeviceXcbPresentationSupportKHR(physicalDevice, queueFamilyIndex,
+			connection, visual_id)
+	}
 }
 
 pub const khr_wayland_surface_spec_version = 6
 pub const khr_wayland_surface_extension_name = c'VK_KHR_wayland_surface'
 
-pub type WaylandSurfaceCreateFlagsKHR = u32
-
-@[typedef]
-pub struct C.wl_display {}
-
-@[typedef]
-pub struct C.wl_surface {}
-
-pub type WaylandSurfaceCreateInfoKHR = C.VkWaylandSurfaceCreateInfoKHR
-
-@[typedef]
-pub struct C.VkWaylandSurfaceCreateInfoKHR {
-pub mut:
-	sType   StructureType = StructureType.wayland_surface_create_info_khr
-	pNext   voidptr       = unsafe { nil }
-	flags   WaylandSurfaceCreateFlagsKHR
-	display &voidptr
-	surface &voidptr
+$if vulkan_wayland ? {
+	#flag -DVK_USE_PLATFORM_WAYLAND_KHR
 }
+$if vulkan_wayland ? {
+	pub type WaylandSurfaceCreateFlagsKHR = u32
 
-@[keep_args_alive]
-fn C.vkCreateWaylandSurfaceKHR(
+	@[typedef]
+	pub struct C.wl_display {}
+
+	@[typedef]
+	pub struct C.wl_surface {}
+
+	pub type WaylandSurfaceCreateInfoKHR = C.VkWaylandSurfaceCreateInfoKHR
+
+	@[typedef]
+	pub struct C.VkWaylandSurfaceCreateInfoKHR {
+	pub mut:
+		sType   StructureType = StructureType.wayland_surface_create_info_khr
+		pNext   voidptr       = unsafe { nil }
+		flags   WaylandSurfaceCreateFlagsKHR
+		display &voidptr
+		surface &voidptr
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateWaylandSurfaceKHR(
 	instance Instance, const_pCreateInfo &WaylandSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateWaylandSurfaceKHR = fn (instance Instance, const_pCreateInfo &WaylandSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateWaylandSurfaceKHR = fn (instance Instance, const_pCreateInfo &WaylandSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_wayland_surface_khr(
+	@[inline]
+	pub fn create_wayland_surface_khr(
 	instance Instance,
 	const_pCreateInfo &WaylandSurfaceCreateInfoKHR,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateWaylandSurfaceKHR(instance, const_pCreateInfo, const_pAllocator, pSurface)
-}
+		return C.vkCreateWaylandSurfaceKHR(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 
-@[keep_args_alive]
-fn C.vkGetPhysicalDeviceWaylandPresentationSupportKHR(
+	@[keep_args_alive]
+	fn C.vkGetPhysicalDeviceWaylandPresentationSupportKHR(
 	physicalDevice PhysicalDevice, queueFamilyIndex u32, display &voidptr) Bool32
 
-pub type PFN_vkGetPhysicalDeviceWaylandPresentationSupportKHR = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, display &voidptr) Bool32
+	pub type PFN_vkGetPhysicalDeviceWaylandPresentationSupportKHR = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, display &voidptr) Bool32
 
-@[inline]
-pub fn get_physical_device_wayland_presentation_support_khr(
+	@[inline]
+	pub fn get_physical_device_wayland_presentation_support_khr(
 	physicalDevice PhysicalDevice,
 	queueFamilyIndex u32,
 	display &voidptr) Bool32 {
-	return C.vkGetPhysicalDeviceWaylandPresentationSupportKHR(physicalDevice, queueFamilyIndex,
-		display)
+		return C.vkGetPhysicalDeviceWaylandPresentationSupportKHR(physicalDevice, queueFamilyIndex,
+			display)
+	}
 }
-
-pub type ANativeWindow = C.ANativeWindow
-
-@[typedef]
-pub struct C.ANativeWindow {}
 
 pub const khr_android_surface_spec_version = 6
 pub const khr_android_surface_extension_name = c'VK_KHR_android_surface'
 
-pub type AndroidSurfaceCreateFlagsKHR = u32
-pub type AndroidSurfaceCreateInfoKHR = C.VkAndroidSurfaceCreateInfoKHR
-
-@[typedef]
-pub struct C.VkAndroidSurfaceCreateInfoKHR {
-pub mut:
-	sType  StructureType = StructureType.android_surface_create_info_khr
-	pNext  voidptr       = unsafe { nil }
-	flags  AndroidSurfaceCreateFlagsKHR
-	window &ANativeWindow
+$if vulkan_android ? {
+	#flag -DVK_USE_PLATFORM_ANDROID_KHR
 }
+$if vulkan_android ? {
+	pub type ANativeWindow = C.ANativeWindow
 
-@[keep_args_alive]
-fn C.vkCreateAndroidSurfaceKHR(
+	@[typedef]
+	pub struct C.ANativeWindow {}
+
+	pub type AndroidSurfaceCreateFlagsKHR = u32
+	pub type AndroidSurfaceCreateInfoKHR = C.VkAndroidSurfaceCreateInfoKHR
+
+	@[typedef]
+	pub struct C.VkAndroidSurfaceCreateInfoKHR {
+	pub mut:
+		sType  StructureType = StructureType.android_surface_create_info_khr
+		pNext  voidptr       = unsafe { nil }
+		flags  AndroidSurfaceCreateFlagsKHR
+		window &ANativeWindow
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateAndroidSurfaceKHR(
 	instance Instance, const_pCreateInfo &AndroidSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateAndroidSurfaceKHR = fn (instance Instance, const_pCreateInfo &AndroidSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateAndroidSurfaceKHR = fn (instance Instance, const_pCreateInfo &AndroidSurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_android_surface_khr(
+	@[inline]
+	pub fn create_android_surface_khr(
 	instance Instance,
 	const_pCreateInfo &AndroidSurfaceCreateInfoKHR,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateAndroidSurfaceKHR(instance, const_pCreateInfo, const_pAllocator, pSurface)
+		return C.vkCreateAndroidSurfaceKHR(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 }
 
 pub const khr_win32_surface_spec_version = 6
 pub const khr_win32_surface_extension_name = c'VK_KHR_win32_surface'
 
-pub type Win32SurfaceCreateFlagsKHR = u32
-pub type Win32SurfaceCreateInfoKHR = C.VkWin32SurfaceCreateInfoKHR
-
-@[typedef]
-pub struct C.VkWin32SurfaceCreateInfoKHR {
-pub mut:
-	sType     StructureType = StructureType.win32_surface_create_info_khr
-	pNext     voidptr       = unsafe { nil }
-	flags     Win32SurfaceCreateFlagsKHR
-	hinstance voidptr
-	hwnd      voidptr
+$if vulkan_win32 ? {
+	#flag -DVK_USE_PLATFORM_WIN32_KHR
 }
+$if vulkan_win32 ? {
+	pub type Win32SurfaceCreateFlagsKHR = u32
+	pub type Win32SurfaceCreateInfoKHR = C.VkWin32SurfaceCreateInfoKHR
 
-@[keep_args_alive]
-fn C.vkCreateWin32SurfaceKHR(
+	@[typedef]
+	pub struct C.VkWin32SurfaceCreateInfoKHR {
+	pub mut:
+		sType     StructureType = StructureType.win32_surface_create_info_khr
+		pNext     voidptr       = unsafe { nil }
+		flags     Win32SurfaceCreateFlagsKHR
+		hinstance voidptr
+		hwnd      voidptr
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateWin32SurfaceKHR(
 	instance Instance, const_pCreateInfo &Win32SurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateWin32SurfaceKHR = fn (instance Instance, const_pCreateInfo &Win32SurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateWin32SurfaceKHR = fn (instance Instance, const_pCreateInfo &Win32SurfaceCreateInfoKHR, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_win32_surface_khr(
+	@[inline]
+	pub fn create_win32_surface_khr(
 	instance Instance,
 	const_pCreateInfo &Win32SurfaceCreateInfoKHR,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateWin32SurfaceKHR(instance, const_pCreateInfo, const_pAllocator, pSurface)
-}
+		return C.vkCreateWin32SurfaceKHR(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 
-@[keep_args_alive]
-fn C.vkGetPhysicalDeviceWin32PresentationSupportKHR(
+	@[keep_args_alive]
+	fn C.vkGetPhysicalDeviceWin32PresentationSupportKHR(
 	physicalDevice PhysicalDevice, queueFamilyIndex u32) Bool32
 
-pub type PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32) Bool32
+	pub type PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32) Bool32
 
-@[inline]
-pub fn get_physical_device_win32_presentation_support_khr(
+	@[inline]
+	pub fn get_physical_device_win32_presentation_support_khr(
 	physicalDevice PhysicalDevice,
 	queueFamilyIndex u32) Bool32 {
-	return C.vkGetPhysicalDeviceWin32PresentationSupportKHR(physicalDevice, queueFamilyIndex)
+		return C.vkGetPhysicalDeviceWin32PresentationSupportKHR(physicalDevice, queueFamilyIndex)
+	}
 }
 
 pub const khr_sampler_mirror_clamp_to_edge_spec_version = 3
@@ -14339,81 +14364,84 @@ pub type ExportMemoryAllocateInfoKHR = C.VkExportMemoryAllocateInfo
 
 pub const khr_external_memory_win32_spec_version = 1
 pub const khr_external_memory_win32_extension_name = c'VK_KHR_external_memory_win32'
-// ImportMemoryWin32HandleInfoKHR extends VkMemoryAllocateInfo
-pub type ImportMemoryWin32HandleInfoKHR = C.VkImportMemoryWin32HandleInfoKHR
 
-@[typedef]
-pub struct C.VkImportMemoryWin32HandleInfoKHR {
-pub mut:
-	sType      StructureType = StructureType.import_memory_win32_handle_info_khr
-	pNext      voidptr       = unsafe { nil }
-	handleType ExternalMemoryHandleTypeFlagBits
-	handle     voidptr
-	name       &u16
-}
+$if vulkan_win32 ? {
+	// ImportMemoryWin32HandleInfoKHR extends VkMemoryAllocateInfo
+	pub type ImportMemoryWin32HandleInfoKHR = C.VkImportMemoryWin32HandleInfoKHR
 
-// ExportMemoryWin32HandleInfoKHR extends VkMemoryAllocateInfo
-pub type ExportMemoryWin32HandleInfoKHR = C.VkExportMemoryWin32HandleInfoKHR
+	@[typedef]
+	pub struct C.VkImportMemoryWin32HandleInfoKHR {
+	pub mut:
+		sType      StructureType = StructureType.import_memory_win32_handle_info_khr
+		pNext      voidptr       = unsafe { nil }
+		handleType ExternalMemoryHandleTypeFlagBits
+		handle     voidptr
+		name       &u16
+	}
 
-@[typedef]
-pub struct C.VkExportMemoryWin32HandleInfoKHR {
-pub mut:
-	sType       StructureType = StructureType.export_memory_win32_handle_info_khr
-	pNext       voidptr       = unsafe { nil }
-	pAttributes &voidptr
-	dwAccess    u32
-	name        &u16
-}
+	// ExportMemoryWin32HandleInfoKHR extends VkMemoryAllocateInfo
+	pub type ExportMemoryWin32HandleInfoKHR = C.VkExportMemoryWin32HandleInfoKHR
 
-pub type MemoryWin32HandlePropertiesKHR = C.VkMemoryWin32HandlePropertiesKHR
+	@[typedef]
+	pub struct C.VkExportMemoryWin32HandleInfoKHR {
+	pub mut:
+		sType       StructureType = StructureType.export_memory_win32_handle_info_khr
+		pNext       voidptr       = unsafe { nil }
+		pAttributes &voidptr
+		dwAccess    u32
+		name        &u16
+	}
 
-@[typedef]
-pub struct C.VkMemoryWin32HandlePropertiesKHR {
-pub mut:
-	sType          StructureType = StructureType.memory_win32_handle_properties_khr
-	pNext          voidptr       = unsafe { nil }
-	memoryTypeBits u32
-}
+	pub type MemoryWin32HandlePropertiesKHR = C.VkMemoryWin32HandlePropertiesKHR
 
-pub type MemoryGetWin32HandleInfoKHR = C.VkMemoryGetWin32HandleInfoKHR
+	@[typedef]
+	pub struct C.VkMemoryWin32HandlePropertiesKHR {
+	pub mut:
+		sType          StructureType = StructureType.memory_win32_handle_properties_khr
+		pNext          voidptr       = unsafe { nil }
+		memoryTypeBits u32
+	}
 
-@[typedef]
-pub struct C.VkMemoryGetWin32HandleInfoKHR {
-pub mut:
-	sType      StructureType = StructureType.memory_get_win32_handle_info_khr
-	pNext      voidptr       = unsafe { nil }
-	memory     DeviceMemory
-	handleType ExternalMemoryHandleTypeFlagBits
-}
+	pub type MemoryGetWin32HandleInfoKHR = C.VkMemoryGetWin32HandleInfoKHR
 
-@[keep_args_alive]
-fn C.vkGetMemoryWin32HandleKHR(
+	@[typedef]
+	pub struct C.VkMemoryGetWin32HandleInfoKHR {
+	pub mut:
+		sType      StructureType = StructureType.memory_get_win32_handle_info_khr
+		pNext      voidptr       = unsafe { nil }
+		memory     DeviceMemory
+		handleType ExternalMemoryHandleTypeFlagBits
+	}
+
+	@[keep_args_alive]
+	fn C.vkGetMemoryWin32HandleKHR(
 	device Device, const_pGetWin32HandleInfo &MemoryGetWin32HandleInfoKHR, pHandle &voidptr) Result
 
-pub type PFN_vkGetMemoryWin32HandleKHR = fn (device Device, const_pGetWin32HandleInfo &MemoryGetWin32HandleInfoKHR, pHandle &voidptr) Result
+	pub type PFN_vkGetMemoryWin32HandleKHR = fn (device Device, const_pGetWin32HandleInfo &MemoryGetWin32HandleInfoKHR, pHandle &voidptr) Result
 
-@[inline]
-pub fn get_memory_win32_handle_khr(
+	@[inline]
+	pub fn get_memory_win32_handle_khr(
 	device Device,
 	const_pGetWin32HandleInfo &MemoryGetWin32HandleInfoKHR,
 	pHandle &voidptr) Result {
-	return C.vkGetMemoryWin32HandleKHR(device, const_pGetWin32HandleInfo, pHandle)
-}
+		return C.vkGetMemoryWin32HandleKHR(device, const_pGetWin32HandleInfo, pHandle)
+	}
 
-@[keep_args_alive]
-fn C.vkGetMemoryWin32HandlePropertiesKHR(
+	@[keep_args_alive]
+	fn C.vkGetMemoryWin32HandlePropertiesKHR(
 	device Device, handleType ExternalMemoryHandleTypeFlagBits, handle voidptr, mut_pMemoryWin32HandleProperties &MemoryWin32HandlePropertiesKHR) Result
 
-pub type PFN_vkGetMemoryWin32HandlePropertiesKHR = fn (device Device, handleType ExternalMemoryHandleTypeFlagBits, handle voidptr, mut_pMemoryWin32HandleProperties &MemoryWin32HandlePropertiesKHR) Result
+	pub type PFN_vkGetMemoryWin32HandlePropertiesKHR = fn (device Device, handleType ExternalMemoryHandleTypeFlagBits, handle voidptr, mut_pMemoryWin32HandleProperties &MemoryWin32HandlePropertiesKHR) Result
 
-@[inline]
-pub fn get_memory_win32_handle_properties_khr(
+	@[inline]
+	pub fn get_memory_win32_handle_properties_khr(
 	device Device,
 	handleType ExternalMemoryHandleTypeFlagBits,
 	handle voidptr,
 	mut mut_pMemoryWin32HandleProperties MemoryWin32HandlePropertiesKHR) Result {
-	return C.vkGetMemoryWin32HandlePropertiesKHR(device, handleType, handle,
-		mut_pMemoryWin32HandleProperties)
+		return C.vkGetMemoryWin32HandlePropertiesKHR(device, handleType, handle,
+			mut_pMemoryWin32HandleProperties)
+	}
 }
 
 pub const khr_external_memory_fd_spec_version = 1
@@ -14486,21 +14514,24 @@ pub fn get_memory_fd_properties_khr(
 
 pub const khr_win32_keyed_mutex_spec_version = 1
 pub const khr_win32_keyed_mutex_extension_name = c'VK_KHR_win32_keyed_mutex'
-// Win32KeyedMutexAcquireReleaseInfoKHR extends VkSubmitInfo,VkSubmitInfo2
-pub type Win32KeyedMutexAcquireReleaseInfoKHR = C.VkWin32KeyedMutexAcquireReleaseInfoKHR
 
-@[typedef]
-pub struct C.VkWin32KeyedMutexAcquireReleaseInfoKHR {
-pub mut:
-	sType            StructureType = StructureType.win32_keyed_mutex_acquire_release_info_khr
-	pNext            voidptr       = unsafe { nil }
-	acquireCount     u32
-	pAcquireSyncs    &DeviceMemory
-	pAcquireKeys     &u64
-	pAcquireTimeouts &u32
-	releaseCount     u32
-	pReleaseSyncs    &DeviceMemory
-	pReleaseKeys     &u64
+$if vulkan_win32 ? {
+	// Win32KeyedMutexAcquireReleaseInfoKHR extends VkSubmitInfo,VkSubmitInfo2
+	pub type Win32KeyedMutexAcquireReleaseInfoKHR = C.VkWin32KeyedMutexAcquireReleaseInfoKHR
+
+	@[typedef]
+	pub struct C.VkWin32KeyedMutexAcquireReleaseInfoKHR {
+	pub mut:
+		sType            StructureType = StructureType.win32_keyed_mutex_acquire_release_info_khr
+		pNext            voidptr       = unsafe { nil }
+		acquireCount     u32
+		pAcquireSyncs    &DeviceMemory
+		pAcquireKeys     &u64
+		pAcquireTimeouts &u32
+		releaseCount     u32
+		pReleaseSyncs    &DeviceMemory
+		pReleaseKeys     &u64
+	}
 }
 
 pub const khr_external_semaphore_capabilities_spec_version = 1
@@ -14542,83 +14573,85 @@ pub type ExportSemaphoreCreateInfoKHR = C.VkExportSemaphoreCreateInfo
 pub const khr_external_semaphore_win32_spec_version = 1
 pub const khr_external_semaphore_win32_extension_name = c'VK_KHR_external_semaphore_win32'
 
-pub type ImportSemaphoreWin32HandleInfoKHR = C.VkImportSemaphoreWin32HandleInfoKHR
+$if vulkan_win32 ? {
+	pub type ImportSemaphoreWin32HandleInfoKHR = C.VkImportSemaphoreWin32HandleInfoKHR
 
-@[typedef]
-pub struct C.VkImportSemaphoreWin32HandleInfoKHR {
-pub mut:
-	sType      StructureType = StructureType.import_semaphore_win32_handle_info_khr
-	pNext      voidptr       = unsafe { nil }
-	semaphore  Semaphore
-	flags      SemaphoreImportFlags
-	handleType ExternalSemaphoreHandleTypeFlagBits
-	handle     voidptr
-	name       &u16
-}
+	@[typedef]
+	pub struct C.VkImportSemaphoreWin32HandleInfoKHR {
+	pub mut:
+		sType      StructureType = StructureType.import_semaphore_win32_handle_info_khr
+		pNext      voidptr       = unsafe { nil }
+		semaphore  Semaphore
+		flags      SemaphoreImportFlags
+		handleType ExternalSemaphoreHandleTypeFlagBits
+		handle     voidptr
+		name       &u16
+	}
 
-// ExportSemaphoreWin32HandleInfoKHR extends VkSemaphoreCreateInfo
-pub type ExportSemaphoreWin32HandleInfoKHR = C.VkExportSemaphoreWin32HandleInfoKHR
+	// ExportSemaphoreWin32HandleInfoKHR extends VkSemaphoreCreateInfo
+	pub type ExportSemaphoreWin32HandleInfoKHR = C.VkExportSemaphoreWin32HandleInfoKHR
 
-@[typedef]
-pub struct C.VkExportSemaphoreWin32HandleInfoKHR {
-pub mut:
-	sType       StructureType = StructureType.export_semaphore_win32_handle_info_khr
-	pNext       voidptr       = unsafe { nil }
-	pAttributes &voidptr
-	dwAccess    u32
-	name        &u16
-}
+	@[typedef]
+	pub struct C.VkExportSemaphoreWin32HandleInfoKHR {
+	pub mut:
+		sType       StructureType = StructureType.export_semaphore_win32_handle_info_khr
+		pNext       voidptr       = unsafe { nil }
+		pAttributes &voidptr
+		dwAccess    u32
+		name        &u16
+	}
 
-// D3D12FenceSubmitInfoKHR extends VkSubmitInfo
-pub type D3D12FenceSubmitInfoKHR = C.VkD3D12FenceSubmitInfoKHR
+	// D3D12FenceSubmitInfoKHR extends VkSubmitInfo
+	pub type D3D12FenceSubmitInfoKHR = C.VkD3D12FenceSubmitInfoKHR
 
-@[typedef]
-pub struct C.VkD3D12FenceSubmitInfoKHR {
-pub mut:
-	sType                      StructureType = StructureType.d3d12_fence_submit_info_khr
-	pNext                      voidptr       = unsafe { nil }
-	waitSemaphoreValuesCount   u32
-	pWaitSemaphoreValues       &u64
-	signalSemaphoreValuesCount u32
-	pSignalSemaphoreValues     &u64
-}
+	@[typedef]
+	pub struct C.VkD3D12FenceSubmitInfoKHR {
+	pub mut:
+		sType                      StructureType = StructureType.d3d12_fence_submit_info_khr
+		pNext                      voidptr       = unsafe { nil }
+		waitSemaphoreValuesCount   u32
+		pWaitSemaphoreValues       &u64
+		signalSemaphoreValuesCount u32
+		pSignalSemaphoreValues     &u64
+	}
 
-pub type SemaphoreGetWin32HandleInfoKHR = C.VkSemaphoreGetWin32HandleInfoKHR
+	pub type SemaphoreGetWin32HandleInfoKHR = C.VkSemaphoreGetWin32HandleInfoKHR
 
-@[typedef]
-pub struct C.VkSemaphoreGetWin32HandleInfoKHR {
-pub mut:
-	sType      StructureType = StructureType.semaphore_get_win32_handle_info_khr
-	pNext      voidptr       = unsafe { nil }
-	semaphore  Semaphore
-	handleType ExternalSemaphoreHandleTypeFlagBits
-}
+	@[typedef]
+	pub struct C.VkSemaphoreGetWin32HandleInfoKHR {
+	pub mut:
+		sType      StructureType = StructureType.semaphore_get_win32_handle_info_khr
+		pNext      voidptr       = unsafe { nil }
+		semaphore  Semaphore
+		handleType ExternalSemaphoreHandleTypeFlagBits
+	}
 
-@[keep_args_alive]
-fn C.vkImportSemaphoreWin32HandleKHR(
+	@[keep_args_alive]
+	fn C.vkImportSemaphoreWin32HandleKHR(
 	device Device, const_pImportSemaphoreWin32HandleInfo &ImportSemaphoreWin32HandleInfoKHR) Result
 
-pub type PFN_vkImportSemaphoreWin32HandleKHR = fn (device Device, const_pImportSemaphoreWin32HandleInfo &ImportSemaphoreWin32HandleInfoKHR) Result
+	pub type PFN_vkImportSemaphoreWin32HandleKHR = fn (device Device, const_pImportSemaphoreWin32HandleInfo &ImportSemaphoreWin32HandleInfoKHR) Result
 
-@[inline]
-pub fn import_semaphore_win32_handle_khr(
+	@[inline]
+	pub fn import_semaphore_win32_handle_khr(
 	device Device,
 	const_pImportSemaphoreWin32HandleInfo &ImportSemaphoreWin32HandleInfoKHR) Result {
-	return C.vkImportSemaphoreWin32HandleKHR(device, const_pImportSemaphoreWin32HandleInfo)
-}
+		return C.vkImportSemaphoreWin32HandleKHR(device, const_pImportSemaphoreWin32HandleInfo)
+	}
 
-@[keep_args_alive]
-fn C.vkGetSemaphoreWin32HandleKHR(
+	@[keep_args_alive]
+	fn C.vkGetSemaphoreWin32HandleKHR(
 	device Device, const_pGetWin32HandleInfo &SemaphoreGetWin32HandleInfoKHR, pHandle &voidptr) Result
 
-pub type PFN_vkGetSemaphoreWin32HandleKHR = fn (device Device, const_pGetWin32HandleInfo &SemaphoreGetWin32HandleInfoKHR, pHandle &voidptr) Result
+	pub type PFN_vkGetSemaphoreWin32HandleKHR = fn (device Device, const_pGetWin32HandleInfo &SemaphoreGetWin32HandleInfoKHR, pHandle &voidptr) Result
 
-@[inline]
-pub fn get_semaphore_win32_handle_khr(
+	@[inline]
+	pub fn get_semaphore_win32_handle_khr(
 	device Device,
 	const_pGetWin32HandleInfo &SemaphoreGetWin32HandleInfoKHR,
 	pHandle &voidptr) Result {
-	return C.vkGetSemaphoreWin32HandleKHR(device, const_pGetWin32HandleInfo, pHandle)
+		return C.vkGetSemaphoreWin32HandleKHR(device, const_pGetWin32HandleInfo, pHandle)
+	}
 }
 
 pub const khr_external_semaphore_fd_spec_version = 1
@@ -14974,69 +15007,71 @@ pub type ExportFenceCreateInfoKHR = C.VkExportFenceCreateInfo
 pub const khr_external_fence_win32_spec_version = 1
 pub const khr_external_fence_win32_extension_name = c'VK_KHR_external_fence_win32'
 
-pub type ImportFenceWin32HandleInfoKHR = C.VkImportFenceWin32HandleInfoKHR
+$if vulkan_win32 ? {
+	pub type ImportFenceWin32HandleInfoKHR = C.VkImportFenceWin32HandleInfoKHR
 
-@[typedef]
-pub struct C.VkImportFenceWin32HandleInfoKHR {
-pub mut:
-	sType      StructureType = StructureType.import_fence_win32_handle_info_khr
-	pNext      voidptr       = unsafe { nil }
-	fence      Fence
-	flags      FenceImportFlags
-	handleType ExternalFenceHandleTypeFlagBits
-	handle     voidptr
-	name       &u16
-}
+	@[typedef]
+	pub struct C.VkImportFenceWin32HandleInfoKHR {
+	pub mut:
+		sType      StructureType = StructureType.import_fence_win32_handle_info_khr
+		pNext      voidptr       = unsafe { nil }
+		fence      Fence
+		flags      FenceImportFlags
+		handleType ExternalFenceHandleTypeFlagBits
+		handle     voidptr
+		name       &u16
+	}
 
-// ExportFenceWin32HandleInfoKHR extends VkFenceCreateInfo
-pub type ExportFenceWin32HandleInfoKHR = C.VkExportFenceWin32HandleInfoKHR
+	// ExportFenceWin32HandleInfoKHR extends VkFenceCreateInfo
+	pub type ExportFenceWin32HandleInfoKHR = C.VkExportFenceWin32HandleInfoKHR
 
-@[typedef]
-pub struct C.VkExportFenceWin32HandleInfoKHR {
-pub mut:
-	sType       StructureType = StructureType.export_fence_win32_handle_info_khr
-	pNext       voidptr       = unsafe { nil }
-	pAttributes &voidptr
-	dwAccess    u32
-	name        &u16
-}
+	@[typedef]
+	pub struct C.VkExportFenceWin32HandleInfoKHR {
+	pub mut:
+		sType       StructureType = StructureType.export_fence_win32_handle_info_khr
+		pNext       voidptr       = unsafe { nil }
+		pAttributes &voidptr
+		dwAccess    u32
+		name        &u16
+	}
 
-pub type FenceGetWin32HandleInfoKHR = C.VkFenceGetWin32HandleInfoKHR
+	pub type FenceGetWin32HandleInfoKHR = C.VkFenceGetWin32HandleInfoKHR
 
-@[typedef]
-pub struct C.VkFenceGetWin32HandleInfoKHR {
-pub mut:
-	sType      StructureType = StructureType.fence_get_win32_handle_info_khr
-	pNext      voidptr       = unsafe { nil }
-	fence      Fence
-	handleType ExternalFenceHandleTypeFlagBits
-}
+	@[typedef]
+	pub struct C.VkFenceGetWin32HandleInfoKHR {
+	pub mut:
+		sType      StructureType = StructureType.fence_get_win32_handle_info_khr
+		pNext      voidptr       = unsafe { nil }
+		fence      Fence
+		handleType ExternalFenceHandleTypeFlagBits
+	}
 
-@[keep_args_alive]
-fn C.vkImportFenceWin32HandleKHR(
+	@[keep_args_alive]
+	fn C.vkImportFenceWin32HandleKHR(
 	device Device, const_pImportFenceWin32HandleInfo &ImportFenceWin32HandleInfoKHR) Result
 
-pub type PFN_vkImportFenceWin32HandleKHR = fn (device Device, const_pImportFenceWin32HandleInfo &ImportFenceWin32HandleInfoKHR) Result
+	pub type PFN_vkImportFenceWin32HandleKHR = fn (device Device, const_pImportFenceWin32HandleInfo &ImportFenceWin32HandleInfoKHR) Result
 
-@[inline]
-pub fn import_fence_win32_handle_khr(
+	@[inline]
+	pub fn import_fence_win32_handle_khr(
 	device Device,
 	const_pImportFenceWin32HandleInfo &ImportFenceWin32HandleInfoKHR) Result {
-	return C.vkImportFenceWin32HandleKHR(device, const_pImportFenceWin32HandleInfo)
-}
+		return C.vkImportFenceWin32HandleKHR(device, const_pImportFenceWin32HandleInfo)
+	}
 
-@[keep_args_alive]
-fn C.vkGetFenceWin32HandleKHR(
+	@[keep_args_alive]
+	fn C.vkGetFenceWin32HandleKHR(
 	device Device, const_pGetWin32HandleInfo &FenceGetWin32HandleInfoKHR, pHandle &voidptr) Result
 
-pub type PFN_vkGetFenceWin32HandleKHR = fn (device Device, const_pGetWin32HandleInfo &FenceGetWin32HandleInfoKHR, pHandle &voidptr) Result
+	pub type PFN_vkGetFenceWin32HandleKHR = fn (device Device, const_pGetWin32HandleInfo &FenceGetWin32HandleInfoKHR, pHandle &voidptr) Result
 
-@[inline]
-pub fn get_fence_win32_handle_khr(
+	@[inline]
+	pub fn get_fence_win32_handle_khr(
 	device Device,
 	const_pGetWin32HandleInfo &FenceGetWin32HandleInfoKHR,
 	pHandle &voidptr) Result {
-	return C.vkGetFenceWin32HandleKHR(device, const_pGetWin32HandleInfo, pHandle)
+		return C.vkGetFenceWin32HandleKHR(device, const_pGetWin32HandleInfo, pHandle)
+	}
 }
 
 pub const khr_external_fence_fd_spec_version = 1
@@ -15697,40 +15732,46 @@ pub fn bind_image_memory2_khr(
 
 pub const khr_portability_subset_spec_version = 1
 pub const khr_portability_subset_extension_name = c'VK_KHR_portability_subset'
-// PhysicalDevicePortabilitySubsetFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDevicePortabilitySubsetFeaturesKHR = C.VkPhysicalDevicePortabilitySubsetFeaturesKHR
 
-@[typedef]
-pub struct C.VkPhysicalDevicePortabilitySubsetFeaturesKHR {
-pub mut:
-	sType                                  StructureType
-	pNext                                  voidptr = unsafe { nil }
-	constantAlphaColorBlendFactors         Bool32
-	events                                 Bool32
-	imageViewFormatReinterpretation        Bool32
-	imageViewFormatSwizzle                 Bool32
-	imageView2DOn3DImage                   Bool32
-	multisampleArrayImage                  Bool32
-	mutableComparisonSamplers              Bool32
-	pointPolygons                          Bool32
-	samplerMipLodBias                      Bool32
-	separateStencilMaskRef                 Bool32
-	shaderSampleRateInterpolationFunctions Bool32
-	tessellationIsolines                   Bool32
-	tessellationPointMode                  Bool32
-	triangleFans                           Bool32
-	vertexAttributeAccessBeyondStride      Bool32
+$if vulkan_provisional ? {
+	#flag -DVK_ENABLE_BETA_EXTENSIONS
 }
+$if vulkan_provisional ? {
+	// PhysicalDevicePortabilitySubsetFeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+	pub type PhysicalDevicePortabilitySubsetFeaturesKHR = C.VkPhysicalDevicePortabilitySubsetFeaturesKHR
 
-// PhysicalDevicePortabilitySubsetPropertiesKHR extends VkPhysicalDeviceProperties2
-pub type PhysicalDevicePortabilitySubsetPropertiesKHR = C.VkPhysicalDevicePortabilitySubsetPropertiesKHR
+	@[typedef]
+	pub struct C.VkPhysicalDevicePortabilitySubsetFeaturesKHR {
+	pub mut:
+		sType                                  StructureType
+		pNext                                  voidptr = unsafe { nil }
+		constantAlphaColorBlendFactors         Bool32
+		events                                 Bool32
+		imageViewFormatReinterpretation        Bool32
+		imageViewFormatSwizzle                 Bool32
+		imageView2DOn3DImage                   Bool32
+		multisampleArrayImage                  Bool32
+		mutableComparisonSamplers              Bool32
+		pointPolygons                          Bool32
+		samplerMipLodBias                      Bool32
+		separateStencilMaskRef                 Bool32
+		shaderSampleRateInterpolationFunctions Bool32
+		tessellationIsolines                   Bool32
+		tessellationPointMode                  Bool32
+		triangleFans                           Bool32
+		vertexAttributeAccessBeyondStride      Bool32
+	}
 
-@[typedef]
-pub struct C.VkPhysicalDevicePortabilitySubsetPropertiesKHR {
-pub mut:
-	sType                                StructureType
-	pNext                                voidptr = unsafe { nil }
-	minVertexInputBindingStrideAlignment u32
+	// PhysicalDevicePortabilitySubsetPropertiesKHR extends VkPhysicalDeviceProperties2
+	pub type PhysicalDevicePortabilitySubsetPropertiesKHR = C.VkPhysicalDevicePortabilitySubsetPropertiesKHR
+
+	@[typedef]
+	pub struct C.VkPhysicalDevicePortabilitySubsetPropertiesKHR {
+	pub mut:
+		sType                                StructureType
+		pNext                                voidptr = unsafe { nil }
+		minVertexInputBindingStrideAlignment u32
+	}
 }
 
 pub const khr_maintenance_3_spec_version = 1
@@ -21222,33 +21263,38 @@ pub const amd_shader_image_load_store_lod_extension_name = c'VK_AMD_shader_image
 pub const ggp_stream_descriptor_surface_spec_version = 1
 pub const ggp_stream_descriptor_surface_extension_name = c'VK_GGP_stream_descriptor_surface'
 
-pub type StreamDescriptorSurfaceCreateFlagsGGP = u32
-pub type StreamDescriptorSurfaceCreateInfoGGP = C.VkStreamDescriptorSurfaceCreateInfoGGP
-
-@[typedef]
-pub struct C.VkStreamDescriptorSurfaceCreateInfoGGP {
-pub mut:
-	sType            StructureType = StructureType.stream_descriptor_surface_create_info_ggp
-	pNext            voidptr       = unsafe { nil }
-	flags            StreamDescriptorSurfaceCreateFlagsGGP
-	streamDescriptor usize
+$if vulkan_ggp ? {
+	#flag -DVK_USE_PLATFORM_GGP
 }
+$if vulkan_ggp ? {
+	pub type StreamDescriptorSurfaceCreateFlagsGGP = u32
+	pub type StreamDescriptorSurfaceCreateInfoGGP = C.VkStreamDescriptorSurfaceCreateInfoGGP
 
-@[keep_args_alive]
-fn C.vkCreateStreamDescriptorSurfaceGGP(
+	@[typedef]
+	pub struct C.VkStreamDescriptorSurfaceCreateInfoGGP {
+	pub mut:
+		sType            StructureType = StructureType.stream_descriptor_surface_create_info_ggp
+		pNext            voidptr       = unsafe { nil }
+		flags            StreamDescriptorSurfaceCreateFlagsGGP
+		streamDescriptor usize
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateStreamDescriptorSurfaceGGP(
 	instance Instance, const_pCreateInfo &StreamDescriptorSurfaceCreateInfoGGP, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateStreamDescriptorSurfaceGGP = fn (instance Instance, const_pCreateInfo &StreamDescriptorSurfaceCreateInfoGGP, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateStreamDescriptorSurfaceGGP = fn (instance Instance, const_pCreateInfo &StreamDescriptorSurfaceCreateInfoGGP, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_stream_descriptor_surface_ggp(
+	@[inline]
+	pub fn create_stream_descriptor_surface_ggp(
 	instance Instance,
 	const_pCreateInfo &StreamDescriptorSurfaceCreateInfoGGP,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateStreamDescriptorSurfaceGGP(instance, const_pCreateInfo, const_pAllocator,
-		pSurface)
+		return C.vkCreateStreamDescriptorSurfaceGGP(instance, const_pCreateInfo, const_pAllocator,
+			pSurface)
+	}
 }
 
 pub const nv_corner_sampled_image_spec_version = 2
@@ -21345,62 +21391,68 @@ pub mut:
 
 pub const nv_external_memory_win32_spec_version = 1
 pub const nv_external_memory_win32_extension_name = c'VK_NV_external_memory_win32'
-// ImportMemoryWin32HandleInfoNV extends VkMemoryAllocateInfo
-pub type ImportMemoryWin32HandleInfoNV = C.VkImportMemoryWin32HandleInfoNV
 
-@[typedef]
-pub struct C.VkImportMemoryWin32HandleInfoNV {
-pub mut:
-	sType      StructureType = StructureType.import_memory_win32_handle_info_nv
-	pNext      voidptr       = unsafe { nil }
-	handleType ExternalMemoryHandleTypeFlagsNV
-	handle     voidptr
-}
+$if vulkan_win32 ? {
+	// ImportMemoryWin32HandleInfoNV extends VkMemoryAllocateInfo
+	pub type ImportMemoryWin32HandleInfoNV = C.VkImportMemoryWin32HandleInfoNV
 
-// ExportMemoryWin32HandleInfoNV extends VkMemoryAllocateInfo
-pub type ExportMemoryWin32HandleInfoNV = C.VkExportMemoryWin32HandleInfoNV
+	@[typedef]
+	pub struct C.VkImportMemoryWin32HandleInfoNV {
+	pub mut:
+		sType      StructureType = StructureType.import_memory_win32_handle_info_nv
+		pNext      voidptr       = unsafe { nil }
+		handleType ExternalMemoryHandleTypeFlagsNV
+		handle     voidptr
+	}
 
-@[typedef]
-pub struct C.VkExportMemoryWin32HandleInfoNV {
-pub mut:
-	sType       StructureType = StructureType.export_memory_win32_handle_info_nv
-	pNext       voidptr       = unsafe { nil }
-	pAttributes &voidptr
-	dwAccess    u32
-}
+	// ExportMemoryWin32HandleInfoNV extends VkMemoryAllocateInfo
+	pub type ExportMemoryWin32HandleInfoNV = C.VkExportMemoryWin32HandleInfoNV
 
-@[keep_args_alive]
-fn C.vkGetMemoryWin32HandleNV(
+	@[typedef]
+	pub struct C.VkExportMemoryWin32HandleInfoNV {
+	pub mut:
+		sType       StructureType = StructureType.export_memory_win32_handle_info_nv
+		pNext       voidptr       = unsafe { nil }
+		pAttributes &voidptr
+		dwAccess    u32
+	}
+
+	@[keep_args_alive]
+	fn C.vkGetMemoryWin32HandleNV(
 	device Device, memory DeviceMemory, handleType ExternalMemoryHandleTypeFlagsNV, pHandle &voidptr) Result
 
-pub type PFN_vkGetMemoryWin32HandleNV = fn (device Device, memory DeviceMemory, handleType ExternalMemoryHandleTypeFlagsNV, pHandle &voidptr) Result
+	pub type PFN_vkGetMemoryWin32HandleNV = fn (device Device, memory DeviceMemory, handleType ExternalMemoryHandleTypeFlagsNV, pHandle &voidptr) Result
 
-@[inline]
-pub fn get_memory_win32_handle_nv(
+	@[inline]
+	pub fn get_memory_win32_handle_nv(
 	device Device,
 	memory DeviceMemory,
 	handleType ExternalMemoryHandleTypeFlagsNV,
 	pHandle &voidptr) Result {
-	return C.vkGetMemoryWin32HandleNV(device, memory, handleType, pHandle)
+		return C.vkGetMemoryWin32HandleNV(device, memory, handleType, pHandle)
+	}
 }
 
 pub const nv_win32_keyed_mutex_spec_version = 2
 pub const nv_win32_keyed_mutex_extension_name = c'VK_NV_win32_keyed_mutex'
-// Win32KeyedMutexAcquireReleaseInfoNV extends VkSubmitInfo,VkSubmitInfo2
-pub type Win32KeyedMutexAcquireReleaseInfoNV = C.VkWin32KeyedMutexAcquireReleaseInfoNV
 
-@[typedef]
-pub struct C.VkWin32KeyedMutexAcquireReleaseInfoNV {
-pub mut:
-	sType                       StructureType = StructureType.win32_keyed_mutex_acquire_release_info_nv
-	pNext                       voidptr       = unsafe { nil }
-	acquireCount                u32
-	pAcquireSyncs               &DeviceMemory
-	pAcquireKeys                &u64
-	pAcquireTimeoutMilliseconds &u32
-	releaseCount                u32
-	pReleaseSyncs               &DeviceMemory
-	pReleaseKeys                &u64
+$if vulkan_win32 ? {
+	// Win32KeyedMutexAcquireReleaseInfoNV extends VkSubmitInfo,VkSubmitInfo2
+	pub type Win32KeyedMutexAcquireReleaseInfoNV = C.VkWin32KeyedMutexAcquireReleaseInfoNV
+
+	@[typedef]
+	pub struct C.VkWin32KeyedMutexAcquireReleaseInfoNV {
+	pub mut:
+		sType                       StructureType = StructureType.win32_keyed_mutex_acquire_release_info_nv
+		pNext                       voidptr       = unsafe { nil }
+		acquireCount                u32
+		pAcquireSyncs               &DeviceMemory
+		pAcquireKeys                &u64
+		pAcquireTimeoutMilliseconds &u32
+		releaseCount                u32
+		pReleaseSyncs               &DeviceMemory
+		pReleaseKeys                &u64
+	}
 }
 
 pub const ext_validation_flags_spec_version = 3
@@ -21426,32 +21478,37 @@ pub mut:
 pub const nn_vi_surface_spec_version = 1
 pub const nn_vi_surface_extension_name = c'VK_NN_vi_surface'
 
-pub type ViSurfaceCreateFlagsNN = u32
-pub type ViSurfaceCreateInfoNN = C.VkViSurfaceCreateInfoNN
-
-@[typedef]
-pub struct C.VkViSurfaceCreateInfoNN {
-pub mut:
-	sType  StructureType = StructureType.vi_surface_create_info_nn
-	pNext  voidptr       = unsafe { nil }
-	flags  ViSurfaceCreateFlagsNN
-	window voidptr
+$if vulkan_vi ? {
+	#flag -DVK_USE_PLATFORM_VI_NN
 }
+$if vulkan_vi ? {
+	pub type ViSurfaceCreateFlagsNN = u32
+	pub type ViSurfaceCreateInfoNN = C.VkViSurfaceCreateInfoNN
 
-@[keep_args_alive]
-fn C.vkCreateViSurfaceNN(
+	@[typedef]
+	pub struct C.VkViSurfaceCreateInfoNN {
+	pub mut:
+		sType  StructureType = StructureType.vi_surface_create_info_nn
+		pNext  voidptr       = unsafe { nil }
+		flags  ViSurfaceCreateFlagsNN
+		window voidptr
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateViSurfaceNN(
 	instance Instance, const_pCreateInfo &ViSurfaceCreateInfoNN, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateViSurfaceNN = fn (instance Instance, const_pCreateInfo &ViSurfaceCreateInfoNN, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateViSurfaceNN = fn (instance Instance, const_pCreateInfo &ViSurfaceCreateInfoNN, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_vi_surface_nn(
+	@[inline]
+	pub fn create_vi_surface_nn(
 	instance Instance,
 	const_pCreateInfo &ViSurfaceCreateInfoNN,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateViSurfaceNN(instance, const_pCreateInfo, const_pAllocator, pSurface)
+		return C.vkCreateViSurfaceNN(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 }
 
 pub const ext_shader_subgroup_ballot_spec_version = 1
@@ -21625,33 +21682,38 @@ pub fn release_display_ext(
 pub const ext_acquire_xlib_display_spec_version = 1
 pub const ext_acquire_xlib_display_extension_name = c'VK_EXT_acquire_xlib_display'
 
-@[keep_args_alive]
-fn C.vkAcquireXlibDisplayEXT(
+$if vulkan_xlib_xrandr ? {
+	#flag -DVK_USE_PLATFORM_XLIB_XRANDR_EXT
+}
+$if vulkan_xlib_xrandr ? {
+	@[keep_args_alive]
+	fn C.vkAcquireXlibDisplayEXT(
 	physicalDevice PhysicalDevice, dpy &voidptr, display DisplayKHR) Result
 
-pub type PFN_vkAcquireXlibDisplayEXT = fn (physicalDevice PhysicalDevice, dpy &voidptr, display DisplayKHR) Result
+	pub type PFN_vkAcquireXlibDisplayEXT = fn (physicalDevice PhysicalDevice, dpy &voidptr, display DisplayKHR) Result
 
-@[inline]
-pub fn acquire_xlib_display_ext(
+	@[inline]
+	pub fn acquire_xlib_display_ext(
 	physicalDevice PhysicalDevice,
 	dpy &voidptr,
 	display DisplayKHR) Result {
-	return C.vkAcquireXlibDisplayEXT(physicalDevice, dpy, display)
-}
+		return C.vkAcquireXlibDisplayEXT(physicalDevice, dpy, display)
+	}
 
-@[keep_args_alive]
-fn C.vkGetRandROutputDisplayEXT(
+	@[keep_args_alive]
+	fn C.vkGetRandROutputDisplayEXT(
 	physicalDevice PhysicalDevice, dpy &voidptr, rrOutput usize, pDisplay &DisplayKHR) Result
 
-pub type PFN_vkGetRandROutputDisplayEXT = fn (physicalDevice PhysicalDevice, dpy &voidptr, rrOutput usize, pDisplay &DisplayKHR) Result
+	pub type PFN_vkGetRandROutputDisplayEXT = fn (physicalDevice PhysicalDevice, dpy &voidptr, rrOutput usize, pDisplay &DisplayKHR) Result
 
-@[inline]
-pub fn get_rand_r_output_display_ext(
+	@[inline]
+	pub fn get_rand_r_output_display_ext(
 	physicalDevice PhysicalDevice,
 	dpy &voidptr,
 	rrOutput usize,
 	pDisplay &DisplayKHR) Result {
-	return C.vkGetRandROutputDisplayEXT(physicalDevice, dpy, rrOutput, pDisplay)
+		return C.vkGetRandROutputDisplayEXT(physicalDevice, dpy, rrOutput, pDisplay)
+	}
 }
 
 pub const ext_display_surface_counter_spec_version = 1
@@ -22184,63 +22246,73 @@ pub mut:
 pub const mvk_ios_surface_spec_version = 3
 pub const mvk_ios_surface_extension_name = c'VK_MVK_ios_surface'
 
-pub type IOSSurfaceCreateFlagsMVK = u32
-pub type IOSSurfaceCreateInfoMVK = C.VkIOSSurfaceCreateInfoMVK
-
-@[typedef]
-pub struct C.VkIOSSurfaceCreateInfoMVK {
-pub mut:
-	sType StructureType = StructureType.ios_surface_create_info_mvk
-	pNext voidptr       = unsafe { nil }
-	flags IOSSurfaceCreateFlagsMVK
-	pView voidptr
+$if vulkan_ios ? {
+	#flag -DVK_USE_PLATFORM_IOS_MVK
 }
+$if vulkan_ios ? {
+	pub type IOSSurfaceCreateFlagsMVK = u32
+	pub type IOSSurfaceCreateInfoMVK = C.VkIOSSurfaceCreateInfoMVK
 
-@[keep_args_alive]
-fn C.vkCreateIOSSurfaceMVK(
+	@[typedef]
+	pub struct C.VkIOSSurfaceCreateInfoMVK {
+	pub mut:
+		sType StructureType = StructureType.ios_surface_create_info_mvk
+		pNext voidptr       = unsafe { nil }
+		flags IOSSurfaceCreateFlagsMVK
+		pView voidptr
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateIOSSurfaceMVK(
 	instance Instance, const_pCreateInfo &IOSSurfaceCreateInfoMVK, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateIOSSurfaceMVK = fn (instance Instance, const_pCreateInfo &IOSSurfaceCreateInfoMVK, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateIOSSurfaceMVK = fn (instance Instance, const_pCreateInfo &IOSSurfaceCreateInfoMVK, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_ios_surface_mvk(
+	@[inline]
+	pub fn create_ios_surface_mvk(
 	instance Instance,
 	const_pCreateInfo &IOSSurfaceCreateInfoMVK,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateIOSSurfaceMVK(instance, const_pCreateInfo, const_pAllocator, pSurface)
+		return C.vkCreateIOSSurfaceMVK(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 }
 
 pub const mvk_macos_surface_spec_version = 3
 pub const mvk_macos_surface_extension_name = c'VK_MVK_macos_surface'
 
-pub type MacOSSurfaceCreateFlagsMVK = u32
-pub type MacOSSurfaceCreateInfoMVK = C.VkMacOSSurfaceCreateInfoMVK
-
-@[typedef]
-pub struct C.VkMacOSSurfaceCreateInfoMVK {
-pub mut:
-	sType StructureType = StructureType.macos_surface_create_info_mvk
-	pNext voidptr       = unsafe { nil }
-	flags MacOSSurfaceCreateFlagsMVK
-	pView voidptr
+$if vulkan_macos ? {
+	#flag -DVK_USE_PLATFORM_MACOS_MVK
 }
+$if vulkan_macos ? {
+	pub type MacOSSurfaceCreateFlagsMVK = u32
+	pub type MacOSSurfaceCreateInfoMVK = C.VkMacOSSurfaceCreateInfoMVK
 
-@[keep_args_alive]
-fn C.vkCreateMacOSSurfaceMVK(
+	@[typedef]
+	pub struct C.VkMacOSSurfaceCreateInfoMVK {
+	pub mut:
+		sType StructureType = StructureType.macos_surface_create_info_mvk
+		pNext voidptr       = unsafe { nil }
+		flags MacOSSurfaceCreateFlagsMVK
+		pView voidptr
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateMacOSSurfaceMVK(
 	instance Instance, const_pCreateInfo &MacOSSurfaceCreateInfoMVK, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateMacOSSurfaceMVK = fn (instance Instance, const_pCreateInfo &MacOSSurfaceCreateInfoMVK, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateMacOSSurfaceMVK = fn (instance Instance, const_pCreateInfo &MacOSSurfaceCreateInfoMVK, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_mac_os_surface_mvk(
+	@[inline]
+	pub fn create_mac_os_surface_mvk(
 	instance Instance,
 	const_pCreateInfo &MacOSSurfaceCreateInfoMVK,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateMacOSSurfaceMVK(instance, const_pCreateInfo, const_pAllocator, pSurface)
+		return C.vkCreateMacOSSurfaceMVK(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 }
 
 pub const ext_external_memory_dma_buf_spec_version = 1
@@ -22500,129 +22572,132 @@ pub fn submit_debug_utils_message_ext(
 	C.vkSubmitDebugUtilsMessageEXT(instance, messageSeverity, messageTypes, const_pCallbackData)
 }
 
-pub type AHardwareBuffer = C.AHardwareBuffer
-
-@[typedef]
-pub struct C.AHardwareBuffer {}
-
 pub const android_external_memory_android_hardware_buffer_spec_version = 5
 pub const android_external_memory_android_hardware_buffer_extension_name = c'VK_ANDROID_external_memory_android_hardware_buffer'
-// AndroidHardwareBufferUsageANDROID extends VkImageFormatProperties2
-pub type AndroidHardwareBufferUsageANDROID = C.VkAndroidHardwareBufferUsageANDROID
 
-@[typedef]
-pub struct C.VkAndroidHardwareBufferUsageANDROID {
-pub mut:
-	sType                      StructureType = StructureType.android_hardware_buffer_usage_android
-	pNext                      voidptr       = unsafe { nil }
-	androidHardwareBufferUsage u64
-}
+$if vulkan_android ? {
+	pub type AHardwareBuffer = C.AHardwareBuffer
 
-pub type AndroidHardwareBufferPropertiesANDROID = C.VkAndroidHardwareBufferPropertiesANDROID
+	@[typedef]
+	pub struct C.AHardwareBuffer {}
 
-@[typedef]
-pub struct C.VkAndroidHardwareBufferPropertiesANDROID {
-pub mut:
-	sType          StructureType = StructureType.android_hardware_buffer_properties_android
-	pNext          voidptr       = unsafe { nil }
-	allocationSize DeviceSize
-	memoryTypeBits u32
-}
+	// AndroidHardwareBufferUsageANDROID extends VkImageFormatProperties2
+	pub type AndroidHardwareBufferUsageANDROID = C.VkAndroidHardwareBufferUsageANDROID
 
-// AndroidHardwareBufferFormatPropertiesANDROID extends VkAndroidHardwareBufferPropertiesANDROID
-pub type AndroidHardwareBufferFormatPropertiesANDROID = C.VkAndroidHardwareBufferFormatPropertiesANDROID
+	@[typedef]
+	pub struct C.VkAndroidHardwareBufferUsageANDROID {
+	pub mut:
+		sType                      StructureType = StructureType.android_hardware_buffer_usage_android
+		pNext                      voidptr       = unsafe { nil }
+		androidHardwareBufferUsage u64
+	}
 
-@[typedef]
-pub struct C.VkAndroidHardwareBufferFormatPropertiesANDROID {
-pub mut:
-	sType                            StructureType = StructureType.android_hardware_buffer_format_properties_android
-	pNext                            voidptr       = unsafe { nil }
-	format                           Format
-	externalFormat                   u64
-	formatFeatures                   FormatFeatureFlags
-	samplerYcbcrConversionComponents ComponentMapping
-	suggestedYcbcrModel              SamplerYcbcrModelConversion
-	suggestedYcbcrRange              SamplerYcbcrRange
-	suggestedXChromaOffset           ChromaLocation
-	suggestedYChromaOffset           ChromaLocation
-}
+	pub type AndroidHardwareBufferPropertiesANDROID = C.VkAndroidHardwareBufferPropertiesANDROID
 
-// ImportAndroidHardwareBufferInfoANDROID extends VkMemoryAllocateInfo
-pub type ImportAndroidHardwareBufferInfoANDROID = C.VkImportAndroidHardwareBufferInfoANDROID
+	@[typedef]
+	pub struct C.VkAndroidHardwareBufferPropertiesANDROID {
+	pub mut:
+		sType          StructureType = StructureType.android_hardware_buffer_properties_android
+		pNext          voidptr       = unsafe { nil }
+		allocationSize DeviceSize
+		memoryTypeBits u32
+	}
 
-@[typedef]
-pub struct C.VkImportAndroidHardwareBufferInfoANDROID {
-pub mut:
-	sType  StructureType = StructureType.import_android_hardware_buffer_info_android
-	pNext  voidptr       = unsafe { nil }
-	buffer &AHardwareBuffer
-}
+	// AndroidHardwareBufferFormatPropertiesANDROID extends VkAndroidHardwareBufferPropertiesANDROID
+	pub type AndroidHardwareBufferFormatPropertiesANDROID = C.VkAndroidHardwareBufferFormatPropertiesANDROID
 
-pub type MemoryGetAndroidHardwareBufferInfoANDROID = C.VkMemoryGetAndroidHardwareBufferInfoANDROID
+	@[typedef]
+	pub struct C.VkAndroidHardwareBufferFormatPropertiesANDROID {
+	pub mut:
+		sType                            StructureType = StructureType.android_hardware_buffer_format_properties_android
+		pNext                            voidptr       = unsafe { nil }
+		format                           Format
+		externalFormat                   u64
+		formatFeatures                   FormatFeatureFlags
+		samplerYcbcrConversionComponents ComponentMapping
+		suggestedYcbcrModel              SamplerYcbcrModelConversion
+		suggestedYcbcrRange              SamplerYcbcrRange
+		suggestedXChromaOffset           ChromaLocation
+		suggestedYChromaOffset           ChromaLocation
+	}
 
-@[typedef]
-pub struct C.VkMemoryGetAndroidHardwareBufferInfoANDROID {
-pub mut:
-	sType  StructureType = StructureType.memory_get_android_hardware_buffer_info_android
-	pNext  voidptr       = unsafe { nil }
-	memory DeviceMemory
-}
+	// ImportAndroidHardwareBufferInfoANDROID extends VkMemoryAllocateInfo
+	pub type ImportAndroidHardwareBufferInfoANDROID = C.VkImportAndroidHardwareBufferInfoANDROID
 
-// ExternalFormatANDROID extends VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo,VkAttachmentDescription2,VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo
-pub type ExternalFormatANDROID = C.VkExternalFormatANDROID
+	@[typedef]
+	pub struct C.VkImportAndroidHardwareBufferInfoANDROID {
+	pub mut:
+		sType  StructureType = StructureType.import_android_hardware_buffer_info_android
+		pNext  voidptr       = unsafe { nil }
+		buffer &AHardwareBuffer
+	}
 
-@[typedef]
-pub struct C.VkExternalFormatANDROID {
-pub mut:
-	sType          StructureType = StructureType.external_format_android
-	pNext          voidptr       = unsafe { nil }
-	externalFormat u64
-}
+	pub type MemoryGetAndroidHardwareBufferInfoANDROID = C.VkMemoryGetAndroidHardwareBufferInfoANDROID
 
-// AndroidHardwareBufferFormatProperties2ANDROID extends VkAndroidHardwareBufferPropertiesANDROID
-pub type AndroidHardwareBufferFormatProperties2ANDROID = C.VkAndroidHardwareBufferFormatProperties2ANDROID
+	@[typedef]
+	pub struct C.VkMemoryGetAndroidHardwareBufferInfoANDROID {
+	pub mut:
+		sType  StructureType = StructureType.memory_get_android_hardware_buffer_info_android
+		pNext  voidptr       = unsafe { nil }
+		memory DeviceMemory
+	}
 
-@[typedef]
-pub struct C.VkAndroidHardwareBufferFormatProperties2ANDROID {
-pub mut:
-	sType                            StructureType = StructureType.android_hardware_buffer_format_properties2_android
-	pNext                            voidptr       = unsafe { nil }
-	format                           Format
-	externalFormat                   u64
-	formatFeatures                   FormatFeatureFlags2
-	samplerYcbcrConversionComponents ComponentMapping
-	suggestedYcbcrModel              SamplerYcbcrModelConversion
-	suggestedYcbcrRange              SamplerYcbcrRange
-	suggestedXChromaOffset           ChromaLocation
-	suggestedYChromaOffset           ChromaLocation
-}
+	// ExternalFormatANDROID extends VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo,VkAttachmentDescription2,VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo
+	pub type ExternalFormatANDROID = C.VkExternalFormatANDROID
 
-@[keep_args_alive]
-fn C.vkGetAndroidHardwareBufferPropertiesANDROID(
+	@[typedef]
+	pub struct C.VkExternalFormatANDROID {
+	pub mut:
+		sType          StructureType = StructureType.external_format_android
+		pNext          voidptr       = unsafe { nil }
+		externalFormat u64
+	}
+
+	// AndroidHardwareBufferFormatProperties2ANDROID extends VkAndroidHardwareBufferPropertiesANDROID
+	pub type AndroidHardwareBufferFormatProperties2ANDROID = C.VkAndroidHardwareBufferFormatProperties2ANDROID
+
+	@[typedef]
+	pub struct C.VkAndroidHardwareBufferFormatProperties2ANDROID {
+	pub mut:
+		sType                            StructureType = StructureType.android_hardware_buffer_format_properties2_android
+		pNext                            voidptr       = unsafe { nil }
+		format                           Format
+		externalFormat                   u64
+		formatFeatures                   FormatFeatureFlags2
+		samplerYcbcrConversionComponents ComponentMapping
+		suggestedYcbcrModel              SamplerYcbcrModelConversion
+		suggestedYcbcrRange              SamplerYcbcrRange
+		suggestedXChromaOffset           ChromaLocation
+		suggestedYChromaOffset           ChromaLocation
+	}
+
+	@[keep_args_alive]
+	fn C.vkGetAndroidHardwareBufferPropertiesANDROID(
 	device Device, const_buffer &AHardwareBuffer, mut_pProperties &AndroidHardwareBufferPropertiesANDROID) Result
 
-pub type PFN_vkGetAndroidHardwareBufferPropertiesANDROID = fn (device Device, const_buffer &AHardwareBuffer, mut_pProperties &AndroidHardwareBufferPropertiesANDROID) Result
+	pub type PFN_vkGetAndroidHardwareBufferPropertiesANDROID = fn (device Device, const_buffer &AHardwareBuffer, mut_pProperties &AndroidHardwareBufferPropertiesANDROID) Result
 
-@[inline]
-pub fn get_android_hardware_buffer_properties_android(
+	@[inline]
+	pub fn get_android_hardware_buffer_properties_android(
 	device Device,
 	const_buffer &AHardwareBuffer,
 	mut mut_pProperties AndroidHardwareBufferPropertiesANDROID) Result {
-	return C.vkGetAndroidHardwareBufferPropertiesANDROID(device, const_buffer, mut_pProperties)
-}
+		return C.vkGetAndroidHardwareBufferPropertiesANDROID(device, const_buffer, mut_pProperties)
+	}
 
-@[keep_args_alive]
-fn C.vkGetMemoryAndroidHardwareBufferANDROID(
+	@[keep_args_alive]
+	fn C.vkGetMemoryAndroidHardwareBufferANDROID(
 	device Device, const_pInfo &MemoryGetAndroidHardwareBufferInfoANDROID, mut_pBuffer &&AHardwareBuffer) Result
 
-pub type PFN_vkGetMemoryAndroidHardwareBufferANDROID = fn (device Device, const_pInfo &MemoryGetAndroidHardwareBufferInfoANDROID, mut_pBuffer &&AHardwareBuffer) Result
+	pub type PFN_vkGetMemoryAndroidHardwareBufferANDROID = fn (device Device, const_pInfo &MemoryGetAndroidHardwareBufferInfoANDROID, mut_pBuffer &&AHardwareBuffer) Result
 
-@[inline]
-pub fn get_memory_android_hardware_buffer_android(
+	@[inline]
+	pub fn get_memory_android_hardware_buffer_android(
 	device Device,
 	const_pInfo &MemoryGetAndroidHardwareBufferInfoANDROID,
 	mut mut_pBuffer AHardwareBuffer) Result {
-	return C.vkGetMemoryAndroidHardwareBufferANDROID(device, const_pInfo, mut_pBuffer)
+		return C.vkGetMemoryAndroidHardwareBufferANDROID(device, const_pInfo, mut_pBuffer)
+	}
 }
 
 pub const ext_sampler_filter_minmax_spec_version = 2
@@ -23028,215 +23103,218 @@ pub fn cmd_copy_gpa_session_results_amd(
 
 pub const amdx_shader_enqueue_spec_version = 2
 pub const amdx_shader_enqueue_extension_name = c'VK_AMDX_shader_enqueue'
-pub const shader_index_unused_amdx = ~u32(0)
-// PhysicalDeviceShaderEnqueueFeaturesAMDX extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceShaderEnqueueFeaturesAMDX = C.VkPhysicalDeviceShaderEnqueueFeaturesAMDX
 
-@[typedef]
-pub struct C.VkPhysicalDeviceShaderEnqueueFeaturesAMDX {
-pub mut:
-	sType             StructureType
-	pNext             voidptr = unsafe { nil }
-	shaderEnqueue     Bool32
-	shaderMeshEnqueue Bool32
-}
+$if vulkan_provisional ? {
+	pub const shader_index_unused_amdx = ~u32(0)
+	// PhysicalDeviceShaderEnqueueFeaturesAMDX extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+	pub type PhysicalDeviceShaderEnqueueFeaturesAMDX = C.VkPhysicalDeviceShaderEnqueueFeaturesAMDX
 
-// PhysicalDeviceShaderEnqueuePropertiesAMDX extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceShaderEnqueuePropertiesAMDX = C.VkPhysicalDeviceShaderEnqueuePropertiesAMDX
+	@[typedef]
+	pub struct C.VkPhysicalDeviceShaderEnqueueFeaturesAMDX {
+	pub mut:
+		sType             StructureType
+		pNext             voidptr = unsafe { nil }
+		shaderEnqueue     Bool32
+		shaderMeshEnqueue Bool32
+	}
 
-@[typedef]
-pub struct C.VkPhysicalDeviceShaderEnqueuePropertiesAMDX {
-pub mut:
-	sType                                  StructureType
-	pNext                                  voidptr = unsafe { nil }
-	maxExecutionGraphDepth                 u32
-	maxExecutionGraphShaderOutputNodes     u32
-	maxExecutionGraphShaderPayloadSize     u32
-	maxExecutionGraphShaderPayloadCount    u32
-	executionGraphDispatchAddressAlignment u32
-	maxExecutionGraphWorkgroupCount        [3]u32
-	maxExecutionGraphWorkgroups            u32
-}
+	// PhysicalDeviceShaderEnqueuePropertiesAMDX extends VkPhysicalDeviceProperties2
+	pub type PhysicalDeviceShaderEnqueuePropertiesAMDX = C.VkPhysicalDeviceShaderEnqueuePropertiesAMDX
 
-pub type ExecutionGraphPipelineScratchSizeAMDX = C.VkExecutionGraphPipelineScratchSizeAMDX
+	@[typedef]
+	pub struct C.VkPhysicalDeviceShaderEnqueuePropertiesAMDX {
+	pub mut:
+		sType                                  StructureType
+		pNext                                  voidptr = unsafe { nil }
+		maxExecutionGraphDepth                 u32
+		maxExecutionGraphShaderOutputNodes     u32
+		maxExecutionGraphShaderPayloadSize     u32
+		maxExecutionGraphShaderPayloadCount    u32
+		executionGraphDispatchAddressAlignment u32
+		maxExecutionGraphWorkgroupCount        [3]u32
+		maxExecutionGraphWorkgroups            u32
+	}
 
-@[typedef]
-pub struct C.VkExecutionGraphPipelineScratchSizeAMDX {
-pub mut:
-	sType           StructureType
-	pNext           voidptr = unsafe { nil }
-	minSize         DeviceSize
-	maxSize         DeviceSize
-	sizeGranularity DeviceSize
-}
+	pub type ExecutionGraphPipelineScratchSizeAMDX = C.VkExecutionGraphPipelineScratchSizeAMDX
 
-pub type ExecutionGraphPipelineCreateInfoAMDX = C.VkExecutionGraphPipelineCreateInfoAMDX
+	@[typedef]
+	pub struct C.VkExecutionGraphPipelineScratchSizeAMDX {
+	pub mut:
+		sType           StructureType
+		pNext           voidptr = unsafe { nil }
+		minSize         DeviceSize
+		maxSize         DeviceSize
+		sizeGranularity DeviceSize
+	}
 
-@[typedef]
-pub struct C.VkExecutionGraphPipelineCreateInfoAMDX {
-pub mut:
-	sType              StructureType
-	pNext              voidptr = unsafe { nil }
-	flags              PipelineCreateFlags
-	stageCount         u32
-	pStages            &PipelineShaderStageCreateInfo
-	pLibraryInfo       &PipelineLibraryCreateInfoKHR
-	layout             PipelineLayout
-	basePipelineHandle Pipeline
-	basePipelineIndex  i32
-}
+	pub type ExecutionGraphPipelineCreateInfoAMDX = C.VkExecutionGraphPipelineCreateInfoAMDX
 
-pub type DeviceOrHostAddressConstAMDX = C.VkDeviceOrHostAddressConstAMDX
+	@[typedef]
+	pub struct C.VkExecutionGraphPipelineCreateInfoAMDX {
+	pub mut:
+		sType              StructureType
+		pNext              voidptr = unsafe { nil }
+		flags              PipelineCreateFlags
+		stageCount         u32
+		pStages            &PipelineShaderStageCreateInfo
+		pLibraryInfo       &PipelineLibraryCreateInfoKHR
+		layout             PipelineLayout
+		basePipelineHandle Pipeline
+		basePipelineIndex  i32
+	}
 
-@[typedef]
-pub union C.VkDeviceOrHostAddressConstAMDX {
-pub mut:
-	deviceAddress DeviceAddress
-	hostAddress   voidptr
-}
+	pub type DeviceOrHostAddressConstAMDX = C.VkDeviceOrHostAddressConstAMDX
 
-pub type DispatchGraphInfoAMDX = C.VkDispatchGraphInfoAMDX
+	@[typedef]
+	pub union C.VkDeviceOrHostAddressConstAMDX {
+	pub mut:
+		deviceAddress DeviceAddress
+		hostAddress   voidptr
+	}
 
-@[typedef]
-pub struct C.VkDispatchGraphInfoAMDX {
-pub mut:
-	nodeIndex     u32
-	payloadCount  u32
-	payloads      DeviceOrHostAddressConstAMDX
-	payloadStride u64
-}
+	pub type DispatchGraphInfoAMDX = C.VkDispatchGraphInfoAMDX
 
-pub type DispatchGraphCountInfoAMDX = C.VkDispatchGraphCountInfoAMDX
+	@[typedef]
+	pub struct C.VkDispatchGraphInfoAMDX {
+	pub mut:
+		nodeIndex     u32
+		payloadCount  u32
+		payloads      DeviceOrHostAddressConstAMDX
+		payloadStride u64
+	}
 
-@[typedef]
-pub struct C.VkDispatchGraphCountInfoAMDX {
-pub mut:
-	count  u32
-	infos  DeviceOrHostAddressConstAMDX
-	stride u64
-}
+	pub type DispatchGraphCountInfoAMDX = C.VkDispatchGraphCountInfoAMDX
 
-// PipelineShaderStageNodeCreateInfoAMDX extends VkPipelineShaderStageCreateInfo
-pub type PipelineShaderStageNodeCreateInfoAMDX = C.VkPipelineShaderStageNodeCreateInfoAMDX
+	@[typedef]
+	pub struct C.VkDispatchGraphCountInfoAMDX {
+	pub mut:
+		count  u32
+		infos  DeviceOrHostAddressConstAMDX
+		stride u64
+	}
 
-@[typedef]
-pub struct C.VkPipelineShaderStageNodeCreateInfoAMDX {
-pub mut:
-	sType StructureType
-	pNext voidptr = unsafe { nil }
-	pName &char
-	index u32
-}
+	// PipelineShaderStageNodeCreateInfoAMDX extends VkPipelineShaderStageCreateInfo
+	pub type PipelineShaderStageNodeCreateInfoAMDX = C.VkPipelineShaderStageNodeCreateInfoAMDX
 
-@[keep_args_alive]
-fn C.vkCreateExecutionGraphPipelinesAMDX(
+	@[typedef]
+	pub struct C.VkPipelineShaderStageNodeCreateInfoAMDX {
+	pub mut:
+		sType StructureType
+		pNext voidptr = unsafe { nil }
+		pName &char
+		index u32
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateExecutionGraphPipelinesAMDX(
 	device Device, pipelineCache PipelineCache, createInfoCount u32, const_pCreateInfos &ExecutionGraphPipelineCreateInfoAMDX, const_pAllocator &AllocationCallbacks, pPipelines &Pipeline) Result
 
-// pipelineCache Optional, can be NULL or 0
+	// pipelineCache Optional, can be NULL or 0
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateExecutionGraphPipelinesAMDX = fn (device Device, pipelineCache PipelineCache, createInfoCount u32, const_pCreateInfos &ExecutionGraphPipelineCreateInfoAMDX, const_pAllocator &AllocationCallbacks, pPipelines &Pipeline) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateExecutionGraphPipelinesAMDX = fn (device Device, pipelineCache PipelineCache, createInfoCount u32, const_pCreateInfos &ExecutionGraphPipelineCreateInfoAMDX, const_pAllocator &AllocationCallbacks, pPipelines &Pipeline) Result
 
-@[inline]
-pub fn create_execution_graph_pipelines_amdx(
+	@[inline]
+	pub fn create_execution_graph_pipelines_amdx(
 	device Device,
 	pipelineCache PipelineCache,
 	createInfoCount u32,
 	const_pCreateInfos &ExecutionGraphPipelineCreateInfoAMDX,
 	const_pAllocator &AllocationCallbacks,
 	pPipelines &Pipeline) Result {
-	return C.vkCreateExecutionGraphPipelinesAMDX(device, pipelineCache, createInfoCount,
-		const_pCreateInfos, const_pAllocator, pPipelines)
-}
+		return C.vkCreateExecutionGraphPipelinesAMDX(device, pipelineCache, createInfoCount,
+			const_pCreateInfos, const_pAllocator, pPipelines)
+	}
 
-@[keep_args_alive]
-fn C.vkGetExecutionGraphPipelineScratchSizeAMDX(
+	@[keep_args_alive]
+	fn C.vkGetExecutionGraphPipelineScratchSizeAMDX(
 	device Device, executionGraph Pipeline, mut_pSizeInfo &ExecutionGraphPipelineScratchSizeAMDX) Result
 
-pub type PFN_vkGetExecutionGraphPipelineScratchSizeAMDX = fn (device Device, executionGraph Pipeline, mut_pSizeInfo &ExecutionGraphPipelineScratchSizeAMDX) Result
+	pub type PFN_vkGetExecutionGraphPipelineScratchSizeAMDX = fn (device Device, executionGraph Pipeline, mut_pSizeInfo &ExecutionGraphPipelineScratchSizeAMDX) Result
 
-@[inline]
-pub fn get_execution_graph_pipeline_scratch_size_amdx(
+	@[inline]
+	pub fn get_execution_graph_pipeline_scratch_size_amdx(
 	device Device,
 	executionGraph Pipeline,
 	mut mut_pSizeInfo ExecutionGraphPipelineScratchSizeAMDX) Result {
-	return C.vkGetExecutionGraphPipelineScratchSizeAMDX(device, executionGraph, mut_pSizeInfo)
-}
+		return C.vkGetExecutionGraphPipelineScratchSizeAMDX(device, executionGraph, mut_pSizeInfo)
+	}
 
-@[keep_args_alive]
-fn C.vkGetExecutionGraphPipelineNodeIndexAMDX(
+	@[keep_args_alive]
+	fn C.vkGetExecutionGraphPipelineNodeIndexAMDX(
 	device Device, executionGraph Pipeline, const_pNodeInfo &PipelineShaderStageNodeCreateInfoAMDX, pNodeIndex &u32) Result
 
-pub type PFN_vkGetExecutionGraphPipelineNodeIndexAMDX = fn (device Device, executionGraph Pipeline, const_pNodeInfo &PipelineShaderStageNodeCreateInfoAMDX, pNodeIndex &u32) Result
+	pub type PFN_vkGetExecutionGraphPipelineNodeIndexAMDX = fn (device Device, executionGraph Pipeline, const_pNodeInfo &PipelineShaderStageNodeCreateInfoAMDX, pNodeIndex &u32) Result
 
-@[inline]
-pub fn get_execution_graph_pipeline_node_index_amdx(
+	@[inline]
+	pub fn get_execution_graph_pipeline_node_index_amdx(
 	device Device,
 	executionGraph Pipeline,
 	const_pNodeInfo &PipelineShaderStageNodeCreateInfoAMDX,
 	pNodeIndex &u32) Result {
-	return C.vkGetExecutionGraphPipelineNodeIndexAMDX(device, executionGraph, const_pNodeInfo,
-		pNodeIndex)
-}
+		return C.vkGetExecutionGraphPipelineNodeIndexAMDX(device, executionGraph, const_pNodeInfo,
+			pNodeIndex)
+	}
 
-@[keep_args_alive]
-fn C.vkCmdInitializeGraphScratchMemoryAMDX(
+	@[keep_args_alive]
+	fn C.vkCmdInitializeGraphScratchMemoryAMDX(
 	commandBuffer CommandBuffer, executionGraph Pipeline, scratch DeviceAddress, scratchSize DeviceSize)
 
-pub type PFN_vkCmdInitializeGraphScratchMemoryAMDX = fn (commandBuffer CommandBuffer, executionGraph Pipeline, scratch DeviceAddress, scratchSize DeviceSize)
+	pub type PFN_vkCmdInitializeGraphScratchMemoryAMDX = fn (commandBuffer CommandBuffer, executionGraph Pipeline, scratch DeviceAddress, scratchSize DeviceSize)
 
-@[inline]
-pub fn cmd_initialize_graph_scratch_memory_amdx(
+	@[inline]
+	pub fn cmd_initialize_graph_scratch_memory_amdx(
 	commandBuffer CommandBuffer,
 	executionGraph Pipeline,
 	scratch DeviceAddress,
 	scratchSize DeviceSize) {
-	C.vkCmdInitializeGraphScratchMemoryAMDX(commandBuffer, executionGraph, scratch, scratchSize)
-}
+		C.vkCmdInitializeGraphScratchMemoryAMDX(commandBuffer, executionGraph, scratch, scratchSize)
+	}
 
-@[keep_args_alive]
-fn C.vkCmdDispatchGraphAMDX(
+	@[keep_args_alive]
+	fn C.vkCmdDispatchGraphAMDX(
 	commandBuffer CommandBuffer, scratch DeviceAddress, scratchSize DeviceSize, const_pCountInfo &DispatchGraphCountInfoAMDX)
 
-pub type PFN_vkCmdDispatchGraphAMDX = fn (commandBuffer CommandBuffer, scratch DeviceAddress, scratchSize DeviceSize, const_pCountInfo &DispatchGraphCountInfoAMDX)
+	pub type PFN_vkCmdDispatchGraphAMDX = fn (commandBuffer CommandBuffer, scratch DeviceAddress, scratchSize DeviceSize, const_pCountInfo &DispatchGraphCountInfoAMDX)
 
-@[inline]
-pub fn cmd_dispatch_graph_amdx(
+	@[inline]
+	pub fn cmd_dispatch_graph_amdx(
 	commandBuffer CommandBuffer,
 	scratch DeviceAddress,
 	scratchSize DeviceSize,
 	const_pCountInfo &DispatchGraphCountInfoAMDX) {
-	C.vkCmdDispatchGraphAMDX(commandBuffer, scratch, scratchSize, const_pCountInfo)
-}
+		C.vkCmdDispatchGraphAMDX(commandBuffer, scratch, scratchSize, const_pCountInfo)
+	}
 
-@[keep_args_alive]
-fn C.vkCmdDispatchGraphIndirectAMDX(
+	@[keep_args_alive]
+	fn C.vkCmdDispatchGraphIndirectAMDX(
 	commandBuffer CommandBuffer, scratch DeviceAddress, scratchSize DeviceSize, const_pCountInfo &DispatchGraphCountInfoAMDX)
 
-pub type PFN_vkCmdDispatchGraphIndirectAMDX = fn (commandBuffer CommandBuffer, scratch DeviceAddress, scratchSize DeviceSize, const_pCountInfo &DispatchGraphCountInfoAMDX)
+	pub type PFN_vkCmdDispatchGraphIndirectAMDX = fn (commandBuffer CommandBuffer, scratch DeviceAddress, scratchSize DeviceSize, const_pCountInfo &DispatchGraphCountInfoAMDX)
 
-@[inline]
-pub fn cmd_dispatch_graph_indirect_amdx(
+	@[inline]
+	pub fn cmd_dispatch_graph_indirect_amdx(
 	commandBuffer CommandBuffer,
 	scratch DeviceAddress,
 	scratchSize DeviceSize,
 	const_pCountInfo &DispatchGraphCountInfoAMDX) {
-	C.vkCmdDispatchGraphIndirectAMDX(commandBuffer, scratch, scratchSize, const_pCountInfo)
-}
+		C.vkCmdDispatchGraphIndirectAMDX(commandBuffer, scratch, scratchSize, const_pCountInfo)
+	}
 
-@[keep_args_alive]
-fn C.vkCmdDispatchGraphIndirectCountAMDX(
+	@[keep_args_alive]
+	fn C.vkCmdDispatchGraphIndirectCountAMDX(
 	commandBuffer CommandBuffer, scratch DeviceAddress, scratchSize DeviceSize, countInfo DeviceAddress)
 
-pub type PFN_vkCmdDispatchGraphIndirectCountAMDX = fn (commandBuffer CommandBuffer, scratch DeviceAddress, scratchSize DeviceSize, countInfo DeviceAddress)
+	pub type PFN_vkCmdDispatchGraphIndirectCountAMDX = fn (commandBuffer CommandBuffer, scratch DeviceAddress, scratchSize DeviceSize, countInfo DeviceAddress)
 
-@[inline]
-pub fn cmd_dispatch_graph_indirect_count_amdx(
+	@[inline]
+	pub fn cmd_dispatch_graph_indirect_count_amdx(
 	commandBuffer CommandBuffer,
 	scratch DeviceAddress,
 	scratchSize DeviceSize,
 	countInfo DeviceAddress) {
-	C.vkCmdDispatchGraphIndirectCountAMDX(commandBuffer, scratch, scratchSize, countInfo)
+		C.vkCmdDispatchGraphIndirectCountAMDX(commandBuffer, scratch, scratchSize, countInfo)
+	}
 }
 
 // Pointer to VkTensorARM_T
@@ -25284,15 +25362,18 @@ pub type PhysicalDeviceVertexAttributeDivisorFeaturesEXT = C.VkPhysicalDeviceVer
 
 pub const ggp_frame_token_spec_version = 1
 pub const ggp_frame_token_extension_name = c'VK_GGP_frame_token'
-// PresentFrameTokenGGP extends VkPresentInfoKHR
-pub type PresentFrameTokenGGP = C.VkPresentFrameTokenGGP
 
-@[typedef]
-pub struct C.VkPresentFrameTokenGGP {
-pub mut:
-	sType      StructureType = StructureType.present_frame_token_ggp
-	pNext      voidptr       = unsafe { nil }
-	frameToken u64
+$if vulkan_ggp ? {
+	// PresentFrameTokenGGP extends VkPresentInfoKHR
+	pub type PresentFrameTokenGGP = C.VkPresentFrameTokenGGP
+
+	@[typedef]
+	pub struct C.VkPresentFrameTokenGGP {
+	pub mut:
+		sType      StructureType = StructureType.present_frame_token_ggp
+		pNext      voidptr       = unsafe { nil }
+		frameToken u64
+	}
 }
 
 pub const ext_pipeline_creation_feedback_spec_version = 1
@@ -26113,68 +26194,78 @@ pub fn set_local_dimming_amd(
 pub const fuchsia_imagepipe_surface_spec_version = 1
 pub const fuchsia_imagepipe_surface_extension_name = c'VK_FUCHSIA_imagepipe_surface'
 
-pub type ImagePipeSurfaceCreateFlagsFUCHSIA = u32
-
-@[typedef]
-pub struct C.zx_handle_t {}
-
-pub type ImagePipeSurfaceCreateInfoFUCHSIA = C.VkImagePipeSurfaceCreateInfoFUCHSIA
-
-@[typedef]
-pub struct C.VkImagePipeSurfaceCreateInfoFUCHSIA {
-pub mut:
-	sType           StructureType = StructureType.imagepipe_surface_create_info_fuchsia
-	pNext           voidptr       = unsafe { nil }
-	flags           ImagePipeSurfaceCreateFlagsFUCHSIA
-	imagePipeHandle u32
+$if vulkan_fuchsia ? {
+	#flag -DVK_USE_PLATFORM_FUCHSIA
 }
+$if vulkan_fuchsia ? {
+	pub type ImagePipeSurfaceCreateFlagsFUCHSIA = u32
 
-@[keep_args_alive]
-fn C.vkCreateImagePipeSurfaceFUCHSIA(
+	@[typedef]
+	pub struct C.zx_handle_t {}
+
+	pub type ImagePipeSurfaceCreateInfoFUCHSIA = C.VkImagePipeSurfaceCreateInfoFUCHSIA
+
+	@[typedef]
+	pub struct C.VkImagePipeSurfaceCreateInfoFUCHSIA {
+	pub mut:
+		sType           StructureType = StructureType.imagepipe_surface_create_info_fuchsia
+		pNext           voidptr       = unsafe { nil }
+		flags           ImagePipeSurfaceCreateFlagsFUCHSIA
+		imagePipeHandle u32
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateImagePipeSurfaceFUCHSIA(
 	instance Instance, const_pCreateInfo &ImagePipeSurfaceCreateInfoFUCHSIA, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateImagePipeSurfaceFUCHSIA = fn (instance Instance, const_pCreateInfo &ImagePipeSurfaceCreateInfoFUCHSIA, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateImagePipeSurfaceFUCHSIA = fn (instance Instance, const_pCreateInfo &ImagePipeSurfaceCreateInfoFUCHSIA, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_image_pipe_surface_fuchsia(
+	@[inline]
+	pub fn create_image_pipe_surface_fuchsia(
 	instance Instance,
 	const_pCreateInfo &ImagePipeSurfaceCreateInfoFUCHSIA,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateImagePipeSurfaceFUCHSIA(instance, const_pCreateInfo, const_pAllocator,
-		pSurface)
+		return C.vkCreateImagePipeSurfaceFUCHSIA(instance, const_pCreateInfo, const_pAllocator,
+			pSurface)
+	}
 }
 
 pub const ext_metal_surface_spec_version = 1
 pub const ext_metal_surface_extension_name = c'VK_EXT_metal_surface'
 
-pub type MetalSurfaceCreateFlagsEXT = u32
-pub type MetalSurfaceCreateInfoEXT = C.VkMetalSurfaceCreateInfoEXT
-
-@[typedef]
-pub struct C.VkMetalSurfaceCreateInfoEXT {
-pub mut:
-	sType  StructureType = StructureType.metal_surface_create_info_ext
-	pNext  voidptr       = unsafe { nil }
-	flags  MetalSurfaceCreateFlagsEXT
-	pLayer &voidptr
+$if vulkan_metal ? {
+	#flag -DVK_USE_PLATFORM_METAL_EXT
 }
+$if vulkan_metal ? {
+	pub type MetalSurfaceCreateFlagsEXT = u32
+	pub type MetalSurfaceCreateInfoEXT = C.VkMetalSurfaceCreateInfoEXT
 
-@[keep_args_alive]
-fn C.vkCreateMetalSurfaceEXT(
+	@[typedef]
+	pub struct C.VkMetalSurfaceCreateInfoEXT {
+	pub mut:
+		sType  StructureType = StructureType.metal_surface_create_info_ext
+		pNext  voidptr       = unsafe { nil }
+		flags  MetalSurfaceCreateFlagsEXT
+		pLayer &voidptr
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateMetalSurfaceEXT(
 	instance Instance, const_pCreateInfo &MetalSurfaceCreateInfoEXT, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateMetalSurfaceEXT = fn (instance Instance, const_pCreateInfo &MetalSurfaceCreateInfoEXT, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateMetalSurfaceEXT = fn (instance Instance, const_pCreateInfo &MetalSurfaceCreateInfoEXT, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_metal_surface_ext(
+	@[inline]
+	pub fn create_metal_surface_ext(
 	instance Instance,
 	const_pCreateInfo &MetalSurfaceCreateInfoEXT,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateMetalSurfaceEXT(instance, const_pCreateInfo, const_pAllocator, pSurface)
+		return C.vkCreateMetalSurfaceEXT(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 }
 
 pub const ext_fragment_density_map_spec_version = 3
@@ -26660,103 +26751,105 @@ pub mut:
 pub const ext_full_screen_exclusive_spec_version = 4
 pub const ext_full_screen_exclusive_extension_name = c'VK_EXT_full_screen_exclusive'
 
-pub enum FullScreenExclusiveEXT as u32 {
-	default                = 0
-	allowed                = 1
-	disallowed             = 2
-	application_controlled = 3
-	max_enum_ext           = max_int
-}
-// SurfaceFullScreenExclusiveInfoEXT extends VkPhysicalDeviceSurfaceInfo2KHR,VkSwapchainCreateInfoKHR
-pub type SurfaceFullScreenExclusiveInfoEXT = C.VkSurfaceFullScreenExclusiveInfoEXT
+$if vulkan_win32 ? {
+	pub enum FullScreenExclusiveEXT as u32 {
+		default                = 0
+		allowed                = 1
+		disallowed             = 2
+		application_controlled = 3
+		max_enum_ext           = max_int
+	}
+	// SurfaceFullScreenExclusiveInfoEXT extends VkPhysicalDeviceSurfaceInfo2KHR,VkSwapchainCreateInfoKHR
+	pub type SurfaceFullScreenExclusiveInfoEXT = C.VkSurfaceFullScreenExclusiveInfoEXT
 
-@[typedef]
-pub struct C.VkSurfaceFullScreenExclusiveInfoEXT {
-pub mut:
-	sType               StructureType = StructureType.surface_full_screen_exclusive_info_ext
-	pNext               voidptr       = unsafe { nil }
-	fullScreenExclusive FullScreenExclusiveEXT
-}
+	@[typedef]
+	pub struct C.VkSurfaceFullScreenExclusiveInfoEXT {
+	pub mut:
+		sType               StructureType = StructureType.surface_full_screen_exclusive_info_ext
+		pNext               voidptr       = unsafe { nil }
+		fullScreenExclusive FullScreenExclusiveEXT
+	}
 
-// SurfaceCapabilitiesFullScreenExclusiveEXT extends VkSurfaceCapabilities2KHR
-pub type SurfaceCapabilitiesFullScreenExclusiveEXT = C.VkSurfaceCapabilitiesFullScreenExclusiveEXT
+	// SurfaceCapabilitiesFullScreenExclusiveEXT extends VkSurfaceCapabilities2KHR
+	pub type SurfaceCapabilitiesFullScreenExclusiveEXT = C.VkSurfaceCapabilitiesFullScreenExclusiveEXT
 
-@[typedef]
-pub struct C.VkSurfaceCapabilitiesFullScreenExclusiveEXT {
-pub mut:
-	sType                        StructureType = StructureType.surface_capabilities_full_screen_exclusive_ext
-	pNext                        voidptr       = unsafe { nil }
-	fullScreenExclusiveSupported Bool32
-}
+	@[typedef]
+	pub struct C.VkSurfaceCapabilitiesFullScreenExclusiveEXT {
+	pub mut:
+		sType                        StructureType = StructureType.surface_capabilities_full_screen_exclusive_ext
+		pNext                        voidptr       = unsafe { nil }
+		fullScreenExclusiveSupported Bool32
+	}
 
-// SurfaceFullScreenExclusiveWin32InfoEXT extends VkPhysicalDeviceSurfaceInfo2KHR,VkSwapchainCreateInfoKHR
-pub type SurfaceFullScreenExclusiveWin32InfoEXT = C.VkSurfaceFullScreenExclusiveWin32InfoEXT
+	// SurfaceFullScreenExclusiveWin32InfoEXT extends VkPhysicalDeviceSurfaceInfo2KHR,VkSwapchainCreateInfoKHR
+	pub type SurfaceFullScreenExclusiveWin32InfoEXT = C.VkSurfaceFullScreenExclusiveWin32InfoEXT
 
-@[typedef]
-pub struct C.VkSurfaceFullScreenExclusiveWin32InfoEXT {
-pub mut:
-	sType    StructureType = StructureType.surface_full_screen_exclusive_win32_info_ext
-	pNext    voidptr       = unsafe { nil }
-	hmonitor voidptr
-}
+	@[typedef]
+	pub struct C.VkSurfaceFullScreenExclusiveWin32InfoEXT {
+	pub mut:
+		sType    StructureType = StructureType.surface_full_screen_exclusive_win32_info_ext
+		pNext    voidptr       = unsafe { nil }
+		hmonitor voidptr
+	}
 
-@[keep_args_alive]
-fn C.vkGetPhysicalDeviceSurfacePresentModes2EXT(
+	@[keep_args_alive]
+	fn C.vkGetPhysicalDeviceSurfacePresentModes2EXT(
 	physicalDevice PhysicalDevice, const_pSurfaceInfo &PhysicalDeviceSurfaceInfo2KHR, pPresentModeCount &u32, pPresentModes &PresentModeKHR) Result
 
-// pPresentModeCount Pointer. Required, but 0/NULL allowed
-// pPresentModes Optional, can be NULL or 0
-pub type PFN_vkGetPhysicalDeviceSurfacePresentModes2EXT = fn (physicalDevice PhysicalDevice, const_pSurfaceInfo &PhysicalDeviceSurfaceInfo2KHR, pPresentModeCount &u32, pPresentModes &PresentModeKHR) Result
+	// pPresentModeCount Pointer. Required, but 0/NULL allowed
+	// pPresentModes Optional, can be NULL or 0
+	pub type PFN_vkGetPhysicalDeviceSurfacePresentModes2EXT = fn (physicalDevice PhysicalDevice, const_pSurfaceInfo &PhysicalDeviceSurfaceInfo2KHR, pPresentModeCount &u32, pPresentModes &PresentModeKHR) Result
 
-@[inline]
-pub fn get_physical_device_surface_present_modes2_ext(
+	@[inline]
+	pub fn get_physical_device_surface_present_modes2_ext(
 	physicalDevice PhysicalDevice,
 	const_pSurfaceInfo &PhysicalDeviceSurfaceInfo2KHR,
 	pPresentModeCount &u32,
 	pPresentModes &PresentModeKHR) Result {
-	return C.vkGetPhysicalDeviceSurfacePresentModes2EXT(physicalDevice, const_pSurfaceInfo,
-		pPresentModeCount, pPresentModes)
-}
+		return C.vkGetPhysicalDeviceSurfacePresentModes2EXT(physicalDevice, const_pSurfaceInfo,
+			pPresentModeCount, pPresentModes)
+	}
 
-@[keep_args_alive]
-fn C.vkAcquireFullScreenExclusiveModeEXT(
+	@[keep_args_alive]
+	fn C.vkAcquireFullScreenExclusiveModeEXT(
 	device Device, swapchain SwapchainKHR) Result
 
-pub type PFN_vkAcquireFullScreenExclusiveModeEXT = fn (device Device, swapchain SwapchainKHR) Result
+	pub type PFN_vkAcquireFullScreenExclusiveModeEXT = fn (device Device, swapchain SwapchainKHR) Result
 
-@[inline]
-pub fn acquire_full_screen_exclusive_mode_ext(
+	@[inline]
+	pub fn acquire_full_screen_exclusive_mode_ext(
 	device Device,
 	swapchain SwapchainKHR) Result {
-	return C.vkAcquireFullScreenExclusiveModeEXT(device, swapchain)
-}
+		return C.vkAcquireFullScreenExclusiveModeEXT(device, swapchain)
+	}
 
-@[keep_args_alive]
-fn C.vkReleaseFullScreenExclusiveModeEXT(
+	@[keep_args_alive]
+	fn C.vkReleaseFullScreenExclusiveModeEXT(
 	device Device, swapchain SwapchainKHR) Result
 
-pub type PFN_vkReleaseFullScreenExclusiveModeEXT = fn (device Device, swapchain SwapchainKHR) Result
+	pub type PFN_vkReleaseFullScreenExclusiveModeEXT = fn (device Device, swapchain SwapchainKHR) Result
 
-@[inline]
-pub fn release_full_screen_exclusive_mode_ext(
+	@[inline]
+	pub fn release_full_screen_exclusive_mode_ext(
 	device Device,
 	swapchain SwapchainKHR) Result {
-	return C.vkReleaseFullScreenExclusiveModeEXT(device, swapchain)
-}
+		return C.vkReleaseFullScreenExclusiveModeEXT(device, swapchain)
+	}
 
-@[keep_args_alive]
-fn C.vkGetDeviceGroupSurfacePresentModes2EXT(
+	@[keep_args_alive]
+	fn C.vkGetDeviceGroupSurfacePresentModes2EXT(
 	device Device, const_pSurfaceInfo &PhysicalDeviceSurfaceInfo2KHR, pModes &DeviceGroupPresentModeFlagsKHR) Result
 
-// pModes Pointer. Required, but 0/NULL allowed
-pub type PFN_vkGetDeviceGroupSurfacePresentModes2EXT = fn (device Device, const_pSurfaceInfo &PhysicalDeviceSurfaceInfo2KHR, pModes &DeviceGroupPresentModeFlagsKHR) Result
+	// pModes Pointer. Required, but 0/NULL allowed
+	pub type PFN_vkGetDeviceGroupSurfacePresentModes2EXT = fn (device Device, const_pSurfaceInfo &PhysicalDeviceSurfaceInfo2KHR, pModes &DeviceGroupPresentModeFlagsKHR) Result
 
-@[inline]
-pub fn get_device_group_surface_present_modes2_ext(
+	@[inline]
+	pub fn get_device_group_surface_present_modes2_ext(
 	device Device,
 	const_pSurfaceInfo &PhysicalDeviceSurfaceInfo2KHR,
 	pModes &DeviceGroupPresentModeFlagsKHR) Result {
-	return C.vkGetDeviceGroupSurfacePresentModes2EXT(device, const_pSurfaceInfo, pModes)
+		return C.vkGetDeviceGroupSurfacePresentModes2EXT(device, const_pSurfaceInfo, pModes)
+	}
 }
 
 pub const ext_headless_surface_spec_version = 1
@@ -28091,171 +28184,173 @@ pub mut:
 	splitBarrierReservedSharedMemory u32
 }
 
-// Pointer to VkCudaModuleNV_T
-pub type CudaModuleNV = voidptr
-
-// Pointer to VkCudaFunctionNV_T
-pub type CudaFunctionNV = voidptr
-
 pub const nv_cuda_kernel_launch_spec_version = 2
 pub const nv_cuda_kernel_launch_extension_name = c'VK_NV_cuda_kernel_launch'
 
-pub type CudaModuleCreateInfoNV = C.VkCudaModuleCreateInfoNV
+$if vulkan_provisional ? {
+	// Pointer to VkCudaModuleNV_T
+	pub type CudaModuleNV = voidptr
 
-@[typedef]
-pub struct C.VkCudaModuleCreateInfoNV {
-pub mut:
-	sType    StructureType
-	pNext    voidptr = unsafe { nil }
-	dataSize usize
-	pData    voidptr
-}
+	// Pointer to VkCudaFunctionNV_T
+	pub type CudaFunctionNV = voidptr
 
-pub type CudaFunctionCreateInfoNV = C.VkCudaFunctionCreateInfoNV
+	pub type CudaModuleCreateInfoNV = C.VkCudaModuleCreateInfoNV
 
-@[typedef]
-pub struct C.VkCudaFunctionCreateInfoNV {
-pub mut:
-	sType  StructureType
-	pNext  voidptr = unsafe { nil }
-	module CudaModuleNV
-	pName  &char
-}
+	@[typedef]
+	pub struct C.VkCudaModuleCreateInfoNV {
+	pub mut:
+		sType    StructureType
+		pNext    voidptr = unsafe { nil }
+		dataSize usize
+		pData    voidptr
+	}
 
-pub type CudaLaunchInfoNV = C.VkCudaLaunchInfoNV
+	pub type CudaFunctionCreateInfoNV = C.VkCudaFunctionCreateInfoNV
 
-@[typedef]
-pub struct C.VkCudaLaunchInfoNV {
-pub mut:
-	sType          StructureType
-	pNext          voidptr = unsafe { nil }
-	function       CudaFunctionNV
-	gridDimX       u32
-	gridDimY       u32
-	gridDimZ       u32
-	blockDimX      u32
-	blockDimY      u32
-	blockDimZ      u32
-	sharedMemBytes u32
-	paramCount     usize
-	pParams        &voidptr
-	extraCount     usize
-	pExtras        &voidptr
-}
+	@[typedef]
+	pub struct C.VkCudaFunctionCreateInfoNV {
+	pub mut:
+		sType  StructureType
+		pNext  voidptr = unsafe { nil }
+		module CudaModuleNV
+		pName  &char
+	}
 
-// PhysicalDeviceCudaKernelLaunchFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceCudaKernelLaunchFeaturesNV = C.VkPhysicalDeviceCudaKernelLaunchFeaturesNV
+	pub type CudaLaunchInfoNV = C.VkCudaLaunchInfoNV
 
-@[typedef]
-pub struct C.VkPhysicalDeviceCudaKernelLaunchFeaturesNV {
-pub mut:
-	sType                    StructureType
-	pNext                    voidptr = unsafe { nil }
-	cudaKernelLaunchFeatures Bool32
-}
+	@[typedef]
+	pub struct C.VkCudaLaunchInfoNV {
+	pub mut:
+		sType          StructureType
+		pNext          voidptr = unsafe { nil }
+		function       CudaFunctionNV
+		gridDimX       u32
+		gridDimY       u32
+		gridDimZ       u32
+		blockDimX      u32
+		blockDimY      u32
+		blockDimZ      u32
+		sharedMemBytes u32
+		paramCount     usize
+		pParams        &voidptr
+		extraCount     usize
+		pExtras        &voidptr
+	}
 
-// PhysicalDeviceCudaKernelLaunchPropertiesNV extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceCudaKernelLaunchPropertiesNV = C.VkPhysicalDeviceCudaKernelLaunchPropertiesNV
+	// PhysicalDeviceCudaKernelLaunchFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+	pub type PhysicalDeviceCudaKernelLaunchFeaturesNV = C.VkPhysicalDeviceCudaKernelLaunchFeaturesNV
 
-@[typedef]
-pub struct C.VkPhysicalDeviceCudaKernelLaunchPropertiesNV {
-pub mut:
-	sType                  StructureType
-	pNext                  voidptr = unsafe { nil }
-	computeCapabilityMinor u32
-	computeCapabilityMajor u32
-}
+	@[typedef]
+	pub struct C.VkPhysicalDeviceCudaKernelLaunchFeaturesNV {
+	pub mut:
+		sType                    StructureType
+		pNext                    voidptr = unsafe { nil }
+		cudaKernelLaunchFeatures Bool32
+	}
 
-@[keep_args_alive]
-fn C.vkCreateCudaModuleNV(
+	// PhysicalDeviceCudaKernelLaunchPropertiesNV extends VkPhysicalDeviceProperties2
+	pub type PhysicalDeviceCudaKernelLaunchPropertiesNV = C.VkPhysicalDeviceCudaKernelLaunchPropertiesNV
+
+	@[typedef]
+	pub struct C.VkPhysicalDeviceCudaKernelLaunchPropertiesNV {
+	pub mut:
+		sType                  StructureType
+		pNext                  voidptr = unsafe { nil }
+		computeCapabilityMinor u32
+		computeCapabilityMajor u32
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateCudaModuleNV(
 	device Device, const_pCreateInfo &CudaModuleCreateInfoNV, const_pAllocator &AllocationCallbacks, pModule &CudaModuleNV) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateCudaModuleNV = fn (device Device, const_pCreateInfo &CudaModuleCreateInfoNV, const_pAllocator &AllocationCallbacks, pModule &CudaModuleNV) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateCudaModuleNV = fn (device Device, const_pCreateInfo &CudaModuleCreateInfoNV, const_pAllocator &AllocationCallbacks, pModule &CudaModuleNV) Result
 
-@[inline]
-pub fn create_cuda_module_nv(
+	@[inline]
+	pub fn create_cuda_module_nv(
 	device Device,
 	const_pCreateInfo &CudaModuleCreateInfoNV,
 	const_pAllocator &AllocationCallbacks,
 	pModule &CudaModuleNV) Result {
-	return C.vkCreateCudaModuleNV(device, const_pCreateInfo, const_pAllocator, pModule)
-}
+		return C.vkCreateCudaModuleNV(device, const_pCreateInfo, const_pAllocator, pModule)
+	}
 
-@[keep_args_alive]
-fn C.vkGetCudaModuleCacheNV(
+	@[keep_args_alive]
+	fn C.vkGetCudaModuleCacheNV(
 	device Device, vkmodule CudaModuleNV, pCacheSize &usize, pCacheData voidptr) Result
 
-// pCacheSize Pointer. Required, but 0/NULL allowed
-// pCacheData Optional, can be NULL or 0
-pub type PFN_vkGetCudaModuleCacheNV = fn (device Device, vkmodule CudaModuleNV, pCacheSize &usize, pCacheData voidptr) Result
+	// pCacheSize Pointer. Required, but 0/NULL allowed
+	// pCacheData Optional, can be NULL or 0
+	pub type PFN_vkGetCudaModuleCacheNV = fn (device Device, vkmodule CudaModuleNV, pCacheSize &usize, pCacheData voidptr) Result
 
-@[inline]
-pub fn get_cuda_module_cache_nv(
+	@[inline]
+	pub fn get_cuda_module_cache_nv(
 	device Device,
 	vkmodule CudaModuleNV,
 	pCacheSize &usize,
 	pCacheData voidptr) Result {
-	return C.vkGetCudaModuleCacheNV(device, vkmodule, pCacheSize, pCacheData)
-}
+		return C.vkGetCudaModuleCacheNV(device, vkmodule, pCacheSize, pCacheData)
+	}
 
-@[keep_args_alive]
-fn C.vkCreateCudaFunctionNV(
+	@[keep_args_alive]
+	fn C.vkCreateCudaFunctionNV(
 	device Device, const_pCreateInfo &CudaFunctionCreateInfoNV, const_pAllocator &AllocationCallbacks, pFunction &CudaFunctionNV) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateCudaFunctionNV = fn (device Device, const_pCreateInfo &CudaFunctionCreateInfoNV, const_pAllocator &AllocationCallbacks, pFunction &CudaFunctionNV) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateCudaFunctionNV = fn (device Device, const_pCreateInfo &CudaFunctionCreateInfoNV, const_pAllocator &AllocationCallbacks, pFunction &CudaFunctionNV) Result
 
-@[inline]
-pub fn create_cuda_function_nv(
+	@[inline]
+	pub fn create_cuda_function_nv(
 	device Device,
 	const_pCreateInfo &CudaFunctionCreateInfoNV,
 	const_pAllocator &AllocationCallbacks,
 	pFunction &CudaFunctionNV) Result {
-	return C.vkCreateCudaFunctionNV(device, const_pCreateInfo, const_pAllocator, pFunction)
-}
+		return C.vkCreateCudaFunctionNV(device, const_pCreateInfo, const_pAllocator, pFunction)
+	}
 
-@[keep_args_alive]
-fn C.vkDestroyCudaModuleNV(
+	@[keep_args_alive]
+	fn C.vkDestroyCudaModuleNV(
 	device Device, vkmodule CudaModuleNV, const_pAllocator &AllocationCallbacks)
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkDestroyCudaModuleNV = fn (device Device, vkmodule CudaModuleNV, const_pAllocator &AllocationCallbacks)
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkDestroyCudaModuleNV = fn (device Device, vkmodule CudaModuleNV, const_pAllocator &AllocationCallbacks)
 
-@[inline]
-pub fn destroy_cuda_module_nv(
+	@[inline]
+	pub fn destroy_cuda_module_nv(
 	device Device,
 	vkmodule CudaModuleNV,
 	const_pAllocator &AllocationCallbacks) {
-	C.vkDestroyCudaModuleNV(device, vkmodule, const_pAllocator)
-}
+		C.vkDestroyCudaModuleNV(device, vkmodule, const_pAllocator)
+	}
 
-@[keep_args_alive]
-fn C.vkDestroyCudaFunctionNV(
+	@[keep_args_alive]
+	fn C.vkDestroyCudaFunctionNV(
 	device Device, function CudaFunctionNV, const_pAllocator &AllocationCallbacks)
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkDestroyCudaFunctionNV = fn (device Device, function CudaFunctionNV, const_pAllocator &AllocationCallbacks)
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkDestroyCudaFunctionNV = fn (device Device, function CudaFunctionNV, const_pAllocator &AllocationCallbacks)
 
-@[inline]
-pub fn destroy_cuda_function_nv(
+	@[inline]
+	pub fn destroy_cuda_function_nv(
 	device Device,
 	function CudaFunctionNV,
 	const_pAllocator &AllocationCallbacks) {
-	C.vkDestroyCudaFunctionNV(device, function, const_pAllocator)
-}
+		C.vkDestroyCudaFunctionNV(device, function, const_pAllocator)
+	}
 
-@[keep_args_alive]
-fn C.vkCmdCudaLaunchKernelNV(
+	@[keep_args_alive]
+	fn C.vkCmdCudaLaunchKernelNV(
 	commandBuffer CommandBuffer, const_pLaunchInfo &CudaLaunchInfoNV)
 
-pub type PFN_vkCmdCudaLaunchKernelNV = fn (commandBuffer CommandBuffer, const_pLaunchInfo &CudaLaunchInfoNV)
+	pub type PFN_vkCmdCudaLaunchKernelNV = fn (commandBuffer CommandBuffer, const_pLaunchInfo &CudaLaunchInfoNV)
 
-@[inline]
-pub fn cmd_cuda_launch_kernel_nv(
+	@[inline]
+	pub fn cmd_cuda_launch_kernel_nv(
 	commandBuffer CommandBuffer,
 	const_pLaunchInfo &CudaLaunchInfoNV) {
-	C.vkCmdCudaLaunchKernelNV(commandBuffer, const_pLaunchInfo)
+		C.vkCmdCudaLaunchKernelNV(commandBuffer, const_pLaunchInfo)
+	}
 }
 
 pub const qcom_tile_shading_spec_version = 2
@@ -28491,201 +28586,203 @@ pub fn shutdown_latency_device_legacy_nv(
 	C.vkShutdownLatencyDeviceLegacyNV(device)
 }
 
-pub type MTLDevice_id = C.MTLDevice_id
-
-@[typedef]
-pub struct C.MTLDevice_id {}
-
-pub type MTLCommandQueue_id = C.MTLCommandQueue_id
-
-@[typedef]
-pub struct C.MTLCommandQueue_id {}
-
-pub type MTLBuffer_id = C.MTLBuffer_id
-
-@[typedef]
-pub struct C.MTLBuffer_id {}
-
-pub type MTLTexture_id = C.MTLTexture_id
-
-@[typedef]
-pub struct C.MTLTexture_id {}
-
-pub type IOSurfaceRef = C.IOSurfaceRef
-
-@[typedef]
-pub struct C.IOSurfaceRef {}
-
-pub type MTLSharedEvent_id = C.MTLSharedEvent_id
-
-@[typedef]
-pub struct C.MTLSharedEvent_id {}
-
 pub const ext_metal_objects_spec_version = 2
 pub const ext_metal_objects_extension_name = c'VK_EXT_metal_objects'
 
-pub enum ExportMetalObjectTypeFlagBitsEXT as u32 {
-	metal_device        = u32(0x00000001)
-	metal_command_queue = u32(0x00000002)
-	metal_buffer        = u32(0x00000004)
-	metal_texture       = u32(0x00000008)
-	metal_iosurface     = u32(0x00000010)
-	metal_shared_event  = u32(0x00000020)
-	max_enum_ext        = max_int
-}
-pub type ExportMetalObjectTypeFlagsEXT = u32
+$if vulkan_metal ? {
+	pub type MTLDevice_id = C.MTLDevice_id
 
-// ExportMetalObjectCreateInfoEXT extends VkInstanceCreateInfo,VkMemoryAllocateInfo,VkImageCreateInfo,VkImageViewCreateInfo,VkBufferViewCreateInfo,VkSemaphoreCreateInfo,VkEventCreateInfo
-pub type ExportMetalObjectCreateInfoEXT = C.VkExportMetalObjectCreateInfoEXT
+	@[typedef]
+	pub struct C.MTLDevice_id {}
 
-@[typedef]
-pub struct C.VkExportMetalObjectCreateInfoEXT {
-pub mut:
-	sType            StructureType = StructureType.export_metal_object_create_info_ext
-	pNext            voidptr       = unsafe { nil }
-	exportObjectType ExportMetalObjectTypeFlagBitsEXT
-}
+	pub type MTLCommandQueue_id = C.MTLCommandQueue_id
 
-pub type ExportMetalObjectsInfoEXT = C.VkExportMetalObjectsInfoEXT
+	@[typedef]
+	pub struct C.MTLCommandQueue_id {}
 
-@[typedef]
-pub struct C.VkExportMetalObjectsInfoEXT {
-pub mut:
-	sType StructureType = StructureType.export_metal_objects_info_ext
-	pNext voidptr       = unsafe { nil }
-}
+	pub type MTLBuffer_id = C.MTLBuffer_id
 
-// ExportMetalDeviceInfoEXT extends VkExportMetalObjectsInfoEXT
-pub type ExportMetalDeviceInfoEXT = C.VkExportMetalDeviceInfoEXT
+	@[typedef]
+	pub struct C.MTLBuffer_id {}
 
-@[typedef]
-pub struct C.VkExportMetalDeviceInfoEXT {
-pub mut:
-	sType     StructureType = StructureType.export_metal_device_info_ext
-	pNext     voidptr       = unsafe { nil }
-	mtlDevice voidptr
-}
+	pub type MTLTexture_id = C.MTLTexture_id
 
-// ExportMetalCommandQueueInfoEXT extends VkExportMetalObjectsInfoEXT
-pub type ExportMetalCommandQueueInfoEXT = C.VkExportMetalCommandQueueInfoEXT
+	@[typedef]
+	pub struct C.MTLTexture_id {}
 
-@[typedef]
-pub struct C.VkExportMetalCommandQueueInfoEXT {
-pub mut:
-	sType           StructureType = StructureType.export_metal_command_queue_info_ext
-	pNext           voidptr       = unsafe { nil }
-	queue           Queue
-	mtlCommandQueue voidptr
-}
+	pub type IOSurfaceRef = C.IOSurfaceRef
 
-// ExportMetalBufferInfoEXT extends VkExportMetalObjectsInfoEXT
-pub type ExportMetalBufferInfoEXT = C.VkExportMetalBufferInfoEXT
+	@[typedef]
+	pub struct C.IOSurfaceRef {}
 
-@[typedef]
-pub struct C.VkExportMetalBufferInfoEXT {
-pub mut:
-	sType     StructureType = StructureType.export_metal_buffer_info_ext
-	pNext     voidptr       = unsafe { nil }
-	memory    DeviceMemory
-	mtlBuffer voidptr
-}
+	pub type MTLSharedEvent_id = C.MTLSharedEvent_id
 
-// ImportMetalBufferInfoEXT extends VkMemoryAllocateInfo
-pub type ImportMetalBufferInfoEXT = C.VkImportMetalBufferInfoEXT
+	@[typedef]
+	pub struct C.MTLSharedEvent_id {}
 
-@[typedef]
-pub struct C.VkImportMetalBufferInfoEXT {
-pub mut:
-	sType     StructureType = StructureType.import_metal_buffer_info_ext
-	pNext     voidptr       = unsafe { nil }
-	mtlBuffer voidptr
-}
+	pub enum ExportMetalObjectTypeFlagBitsEXT as u32 {
+		metal_device        = u32(0x00000001)
+		metal_command_queue = u32(0x00000002)
+		metal_buffer        = u32(0x00000004)
+		metal_texture       = u32(0x00000008)
+		metal_iosurface     = u32(0x00000010)
+		metal_shared_event  = u32(0x00000020)
+		max_enum_ext        = max_int
+	}
+	pub type ExportMetalObjectTypeFlagsEXT = u32
 
-// ExportMetalTextureInfoEXT extends VkExportMetalObjectsInfoEXT
-pub type ExportMetalTextureInfoEXT = C.VkExportMetalTextureInfoEXT
+	// ExportMetalObjectCreateInfoEXT extends VkInstanceCreateInfo,VkMemoryAllocateInfo,VkImageCreateInfo,VkImageViewCreateInfo,VkBufferViewCreateInfo,VkSemaphoreCreateInfo,VkEventCreateInfo
+	pub type ExportMetalObjectCreateInfoEXT = C.VkExportMetalObjectCreateInfoEXT
 
-@[typedef]
-pub struct C.VkExportMetalTextureInfoEXT {
-pub mut:
-	sType      StructureType = StructureType.export_metal_texture_info_ext
-	pNext      voidptr       = unsafe { nil }
-	image      Image
-	imageView  ImageView
-	bufferView BufferView
-	plane      ImageAspectFlagBits
-	mtlTexture voidptr
-}
+	@[typedef]
+	pub struct C.VkExportMetalObjectCreateInfoEXT {
+	pub mut:
+		sType            StructureType = StructureType.export_metal_object_create_info_ext
+		pNext            voidptr       = unsafe { nil }
+		exportObjectType ExportMetalObjectTypeFlagBitsEXT
+	}
 
-// ImportMetalTextureInfoEXT extends VkImageCreateInfo
-pub type ImportMetalTextureInfoEXT = C.VkImportMetalTextureInfoEXT
+	pub type ExportMetalObjectsInfoEXT = C.VkExportMetalObjectsInfoEXT
 
-@[typedef]
-pub struct C.VkImportMetalTextureInfoEXT {
-pub mut:
-	sType      StructureType = StructureType.import_metal_texture_info_ext
-	pNext      voidptr       = unsafe { nil }
-	plane      ImageAspectFlagBits
-	mtlTexture voidptr
-}
+	@[typedef]
+	pub struct C.VkExportMetalObjectsInfoEXT {
+	pub mut:
+		sType StructureType = StructureType.export_metal_objects_info_ext
+		pNext voidptr       = unsafe { nil }
+	}
 
-// ExportMetalIOSurfaceInfoEXT extends VkExportMetalObjectsInfoEXT
-pub type ExportMetalIOSurfaceInfoEXT = C.VkExportMetalIOSurfaceInfoEXT
+	// ExportMetalDeviceInfoEXT extends VkExportMetalObjectsInfoEXT
+	pub type ExportMetalDeviceInfoEXT = C.VkExportMetalDeviceInfoEXT
 
-@[typedef]
-pub struct C.VkExportMetalIOSurfaceInfoEXT {
-pub mut:
-	sType     StructureType = StructureType.export_metal_io_surface_info_ext
-	pNext     voidptr       = unsafe { nil }
-	image     Image
-	ioSurface voidptr
-}
+	@[typedef]
+	pub struct C.VkExportMetalDeviceInfoEXT {
+	pub mut:
+		sType     StructureType = StructureType.export_metal_device_info_ext
+		pNext     voidptr       = unsafe { nil }
+		mtlDevice voidptr
+	}
 
-// ImportMetalIOSurfaceInfoEXT extends VkImageCreateInfo
-pub type ImportMetalIOSurfaceInfoEXT = C.VkImportMetalIOSurfaceInfoEXT
+	// ExportMetalCommandQueueInfoEXT extends VkExportMetalObjectsInfoEXT
+	pub type ExportMetalCommandQueueInfoEXT = C.VkExportMetalCommandQueueInfoEXT
 
-@[typedef]
-pub struct C.VkImportMetalIOSurfaceInfoEXT {
-pub mut:
-	sType     StructureType = StructureType.import_metal_io_surface_info_ext
-	pNext     voidptr       = unsafe { nil }
-	ioSurface voidptr
-}
+	@[typedef]
+	pub struct C.VkExportMetalCommandQueueInfoEXT {
+	pub mut:
+		sType           StructureType = StructureType.export_metal_command_queue_info_ext
+		pNext           voidptr       = unsafe { nil }
+		queue           Queue
+		mtlCommandQueue voidptr
+	}
 
-// ExportMetalSharedEventInfoEXT extends VkExportMetalObjectsInfoEXT
-pub type ExportMetalSharedEventInfoEXT = C.VkExportMetalSharedEventInfoEXT
+	// ExportMetalBufferInfoEXT extends VkExportMetalObjectsInfoEXT
+	pub type ExportMetalBufferInfoEXT = C.VkExportMetalBufferInfoEXT
 
-@[typedef]
-pub struct C.VkExportMetalSharedEventInfoEXT {
-pub mut:
-	sType          StructureType = StructureType.export_metal_shared_event_info_ext
-	pNext          voidptr       = unsafe { nil }
-	semaphore      Semaphore
-	event          Event
-	mtlSharedEvent voidptr
-}
+	@[typedef]
+	pub struct C.VkExportMetalBufferInfoEXT {
+	pub mut:
+		sType     StructureType = StructureType.export_metal_buffer_info_ext
+		pNext     voidptr       = unsafe { nil }
+		memory    DeviceMemory
+		mtlBuffer voidptr
+	}
 
-// ImportMetalSharedEventInfoEXT extends VkSemaphoreCreateInfo,VkEventCreateInfo
-pub type ImportMetalSharedEventInfoEXT = C.VkImportMetalSharedEventInfoEXT
+	// ImportMetalBufferInfoEXT extends VkMemoryAllocateInfo
+	pub type ImportMetalBufferInfoEXT = C.VkImportMetalBufferInfoEXT
 
-@[typedef]
-pub struct C.VkImportMetalSharedEventInfoEXT {
-pub mut:
-	sType          StructureType = StructureType.import_metal_shared_event_info_ext
-	pNext          voidptr       = unsafe { nil }
-	mtlSharedEvent voidptr
-}
+	@[typedef]
+	pub struct C.VkImportMetalBufferInfoEXT {
+	pub mut:
+		sType     StructureType = StructureType.import_metal_buffer_info_ext
+		pNext     voidptr       = unsafe { nil }
+		mtlBuffer voidptr
+	}
 
-@[keep_args_alive]
-fn C.vkExportMetalObjectsEXT(
+	// ExportMetalTextureInfoEXT extends VkExportMetalObjectsInfoEXT
+	pub type ExportMetalTextureInfoEXT = C.VkExportMetalTextureInfoEXT
+
+	@[typedef]
+	pub struct C.VkExportMetalTextureInfoEXT {
+	pub mut:
+		sType      StructureType = StructureType.export_metal_texture_info_ext
+		pNext      voidptr       = unsafe { nil }
+		image      Image
+		imageView  ImageView
+		bufferView BufferView
+		plane      ImageAspectFlagBits
+		mtlTexture voidptr
+	}
+
+	// ImportMetalTextureInfoEXT extends VkImageCreateInfo
+	pub type ImportMetalTextureInfoEXT = C.VkImportMetalTextureInfoEXT
+
+	@[typedef]
+	pub struct C.VkImportMetalTextureInfoEXT {
+	pub mut:
+		sType      StructureType = StructureType.import_metal_texture_info_ext
+		pNext      voidptr       = unsafe { nil }
+		plane      ImageAspectFlagBits
+		mtlTexture voidptr
+	}
+
+	// ExportMetalIOSurfaceInfoEXT extends VkExportMetalObjectsInfoEXT
+	pub type ExportMetalIOSurfaceInfoEXT = C.VkExportMetalIOSurfaceInfoEXT
+
+	@[typedef]
+	pub struct C.VkExportMetalIOSurfaceInfoEXT {
+	pub mut:
+		sType     StructureType = StructureType.export_metal_io_surface_info_ext
+		pNext     voidptr       = unsafe { nil }
+		image     Image
+		ioSurface voidptr
+	}
+
+	// ImportMetalIOSurfaceInfoEXT extends VkImageCreateInfo
+	pub type ImportMetalIOSurfaceInfoEXT = C.VkImportMetalIOSurfaceInfoEXT
+
+	@[typedef]
+	pub struct C.VkImportMetalIOSurfaceInfoEXT {
+	pub mut:
+		sType     StructureType = StructureType.import_metal_io_surface_info_ext
+		pNext     voidptr       = unsafe { nil }
+		ioSurface voidptr
+	}
+
+	// ExportMetalSharedEventInfoEXT extends VkExportMetalObjectsInfoEXT
+	pub type ExportMetalSharedEventInfoEXT = C.VkExportMetalSharedEventInfoEXT
+
+	@[typedef]
+	pub struct C.VkExportMetalSharedEventInfoEXT {
+	pub mut:
+		sType          StructureType = StructureType.export_metal_shared_event_info_ext
+		pNext          voidptr       = unsafe { nil }
+		semaphore      Semaphore
+		event          Event
+		mtlSharedEvent voidptr
+	}
+
+	// ImportMetalSharedEventInfoEXT extends VkSemaphoreCreateInfo,VkEventCreateInfo
+	pub type ImportMetalSharedEventInfoEXT = C.VkImportMetalSharedEventInfoEXT
+
+	@[typedef]
+	pub struct C.VkImportMetalSharedEventInfoEXT {
+	pub mut:
+		sType          StructureType = StructureType.import_metal_shared_event_info_ext
+		pNext          voidptr       = unsafe { nil }
+		mtlSharedEvent voidptr
+	}
+
+	@[keep_args_alive]
+	fn C.vkExportMetalObjectsEXT(
 	device Device, mut_pMetalObjectsInfo &ExportMetalObjectsInfoEXT)
 
-pub type PFN_vkExportMetalObjectsEXT = fn (device Device, mut_pMetalObjectsInfo &ExportMetalObjectsInfoEXT)
+	pub type PFN_vkExportMetalObjectsEXT = fn (device Device, mut_pMetalObjectsInfo &ExportMetalObjectsInfoEXT)
 
-@[inline]
-pub fn export_metal_objects_ext(
+	@[inline]
+	pub fn export_metal_objects_ext(
 	device Device,
 	mut mut_pMetalObjectsInfo ExportMetalObjectsInfoEXT) {
-	C.vkExportMetalObjectsEXT(device, mut_pMetalObjectsInfo)
+		C.vkExportMetalObjectsEXT(device, mut_pMetalObjectsInfo)
+	}
 }
 
 pub const ext_descriptor_buffer_spec_version = 1
@@ -29565,78 +29662,85 @@ pub mut:
 pub const nv_acquire_winrt_display_spec_version = 1
 pub const nv_acquire_winrt_display_extension_name = c'VK_NV_acquire_winrt_display'
 
-@[keep_args_alive]
-fn C.vkAcquireWinrtDisplayNV(
+$if vulkan_win32 ? {
+	@[keep_args_alive]
+	fn C.vkAcquireWinrtDisplayNV(
 	physicalDevice PhysicalDevice, display DisplayKHR) Result
 
-pub type PFN_vkAcquireWinrtDisplayNV = fn (physicalDevice PhysicalDevice, display DisplayKHR) Result
+	pub type PFN_vkAcquireWinrtDisplayNV = fn (physicalDevice PhysicalDevice, display DisplayKHR) Result
 
-@[inline]
-pub fn acquire_winrt_display_nv(
+	@[inline]
+	pub fn acquire_winrt_display_nv(
 	physicalDevice PhysicalDevice,
 	display DisplayKHR) Result {
-	return C.vkAcquireWinrtDisplayNV(physicalDevice, display)
-}
+		return C.vkAcquireWinrtDisplayNV(physicalDevice, display)
+	}
 
-@[keep_args_alive]
-fn C.vkGetWinrtDisplayNV(
+	@[keep_args_alive]
+	fn C.vkGetWinrtDisplayNV(
 	physicalDevice PhysicalDevice, deviceRelativeId u32, pDisplay &DisplayKHR) Result
 
-pub type PFN_vkGetWinrtDisplayNV = fn (physicalDevice PhysicalDevice, deviceRelativeId u32, pDisplay &DisplayKHR) Result
+	pub type PFN_vkGetWinrtDisplayNV = fn (physicalDevice PhysicalDevice, deviceRelativeId u32, pDisplay &DisplayKHR) Result
 
-@[inline]
-pub fn get_winrt_display_nv(
+	@[inline]
+	pub fn get_winrt_display_nv(
 	physicalDevice PhysicalDevice,
 	deviceRelativeId u32,
 	pDisplay &DisplayKHR) Result {
-	return C.vkGetWinrtDisplayNV(physicalDevice, deviceRelativeId, pDisplay)
+		return C.vkGetWinrtDisplayNV(physicalDevice, deviceRelativeId, pDisplay)
+	}
 }
 
 pub const ext_directfb_surface_spec_version = 1
 pub const ext_directfb_surface_extension_name = c'VK_EXT_directfb_surface'
 
-pub type DirectFBSurfaceCreateFlagsEXT = u32
-pub type DirectFBSurfaceCreateInfoEXT = C.VkDirectFBSurfaceCreateInfoEXT
-
-@[typedef]
-pub struct C.VkDirectFBSurfaceCreateInfoEXT {
-pub mut:
-	sType   StructureType = StructureType.directfb_surface_create_info_ext
-	pNext   voidptr       = unsafe { nil }
-	flags   DirectFBSurfaceCreateFlagsEXT
-	dfb     &voidptr
-	surface &voidptr
+$if vulkan_directfb ? {
+	#flag -DVK_USE_PLATFORM_DIRECTFB_EXT
 }
+$if vulkan_directfb ? {
+	pub type DirectFBSurfaceCreateFlagsEXT = u32
+	pub type DirectFBSurfaceCreateInfoEXT = C.VkDirectFBSurfaceCreateInfoEXT
 
-@[keep_args_alive]
-fn C.vkCreateDirectFBSurfaceEXT(
+	@[typedef]
+	pub struct C.VkDirectFBSurfaceCreateInfoEXT {
+	pub mut:
+		sType   StructureType = StructureType.directfb_surface_create_info_ext
+		pNext   voidptr       = unsafe { nil }
+		flags   DirectFBSurfaceCreateFlagsEXT
+		dfb     &voidptr
+		surface &voidptr
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateDirectFBSurfaceEXT(
 	instance Instance, const_pCreateInfo &DirectFBSurfaceCreateInfoEXT, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateDirectFBSurfaceEXT = fn (instance Instance, const_pCreateInfo &DirectFBSurfaceCreateInfoEXT, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateDirectFBSurfaceEXT = fn (instance Instance, const_pCreateInfo &DirectFBSurfaceCreateInfoEXT, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_direct_fb_surface_ext(
+	@[inline]
+	pub fn create_direct_fb_surface_ext(
 	instance Instance,
 	const_pCreateInfo &DirectFBSurfaceCreateInfoEXT,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateDirectFBSurfaceEXT(instance, const_pCreateInfo, const_pAllocator, pSurface)
-}
+		return C.vkCreateDirectFBSurfaceEXT(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 
-@[keep_args_alive]
-fn C.vkGetPhysicalDeviceDirectFBPresentationSupportEXT(
+	@[keep_args_alive]
+	fn C.vkGetPhysicalDeviceDirectFBPresentationSupportEXT(
 	physicalDevice PhysicalDevice, queueFamilyIndex u32, dfb &voidptr) Bool32
 
-pub type PFN_vkGetPhysicalDeviceDirectFBPresentationSupportEXT = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, dfb &voidptr) Bool32
+	pub type PFN_vkGetPhysicalDeviceDirectFBPresentationSupportEXT = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, dfb &voidptr) Bool32
 
-@[inline]
-pub fn get_physical_device_direct_fb_presentation_support_ext(
+	@[inline]
+	pub fn get_physical_device_direct_fb_presentation_support_ext(
 	physicalDevice PhysicalDevice,
 	queueFamilyIndex u32,
 	dfb &voidptr) Bool32 {
-	return C.vkGetPhysicalDeviceDirectFBPresentationSupportEXT(physicalDevice, queueFamilyIndex,
-		dfb)
+		return C.vkGetPhysicalDeviceDirectFBPresentationSupportEXT(physicalDevice,
+			queueFamilyIndex, dfb)
+	}
 }
 
 pub const valve_mutable_descriptor_type_spec_version = 1
@@ -29842,344 +29946,353 @@ pub type PhysicalDevicePresentModeFifoLatestReadyFeaturesEXT = C.VkPhysicalDevic
 
 pub const fuchsia_external_memory_spec_version = 1
 pub const fuchsia_external_memory_extension_name = c'VK_FUCHSIA_external_memory'
-// ImportMemoryZirconHandleInfoFUCHSIA extends VkMemoryAllocateInfo
-pub type ImportMemoryZirconHandleInfoFUCHSIA = C.VkImportMemoryZirconHandleInfoFUCHSIA
 
-@[typedef]
-pub struct C.VkImportMemoryZirconHandleInfoFUCHSIA {
-pub mut:
-	sType      StructureType = StructureType.import_memory_zircon_handle_info_fuchsia
-	pNext      voidptr       = unsafe { nil }
-	handleType ExternalMemoryHandleTypeFlagBits
-	handle     u32
-}
+$if vulkan_fuchsia ? {
+	// ImportMemoryZirconHandleInfoFUCHSIA extends VkMemoryAllocateInfo
+	pub type ImportMemoryZirconHandleInfoFUCHSIA = C.VkImportMemoryZirconHandleInfoFUCHSIA
 
-pub type MemoryZirconHandlePropertiesFUCHSIA = C.VkMemoryZirconHandlePropertiesFUCHSIA
+	@[typedef]
+	pub struct C.VkImportMemoryZirconHandleInfoFUCHSIA {
+	pub mut:
+		sType      StructureType = StructureType.import_memory_zircon_handle_info_fuchsia
+		pNext      voidptr       = unsafe { nil }
+		handleType ExternalMemoryHandleTypeFlagBits
+		handle     u32
+	}
 
-@[typedef]
-pub struct C.VkMemoryZirconHandlePropertiesFUCHSIA {
-pub mut:
-	sType          StructureType = StructureType.memory_zircon_handle_properties_fuchsia
-	pNext          voidptr       = unsafe { nil }
-	memoryTypeBits u32
-}
+	pub type MemoryZirconHandlePropertiesFUCHSIA = C.VkMemoryZirconHandlePropertiesFUCHSIA
 
-pub type MemoryGetZirconHandleInfoFUCHSIA = C.VkMemoryGetZirconHandleInfoFUCHSIA
+	@[typedef]
+	pub struct C.VkMemoryZirconHandlePropertiesFUCHSIA {
+	pub mut:
+		sType          StructureType = StructureType.memory_zircon_handle_properties_fuchsia
+		pNext          voidptr       = unsafe { nil }
+		memoryTypeBits u32
+	}
 
-@[typedef]
-pub struct C.VkMemoryGetZirconHandleInfoFUCHSIA {
-pub mut:
-	sType      StructureType = StructureType.memory_get_zircon_handle_info_fuchsia
-	pNext      voidptr       = unsafe { nil }
-	memory     DeviceMemory
-	handleType ExternalMemoryHandleTypeFlagBits
-}
+	pub type MemoryGetZirconHandleInfoFUCHSIA = C.VkMemoryGetZirconHandleInfoFUCHSIA
 
-@[keep_args_alive]
-fn C.vkGetMemoryZirconHandleFUCHSIA(
+	@[typedef]
+	pub struct C.VkMemoryGetZirconHandleInfoFUCHSIA {
+	pub mut:
+		sType      StructureType = StructureType.memory_get_zircon_handle_info_fuchsia
+		pNext      voidptr       = unsafe { nil }
+		memory     DeviceMemory
+		handleType ExternalMemoryHandleTypeFlagBits
+	}
+
+	@[keep_args_alive]
+	fn C.vkGetMemoryZirconHandleFUCHSIA(
 	device Device, const_pGetZirconHandleInfo &MemoryGetZirconHandleInfoFUCHSIA, pZirconHandle &u32) Result
 
-pub type PFN_vkGetMemoryZirconHandleFUCHSIA = fn (device Device, const_pGetZirconHandleInfo &MemoryGetZirconHandleInfoFUCHSIA, pZirconHandle &u32) Result
+	pub type PFN_vkGetMemoryZirconHandleFUCHSIA = fn (device Device, const_pGetZirconHandleInfo &MemoryGetZirconHandleInfoFUCHSIA, pZirconHandle &u32) Result
 
-@[inline]
-pub fn get_memory_zircon_handle_fuchsia(
+	@[inline]
+	pub fn get_memory_zircon_handle_fuchsia(
 	device Device,
 	const_pGetZirconHandleInfo &MemoryGetZirconHandleInfoFUCHSIA,
 	pZirconHandle &u32) Result {
-	return C.vkGetMemoryZirconHandleFUCHSIA(device, const_pGetZirconHandleInfo, pZirconHandle)
-}
+		return C.vkGetMemoryZirconHandleFUCHSIA(device, const_pGetZirconHandleInfo, pZirconHandle)
+	}
 
-@[keep_args_alive]
-fn C.vkGetMemoryZirconHandlePropertiesFUCHSIA(
+	@[keep_args_alive]
+	fn C.vkGetMemoryZirconHandlePropertiesFUCHSIA(
 	device Device, handleType ExternalMemoryHandleTypeFlagBits, zirconHandle u32, mut_pMemoryZirconHandleProperties &MemoryZirconHandlePropertiesFUCHSIA) Result
 
-pub type PFN_vkGetMemoryZirconHandlePropertiesFUCHSIA = fn (device Device, handleType ExternalMemoryHandleTypeFlagBits, zirconHandle u32, mut_pMemoryZirconHandleProperties &MemoryZirconHandlePropertiesFUCHSIA) Result
+	pub type PFN_vkGetMemoryZirconHandlePropertiesFUCHSIA = fn (device Device, handleType ExternalMemoryHandleTypeFlagBits, zirconHandle u32, mut_pMemoryZirconHandleProperties &MemoryZirconHandlePropertiesFUCHSIA) Result
 
-@[inline]
-pub fn get_memory_zircon_handle_properties_fuchsia(
+	@[inline]
+	pub fn get_memory_zircon_handle_properties_fuchsia(
 	device Device,
 	handleType ExternalMemoryHandleTypeFlagBits,
 	zirconHandle u32,
 	mut mut_pMemoryZirconHandleProperties MemoryZirconHandlePropertiesFUCHSIA) Result {
-	return C.vkGetMemoryZirconHandlePropertiesFUCHSIA(device, handleType, zirconHandle,
-		mut_pMemoryZirconHandleProperties)
+		return C.vkGetMemoryZirconHandlePropertiesFUCHSIA(device, handleType, zirconHandle,
+			mut_pMemoryZirconHandleProperties)
+	}
 }
 
 pub const fuchsia_external_semaphore_spec_version = 1
 pub const fuchsia_external_semaphore_extension_name = c'VK_FUCHSIA_external_semaphore'
 
-pub type ImportSemaphoreZirconHandleInfoFUCHSIA = C.VkImportSemaphoreZirconHandleInfoFUCHSIA
+$if vulkan_fuchsia ? {
+	pub type ImportSemaphoreZirconHandleInfoFUCHSIA = C.VkImportSemaphoreZirconHandleInfoFUCHSIA
 
-@[typedef]
-pub struct C.VkImportSemaphoreZirconHandleInfoFUCHSIA {
-pub mut:
-	sType        StructureType = StructureType.import_semaphore_zircon_handle_info_fuchsia
-	pNext        voidptr       = unsafe { nil }
-	semaphore    Semaphore
-	flags        SemaphoreImportFlags
-	handleType   ExternalSemaphoreHandleTypeFlagBits
-	zirconHandle u32
-}
+	@[typedef]
+	pub struct C.VkImportSemaphoreZirconHandleInfoFUCHSIA {
+	pub mut:
+		sType        StructureType = StructureType.import_semaphore_zircon_handle_info_fuchsia
+		pNext        voidptr       = unsafe { nil }
+		semaphore    Semaphore
+		flags        SemaphoreImportFlags
+		handleType   ExternalSemaphoreHandleTypeFlagBits
+		zirconHandle u32
+	}
 
-pub type SemaphoreGetZirconHandleInfoFUCHSIA = C.VkSemaphoreGetZirconHandleInfoFUCHSIA
+	pub type SemaphoreGetZirconHandleInfoFUCHSIA = C.VkSemaphoreGetZirconHandleInfoFUCHSIA
 
-@[typedef]
-pub struct C.VkSemaphoreGetZirconHandleInfoFUCHSIA {
-pub mut:
-	sType      StructureType = StructureType.semaphore_get_zircon_handle_info_fuchsia
-	pNext      voidptr       = unsafe { nil }
-	semaphore  Semaphore
-	handleType ExternalSemaphoreHandleTypeFlagBits
-}
+	@[typedef]
+	pub struct C.VkSemaphoreGetZirconHandleInfoFUCHSIA {
+	pub mut:
+		sType      StructureType = StructureType.semaphore_get_zircon_handle_info_fuchsia
+		pNext      voidptr       = unsafe { nil }
+		semaphore  Semaphore
+		handleType ExternalSemaphoreHandleTypeFlagBits
+	}
 
-@[keep_args_alive]
-fn C.vkImportSemaphoreZirconHandleFUCHSIA(
+	@[keep_args_alive]
+	fn C.vkImportSemaphoreZirconHandleFUCHSIA(
 	device Device, const_pImportSemaphoreZirconHandleInfo &ImportSemaphoreZirconHandleInfoFUCHSIA) Result
 
-pub type PFN_vkImportSemaphoreZirconHandleFUCHSIA = fn (device Device, const_pImportSemaphoreZirconHandleInfo &ImportSemaphoreZirconHandleInfoFUCHSIA) Result
+	pub type PFN_vkImportSemaphoreZirconHandleFUCHSIA = fn (device Device, const_pImportSemaphoreZirconHandleInfo &ImportSemaphoreZirconHandleInfoFUCHSIA) Result
 
-@[inline]
-pub fn import_semaphore_zircon_handle_fuchsia(
+	@[inline]
+	pub fn import_semaphore_zircon_handle_fuchsia(
 	device Device,
 	const_pImportSemaphoreZirconHandleInfo &ImportSemaphoreZirconHandleInfoFUCHSIA) Result {
-	return C.vkImportSemaphoreZirconHandleFUCHSIA(device, const_pImportSemaphoreZirconHandleInfo)
-}
+		return C.vkImportSemaphoreZirconHandleFUCHSIA(device,
+			const_pImportSemaphoreZirconHandleInfo)
+	}
 
-@[keep_args_alive]
-fn C.vkGetSemaphoreZirconHandleFUCHSIA(
+	@[keep_args_alive]
+	fn C.vkGetSemaphoreZirconHandleFUCHSIA(
 	device Device, const_pGetZirconHandleInfo &SemaphoreGetZirconHandleInfoFUCHSIA, pZirconHandle &u32) Result
 
-pub type PFN_vkGetSemaphoreZirconHandleFUCHSIA = fn (device Device, const_pGetZirconHandleInfo &SemaphoreGetZirconHandleInfoFUCHSIA, pZirconHandle &u32) Result
+	pub type PFN_vkGetSemaphoreZirconHandleFUCHSIA = fn (device Device, const_pGetZirconHandleInfo &SemaphoreGetZirconHandleInfoFUCHSIA, pZirconHandle &u32) Result
 
-@[inline]
-pub fn get_semaphore_zircon_handle_fuchsia(
+	@[inline]
+	pub fn get_semaphore_zircon_handle_fuchsia(
 	device Device,
 	const_pGetZirconHandleInfo &SemaphoreGetZirconHandleInfoFUCHSIA,
 	pZirconHandle &u32) Result {
-	return C.vkGetSemaphoreZirconHandleFUCHSIA(device, const_pGetZirconHandleInfo, pZirconHandle)
+		return C.vkGetSemaphoreZirconHandleFUCHSIA(device, const_pGetZirconHandleInfo,
+			pZirconHandle)
+	}
 }
-
-// Pointer to VkBufferCollectionFUCHSIA_T
-pub type BufferCollectionFUCHSIA = voidptr
 
 pub const fuchsia_buffer_collection_spec_version = 2
 pub const fuchsia_buffer_collection_extension_name = c'VK_FUCHSIA_buffer_collection'
 
-pub type ImageFormatConstraintsFlagsFUCHSIA = u32
+$if vulkan_fuchsia ? {
+	// Pointer to VkBufferCollectionFUCHSIA_T
+	pub type BufferCollectionFUCHSIA = voidptr
 
-pub enum ImageConstraintsInfoFlagBitsFUCHSIA as u32 {
-	cpu_read_rarely    = u32(0x00000001)
-	cpu_read_often     = u32(0x00000002)
-	cpu_write_rarely   = u32(0x00000004)
-	cpu_write_often    = u32(0x00000008)
-	protected_optional = u32(0x00000010)
-	max_enum_fuchsia   = max_int
-}
-pub type ImageConstraintsInfoFlagsFUCHSIA = u32
-pub type BufferCollectionCreateInfoFUCHSIA = C.VkBufferCollectionCreateInfoFUCHSIA
+	pub type ImageFormatConstraintsFlagsFUCHSIA = u32
 
-@[typedef]
-pub struct C.VkBufferCollectionCreateInfoFUCHSIA {
-pub mut:
-	sType           StructureType = StructureType.buffer_collection_create_info_fuchsia
-	pNext           voidptr       = unsafe { nil }
-	collectionToken u32
-}
+	pub enum ImageConstraintsInfoFlagBitsFUCHSIA as u32 {
+		cpu_read_rarely    = u32(0x00000001)
+		cpu_read_often     = u32(0x00000002)
+		cpu_write_rarely   = u32(0x00000004)
+		cpu_write_often    = u32(0x00000008)
+		protected_optional = u32(0x00000010)
+		max_enum_fuchsia   = max_int
+	}
+	pub type ImageConstraintsInfoFlagsFUCHSIA = u32
+	pub type BufferCollectionCreateInfoFUCHSIA = C.VkBufferCollectionCreateInfoFUCHSIA
 
-// ImportMemoryBufferCollectionFUCHSIA extends VkMemoryAllocateInfo
-pub type ImportMemoryBufferCollectionFUCHSIA = C.VkImportMemoryBufferCollectionFUCHSIA
+	@[typedef]
+	pub struct C.VkBufferCollectionCreateInfoFUCHSIA {
+	pub mut:
+		sType           StructureType = StructureType.buffer_collection_create_info_fuchsia
+		pNext           voidptr       = unsafe { nil }
+		collectionToken u32
+	}
 
-@[typedef]
-pub struct C.VkImportMemoryBufferCollectionFUCHSIA {
-pub mut:
-	sType      StructureType = StructureType.import_memory_buffer_collection_fuchsia
-	pNext      voidptr       = unsafe { nil }
-	collection BufferCollectionFUCHSIA
-	index      u32
-}
+	// ImportMemoryBufferCollectionFUCHSIA extends VkMemoryAllocateInfo
+	pub type ImportMemoryBufferCollectionFUCHSIA = C.VkImportMemoryBufferCollectionFUCHSIA
 
-// BufferCollectionImageCreateInfoFUCHSIA extends VkImageCreateInfo
-pub type BufferCollectionImageCreateInfoFUCHSIA = C.VkBufferCollectionImageCreateInfoFUCHSIA
+	@[typedef]
+	pub struct C.VkImportMemoryBufferCollectionFUCHSIA {
+	pub mut:
+		sType      StructureType = StructureType.import_memory_buffer_collection_fuchsia
+		pNext      voidptr       = unsafe { nil }
+		collection BufferCollectionFUCHSIA
+		index      u32
+	}
 
-@[typedef]
-pub struct C.VkBufferCollectionImageCreateInfoFUCHSIA {
-pub mut:
-	sType      StructureType = StructureType.buffer_collection_image_create_info_fuchsia
-	pNext      voidptr       = unsafe { nil }
-	collection BufferCollectionFUCHSIA
-	index      u32
-}
+	// BufferCollectionImageCreateInfoFUCHSIA extends VkImageCreateInfo
+	pub type BufferCollectionImageCreateInfoFUCHSIA = C.VkBufferCollectionImageCreateInfoFUCHSIA
 
-pub type BufferCollectionConstraintsInfoFUCHSIA = C.VkBufferCollectionConstraintsInfoFUCHSIA
+	@[typedef]
+	pub struct C.VkBufferCollectionImageCreateInfoFUCHSIA {
+	pub mut:
+		sType      StructureType = StructureType.buffer_collection_image_create_info_fuchsia
+		pNext      voidptr       = unsafe { nil }
+		collection BufferCollectionFUCHSIA
+		index      u32
+	}
 
-@[typedef]
-pub struct C.VkBufferCollectionConstraintsInfoFUCHSIA {
-pub mut:
-	sType                           StructureType = StructureType.buffer_collection_constraints_info_fuchsia
-	pNext                           voidptr       = unsafe { nil }
-	minBufferCount                  u32
-	maxBufferCount                  u32
-	minBufferCountForCamping        u32
-	minBufferCountForDedicatedSlack u32
-	minBufferCountForSharedSlack    u32
-}
+	pub type BufferCollectionConstraintsInfoFUCHSIA = C.VkBufferCollectionConstraintsInfoFUCHSIA
 
-pub type BufferConstraintsInfoFUCHSIA = C.VkBufferConstraintsInfoFUCHSIA
+	@[typedef]
+	pub struct C.VkBufferCollectionConstraintsInfoFUCHSIA {
+	pub mut:
+		sType                           StructureType = StructureType.buffer_collection_constraints_info_fuchsia
+		pNext                           voidptr       = unsafe { nil }
+		minBufferCount                  u32
+		maxBufferCount                  u32
+		minBufferCountForCamping        u32
+		minBufferCountForDedicatedSlack u32
+		minBufferCountForSharedSlack    u32
+	}
 
-@[typedef]
-pub struct C.VkBufferConstraintsInfoFUCHSIA {
-pub mut:
-	sType                       StructureType = StructureType.buffer_constraints_info_fuchsia
-	pNext                       voidptr       = unsafe { nil }
-	createInfo                  BufferCreateInfo
-	requiredFormatFeatures      FormatFeatureFlags
-	bufferCollectionConstraints BufferCollectionConstraintsInfoFUCHSIA
-}
+	pub type BufferConstraintsInfoFUCHSIA = C.VkBufferConstraintsInfoFUCHSIA
 
-// BufferCollectionBufferCreateInfoFUCHSIA extends VkBufferCreateInfo
-pub type BufferCollectionBufferCreateInfoFUCHSIA = C.VkBufferCollectionBufferCreateInfoFUCHSIA
+	@[typedef]
+	pub struct C.VkBufferConstraintsInfoFUCHSIA {
+	pub mut:
+		sType                       StructureType = StructureType.buffer_constraints_info_fuchsia
+		pNext                       voidptr       = unsafe { nil }
+		createInfo                  BufferCreateInfo
+		requiredFormatFeatures      FormatFeatureFlags
+		bufferCollectionConstraints BufferCollectionConstraintsInfoFUCHSIA
+	}
 
-@[typedef]
-pub struct C.VkBufferCollectionBufferCreateInfoFUCHSIA {
-pub mut:
-	sType      StructureType = StructureType.buffer_collection_buffer_create_info_fuchsia
-	pNext      voidptr       = unsafe { nil }
-	collection BufferCollectionFUCHSIA
-	index      u32
-}
+	// BufferCollectionBufferCreateInfoFUCHSIA extends VkBufferCreateInfo
+	pub type BufferCollectionBufferCreateInfoFUCHSIA = C.VkBufferCollectionBufferCreateInfoFUCHSIA
 
-pub type SysmemColorSpaceFUCHSIA = C.VkSysmemColorSpaceFUCHSIA
+	@[typedef]
+	pub struct C.VkBufferCollectionBufferCreateInfoFUCHSIA {
+	pub mut:
+		sType      StructureType = StructureType.buffer_collection_buffer_create_info_fuchsia
+		pNext      voidptr       = unsafe { nil }
+		collection BufferCollectionFUCHSIA
+		index      u32
+	}
 
-@[typedef]
-pub struct C.VkSysmemColorSpaceFUCHSIA {
-pub mut:
-	sType      StructureType = StructureType.sysmem_color_space_fuchsia
-	pNext      voidptr       = unsafe { nil }
-	colorSpace u32
-}
+	pub type SysmemColorSpaceFUCHSIA = C.VkSysmemColorSpaceFUCHSIA
 
-pub type BufferCollectionPropertiesFUCHSIA = C.VkBufferCollectionPropertiesFUCHSIA
+	@[typedef]
+	pub struct C.VkSysmemColorSpaceFUCHSIA {
+	pub mut:
+		sType      StructureType = StructureType.sysmem_color_space_fuchsia
+		pNext      voidptr       = unsafe { nil }
+		colorSpace u32
+	}
 
-@[typedef]
-pub struct C.VkBufferCollectionPropertiesFUCHSIA {
-pub mut:
-	sType                            StructureType = StructureType.buffer_collection_properties_fuchsia
-	pNext                            voidptr       = unsafe { nil }
-	memoryTypeBits                   u32
-	bufferCount                      u32
-	createInfoIndex                  u32
-	sysmemPixelFormat                u64
-	formatFeatures                   FormatFeatureFlags
-	sysmemColorSpaceIndex            SysmemColorSpaceFUCHSIA
-	samplerYcbcrConversionComponents ComponentMapping
-	suggestedYcbcrModel              SamplerYcbcrModelConversion
-	suggestedYcbcrRange              SamplerYcbcrRange
-	suggestedXChromaOffset           ChromaLocation
-	suggestedYChromaOffset           ChromaLocation
-}
+	pub type BufferCollectionPropertiesFUCHSIA = C.VkBufferCollectionPropertiesFUCHSIA
 
-pub type ImageFormatConstraintsInfoFUCHSIA = C.VkImageFormatConstraintsInfoFUCHSIA
+	@[typedef]
+	pub struct C.VkBufferCollectionPropertiesFUCHSIA {
+	pub mut:
+		sType                            StructureType = StructureType.buffer_collection_properties_fuchsia
+		pNext                            voidptr       = unsafe { nil }
+		memoryTypeBits                   u32
+		bufferCount                      u32
+		createInfoIndex                  u32
+		sysmemPixelFormat                u64
+		formatFeatures                   FormatFeatureFlags
+		sysmemColorSpaceIndex            SysmemColorSpaceFUCHSIA
+		samplerYcbcrConversionComponents ComponentMapping
+		suggestedYcbcrModel              SamplerYcbcrModelConversion
+		suggestedYcbcrRange              SamplerYcbcrRange
+		suggestedXChromaOffset           ChromaLocation
+		suggestedYChromaOffset           ChromaLocation
+	}
 
-@[typedef]
-pub struct C.VkImageFormatConstraintsInfoFUCHSIA {
-pub mut:
-	sType                  StructureType = StructureType.image_format_constraints_info_fuchsia
-	pNext                  voidptr       = unsafe { nil }
-	imageCreateInfo        ImageCreateInfo
-	requiredFormatFeatures FormatFeatureFlags
-	flags                  ImageFormatConstraintsFlagsFUCHSIA
-	sysmemPixelFormat      u64
-	colorSpaceCount        u32
-	pColorSpaces           &SysmemColorSpaceFUCHSIA
-}
+	pub type ImageFormatConstraintsInfoFUCHSIA = C.VkImageFormatConstraintsInfoFUCHSIA
 
-pub type ImageConstraintsInfoFUCHSIA = C.VkImageConstraintsInfoFUCHSIA
+	@[typedef]
+	pub struct C.VkImageFormatConstraintsInfoFUCHSIA {
+	pub mut:
+		sType                  StructureType = StructureType.image_format_constraints_info_fuchsia
+		pNext                  voidptr       = unsafe { nil }
+		imageCreateInfo        ImageCreateInfo
+		requiredFormatFeatures FormatFeatureFlags
+		flags                  ImageFormatConstraintsFlagsFUCHSIA
+		sysmemPixelFormat      u64
+		colorSpaceCount        u32
+		pColorSpaces           &SysmemColorSpaceFUCHSIA
+	}
 
-@[typedef]
-pub struct C.VkImageConstraintsInfoFUCHSIA {
-pub mut:
-	sType                       StructureType = StructureType.image_constraints_info_fuchsia
-	pNext                       voidptr       = unsafe { nil }
-	formatConstraintsCount      u32
-	pFormatConstraints          &ImageFormatConstraintsInfoFUCHSIA
-	bufferCollectionConstraints BufferCollectionConstraintsInfoFUCHSIA
-	flags                       ImageConstraintsInfoFlagsFUCHSIA
-}
+	pub type ImageConstraintsInfoFUCHSIA = C.VkImageConstraintsInfoFUCHSIA
 
-@[keep_args_alive]
-fn C.vkCreateBufferCollectionFUCHSIA(
+	@[typedef]
+	pub struct C.VkImageConstraintsInfoFUCHSIA {
+	pub mut:
+		sType                       StructureType = StructureType.image_constraints_info_fuchsia
+		pNext                       voidptr       = unsafe { nil }
+		formatConstraintsCount      u32
+		pFormatConstraints          &ImageFormatConstraintsInfoFUCHSIA
+		bufferCollectionConstraints BufferCollectionConstraintsInfoFUCHSIA
+		flags                       ImageConstraintsInfoFlagsFUCHSIA
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateBufferCollectionFUCHSIA(
 	device Device, const_pCreateInfo &BufferCollectionCreateInfoFUCHSIA, const_pAllocator &AllocationCallbacks, pCollection &BufferCollectionFUCHSIA) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateBufferCollectionFUCHSIA = fn (device Device, const_pCreateInfo &BufferCollectionCreateInfoFUCHSIA, const_pAllocator &AllocationCallbacks, pCollection &BufferCollectionFUCHSIA) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateBufferCollectionFUCHSIA = fn (device Device, const_pCreateInfo &BufferCollectionCreateInfoFUCHSIA, const_pAllocator &AllocationCallbacks, pCollection &BufferCollectionFUCHSIA) Result
 
-@[inline]
-pub fn create_buffer_collection_fuchsia(
+	@[inline]
+	pub fn create_buffer_collection_fuchsia(
 	device Device,
 	const_pCreateInfo &BufferCollectionCreateInfoFUCHSIA,
 	const_pAllocator &AllocationCallbacks,
 	pCollection &BufferCollectionFUCHSIA) Result {
-	return C.vkCreateBufferCollectionFUCHSIA(device, const_pCreateInfo, const_pAllocator,
-		pCollection)
-}
+		return C.vkCreateBufferCollectionFUCHSIA(device, const_pCreateInfo, const_pAllocator,
+			pCollection)
+	}
 
-@[keep_args_alive]
-fn C.vkSetBufferCollectionImageConstraintsFUCHSIA(
+	@[keep_args_alive]
+	fn C.vkSetBufferCollectionImageConstraintsFUCHSIA(
 	device Device, collection BufferCollectionFUCHSIA, const_pImageConstraintsInfo &ImageConstraintsInfoFUCHSIA) Result
 
-pub type PFN_vkSetBufferCollectionImageConstraintsFUCHSIA = fn (device Device, collection BufferCollectionFUCHSIA, const_pImageConstraintsInfo &ImageConstraintsInfoFUCHSIA) Result
+	pub type PFN_vkSetBufferCollectionImageConstraintsFUCHSIA = fn (device Device, collection BufferCollectionFUCHSIA, const_pImageConstraintsInfo &ImageConstraintsInfoFUCHSIA) Result
 
-@[inline]
-pub fn set_buffer_collection_image_constraints_fuchsia(
+	@[inline]
+	pub fn set_buffer_collection_image_constraints_fuchsia(
 	device Device,
 	collection BufferCollectionFUCHSIA,
 	const_pImageConstraintsInfo &ImageConstraintsInfoFUCHSIA) Result {
-	return C.vkSetBufferCollectionImageConstraintsFUCHSIA(device, collection,
-		const_pImageConstraintsInfo)
-}
+		return C.vkSetBufferCollectionImageConstraintsFUCHSIA(device, collection,
+			const_pImageConstraintsInfo)
+	}
 
-@[keep_args_alive]
-fn C.vkSetBufferCollectionBufferConstraintsFUCHSIA(
+	@[keep_args_alive]
+	fn C.vkSetBufferCollectionBufferConstraintsFUCHSIA(
 	device Device, collection BufferCollectionFUCHSIA, const_pBufferConstraintsInfo &BufferConstraintsInfoFUCHSIA) Result
 
-pub type PFN_vkSetBufferCollectionBufferConstraintsFUCHSIA = fn (device Device, collection BufferCollectionFUCHSIA, const_pBufferConstraintsInfo &BufferConstraintsInfoFUCHSIA) Result
+	pub type PFN_vkSetBufferCollectionBufferConstraintsFUCHSIA = fn (device Device, collection BufferCollectionFUCHSIA, const_pBufferConstraintsInfo &BufferConstraintsInfoFUCHSIA) Result
 
-@[inline]
-pub fn set_buffer_collection_buffer_constraints_fuchsia(
+	@[inline]
+	pub fn set_buffer_collection_buffer_constraints_fuchsia(
 	device Device,
 	collection BufferCollectionFUCHSIA,
 	const_pBufferConstraintsInfo &BufferConstraintsInfoFUCHSIA) Result {
-	return C.vkSetBufferCollectionBufferConstraintsFUCHSIA(device, collection,
-		const_pBufferConstraintsInfo)
-}
+		return C.vkSetBufferCollectionBufferConstraintsFUCHSIA(device, collection,
+			const_pBufferConstraintsInfo)
+	}
 
-@[keep_args_alive]
-fn C.vkDestroyBufferCollectionFUCHSIA(
+	@[keep_args_alive]
+	fn C.vkDestroyBufferCollectionFUCHSIA(
 	device Device, collection BufferCollectionFUCHSIA, const_pAllocator &AllocationCallbacks)
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkDestroyBufferCollectionFUCHSIA = fn (device Device, collection BufferCollectionFUCHSIA, const_pAllocator &AllocationCallbacks)
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkDestroyBufferCollectionFUCHSIA = fn (device Device, collection BufferCollectionFUCHSIA, const_pAllocator &AllocationCallbacks)
 
-@[inline]
-pub fn destroy_buffer_collection_fuchsia(
+	@[inline]
+	pub fn destroy_buffer_collection_fuchsia(
 	device Device,
 	collection BufferCollectionFUCHSIA,
 	const_pAllocator &AllocationCallbacks) {
-	C.vkDestroyBufferCollectionFUCHSIA(device, collection, const_pAllocator)
-}
+		C.vkDestroyBufferCollectionFUCHSIA(device, collection, const_pAllocator)
+	}
 
-@[keep_args_alive]
-fn C.vkGetBufferCollectionPropertiesFUCHSIA(
+	@[keep_args_alive]
+	fn C.vkGetBufferCollectionPropertiesFUCHSIA(
 	device Device, collection BufferCollectionFUCHSIA, mut_pProperties &BufferCollectionPropertiesFUCHSIA) Result
 
-pub type PFN_vkGetBufferCollectionPropertiesFUCHSIA = fn (device Device, collection BufferCollectionFUCHSIA, mut_pProperties &BufferCollectionPropertiesFUCHSIA) Result
+	pub type PFN_vkGetBufferCollectionPropertiesFUCHSIA = fn (device Device, collection BufferCollectionFUCHSIA, mut_pProperties &BufferCollectionPropertiesFUCHSIA) Result
 
-@[inline]
-pub fn get_buffer_collection_properties_fuchsia(
+	@[inline]
+	pub fn get_buffer_collection_properties_fuchsia(
 	device Device,
 	collection BufferCollectionFUCHSIA,
 	mut mut_pProperties BufferCollectionPropertiesFUCHSIA) Result {
-	return C.vkGetBufferCollectionPropertiesFUCHSIA(device, collection, mut_pProperties)
+		return C.vkGetBufferCollectionPropertiesFUCHSIA(device, collection, mut_pProperties)
+	}
 }
 
 pub const huawei_subpass_shading_spec_version = 3
@@ -30513,48 +30626,53 @@ pub fn cmd_set_primitive_restart_enable_ext(
 pub const qnx_screen_surface_spec_version = 1
 pub const qnx_screen_surface_extension_name = c'VK_QNX_screen_surface'
 
-pub type ScreenSurfaceCreateFlagsQNX = u32
-pub type ScreenSurfaceCreateInfoQNX = C.VkScreenSurfaceCreateInfoQNX
-
-@[typedef]
-pub struct C.VkScreenSurfaceCreateInfoQNX {
-pub mut:
-	sType   StructureType = StructureType.screen_surface_create_info_qnx
-	pNext   voidptr       = unsafe { nil }
-	flags   ScreenSurfaceCreateFlagsQNX
-	context &voidptr
-	window  &voidptr
+$if vulkan_screen ? {
+	#flag -DVK_USE_PLATFORM_SCREEN_QNX
 }
+$if vulkan_screen ? {
+	pub type ScreenSurfaceCreateFlagsQNX = u32
+	pub type ScreenSurfaceCreateInfoQNX = C.VkScreenSurfaceCreateInfoQNX
 
-@[keep_args_alive]
-fn C.vkCreateScreenSurfaceQNX(
+	@[typedef]
+	pub struct C.VkScreenSurfaceCreateInfoQNX {
+	pub mut:
+		sType   StructureType = StructureType.screen_surface_create_info_qnx
+		pNext   voidptr       = unsafe { nil }
+		flags   ScreenSurfaceCreateFlagsQNX
+		context &voidptr
+		window  &voidptr
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateScreenSurfaceQNX(
 	instance Instance, const_pCreateInfo &ScreenSurfaceCreateInfoQNX, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateScreenSurfaceQNX = fn (instance Instance, const_pCreateInfo &ScreenSurfaceCreateInfoQNX, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateScreenSurfaceQNX = fn (instance Instance, const_pCreateInfo &ScreenSurfaceCreateInfoQNX, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_screen_surface_qnx(
+	@[inline]
+	pub fn create_screen_surface_qnx(
 	instance Instance,
 	const_pCreateInfo &ScreenSurfaceCreateInfoQNX,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateScreenSurfaceQNX(instance, const_pCreateInfo, const_pAllocator, pSurface)
-}
+		return C.vkCreateScreenSurfaceQNX(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 
-@[keep_args_alive]
-fn C.vkGetPhysicalDeviceScreenPresentationSupportQNX(
+	@[keep_args_alive]
+	fn C.vkGetPhysicalDeviceScreenPresentationSupportQNX(
 	physicalDevice PhysicalDevice, queueFamilyIndex u32, window &voidptr) Bool32
 
-pub type PFN_vkGetPhysicalDeviceScreenPresentationSupportQNX = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, window &voidptr) Bool32
+	pub type PFN_vkGetPhysicalDeviceScreenPresentationSupportQNX = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, window &voidptr) Bool32
 
-@[inline]
-pub fn get_physical_device_screen_presentation_support_qnx(
+	@[inline]
+	pub fn get_physical_device_screen_presentation_support_qnx(
 	physicalDevice PhysicalDevice,
 	queueFamilyIndex u32,
 	window &voidptr) Bool32 {
-	return C.vkGetPhysicalDeviceScreenPresentationSupportQNX(physicalDevice, queueFamilyIndex,
-		window)
+		return C.vkGetPhysicalDeviceScreenPresentationSupportQNX(physicalDevice, queueFamilyIndex,
+			window)
+	}
 }
 
 pub const ext_color_write_enable_spec_version = 1
@@ -31275,58 +31393,60 @@ pub fn get_micromap_build_sizes_ext(
 pub const nv_displacement_micromap_spec_version = 2
 pub const nv_displacement_micromap_extension_name = c'VK_NV_displacement_micromap'
 
-pub enum DisplacementMicromapFormatNV as u32 {
-	_64_triangles64_bytes    = 1
-	_256_triangles128_bytes  = 2
-	_1024_triangles128_bytes = 3
-	max_enum_nv              = max_int
-}
-// PhysicalDeviceDisplacementMicromapFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceDisplacementMicromapFeaturesNV = C.VkPhysicalDeviceDisplacementMicromapFeaturesNV
+$if vulkan_provisional ? {
+	pub enum DisplacementMicromapFormatNV as u32 {
+		_64_triangles64_bytes    = 1
+		_256_triangles128_bytes  = 2
+		_1024_triangles128_bytes = 3
+		max_enum_nv              = max_int
+	}
+	// PhysicalDeviceDisplacementMicromapFeaturesNV extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+	pub type PhysicalDeviceDisplacementMicromapFeaturesNV = C.VkPhysicalDeviceDisplacementMicromapFeaturesNV
 
-@[typedef]
-pub struct C.VkPhysicalDeviceDisplacementMicromapFeaturesNV {
-pub mut:
-	sType                StructureType
-	pNext                voidptr = unsafe { nil }
-	displacementMicromap Bool32
-}
+	@[typedef]
+	pub struct C.VkPhysicalDeviceDisplacementMicromapFeaturesNV {
+	pub mut:
+		sType                StructureType
+		pNext                voidptr = unsafe { nil }
+		displacementMicromap Bool32
+	}
 
-// PhysicalDeviceDisplacementMicromapPropertiesNV extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceDisplacementMicromapPropertiesNV = C.VkPhysicalDeviceDisplacementMicromapPropertiesNV
+	// PhysicalDeviceDisplacementMicromapPropertiesNV extends VkPhysicalDeviceProperties2
+	pub type PhysicalDeviceDisplacementMicromapPropertiesNV = C.VkPhysicalDeviceDisplacementMicromapPropertiesNV
 
-@[typedef]
-pub struct C.VkPhysicalDeviceDisplacementMicromapPropertiesNV {
-pub mut:
-	sType                                   StructureType
-	pNext                                   voidptr = unsafe { nil }
-	maxDisplacementMicromapSubdivisionLevel u32
-}
+	@[typedef]
+	pub struct C.VkPhysicalDeviceDisplacementMicromapPropertiesNV {
+	pub mut:
+		sType                                   StructureType
+		pNext                                   voidptr = unsafe { nil }
+		maxDisplacementMicromapSubdivisionLevel u32
+	}
 
-// AccelerationStructureTrianglesDisplacementMicromapNV extends VkAccelerationStructureGeometryTrianglesDataKHR
-pub type AccelerationStructureTrianglesDisplacementMicromapNV = C.VkAccelerationStructureTrianglesDisplacementMicromapNV
+	// AccelerationStructureTrianglesDisplacementMicromapNV extends VkAccelerationStructureGeometryTrianglesDataKHR
+	pub type AccelerationStructureTrianglesDisplacementMicromapNV = C.VkAccelerationStructureTrianglesDisplacementMicromapNV
 
-@[typedef]
-pub struct C.VkAccelerationStructureTrianglesDisplacementMicromapNV {
-pub mut:
-	sType                                 StructureType
-	pNext                                 voidptr = unsafe { nil }
-	displacementBiasAndScaleFormat        Format
-	displacementVectorFormat              Format
-	displacementBiasAndScaleBuffer        DeviceOrHostAddressConstKHR
-	displacementBiasAndScaleStride        DeviceSize
-	displacementVectorBuffer              DeviceOrHostAddressConstKHR
-	displacementVectorStride              DeviceSize
-	displacedMicromapPrimitiveFlags       DeviceOrHostAddressConstKHR
-	displacedMicromapPrimitiveFlagsStride DeviceSize
-	indexType                             IndexType
-	indexBuffer                           DeviceOrHostAddressConstKHR
-	indexStride                           DeviceSize
-	baseTriangle                          u32
-	usageCountsCount                      u32
-	pUsageCounts                          &MicromapUsageEXT
-	ppUsageCounts                         &&MicromapUsageEXT
-	micromap                              MicromapEXT
+	@[typedef]
+	pub struct C.VkAccelerationStructureTrianglesDisplacementMicromapNV {
+	pub mut:
+		sType                                 StructureType
+		pNext                                 voidptr = unsafe { nil }
+		displacementBiasAndScaleFormat        Format
+		displacementVectorFormat              Format
+		displacementBiasAndScaleBuffer        DeviceOrHostAddressConstKHR
+		displacementBiasAndScaleStride        DeviceSize
+		displacementVectorBuffer              DeviceOrHostAddressConstKHR
+		displacementVectorStride              DeviceSize
+		displacedMicromapPrimitiveFlags       DeviceOrHostAddressConstKHR
+		displacedMicromapPrimitiveFlagsStride DeviceSize
+		indexType                             IndexType
+		indexBuffer                           DeviceOrHostAddressConstKHR
+		indexStride                           DeviceSize
+		baseTriangle                          u32
+		usageCountsCount                      u32
+		pUsageCounts                          &MicromapUsageEXT
+		ppUsageCounts                         &&MicromapUsageEXT
+		micromap                              MicromapEXT
+	}
 }
 
 pub const ext_load_store_op_none_spec_version = 1
@@ -32146,111 +32266,117 @@ pub mut:
 	maxCommandBufferNestingLevel u32
 }
 
-pub type OH_NativeBuffer = C.OH_NativeBuffer
-
-@[typedef]
-pub struct C.OH_NativeBuffer {}
-
 pub const ohos_external_memory_spec_version = 1
 pub const ohos_external_memory_extension_name = c'VK_OHOS_external_memory'
-// NativeBufferUsageOHOS extends VkImageFormatProperties2
-pub type NativeBufferUsageOHOS = C.VkNativeBufferUsageOHOS
 
-@[typedef]
-pub struct C.VkNativeBufferUsageOHOS {
-pub mut:
-	sType                 StructureType = StructureType.native_buffer_usage_ohos
-	pNext                 voidptr       = unsafe { nil }
-	OHOSNativeBufferUsage u64
+$if vulkan_ohos ? {
+	#flag -DVK_USE_PLATFORM_OHOS
 }
+$if vulkan_ohos ? {
+	pub type OH_NativeBuffer = C.OH_NativeBuffer
 
-pub type NativeBufferPropertiesOHOS = C.VkNativeBufferPropertiesOHOS
+	@[typedef]
+	pub struct C.OH_NativeBuffer {}
 
-@[typedef]
-pub struct C.VkNativeBufferPropertiesOHOS {
-pub mut:
-	sType          StructureType = StructureType.native_buffer_properties_ohos
-	pNext          voidptr       = unsafe { nil }
-	allocationSize DeviceSize
-	memoryTypeBits u32
-}
+	// NativeBufferUsageOHOS extends VkImageFormatProperties2
+	pub type NativeBufferUsageOHOS = C.VkNativeBufferUsageOHOS
 
-// NativeBufferFormatPropertiesOHOS extends VkNativeBufferPropertiesOHOS
-pub type NativeBufferFormatPropertiesOHOS = C.VkNativeBufferFormatPropertiesOHOS
+	@[typedef]
+	pub struct C.VkNativeBufferUsageOHOS {
+	pub mut:
+		sType                 StructureType = StructureType.native_buffer_usage_ohos
+		pNext                 voidptr       = unsafe { nil }
+		OHOSNativeBufferUsage u64
+	}
 
-@[typedef]
-pub struct C.VkNativeBufferFormatPropertiesOHOS {
-pub mut:
-	sType                            StructureType = StructureType.native_buffer_format_properties_ohos
-	pNext                            voidptr       = unsafe { nil }
-	format                           Format
-	externalFormat                   u64
-	formatFeatures                   FormatFeatureFlags
-	samplerYcbcrConversionComponents ComponentMapping
-	suggestedYcbcrModel              SamplerYcbcrModelConversion
-	suggestedYcbcrRange              SamplerYcbcrRange
-	suggestedXChromaOffset           ChromaLocation
-	suggestedYChromaOffset           ChromaLocation
-}
+	pub type NativeBufferPropertiesOHOS = C.VkNativeBufferPropertiesOHOS
 
-// ImportNativeBufferInfoOHOS extends VkMemoryAllocateInfo
-pub type ImportNativeBufferInfoOHOS = C.VkImportNativeBufferInfoOHOS
+	@[typedef]
+	pub struct C.VkNativeBufferPropertiesOHOS {
+	pub mut:
+		sType          StructureType = StructureType.native_buffer_properties_ohos
+		pNext          voidptr       = unsafe { nil }
+		allocationSize DeviceSize
+		memoryTypeBits u32
+	}
 
-@[typedef]
-pub struct C.VkImportNativeBufferInfoOHOS {
-pub mut:
-	sType  StructureType = StructureType.import_native_buffer_info_ohos
-	pNext  voidptr       = unsafe { nil }
-	buffer &OH_NativeBuffer
-}
+	// NativeBufferFormatPropertiesOHOS extends VkNativeBufferPropertiesOHOS
+	pub type NativeBufferFormatPropertiesOHOS = C.VkNativeBufferFormatPropertiesOHOS
 
-pub type MemoryGetNativeBufferInfoOHOS = C.VkMemoryGetNativeBufferInfoOHOS
+	@[typedef]
+	pub struct C.VkNativeBufferFormatPropertiesOHOS {
+	pub mut:
+		sType                            StructureType = StructureType.native_buffer_format_properties_ohos
+		pNext                            voidptr       = unsafe { nil }
+		format                           Format
+		externalFormat                   u64
+		formatFeatures                   FormatFeatureFlags
+		samplerYcbcrConversionComponents ComponentMapping
+		suggestedYcbcrModel              SamplerYcbcrModelConversion
+		suggestedYcbcrRange              SamplerYcbcrRange
+		suggestedXChromaOffset           ChromaLocation
+		suggestedYChromaOffset           ChromaLocation
+	}
 
-@[typedef]
-pub struct C.VkMemoryGetNativeBufferInfoOHOS {
-pub mut:
-	sType  StructureType = StructureType.memory_get_native_buffer_info_ohos
-	pNext  voidptr       = unsafe { nil }
-	memory DeviceMemory
-}
+	// ImportNativeBufferInfoOHOS extends VkMemoryAllocateInfo
+	pub type ImportNativeBufferInfoOHOS = C.VkImportNativeBufferInfoOHOS
 
-// ExternalFormatOHOS extends VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo,VkAttachmentDescription2,VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo
-pub type ExternalFormatOHOS = C.VkExternalFormatOHOS
+	@[typedef]
+	pub struct C.VkImportNativeBufferInfoOHOS {
+	pub mut:
+		sType  StructureType = StructureType.import_native_buffer_info_ohos
+		pNext  voidptr       = unsafe { nil }
+		buffer &OH_NativeBuffer
+	}
 
-@[typedef]
-pub struct C.VkExternalFormatOHOS {
-pub mut:
-	sType          StructureType = StructureType.external_format_ohos
-	pNext          voidptr       = unsafe { nil }
-	externalFormat u64
-}
+	pub type MemoryGetNativeBufferInfoOHOS = C.VkMemoryGetNativeBufferInfoOHOS
 
-@[keep_args_alive]
-fn C.vkGetNativeBufferPropertiesOHOS(
+	@[typedef]
+	pub struct C.VkMemoryGetNativeBufferInfoOHOS {
+	pub mut:
+		sType  StructureType = StructureType.memory_get_native_buffer_info_ohos
+		pNext  voidptr       = unsafe { nil }
+		memory DeviceMemory
+	}
+
+	// ExternalFormatOHOS extends VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo,VkAttachmentDescription2,VkGraphicsPipelineCreateInfo,VkCommandBufferInheritanceInfo
+	pub type ExternalFormatOHOS = C.VkExternalFormatOHOS
+
+	@[typedef]
+	pub struct C.VkExternalFormatOHOS {
+	pub mut:
+		sType          StructureType = StructureType.external_format_ohos
+		pNext          voidptr       = unsafe { nil }
+		externalFormat u64
+	}
+
+	@[keep_args_alive]
+	fn C.vkGetNativeBufferPropertiesOHOS(
 	device Device, const_buffer &OH_NativeBuffer, mut_pProperties &NativeBufferPropertiesOHOS) Result
 
-pub type PFN_vkGetNativeBufferPropertiesOHOS = fn (device Device, const_buffer &OH_NativeBuffer, mut_pProperties &NativeBufferPropertiesOHOS) Result
+	pub type PFN_vkGetNativeBufferPropertiesOHOS = fn (device Device, const_buffer &OH_NativeBuffer, mut_pProperties &NativeBufferPropertiesOHOS) Result
 
-@[inline]
-pub fn get_native_buffer_properties_ohos(
+	@[inline]
+	pub fn get_native_buffer_properties_ohos(
 	device Device,
 	const_buffer &OH_NativeBuffer,
 	mut mut_pProperties NativeBufferPropertiesOHOS) Result {
-	return C.vkGetNativeBufferPropertiesOHOS(device, const_buffer, mut_pProperties)
-}
+		return C.vkGetNativeBufferPropertiesOHOS(device, const_buffer, mut_pProperties)
+	}
 
-@[keep_args_alive]
-fn C.vkGetMemoryNativeBufferOHOS(
+	@[keep_args_alive]
+	fn C.vkGetMemoryNativeBufferOHOS(
 	device Device, const_pInfo &MemoryGetNativeBufferInfoOHOS, mut_pBuffer &&OH_NativeBuffer) Result
 
-pub type PFN_vkGetMemoryNativeBufferOHOS = fn (device Device, const_pInfo &MemoryGetNativeBufferInfoOHOS, mut_pBuffer &&OH_NativeBuffer) Result
+	pub type PFN_vkGetMemoryNativeBufferOHOS = fn (device Device, const_pInfo &MemoryGetNativeBufferInfoOHOS, mut_pBuffer &&OH_NativeBuffer) Result
 
-@[inline]
-pub fn get_memory_native_buffer_ohos(
+	@[inline]
+	pub fn get_memory_native_buffer_ohos(
 	device Device,
 	const_pInfo &MemoryGetNativeBufferInfoOHOS,
 	mut mut_pBuffer OH_NativeBuffer) Result {
-	return C.vkGetMemoryNativeBufferOHOS(device, const_pInfo, mut_pBuffer)
+		return C.vkGetMemoryNativeBufferOHOS(device, const_pInfo, mut_pBuffer)
+	}
 }
 
 pub const ext_external_memory_acquire_unmodified_spec_version = 1
@@ -33714,39 +33840,42 @@ pub type PhysicalDevicePipelineProtectedAccessFeaturesEXT = C.VkPhysicalDevicePi
 
 pub const android_external_format_resolve_spec_version = 1
 pub const android_external_format_resolve_extension_name = c'VK_ANDROID_external_format_resolve'
-// PhysicalDeviceExternalFormatResolveFeaturesANDROID extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceExternalFormatResolveFeaturesANDROID = C.VkPhysicalDeviceExternalFormatResolveFeaturesANDROID
 
-@[typedef]
-pub struct C.VkPhysicalDeviceExternalFormatResolveFeaturesANDROID {
-pub mut:
-	sType                 StructureType = StructureType.physical_device_external_format_resolve_features_android
-	pNext                 voidptr       = unsafe { nil }
-	externalFormatResolve Bool32
-}
+$if vulkan_android ? {
+	// PhysicalDeviceExternalFormatResolveFeaturesANDROID extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+	pub type PhysicalDeviceExternalFormatResolveFeaturesANDROID = C.VkPhysicalDeviceExternalFormatResolveFeaturesANDROID
 
-// PhysicalDeviceExternalFormatResolvePropertiesANDROID extends VkPhysicalDeviceProperties2
-pub type PhysicalDeviceExternalFormatResolvePropertiesANDROID = C.VkPhysicalDeviceExternalFormatResolvePropertiesANDROID
+	@[typedef]
+	pub struct C.VkPhysicalDeviceExternalFormatResolveFeaturesANDROID {
+	pub mut:
+		sType                 StructureType = StructureType.physical_device_external_format_resolve_features_android
+		pNext                 voidptr       = unsafe { nil }
+		externalFormatResolve Bool32
+	}
 
-@[typedef]
-pub struct C.VkPhysicalDeviceExternalFormatResolvePropertiesANDROID {
-pub mut:
-	sType                                        StructureType = StructureType.physical_device_external_format_resolve_properties_android
-	pNext                                        voidptr       = unsafe { nil }
-	nullColorAttachmentWithExternalFormatResolve Bool32
-	externalFormatResolveChromaOffsetX           ChromaLocation
-	externalFormatResolveChromaOffsetY           ChromaLocation
-}
+	// PhysicalDeviceExternalFormatResolvePropertiesANDROID extends VkPhysicalDeviceProperties2
+	pub type PhysicalDeviceExternalFormatResolvePropertiesANDROID = C.VkPhysicalDeviceExternalFormatResolvePropertiesANDROID
 
-// AndroidHardwareBufferFormatResolvePropertiesANDROID extends VkAndroidHardwareBufferPropertiesANDROID
-pub type AndroidHardwareBufferFormatResolvePropertiesANDROID = C.VkAndroidHardwareBufferFormatResolvePropertiesANDROID
+	@[typedef]
+	pub struct C.VkPhysicalDeviceExternalFormatResolvePropertiesANDROID {
+	pub mut:
+		sType                                        StructureType = StructureType.physical_device_external_format_resolve_properties_android
+		pNext                                        voidptr       = unsafe { nil }
+		nullColorAttachmentWithExternalFormatResolve Bool32
+		externalFormatResolveChromaOffsetX           ChromaLocation
+		externalFormatResolveChromaOffsetY           ChromaLocation
+	}
 
-@[typedef]
-pub struct C.VkAndroidHardwareBufferFormatResolvePropertiesANDROID {
-pub mut:
-	sType                 StructureType = StructureType.android_hardware_buffer_format_resolve_properties_android
-	pNext                 voidptr       = unsafe { nil }
-	colorAttachmentFormat Format
+	// AndroidHardwareBufferFormatResolvePropertiesANDROID extends VkAndroidHardwareBufferPropertiesANDROID
+	pub type AndroidHardwareBufferFormatResolvePropertiesANDROID = C.VkAndroidHardwareBufferFormatResolvePropertiesANDROID
+
+	@[typedef]
+	pub struct C.VkAndroidHardwareBufferFormatResolvePropertiesANDROID {
+	pub mut:
+		sType                 StructureType = StructureType.android_hardware_buffer_format_resolve_properties_android
+		pNext                 voidptr       = unsafe { nil }
+		colorAttachmentFormat Format
+	}
 }
 
 pub const amd_anti_lag_spec_version = 1
@@ -33813,39 +33942,42 @@ pub fn anti_lag_update_amd(
 
 pub const amdx_dense_geometry_format_spec_version = 1
 pub const amdx_dense_geometry_format_extension_name = c'VK_AMDX_dense_geometry_format'
-pub const compressed_triangle_format_dgf1_byte_alignment_amdx = u32(128)
-pub const compressed_triangle_format_dgf1_byte_stride_amdx = u32(128)
 
-pub enum CompressedTriangleFormatAMDX as u32 {
-	dgf1          = 0
-	max_enum_amdx = max_int
-}
-// PhysicalDeviceDenseGeometryFormatFeaturesAMDX extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceDenseGeometryFormatFeaturesAMDX = C.VkPhysicalDeviceDenseGeometryFormatFeaturesAMDX
+$if vulkan_provisional ? {
+	pub const compressed_triangle_format_dgf1_byte_alignment_amdx = u32(128)
+	pub const compressed_triangle_format_dgf1_byte_stride_amdx = u32(128)
 
-@[typedef]
-pub struct C.VkPhysicalDeviceDenseGeometryFormatFeaturesAMDX {
-pub mut:
-	sType               StructureType
-	pNext               voidptr = unsafe { nil }
-	denseGeometryFormat Bool32
-}
+	pub enum CompressedTriangleFormatAMDX as u32 {
+		dgf1          = 0
+		max_enum_amdx = max_int
+	}
+	// PhysicalDeviceDenseGeometryFormatFeaturesAMDX extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+	pub type PhysicalDeviceDenseGeometryFormatFeaturesAMDX = C.VkPhysicalDeviceDenseGeometryFormatFeaturesAMDX
 
-// AccelerationStructureDenseGeometryFormatTrianglesDataAMDX extends VkAccelerationStructureGeometryKHR
-pub type AccelerationStructureDenseGeometryFormatTrianglesDataAMDX = C.VkAccelerationStructureDenseGeometryFormatTrianglesDataAMDX
+	@[typedef]
+	pub struct C.VkPhysicalDeviceDenseGeometryFormatFeaturesAMDX {
+	pub mut:
+		sType               StructureType
+		pNext               voidptr = unsafe { nil }
+		denseGeometryFormat Bool32
+	}
 
-@[typedef]
-pub struct C.VkAccelerationStructureDenseGeometryFormatTrianglesDataAMDX {
-pub mut:
-	sType             StructureType
-	pNext             voidptr = unsafe { nil }
-	compressedData    DeviceOrHostAddressConstKHR
-	dataSize          DeviceSize
-	numTriangles      u32
-	numVertices       u32
-	maxPrimitiveIndex u32
-	maxGeometryIndex  u32
-	format            CompressedTriangleFormatAMDX
+	// AccelerationStructureDenseGeometryFormatTrianglesDataAMDX extends VkAccelerationStructureGeometryKHR
+	pub type AccelerationStructureDenseGeometryFormatTrianglesDataAMDX = C.VkAccelerationStructureDenseGeometryFormatTrianglesDataAMDX
+
+	@[typedef]
+	pub struct C.VkAccelerationStructureDenseGeometryFormatTrianglesDataAMDX {
+	pub mut:
+		sType             StructureType
+		pNext             voidptr = unsafe { nil }
+		compressedData    DeviceOrHostAddressConstKHR
+		dataSize          DeviceSize
+		numTriangles      u32
+		numVertices       u32
+		maxPrimitiveIndex u32
+		maxGeometryIndex  u32
+		format            CompressedTriangleFormatAMDX
+	}
 }
 
 // Pointer to VkShaderEXT_T
@@ -35351,81 +35483,83 @@ pub fn cmd_set_attachment_feedback_loop_enable_ext(
 pub const qnx_external_memory_screen_buffer_spec_version = 1
 pub const qnx_external_memory_screen_buffer_extension_name = c'VK_QNX_external_memory_screen_buffer'
 
-pub type ScreenBufferPropertiesQNX = C.VkScreenBufferPropertiesQNX
+$if vulkan_screen ? {
+	pub type ScreenBufferPropertiesQNX = C.VkScreenBufferPropertiesQNX
 
-@[typedef]
-pub struct C.VkScreenBufferPropertiesQNX {
-pub mut:
-	sType          StructureType = StructureType.screen_buffer_properties_qnx
-	pNext          voidptr       = unsafe { nil }
-	allocationSize DeviceSize
-	memoryTypeBits u32
-}
+	@[typedef]
+	pub struct C.VkScreenBufferPropertiesQNX {
+	pub mut:
+		sType          StructureType = StructureType.screen_buffer_properties_qnx
+		pNext          voidptr       = unsafe { nil }
+		allocationSize DeviceSize
+		memoryTypeBits u32
+	}
 
-// ScreenBufferFormatPropertiesQNX extends VkScreenBufferPropertiesQNX
-pub type ScreenBufferFormatPropertiesQNX = C.VkScreenBufferFormatPropertiesQNX
+	// ScreenBufferFormatPropertiesQNX extends VkScreenBufferPropertiesQNX
+	pub type ScreenBufferFormatPropertiesQNX = C.VkScreenBufferFormatPropertiesQNX
 
-@[typedef]
-pub struct C.VkScreenBufferFormatPropertiesQNX {
-pub mut:
-	sType                            StructureType = StructureType.screen_buffer_format_properties_qnx
-	pNext                            voidptr       = unsafe { nil }
-	format                           Format
-	externalFormat                   u64
-	screenUsage                      u64
-	formatFeatures                   FormatFeatureFlags
-	samplerYcbcrConversionComponents ComponentMapping
-	suggestedYcbcrModel              SamplerYcbcrModelConversion
-	suggestedYcbcrRange              SamplerYcbcrRange
-	suggestedXChromaOffset           ChromaLocation
-	suggestedYChromaOffset           ChromaLocation
-}
+	@[typedef]
+	pub struct C.VkScreenBufferFormatPropertiesQNX {
+	pub mut:
+		sType                            StructureType = StructureType.screen_buffer_format_properties_qnx
+		pNext                            voidptr       = unsafe { nil }
+		format                           Format
+		externalFormat                   u64
+		screenUsage                      u64
+		formatFeatures                   FormatFeatureFlags
+		samplerYcbcrConversionComponents ComponentMapping
+		suggestedYcbcrModel              SamplerYcbcrModelConversion
+		suggestedYcbcrRange              SamplerYcbcrRange
+		suggestedXChromaOffset           ChromaLocation
+		suggestedYChromaOffset           ChromaLocation
+	}
 
-// ImportScreenBufferInfoQNX extends VkMemoryAllocateInfo
-pub type ImportScreenBufferInfoQNX = C.VkImportScreenBufferInfoQNX
+	// ImportScreenBufferInfoQNX extends VkMemoryAllocateInfo
+	pub type ImportScreenBufferInfoQNX = C.VkImportScreenBufferInfoQNX
 
-@[typedef]
-pub struct C.VkImportScreenBufferInfoQNX {
-pub mut:
-	sType  StructureType = StructureType.import_screen_buffer_info_qnx
-	pNext  voidptr       = unsafe { nil }
-	buffer &voidptr
-}
+	@[typedef]
+	pub struct C.VkImportScreenBufferInfoQNX {
+	pub mut:
+		sType  StructureType = StructureType.import_screen_buffer_info_qnx
+		pNext  voidptr       = unsafe { nil }
+		buffer &voidptr
+	}
 
-// ExternalFormatQNX extends VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo
-pub type ExternalFormatQNX = C.VkExternalFormatQNX
+	// ExternalFormatQNX extends VkImageCreateInfo,VkSamplerYcbcrConversionCreateInfo
+	pub type ExternalFormatQNX = C.VkExternalFormatQNX
 
-@[typedef]
-pub struct C.VkExternalFormatQNX {
-pub mut:
-	sType          StructureType = StructureType.external_format_qnx
-	pNext          voidptr       = unsafe { nil }
-	externalFormat u64
-}
+	@[typedef]
+	pub struct C.VkExternalFormatQNX {
+	pub mut:
+		sType          StructureType = StructureType.external_format_qnx
+		pNext          voidptr       = unsafe { nil }
+		externalFormat u64
+	}
 
-// PhysicalDeviceExternalMemoryScreenBufferFeaturesQNX extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
-pub type PhysicalDeviceExternalMemoryScreenBufferFeaturesQNX = C.VkPhysicalDeviceExternalMemoryScreenBufferFeaturesQNX
+	// PhysicalDeviceExternalMemoryScreenBufferFeaturesQNX extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+	pub type PhysicalDeviceExternalMemoryScreenBufferFeaturesQNX = C.VkPhysicalDeviceExternalMemoryScreenBufferFeaturesQNX
 
-@[typedef]
-pub struct C.VkPhysicalDeviceExternalMemoryScreenBufferFeaturesQNX {
-pub mut:
-	sType              StructureType = StructureType.physical_device_external_memory_screen_buffer_features_qnx
-	pNext              voidptr       = unsafe { nil }
-	screenBufferImport Bool32
-}
+	@[typedef]
+	pub struct C.VkPhysicalDeviceExternalMemoryScreenBufferFeaturesQNX {
+	pub mut:
+		sType              StructureType = StructureType.physical_device_external_memory_screen_buffer_features_qnx
+		pNext              voidptr       = unsafe { nil }
+		screenBufferImport Bool32
+	}
 
-@[keep_args_alive]
-fn C.vkGetScreenBufferPropertiesQNX(
+	@[keep_args_alive]
+	fn C.vkGetScreenBufferPropertiesQNX(
 	device Device, const_buffer &voidptr, mut_pProperties &ScreenBufferPropertiesQNX) Result
 
-pub type PFN_vkGetScreenBufferPropertiesQNX = fn (device Device, const_buffer &voidptr, mut_pProperties &ScreenBufferPropertiesQNX) Result
+	pub type PFN_vkGetScreenBufferPropertiesQNX = fn (device Device, const_buffer &voidptr, mut_pProperties &ScreenBufferPropertiesQNX) Result
 
-@[inline]
-pub fn get_screen_buffer_properties_qnx(
+	@[inline]
+	pub fn get_screen_buffer_properties_qnx(
 	device Device,
 	const_buffer &voidptr,
 	mut mut_pProperties ScreenBufferPropertiesQNX) Result {
-	return C.vkGetScreenBufferPropertiesQNX(device, const_buffer, mut_pProperties)
+		return C.vkGetScreenBufferPropertiesQNX(device, const_buffer, mut_pProperties)
+	}
 }
 
 pub const msft_layered_driver_spec_version = 1
@@ -36911,40 +37045,42 @@ pub mut:
 	pDepthClampRange &DepthClampRangeEXT
 }
 
-pub type OHNativeWindow = C.OHNativeWindow
-
-@[typedef]
-pub struct C.OHNativeWindow {}
-
 pub const ohos_surface_spec_version = 1
 pub const ohos_surface_extension_name = c'VK_OHOS_surface'
 
-pub type SurfaceCreateFlagsOHOS = u32
-pub type SurfaceCreateInfoOHOS = C.VkSurfaceCreateInfoOHOS
+$if vulkan_ohos ? {
+	pub type OHNativeWindow = C.OHNativeWindow
 
-@[typedef]
-pub struct C.VkSurfaceCreateInfoOHOS {
-pub mut:
-	sType  StructureType = StructureType.surface_create_info_ohos
-	pNext  voidptr       = unsafe { nil }
-	flags  SurfaceCreateFlagsOHOS
-	window &OHNativeWindow
-}
+	@[typedef]
+	pub struct C.OHNativeWindow {}
 
-@[keep_args_alive]
-fn C.vkCreateSurfaceOHOS(
+	pub type SurfaceCreateFlagsOHOS = u32
+	pub type SurfaceCreateInfoOHOS = C.VkSurfaceCreateInfoOHOS
+
+	@[typedef]
+	pub struct C.VkSurfaceCreateInfoOHOS {
+	pub mut:
+		sType  StructureType = StructureType.surface_create_info_ohos
+		pNext  voidptr       = unsafe { nil }
+		flags  SurfaceCreateFlagsOHOS
+		window &OHNativeWindow
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateSurfaceOHOS(
 	instance Instance, const_pCreateInfo &SurfaceCreateInfoOHOS, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateSurfaceOHOS = fn (instance Instance, const_pCreateInfo &SurfaceCreateInfoOHOS, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateSurfaceOHOS = fn (instance Instance, const_pCreateInfo &SurfaceCreateInfoOHOS, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_surface_ohos(
+	@[inline]
+	pub fn create_surface_ohos(
 	instance Instance,
 	const_pCreateInfo &SurfaceCreateInfoOHOS,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateSurfaceOHOS(instance, const_pCreateInfo, const_pAllocator, pSurface)
+		return C.vkCreateSurfaceOHOS(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 }
 
 pub const huawei_hdr_vivid_spec_version = 1
@@ -37059,67 +37195,70 @@ pub const img_filter_linear_2d_extension_name = c'VK_IMG_filter_linear_2d'
 
 pub const ext_external_memory_metal_spec_version = 1
 pub const ext_external_memory_metal_extension_name = c'VK_EXT_external_memory_metal'
-// ImportMemoryMetalHandleInfoEXT extends VkMemoryAllocateInfo
-pub type ImportMemoryMetalHandleInfoEXT = C.VkImportMemoryMetalHandleInfoEXT
 
-@[typedef]
-pub struct C.VkImportMemoryMetalHandleInfoEXT {
-pub mut:
-	sType      StructureType = StructureType.import_memory_metal_handle_info_ext
-	pNext      voidptr       = unsafe { nil }
-	handleType ExternalMemoryHandleTypeFlagBits
-	handle     voidptr
-}
+$if vulkan_metal ? {
+	// ImportMemoryMetalHandleInfoEXT extends VkMemoryAllocateInfo
+	pub type ImportMemoryMetalHandleInfoEXT = C.VkImportMemoryMetalHandleInfoEXT
 
-pub type MemoryMetalHandlePropertiesEXT = C.VkMemoryMetalHandlePropertiesEXT
+	@[typedef]
+	pub struct C.VkImportMemoryMetalHandleInfoEXT {
+	pub mut:
+		sType      StructureType = StructureType.import_memory_metal_handle_info_ext
+		pNext      voidptr       = unsafe { nil }
+		handleType ExternalMemoryHandleTypeFlagBits
+		handle     voidptr
+	}
 
-@[typedef]
-pub struct C.VkMemoryMetalHandlePropertiesEXT {
-pub mut:
-	sType          StructureType = StructureType.memory_metal_handle_properties_ext
-	pNext          voidptr       = unsafe { nil }
-	memoryTypeBits u32
-}
+	pub type MemoryMetalHandlePropertiesEXT = C.VkMemoryMetalHandlePropertiesEXT
 
-pub type MemoryGetMetalHandleInfoEXT = C.VkMemoryGetMetalHandleInfoEXT
+	@[typedef]
+	pub struct C.VkMemoryMetalHandlePropertiesEXT {
+	pub mut:
+		sType          StructureType = StructureType.memory_metal_handle_properties_ext
+		pNext          voidptr       = unsafe { nil }
+		memoryTypeBits u32
+	}
 
-@[typedef]
-pub struct C.VkMemoryGetMetalHandleInfoEXT {
-pub mut:
-	sType      StructureType = StructureType.memory_get_metal_handle_info_ext
-	pNext      voidptr       = unsafe { nil }
-	memory     DeviceMemory
-	handleType ExternalMemoryHandleTypeFlagBits
-}
+	pub type MemoryGetMetalHandleInfoEXT = C.VkMemoryGetMetalHandleInfoEXT
 
-@[keep_args_alive]
-fn C.vkGetMemoryMetalHandleEXT(
+	@[typedef]
+	pub struct C.VkMemoryGetMetalHandleInfoEXT {
+	pub mut:
+		sType      StructureType = StructureType.memory_get_metal_handle_info_ext
+		pNext      voidptr       = unsafe { nil }
+		memory     DeviceMemory
+		handleType ExternalMemoryHandleTypeFlagBits
+	}
+
+	@[keep_args_alive]
+	fn C.vkGetMemoryMetalHandleEXT(
 	device Device, const_pGetMetalHandleInfo &MemoryGetMetalHandleInfoEXT, pHandle &voidptr) Result
 
-pub type PFN_vkGetMemoryMetalHandleEXT = fn (device Device, const_pGetMetalHandleInfo &MemoryGetMetalHandleInfoEXT, pHandle &voidptr) Result
+	pub type PFN_vkGetMemoryMetalHandleEXT = fn (device Device, const_pGetMetalHandleInfo &MemoryGetMetalHandleInfoEXT, pHandle &voidptr) Result
 
-@[inline]
-pub fn get_memory_metal_handle_ext(
+	@[inline]
+	pub fn get_memory_metal_handle_ext(
 	device Device,
 	const_pGetMetalHandleInfo &MemoryGetMetalHandleInfoEXT,
 	pHandle &voidptr) Result {
-	return C.vkGetMemoryMetalHandleEXT(device, const_pGetMetalHandleInfo, pHandle)
-}
+		return C.vkGetMemoryMetalHandleEXT(device, const_pGetMetalHandleInfo, pHandle)
+	}
 
-@[keep_args_alive]
-fn C.vkGetMemoryMetalHandlePropertiesEXT(
+	@[keep_args_alive]
+	fn C.vkGetMemoryMetalHandlePropertiesEXT(
 	device Device, handleType ExternalMemoryHandleTypeFlagBits, const_pHandle voidptr, mut_pMemoryMetalHandleProperties &MemoryMetalHandlePropertiesEXT) Result
 
-pub type PFN_vkGetMemoryMetalHandlePropertiesEXT = fn (device Device, handleType ExternalMemoryHandleTypeFlagBits, const_pHandle voidptr, mut_pMemoryMetalHandleProperties &MemoryMetalHandlePropertiesEXT) Result
+	pub type PFN_vkGetMemoryMetalHandlePropertiesEXT = fn (device Device, handleType ExternalMemoryHandleTypeFlagBits, const_pHandle voidptr, mut_pMemoryMetalHandleProperties &MemoryMetalHandlePropertiesEXT) Result
 
-@[inline]
-pub fn get_memory_metal_handle_properties_ext(
+	@[inline]
+	pub fn get_memory_metal_handle_properties_ext(
 	device Device,
 	handleType ExternalMemoryHandleTypeFlagBits,
 	const_pHandle voidptr,
 	mut mut_pMemoryMetalHandleProperties MemoryMetalHandlePropertiesEXT) Result {
-	return C.vkGetMemoryMetalHandlePropertiesEXT(device, handleType, const_pHandle,
-		mut_pMemoryMetalHandleProperties)
+		return C.vkGetMemoryMetalHandlePropertiesEXT(device, handleType, const_pHandle,
+			mut_pMemoryMetalHandleProperties)
+	}
 }
 
 pub const arm_performance_counters_by_region_spec_version = 1
@@ -38003,54 +38142,60 @@ pub mut:
 pub const sec_ubm_surface_spec_version = 1
 pub const sec_ubm_surface_extension_name = c'VK_SEC_ubm_surface'
 
-pub type UbmSurfaceCreateFlagsSEC = u32
-
-@[typedef]
-pub struct C.ubm_device {}
-
-@[typedef]
-pub struct C.ubm_surface {}
-
-pub type UbmSurfaceCreateInfoSEC = C.VkUbmSurfaceCreateInfoSEC
-
-@[typedef]
-pub struct C.VkUbmSurfaceCreateInfoSEC {
-pub mut:
-	sType   StructureType = StructureType.ubm_surface_create_info_sec
-	pNext   voidptr       = unsafe { nil }
-	flags   UbmSurfaceCreateFlagsSEC
-	device  &voidptr
-	surface &voidptr
+$if vulkan_ubm ? {
+	#flag -DVK_USE_PLATFORM_UBM_SEC
 }
+$if vulkan_ubm ? {
+	pub type UbmSurfaceCreateFlagsSEC = u32
 
-@[keep_args_alive]
-fn C.vkCreateUbmSurfaceSEC(
+	@[typedef]
+	pub struct C.ubm_device {}
+
+	@[typedef]
+	pub struct C.ubm_surface {}
+
+	pub type UbmSurfaceCreateInfoSEC = C.VkUbmSurfaceCreateInfoSEC
+
+	@[typedef]
+	pub struct C.VkUbmSurfaceCreateInfoSEC {
+	pub mut:
+		sType   StructureType = StructureType.ubm_surface_create_info_sec
+		pNext   voidptr       = unsafe { nil }
+		flags   UbmSurfaceCreateFlagsSEC
+		device  &voidptr
+		surface &voidptr
+	}
+
+	@[keep_args_alive]
+	fn C.vkCreateUbmSurfaceSEC(
 	instance Instance, const_pCreateInfo &UbmSurfaceCreateInfoSEC, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-// const_pAllocator Optional, can be NULL or 0
-pub type PFN_vkCreateUbmSurfaceSEC = fn (instance Instance, const_pCreateInfo &UbmSurfaceCreateInfoSEC, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
+	// const_pAllocator Optional, can be NULL or 0
+	pub type PFN_vkCreateUbmSurfaceSEC = fn (instance Instance, const_pCreateInfo &UbmSurfaceCreateInfoSEC, const_pAllocator &AllocationCallbacks, pSurface &SurfaceKHR) Result
 
-@[inline]
-pub fn create_ubm_surface_sec(
+	@[inline]
+	pub fn create_ubm_surface_sec(
 	instance Instance,
 	const_pCreateInfo &UbmSurfaceCreateInfoSEC,
 	const_pAllocator &AllocationCallbacks,
 	pSurface &SurfaceKHR) Result {
-	return C.vkCreateUbmSurfaceSEC(instance, const_pCreateInfo, const_pAllocator, pSurface)
-}
+		return C.vkCreateUbmSurfaceSEC(instance, const_pCreateInfo, const_pAllocator, pSurface)
+	}
 
-@[keep_args_alive]
-fn C.vkGetPhysicalDeviceUbmPresentationSupportSEC(
+	@[keep_args_alive]
+	fn C.vkGetPhysicalDeviceUbmPresentationSupportSEC(
 	physicalDevice PhysicalDevice, queueFamilyIndex u32, device &voidptr) Bool32
 
-pub type PFN_vkGetPhysicalDeviceUbmPresentationSupportSEC = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, device &voidptr) Bool32
+	pub type PFN_vkGetPhysicalDeviceUbmPresentationSupportSEC = fn (physicalDevice PhysicalDevice, queueFamilyIndex u32, device &voidptr) Bool32
 
-@[inline]
-pub fn get_physical_device_ubm_presentation_support_sec(
+	@[inline]
+	pub fn get_physical_device_ubm_presentation_support_sec(
 	physicalDevice PhysicalDevice,
 	queueFamilyIndex u32,
 	device &voidptr) Bool32 {
-	return C.vkGetPhysicalDeviceUbmPresentationSupportSEC(physicalDevice, queueFamilyIndex, device)
+		return C.vkGetPhysicalDeviceUbmPresentationSupportSEC(physicalDevice, queueFamilyIndex,
+			device)
+	}
 }
 
 pub const ext_shader_ocp_microscaling_types_spec_version = 1
