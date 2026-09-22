@@ -96,7 +96,7 @@ fn test_command_pool_and_primary_buffer_expose_raw_handles_and_ownership_metadat
 	pool_handle := vk.CommandPool(unsafe { nil })
 	buffer_handle := vk.CommandBuffer(unsafe { nil })
 	flags := u32(vk.CommandPoolCreateFlagBits.reset_command_buffer)
-	pool := CommandPool{
+	pool := OwnedCommandPool{
 		device:             vk.Device(unsafe { nil })
 		handle:             pool_handle
 		queue_family_index: 4
@@ -116,7 +116,7 @@ fn test_command_pool_and_primary_buffer_expose_raw_handles_and_ownership_metadat
 }
 
 fn test_command_pool_rejects_queue_from_another_device_before_vulkan_call() {
-	device := Device{
+	device := OwnedDevice{
 		handle: vk.Device(unsafe { voidptr(1) })
 	}
 	foreign_queue := Queue{
@@ -130,7 +130,7 @@ fn test_command_pool_rejects_queue_from_another_device_before_vulkan_call() {
 }
 
 fn test_allocate_primary_rejects_zero_count_before_calling_vulkan() {
-	pool := CommandPool{
+	pool := OwnedCommandPool{
 		device: vk.Device(unsafe { nil })
 		handle: vk.CommandPool(unsafe { nil })
 	}
@@ -156,11 +156,11 @@ fn test_fence_and_semaphore_retain_parent_device_and_raw_handles() {
 	device_handle := vk.Device(unsafe { nil })
 	fence_handle := vk.Fence(unsafe { nil })
 	semaphore_handle := vk.Semaphore(unsafe { nil })
-	fence := Fence{
+	fence := &OwnedFence{
 		device: device_handle
 		handle: fence_handle
 	}
-	semaphore := Semaphore{
+	semaphore := &OwnedSemaphore{
 		device: device_handle
 		handle: semaphore_handle
 	}
@@ -172,11 +172,11 @@ fn test_fence_and_semaphore_retain_parent_device_and_raw_handles() {
 }
 
 fn test_sync_destroy_is_idempotent_for_cleared_handles() {
-	mut fence := Fence{
+	mut fence := OwnedFence{
 		device: vk.Device(unsafe { nil })
 		handle: vk.Fence(unsafe { nil })
 	}
-	mut semaphore := Semaphore{
+	mut semaphore := OwnedSemaphore{
 		device: vk.Device(unsafe { nil })
 		handle: vk.Semaphore(unsafe { nil })
 	}
@@ -186,6 +186,35 @@ fn test_sync_destroy_is_idempotent_for_cleared_handles() {
 	semaphore.destroy()
 	assert isnil(fence.handle)
 	assert isnil(semaphore.handle)
+}
+
+fn test_owner_destroy_is_idempotent_for_cleared_handles() {
+	mut instance := OwnedInstance{}
+	mut device := OwnedDevice{}
+	mut pool := OwnedCommandPool{}
+	mut buffer := OwnedBuffer{}
+	mut image := OwnedImage{}
+	mut view := OwnedImageView{}
+	instance.destroy()
+	instance.destroy()
+	device.destroy()
+	device.destroy()
+	pool.destroy()
+	pool.destroy()
+	buffer.destroy()
+	buffer.destroy()
+	image.destroy()
+	image.destroy()
+	view.destroy()
+	view.destroy()
+	assert isnil(instance.handle)
+	assert isnil(device.handle)
+	assert isnil(pool.handle)
+	assert isnil(buffer.handle)
+	assert isnil(buffer.memory)
+	assert isnil(image.handle)
+	assert isnil(image.memory)
+	assert isnil(view.handle)
 }
 
 fn test_queue_submit_rejects_empty_command_list_before_calling_vulkan() {
@@ -203,14 +232,11 @@ fn test_queue_submit_rejects_mismatched_waits_and_stage_masks() {
 	queue := Queue{
 		handle: vk.Queue(unsafe { nil })
 	}
-	command_buffer := PrimaryCommandBuffer{
+	command_buffer := &PrimaryCommandBuffer{
 		handle: vk.CommandBuffer(unsafe { nil })
 	}
-	wait_semaphore := Semaphore{
-		handle: vk.Semaphore(unsafe { nil })
-	}
 	options := SubmitOptions{
-		wait_semaphores: [wait_semaphore]
+		wait_semaphores: [vk.Semaphore(unsafe { nil })]
 	}
 	queue.submit([command_buffer], options) or {
 		assert err.msg() == 'wait semaphore count must match wait stage mask count'
@@ -235,9 +261,8 @@ fn test_queue_submit_handles_rejects_mismatched_waits_and_stage_masks() {
 		handle: vk.Queue(unsafe { nil })
 	}
 	command_buffers := [vk.CommandBuffer(unsafe { nil })]
-	wait_semaphores := [vk.Semaphore(unsafe { nil })]
 	queue.submit_handles(command_buffers, SubmitHandleOptions{
-		wait_semaphores: wait_semaphores
+		wait_semaphores: [vk.Semaphore(unsafe { nil })]
 	}) or {
 		assert err.msg() == 'wait semaphore count must match wait stage mask count'
 		return
@@ -246,15 +271,9 @@ fn test_queue_submit_handles_rejects_mismatched_waits_and_stage_masks() {
 }
 
 fn test_submit_options_accept_matching_waits_signals_and_optional_fence() {
-	wait_semaphore := Semaphore{
-		handle: vk.Semaphore(unsafe { nil })
-	}
-	signal_semaphore := Semaphore{
-		handle: vk.Semaphore(unsafe { nil })
-	}
-	fence := Fence{
-		handle: vk.Fence(unsafe { nil })
-	}
+	wait_semaphore := vk.Semaphore(unsafe { nil })
+	signal_semaphore := vk.Semaphore(unsafe { nil })
+	fence := vk.Fence(unsafe { nil })
 	stage := u32(vk.PipelineStageFlagBits.color_attachment_output)
 	options := SubmitOptions{
 		wait_semaphores:   [wait_semaphore]
@@ -266,11 +285,7 @@ fn test_submit_options_accept_matching_waits_signals_and_optional_fence() {
 	assert options.wait_stage_masks.len == 1
 	assert options.wait_stage_masks[0] == stage
 	assert options.signal_semaphores.len == 1
-	if configured_fence := options.fence {
-		assert configured_fence.handle == fence.handle
-	} else {
-		assert false
-	}
+	assert options.fence == fence
 }
 
 fn memory_properties(types []vk.MemoryPropertyFlags) vk.PhysicalDeviceMemoryProperties {
@@ -321,7 +336,7 @@ fn test_select_memory_type_ignores_compatible_disallowed_type() {
 }
 
 fn test_new_image_2d_rejects_empty_extent_before_calling_vulkan() {
-	device := Device{
+	device := OwnedDevice{
 		handle: vk.Device(unsafe { nil })
 	}
 	usage := u32(vk.ImageUsageFlagBits.sampled)
@@ -333,7 +348,7 @@ fn test_new_image_2d_rejects_empty_extent_before_calling_vulkan() {
 }
 
 fn test_new_image_2d_rejects_empty_usage_before_calling_vulkan() {
-	device := Device{
+	device := OwnedDevice{
 		handle: vk.Device(unsafe { nil })
 	}
 	device.new_image_2d(1, 1, .r8g8b8a8_unorm, .optimal, 0, 0) or {

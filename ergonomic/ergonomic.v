@@ -45,29 +45,34 @@ pub fn require_success(result vk.Result, operation string) ! {
 	}
 }
 
-// Instance is a lightweight wrapper around VkInstance. It does not destroy
-// itself implicitly; call destroy exactly once for every successfully created
-// instance.
-pub struct Instance {
-pub:
+// OwnedInstance owns a VkInstance. It does not destroy itself implicitly; call
+// destroy before its storage goes out of scope.
+@[nocopy]
+pub struct OwnedInstance {
+pub mut:
 	handle vk.Instance
 }
 
 // new_instance initializes Volk, creates an instance with Vulkan's default
 // allocator, and loads instance-level commands.
-pub fn new_instance(create_info &vk.InstanceCreateInfo) !Instance {
+pub fn new_instance(create_info &vk.InstanceCreateInfo) !&OwnedInstance {
 	require_success(vk.initialize_loader(), 'volkInitialize')!
 	mut handle := vk.Instance(unsafe { nil })
 	require_success(vk.create_instance(create_info, unsafe { nil }, &handle), 'vkCreateInstance')!
 	vk.load_instance_commands(handle)
-	return Instance{
+	return &OwnedInstance{
 		handle: handle
 	}
 }
 
 // destroy destroys an instance created by new_instance.
-pub fn (instance Instance) destroy() {
+
+pub fn (mut instance OwnedInstance) destroy() {
+	if isnil(instance.handle) {
+		return
+	}
 	vk.destroy_instance(instance.handle, unsafe { nil })
+	instance.handle = vk.Instance(unsafe { nil })
 }
 
 // PhysicalDevice pairs a Vulkan handle with its core property snapshot.
@@ -163,7 +168,7 @@ pub fn (device PhysicalDevice) find_queue_family(required_flags vk.QueueFlags) ?
 	return select_queue_family(device.queue_families(), required_flags)
 }
 
-// Queue is a borrowed queue handle owned by its parent Device.
+// Queue is a borrowed queue handle owned by its parent OwnedDevice.
 pub struct Queue {
 	device vk.Device
 pub:
@@ -172,13 +177,15 @@ pub:
 	index        u32
 }
 
-// Device owns a logical VkDevice and exposes all requested queues. queue is
+// OwnedDevice owns a logical VkDevice and exposes all requested queues. queue is
 // the selected legacy queue or the first queue in a multi-queue request. It
-// does not destroy itself implicitly; call destroy exactly once.
-pub struct Device {
+// does not destroy itself implicitly; call destroy before it leaves scope.
+@[nocopy]
+pub struct OwnedDevice {
 	physical_device PhysicalDevice
-pub:
+pub mut:
 	handle vk.Device
+pub:
 	queue  Queue
 	queues []Queue
 }
@@ -187,7 +194,7 @@ pub:
 // selected family, then loads Volk's device-level commands.
 //
 // queue_family must have been discovered from this PhysicalDevice.
-pub fn (physical_device PhysicalDevice) new_device(queue_family QueueFamily) !Device {
+pub fn (physical_device PhysicalDevice) new_device(queue_family QueueFamily) !&OwnedDevice {
 	return physical_device.new_device_with_options(DeviceOptions{
 		queue_family: queue_family
 	})
@@ -195,29 +202,36 @@ pub fn (physical_device PhysicalDevice) new_device(queue_family QueueFamily) !De
 
 // destroy destroys a logical device created by new_device. All of its queue
 // handles become invalid at the same time.
-pub fn (device Device) destroy() {
+
+pub fn (mut device OwnedDevice) destroy() {
+	if isnil(device.handle) {
+		return
+	}
 	vk.destroy_device(device.handle, unsafe { nil })
+	device.handle = vk.Device(unsafe { nil })
 }
 
-// CommandPool owns a VkCommandPool for the queue family requested when its
-// parent Device was created. The parent Device must outlive the pool.
-pub struct CommandPool {
+// OwnedCommandPool owns a VkCommandPool for the requested queue family. Its
+// parent OwnedDevice must outlive the pool.
+@[nocopy]
+pub struct OwnedCommandPool {
 	device vk.Device
+pub mut:
+	handle vk.CommandPool
 pub:
-	handle             vk.CommandPool
 	queue_family_index u32
 	flags              vk.CommandPoolCreateFlags
 }
 
-// new_command_pool creates a command pool for the Device's queue family with
+// new_command_pool creates a command pool for the OwnedDevice's queue family with
 // Vulkan's default allocator.
-pub fn (device Device) new_command_pool(flags vk.CommandPoolCreateFlags) !CommandPool {
+pub fn (device &OwnedDevice) new_command_pool(flags vk.CommandPoolCreateFlags) !&OwnedCommandPool {
 	return device.new_command_pool_for_queue(device.queue, flags)
 }
 
-// new_command_pool_for_queue creates a command pool for one of this Device's
+// new_command_pool_for_queue creates a command pool for one of this OwnedDevice's
 // requested queues. Passing a queue borrowed from another device is rejected.
-pub fn (device Device) new_command_pool_for_queue(queue Queue, flags vk.CommandPoolCreateFlags) !CommandPool {
+pub fn (device &OwnedDevice) new_command_pool_for_queue(queue Queue, flags vk.CommandPoolCreateFlags) !&OwnedCommandPool {
 	if queue.device != device.handle {
 		return error('queue does not belong to this device')
 	}
@@ -228,7 +242,7 @@ pub fn (device Device) new_command_pool_for_queue(queue Queue, flags vk.CommandP
 	mut handle := vk.CommandPool(unsafe { nil })
 	require_success(vk.create_command_pool(device.handle, &create_info, unsafe { nil }, &handle),
 		'vkCreateCommandPool')!
-	return CommandPool{
+	return &OwnedCommandPool{
 		device:             device.handle
 		handle:             handle
 		queue_family_index: queue.family_index
@@ -237,13 +251,14 @@ pub fn (device Device) new_command_pool_for_queue(queue Queue, flags vk.CommandP
 }
 
 // reset resets the pool and every command buffer allocated from it.
-pub fn (pool CommandPool) reset(flags vk.CommandPoolResetFlags) ! {
+pub fn (pool &OwnedCommandPool) reset(flags vk.CommandPoolResetFlags) ! {
 	require_success(vk.reset_command_pool(pool.device, pool.handle, flags), 'vkResetCommandPool')!
 }
 
-// PrimaryCommandBuffer is allocated from one CommandPool and retains the exact
+// PrimaryCommandBuffer is allocated from one OwnedCommandPool and retains the exact
 // device and pool handles required to free it. Its raw handle remains public
 // for recording and submission commands.
+@[nocopy]
 pub struct PrimaryCommandBuffer {
 	device       vk.Device
 	command_pool vk.CommandPool
@@ -252,7 +267,7 @@ pub mut:
 }
 
 // allocate_primary allocates count primary command buffers from the pool.
-pub fn (pool CommandPool) allocate_primary(count u32) ![]PrimaryCommandBuffer {
+pub fn (pool &OwnedCommandPool) allocate_primary(count u32) ![]&PrimaryCommandBuffer {
 	if count == 0 {
 		return error('command buffer count must be greater than zero')
 	}
@@ -266,9 +281,9 @@ pub fn (pool CommandPool) allocate_primary(count u32) ![]PrimaryCommandBuffer {
 	require_success(vk.allocate_command_buffers(pool.device, &allocate_info, handles.data),
 		'vkAllocateCommandBuffers')!
 
-	mut buffers := []PrimaryCommandBuffer{cap: int(count)}
+	mut buffers := []&PrimaryCommandBuffer{cap: int(count)}
 	for handle in handles {
-		buffers << PrimaryCommandBuffer{
+		buffers << &PrimaryCommandBuffer{
 			device:       pool.device
 			command_pool: pool.handle
 			handle:       handle
@@ -290,13 +305,13 @@ pub fn (mut buffer PrimaryCommandBuffer) free() {
 
 // reset returns this command buffer to its initial state. Its pool must have
 // been created with VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT.
-pub fn (buffer PrimaryCommandBuffer) reset(flags vk.CommandBufferResetFlags) ! {
+pub fn (buffer &PrimaryCommandBuffer) reset(flags vk.CommandBufferResetFlags) ! {
 	require_success(vk.reset_command_buffer(buffer.handle, flags), 'vkResetCommandBuffer')!
 }
 
 // begin starts recording this primary command buffer. Inheritance information
 // is intentionally null because it is only meaningful for secondary buffers.
-pub fn (buffer PrimaryCommandBuffer) begin(flags vk.CommandBufferUsageFlags) ! {
+pub fn (buffer &PrimaryCommandBuffer) begin(flags vk.CommandBufferUsageFlags) ! {
 	begin_info := vk.CommandBufferBeginInfo{
 		flags:            flags
 		pInheritanceInfo: unsafe { nil }
@@ -305,24 +320,31 @@ pub fn (buffer PrimaryCommandBuffer) begin(flags vk.CommandBufferUsageFlags) ! {
 }
 
 // end finishes recording this command buffer.
-pub fn (buffer PrimaryCommandBuffer) end() ! {
+pub fn (buffer &PrimaryCommandBuffer) end() ! {
 	require_success(vk.end_command_buffer(buffer.handle), 'vkEndCommandBuffer')!
 }
 
 // destroy destroys the command pool and implicitly frees every command buffer
 // still allocated from it. Those wrappers must not be used afterwards.
-pub fn (pool CommandPool) destroy() {
+
+pub fn (mut pool OwnedCommandPool) destroy() {
+	if isnil(pool.handle) {
+		return
+	}
 	vk.destroy_command_pool(pool.device, pool.handle, unsafe { nil })
+	pool.handle = vk.CommandPool(unsafe { nil })
 }
 
 // OwnedBuffer owns a VkBuffer and its bound VkDeviceMemory allocation. Both
 // raw handles remain public for commands and interoperability. Destroy the
-// buffer before destroying its parent Device.
+// buffer before destroying its parent OwnedDevice.
+@[nocopy]
 pub struct OwnedBuffer {
 	device vk.Device
+pub mut:
+	handle vk.Buffer
+	memory vk.DeviceMemory
 pub:
-	handle            vk.Buffer
-	memory            vk.DeviceMemory
 	size              vk.DeviceSize
 	allocation_size   vk.DeviceSize
 	memory_type_index u32
@@ -332,7 +354,7 @@ pub:
 // new_buffer creates an exclusive-sharing buffer, selects a compatible memory
 // type containing every required property, allocates memory, and binds it at
 // offset zero.
-pub fn (device Device) new_buffer(size vk.DeviceSize, usage vk.BufferUsageFlags, required_memory_properties vk.MemoryPropertyFlags) !OwnedBuffer {
+pub fn (device &OwnedDevice) new_buffer(size vk.DeviceSize, usage vk.BufferUsageFlags, required_memory_properties vk.MemoryPropertyFlags) !&OwnedBuffer {
 	if size == 0 {
 		return error('buffer size must be greater than zero')
 	}
@@ -372,7 +394,7 @@ pub fn (device Device) new_buffer(size vk.DeviceSize, usage vk.BufferUsageFlags,
 		return err
 	}
 
-	return OwnedBuffer{
+	return &OwnedBuffer{
 		device:            device.handle
 		handle:            handle
 		memory:            memory
@@ -383,20 +405,28 @@ pub fn (device Device) new_buffer(size vk.DeviceSize, usage vk.BufferUsageFlags,
 	}
 }
 
-// destroy first destroys the buffer, then frees its bound memory. Call it
-// exactly once for every successfully created OwnedBuffer.
-pub fn (buffer OwnedBuffer) destroy() {
-	vk.destroy_buffer(buffer.device, buffer.handle, unsafe { nil })
-	vk.free_memory(buffer.device, buffer.memory, unsafe { nil })
+// destroy first destroys the buffer, then frees its bound memory. Repeated
+// calls are harmless while the parent OwnedDevice remains alive.
+pub fn (mut buffer OwnedBuffer) destroy() {
+	if !isnil(buffer.handle) {
+		vk.destroy_buffer(buffer.device, buffer.handle, unsafe { nil })
+		buffer.handle = vk.Buffer(unsafe { nil })
+	}
+	if !isnil(buffer.memory) {
+		vk.free_memory(buffer.device, buffer.memory, unsafe { nil })
+		buffer.memory = vk.DeviceMemory(unsafe { nil })
+	}
 }
 
 // OwnedImage owns a two-dimensional VkImage and its bound VkDeviceMemory.
 // The image uses one mip level, one array layer, and one sample.
+@[nocopy]
 pub struct OwnedImage {
 	device vk.Device
+pub mut:
+	handle vk.Image
+	memory vk.DeviceMemory
 pub:
-	handle            vk.Image
-	memory            vk.DeviceMemory
 	format            vk.Format
 	extent            vk.Extent3D
 	tiling            vk.ImageTiling
@@ -407,8 +437,8 @@ pub:
 
 // new_image_2d creates an exclusive-sharing 2D image, chooses memory satisfying
 // all required properties, allocates it, and binds it at offset zero.
-pub fn (device Device) new_image_2d(width u32, height u32, format vk.Format, tiling vk.ImageTiling,
-	usage vk.ImageUsageFlags, required_memory_properties vk.MemoryPropertyFlags) !OwnedImage {
+pub fn (device &OwnedDevice) new_image_2d(width u32, height u32, format vk.Format, tiling vk.ImageTiling,
+	usage vk.ImageUsageFlags, required_memory_properties vk.MemoryPropertyFlags) !&OwnedImage {
 	if width == 0 || height == 0 {
 		return error('image width and height must be greater than zero')
 	}
@@ -459,7 +489,7 @@ pub fn (device Device) new_image_2d(width u32, height u32, format vk.Format, til
 		return err
 	}
 
-	return OwnedImage{
+	return &OwnedImage{
 		device:            device.handle
 		handle:            handle
 		memory:            memory
@@ -472,11 +502,17 @@ pub fn (device Device) new_image_2d(width u32, height u32, format vk.Format, til
 	}
 }
 
-// destroy first destroys the image, then frees its bound memory. Call it
-// exactly once before destroying the parent Device.
-pub fn (image OwnedImage) destroy() {
-	vk.destroy_image(image.device, image.handle, unsafe { nil })
-	vk.free_memory(image.device, image.memory, unsafe { nil })
+// destroy first destroys the image, then frees its bound memory. Repeated
+// calls are harmless while the parent OwnedDevice remains alive.
+pub fn (mut image OwnedImage) destroy() {
+	if !isnil(image.handle) {
+		vk.destroy_image(image.device, image.handle, unsafe { nil })
+		image.handle = vk.Image(unsafe { nil })
+	}
+	if !isnil(image.memory) {
+		vk.free_memory(image.device, image.memory, unsafe { nil })
+		image.memory = vk.DeviceMemory(unsafe { nil })
+	}
 }
 
 fn single_image_subresource_range(aspect_mask vk.ImageAspectFlags) vk.ImageSubresourceRange {
@@ -495,11 +531,13 @@ fn image_usage_supports_view(usage vk.ImageUsageFlags) bool {
 }
 
 // OwnedImageView owns a two-dimensional view of one OwnedImage. The view must
-// be destroyed before its image and parent Device.
+// be destroyed before its image and parent OwnedDevice.
+@[nocopy]
 pub struct OwnedImageView {
 	device vk.Device
+pub mut:
+	handle vk.ImageView
 pub:
-	handle            vk.ImageView
 	image             vk.Image
 	format            vk.Format
 	view_type         vk.ImageViewType
@@ -509,7 +547,7 @@ pub:
 // new_view creates an identity-swizzled 2D view over the image's single mip
 // level and array layer. The aspect mask remains explicit because it depends
 // on how the image format will be used.
-pub fn (image OwnedImage) new_view(aspect_mask vk.ImageAspectFlags) !OwnedImageView {
+pub fn (image &OwnedImage) new_view(aspect_mask vk.ImageAspectFlags) !&OwnedImageView {
 	if aspect_mask == 0 {
 		return error('image view aspect mask must not be empty')
 	}
@@ -532,7 +570,7 @@ pub fn (image OwnedImage) new_view(aspect_mask vk.ImageAspectFlags) !OwnedImageV
 	mut handle := vk.ImageView(unsafe { nil })
 	require_success(vk.create_image_view(image.device, &create_info, unsafe { nil }, &handle),
 		'vkCreateImageView')!
-	return OwnedImageView{
+	return &OwnedImageView{
 		device:            image.device
 		handle:            handle
 		image:             image.handle
@@ -542,10 +580,14 @@ pub fn (image OwnedImage) new_view(aspect_mask vk.ImageAspectFlags) !OwnedImageV
 	}
 }
 
-// destroy releases the view. Call it exactly once before destroying its image
-// or parent Device.
-pub fn (view OwnedImageView) destroy() {
+// destroy releases the view and clears its handle. Repeated calls are harmless
+// while the parent OwnedDevice remains alive.
+pub fn (mut view OwnedImageView) destroy() {
+	if isnil(view.handle) {
+		return
+	}
 	vk.destroy_image_view(view.device, view.handle, unsafe { nil })
+	view.handle = vk.ImageView(unsafe { nil })
 }
 
 // ImageLayoutTransition describes one synchronization-1 image barrier. Stage
@@ -565,7 +607,7 @@ pub:
 
 // image_memory_barrier builds the raw barrier used by transition_image_layout.
 // It covers the OwnedImage's single mip level and array layer.
-pub fn (transition ImageLayoutTransition) image_memory_barrier(image OwnedImage) vk.ImageMemoryBarrier {
+pub fn (transition ImageLayoutTransition) image_memory_barrier(image &OwnedImage) vk.ImageMemoryBarrier {
 	return vk.ImageMemoryBarrier{
 		srcAccessMask:       transition.src_access_mask
 		dstAccessMask:       transition.dst_access_mask
@@ -581,7 +623,7 @@ pub fn (transition ImageLayoutTransition) image_memory_barrier(image OwnedImage)
 // transition_image_layout records one vkCmdPipelineBarrier for an OwnedImage.
 // The command buffer must be recording. This helper does not track image state
 // or perform queue-family ownership transfer.
-pub fn (buffer PrimaryCommandBuffer) transition_image_layout(image OwnedImage, transition ImageLayoutTransition) ! {
+pub fn (buffer &PrimaryCommandBuffer) transition_image_layout(image &OwnedImage, transition ImageLayoutTransition) ! {
 	if transition.aspect_mask == 0 {
 		return error('image transition aspect mask must not be empty')
 	}
@@ -590,16 +632,17 @@ pub fn (buffer PrimaryCommandBuffer) transition_image_layout(image OwnedImage, t
 		transition.dependency_flags, 0, unsafe { nil }, 0, unsafe { nil }, 1, &barrier)
 }
 
-// Fence owns a VkFence created by one Device. Its parent device must outlive
+// OwnedFence owns a VkFence created by one OwnedDevice. Its parent must outlive
 // it. The raw handle remains public for queue submission.
-pub struct Fence {
+@[nocopy]
+pub struct OwnedFence {
 	device vk.Device
 pub mut:
 	handle vk.Fence
 }
 
 // new_fence creates a fence, optionally in the signaled state.
-pub fn (device Device) new_fence(signaled bool) !Fence {
+pub fn (device &OwnedDevice) new_fence(signaled bool) !&OwnedFence {
 	flags := if signaled { u32(vk.FenceCreateFlagBits.signaled) } else { vk.FenceCreateFlags(0) }
 	create_info := vk.FenceCreateInfo{
 		flags: flags
@@ -607,37 +650,37 @@ pub fn (device Device) new_fence(signaled bool) !Fence {
 	mut handle := vk.Fence(unsafe { nil })
 	require_success(vk.create_fence(device.handle, &create_info, unsafe { nil }, &handle),
 		'vkCreateFence')!
-	return Fence{
+	return &OwnedFence{
 		device: device.handle
 		handle: handle
 	}
 }
 
 // status returns VK_SUCCESS when signaled and VK_NOT_READY otherwise.
-pub fn (fence Fence) status() !vk.Result {
+pub fn (fence &OwnedFence) status() !vk.Result {
 	return check(vk.get_fence_status(fence.device, fence.handle), 'vkGetFenceStatus')
 }
 
 // is_signaled reports the current fence state.
-pub fn (fence Fence) is_signaled() !bool {
+pub fn (fence &OwnedFence) is_signaled() !bool {
 	return fence.status()! == .success
 }
 
 // wait blocks for at most timeout nanoseconds and returns VK_SUCCESS or
 // VK_TIMEOUT so callers can distinguish completion from expiration.
-pub fn (fence Fence) wait(timeout u64) !vk.Result {
+pub fn (fence &OwnedFence) wait(timeout u64) !vk.Result {
 	return check(vk.wait_for_fences(fence.device, 1, &fence.handle, vk.Bool32(1), timeout),
 		'vkWaitForFences')
 }
 
 // reset returns the fence to the unsignaled state.
-pub fn (fence Fence) reset() ! {
+pub fn (fence &OwnedFence) reset() ! {
 	require_success(vk.reset_fences(fence.device, 1, &fence.handle), 'vkResetFences')!
 }
 
 // destroy releases the fence and clears its handle. Repeated calls are
-// harmless, but the parent Device must still be alive.
-pub fn (mut fence Fence) destroy() {
+// harmless, but the parent OwnedDevice must still be alive.
+pub fn (mut fence OwnedFence) destroy() {
 	if isnil(fence.handle) {
 		return
 	}
@@ -645,29 +688,30 @@ pub fn (mut fence Fence) destroy() {
 	fence.handle = vk.Fence(unsafe { nil })
 }
 
-// Semaphore owns a binary VkSemaphore created by one Device. Its raw handle
-// remains public for submission and presentation structures.
-pub struct Semaphore {
+// OwnedSemaphore owns a binary VkSemaphore created by one OwnedDevice. Its raw
+// handle remains public for submission and presentation structures.
+@[nocopy]
+pub struct OwnedSemaphore {
 	device vk.Device
 pub mut:
 	handle vk.Semaphore
 }
 
 // new_semaphore creates a core binary semaphore.
-pub fn (device Device) new_semaphore() !Semaphore {
+pub fn (device &OwnedDevice) new_semaphore() !&OwnedSemaphore {
 	create_info := vk.SemaphoreCreateInfo{}
 	mut handle := vk.Semaphore(unsafe { nil })
 	require_success(vk.create_semaphore(device.handle, &create_info, unsafe { nil }, &handle),
 		'vkCreateSemaphore')!
-	return Semaphore{
+	return &OwnedSemaphore{
 		device: device.handle
 		handle: handle
 	}
 }
 
 // destroy releases the semaphore and clears its handle. Repeated calls are
-// harmless, but the parent Device must still be alive.
-pub fn (mut semaphore Semaphore) destroy() {
+// harmless, but the parent OwnedDevice must still be alive.
+pub fn (mut semaphore OwnedSemaphore) destroy() {
 	if isnil(semaphore.handle) {
 		return
 	}
@@ -680,10 +724,10 @@ pub fn (mut semaphore Semaphore) destroy() {
 // An absent fence passes VK_NULL_HANDLE to Vulkan.
 pub struct SubmitOptions {
 pub:
-	wait_semaphores   []Semaphore
+	wait_semaphores   []vk.Semaphore
 	wait_stage_masks  []vk.PipelineStageFlags
-	signal_semaphores []Semaphore
-	fence             ?Fence
+	signal_semaphores []vk.Semaphore
+	fence             vk.Fence
 }
 
 // SubmitHandleOptions describes synchronization using raw Vulkan handles.
@@ -700,7 +744,7 @@ pub:
 // submit_handles submits caller-owned raw handle slices without allocating.
 // Keep every supplied slice alive until this call returns.
 pub fn (queue Queue) submit_handles(command_buffers []vk.CommandBuffer,
-	options SubmitHandleOptions) !vk.Result {
+	options &SubmitHandleOptions) !vk.Result {
 	if command_buffers.len == 0 {
 		return error('queue submission requires at least one command buffer')
 	}
@@ -723,7 +767,7 @@ pub fn (queue Queue) submit_handles(command_buffers []vk.CommandBuffer,
 // submit submits one non-empty batch of primary command buffers. It owns the
 // temporary raw-handle arrays for the duration of vkQueueSubmit and preserves
 // both typed Vulkan failures and non-negative result statuses.
-pub fn (queue Queue) submit(command_buffers []PrimaryCommandBuffer, options SubmitOptions) !vk.Result {
+pub fn (queue Queue) submit(command_buffers []&PrimaryCommandBuffer, options &SubmitOptions) !vk.Result {
 	if command_buffers.len == 0 {
 		return error('queue submission requires at least one command buffer')
 	}
@@ -735,30 +779,21 @@ pub fn (queue Queue) submit(command_buffers []PrimaryCommandBuffer, options Subm
 	for command_buffer in command_buffers {
 		command_handles << command_buffer.handle
 	}
-	mut wait_handles := []vk.Semaphore{cap: options.wait_semaphores.len}
-	for semaphore in options.wait_semaphores {
-		wait_handles << semaphore.handle
+	submit_info := vk.SubmitInfo{
+		waitSemaphoreCount:   u32(options.wait_semaphores.len)
+		pWaitSemaphores:      options.wait_semaphores.data
+		pWaitDstStageMask:    options.wait_stage_masks.data
+		commandBufferCount:   u32(command_handles.len)
+		pCommandBuffers:      command_handles.data
+		signalSemaphoreCount: u32(options.signal_semaphores.len)
+		pSignalSemaphores:    options.signal_semaphores.data
 	}
-	mut signal_handles := []vk.Semaphore{cap: options.signal_semaphores.len}
-	for semaphore in options.signal_semaphores {
-		signal_handles << semaphore.handle
-	}
-
-	mut fence_handle := vk.Fence(unsafe { nil })
-	if fence := options.fence {
-		fence_handle = fence.handle
-	}
-	return queue.submit_handles(command_handles, SubmitHandleOptions{
-		wait_semaphores:   wait_handles
-		wait_stage_masks:  options.wait_stage_masks
-		signal_semaphores: signal_handles
-		fence:             fence_handle
-	})
+	return check(vk.queue_submit(queue.handle, 1, &submit_info, options.fence), 'vkQueueSubmit')
 }
 
 // physical_devices performs Vulkan's count/fill enumeration pattern and
 // retries when the available device set changes and VK_INCOMPLETE is returned.
-pub fn (instance Instance) physical_devices() ![]PhysicalDevice {
+pub fn (instance &OwnedInstance) physical_devices() ![]PhysicalDevice {
 	for {
 		mut count := u32(0)
 		require_success(vk.enumerate_physical_devices(instance.handle, &count, unsafe {

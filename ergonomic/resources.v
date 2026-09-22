@@ -3,7 +3,8 @@ module ergonomic
 import antono2.vulkan as vk
 
 // MappedBufferMemory is a borrowed mapping of one OwnedBuffer range. The
-// buffer and its parent Device must outlive the mapping.
+// buffer and its parent OwnedDevice must outlive the mapping.
+@[nocopy]
 pub struct MappedBufferMemory {
 	device            vk.Device
 	memory            vk.DeviceMemory
@@ -27,27 +28,27 @@ fn validate_buffer_range(buffer_size vk.DeviceSize, offset vk.DeviceSize,
 
 // map maps a checked range of host-visible buffer memory. For non-coherent
 // memory, callers using data directly remain responsible for flush/invalidate.
-pub fn (buffer OwnedBuffer) map(offset vk.DeviceSize, size vk.DeviceSize,
-	flags vk.MemoryMapFlags) !MappedBufferMemory {
+pub fn (buffer &OwnedBuffer) map(offset vk.DeviceSize, size vk.DeviceSize,
+	flags vk.MemoryMapFlags) !&MappedBufferMemory {
 	validate_buffer_range(buffer.size, offset, size)!
 	if buffer.memory_properties & u32(vk.MemoryPropertyFlagBits.host_visible) == 0 {
 		return error('buffer memory is not host visible')
 	}
 	mut data := voidptr(unsafe { nil })
 	require_success(vk.map_memory(buffer.device, buffer.memory, offset, size, flags, &data), 'vkMapMemory')!
-	return MappedBufferMemory{
-		device: buffer.device
-		memory: buffer.memory
+	return &MappedBufferMemory{
+		device:            buffer.device
+		memory:            buffer.memory
 		memory_properties: buffer.memory_properties
-		offset: offset
-		size: size
-		data: data
+		offset:            offset
+		size:              size
+		data:              data
 	}
 }
 
 // write_bytes copies bytes into coherent mapped memory after validating the
 // relative range. Empty writes are harmless.
-pub fn (mapping MappedBufferMemory) write_bytes(relative_offset vk.DeviceSize,
+pub fn (mapping &MappedBufferMemory) write_bytes(relative_offset vk.DeviceSize,
 	bytes []u8) ! {
 	if isnil(mapping.data) {
 		return error('buffer memory is not mapped')
@@ -79,7 +80,7 @@ pub fn (mut mapping MappedBufferMemory) unmap() {
 
 // upload_bytes performs one checked map/copy/unmap operation. The buffer must
 // use host-visible, host-coherent memory.
-pub fn (buffer OwnedBuffer) upload_bytes(offset vk.DeviceSize, bytes []u8) ! {
+pub fn (buffer &OwnedBuffer) upload_bytes(offset vk.DeviceSize, bytes []u8) ! {
 	if bytes.len == 0 {
 		if offset > buffer.size {
 			return error('mapped buffer range exceeds buffer size')
@@ -94,7 +95,8 @@ pub fn (buffer OwnedBuffer) upload_bytes(offset vk.DeviceSize, bytes []u8) ! {
 }
 
 // OwnedShaderModule owns a VkShaderModule created from validated SPIR-V words.
-// Its parent Device must outlive it.
+// Its parent OwnedDevice must outlive it.
+@[nocopy]
 pub struct OwnedShaderModule {
 	device vk.Device
 pub mut:
@@ -111,15 +113,15 @@ fn validate_spirv_words(words []u32) ! {
 }
 
 // new_shader_module creates an owned module from aligned SPIR-V words.
-pub fn (device Device) new_shader_module(words []u32) !OwnedShaderModule {
+pub fn (device &OwnedDevice) new_shader_module(words []u32) !&OwnedShaderModule {
 	validate_spirv_words(words)!
 	info := vk.ShaderModuleCreateInfo{
 		codeSize: usize(words.len) * sizeof(u32)
-		pCode: words.data
+		pCode:    words.data
 	}
 	mut handle := vk.ShaderModule(unsafe { nil })
 	require_success(vk.create_shader_module(device.handle, &info, unsafe { nil }, &handle), 'vkCreateShaderModule')!
-	return OwnedShaderModule{
+	return &OwnedShaderModule{
 		device: device.handle
 		handle: handle
 	}
@@ -127,7 +129,7 @@ pub fn (device Device) new_shader_module(words []u32) !OwnedShaderModule {
 
 // new_shader_module_bytes validates the byte count and copies bytes into an
 // aligned word slice before creating an owned shader module.
-pub fn (device Device) new_shader_module_bytes(code []u8) !OwnedShaderModule {
+pub fn (device &OwnedDevice) new_shader_module_bytes(code []u8) !&OwnedShaderModule {
 	if code.len == 0 {
 		return error('SPIR-V code must not be empty')
 	}
@@ -143,7 +145,7 @@ pub fn (device Device) new_shader_module_bytes(code []u8) !OwnedShaderModule {
 }
 
 // destroy releases the shader module and clears its handle. Repeated calls
-// are harmless while the parent Device remains alive.
+// are harmless while the parent OwnedDevice remains alive.
 pub fn (mut shader OwnedShaderModule) destroy() {
 	if isnil(shader.handle) {
 		return
@@ -153,7 +155,7 @@ pub fn (mut shader OwnedShaderModule) destroy() {
 }
 
 // wait_idle waits for all work submitted to this device to complete.
-pub fn (device Device) wait_idle() ! {
+pub fn (device &OwnedDevice) wait_idle() ! {
 	require_success(vk.device_wait_idle(device.handle), 'vkDeviceWaitIdle')!
 }
 

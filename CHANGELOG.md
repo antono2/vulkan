@@ -6,6 +6,17 @@ in `VERSION`.
 
 ## Unreleased
 
+### Changed
+
+- Mark ergonomic Vulkan owners `@[nocopy]`, borrow them by reference in helper
+  and submission APIs, and make mutable destruction consistently idempotent by
+  clearing native handles.
+- Return owned pointers from constructors and use unambiguous `OwnedInstance`,
+  `OwnedDevice`, `OwnedCommandPool`, `OwnedFence`, and `OwnedSemaphore` names so
+  strict V3 does not confuse wrappers with generated raw Vulkan handle types.
+- Return primary command buffers as references so allocation batches preserve
+  unique wrapper ownership without copying.
+
 ## 1.8.0 - 2026-09-22
 
 ### Added

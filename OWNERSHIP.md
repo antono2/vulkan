@@ -4,28 +4,35 @@ The ergonomic module uses explicit destruction and exposes raw Vulkan handles.
 Every successfully created owning wrapper must be destroyed before its parent,
 in the reverse order of creation.
 
-V structs are values and can be copied. A copied `Instance`, `Device`,
-`CommandPool`, `OwnedBuffer`, `OwnedImage`, or `OwnedImageView` refers to the
-same native allocation; destroying more than one copy is invalid. `Fence`,
-`Semaphore`, `PrimaryCommandBuffer`, `MappedBufferMemory`, and
-`OwnedShaderModule` clear their handle or pointer when a mutable value is
-destroyed, freed, or unmapped, but a previously made copy is still independent
-and can retain the old value.
+`OwnedInstance`, `OwnedDevice`, `OwnedCommandPool`, `PrimaryCommandBuffer`,
+`OwnedBuffer`, `OwnedImage`, `OwnedImageView`, `OwnedFence`, `OwnedSemaphore`,
+`MappedBufferMemory`, and `OwnedShaderModule` are marked `@[nocopy]`. Their
+constructors return owned pointers so resources cross module boundaries without
+copying. Keep the pointers in `mut` variables when they need cleanup and pass
+them directly to helpers; do not add another `&`.
+
+Destruction, command-buffer freeing, and unmapping are explicit, mutable, and
+idempotent: they clear the corresponding handle or pointer. This prevents a
+second cleanup through the same value, but does not replace Vulkan's parent /
+child lifetime rules. There are no implicit finalizers.
+
+`PhysicalDevice`, `QueueFamily`, `Queue`, discovery snapshots, and raw Vulkan
+handles remain copyable borrowed values. A copied `Queue` does not extend its
+parent `OwnedDevice` lifetime.
 
 A mapped range borrows its `OwnedBuffer`; unmap it before destroying the buffer.
 An `OwnedShaderModule` must be destroyed before its parent device. A successful
 `new_shader_module*` call copies or consumes SPIR-V only during creation, so the
 input slice need not outlive the call.
 
-Until a breaking ownership redesign, follow these rules:
+Follow these rules:
 
-1. Treat owning wrappers as move-only by convention.
-2. Pass borrowed references or raw handles to helpers instead of copying owners.
-3. Register cleanup immediately and destroy children before parents.
-4. Never destroy or free from more than one copy.
+1. Store every owner in a mutable variable and register cleanup immediately.
+2. Pass owner pointers directly; copy only borrowed snapshots or raw handles.
+3. Destroy children before parents.
+4. Do not use an owner after cleanup, or a borrowed value after its owner is
+   destroyed.
 
-The intended `v2` design is a reference-backed ownership control block. All
-copies would observe one closed state, native destruction would happen at most
-once, and borrowed views such as `Queue` would remain explicitly non-owning.
-Custom allocation callbacks must be retained in that control block so destroy
-calls use the allocator supplied at creation.
+Custom allocation callbacks are not yet supported by the ergonomic owners.
+Any future allocator-aware owner must retain the allocator used at creation so
+the same callbacks are supplied during destruction.

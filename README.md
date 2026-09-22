@@ -128,6 +128,13 @@ coherent uploads, while owned shader modules accept validated SPIR-V words or
 bytes.
 See [the ergonomic API design](API_DESIGN.md).
 
+Owning ergonomic wrappers are `@[nocopy]`, and constructors return owned
+pointers. Store them in `mut` variables so they can be destroyed, pass those
+pointers directly without adding another `&`, and destroy children before
+parents. Destruction is explicit and idempotent; borrowed queues, discovery
+snapshots, and raw Vulkan handles remain copyable. See the complete [ownership
+model](OWNERSHIP.md).
+
 `OwnedBuffer` and `OwnedImage` deliberately use one Vulkan memory allocation
 per resource so their ownership stays obvious in small programs. Applications
 that create many resources should use the companion
@@ -140,7 +147,7 @@ Instance and device configuration can validate requested names before Vulkan is
 called:
 
 ```v
-instance := vke.new_instance_with_options(vke.InstanceOptions{
+mut instance := vke.new_instance_with_options(vke.InstanceOptions{
 	application_name: 'my app'
 	extensions: ['VK_KHR_surface']
 })!
@@ -148,7 +155,7 @@ instance := vke.new_instance_with_options(vke.InstanceOptions{
 family := physical_device.find_queue_family(u32(vk.QueueFlagBits.graphics)) or {
 	return error('no graphics queue')
 }
-device := physical_device.new_device_with_options(vke.DeviceOptions{
+mut device := physical_device.new_device_with_options(vke.DeviceOptions{
 	queue_requests: [vke.DeviceQueueRequest{
 		queue_family: family
 		priorities: [f32(1.0)]
