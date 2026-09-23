@@ -226,18 +226,18 @@ jobs:
           v \
             -new-compiler \
             -check \
-            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
+            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan/c/vendor/volk -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
             generator/test/main.c.v
           v \
             -new-compiler \
             -d vulkan_xlib \
             -check \
-            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
+            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan/c/vendor/volk -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
             generator/test/main.c.v
           v \
             -new-compiler \
             -check \
-            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
+            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan/c/vendor/volk -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
             ci/bundled_header_smoke
       - name: Compile smoke test and ergonomic unit tests
         id: compile
@@ -253,7 +253,7 @@ jobs:
             v_flags=(
               -new-compiler
               "${v_flags[@]}"
-              -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include"
+              -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan/c/vendor/volk -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include"
             )
           fi
           if [[ "${{ runner.os }}" == macOS ]]; then
