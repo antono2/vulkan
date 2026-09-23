@@ -151,7 +151,7 @@ jobs:
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash
         run: bash .github/scripts/setup-vulkan-ci.sh 1.4.309.0 v1.2
-      - name: Install registry-matched headers and pinned Volk
+      - name: Verify bundled headers and Volk against pinned upstream sources
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash
         run: |
@@ -163,8 +163,9 @@ jobs:
           git -C "$registry_checkout" fetch --depth 1 origin "$registry_commit"
           git -C "$registry_checkout" checkout --detach FETCH_HEAD
           test "$(git -C "$registry_checkout" rev-parse HEAD)" = "$registry_commit"
-          mkdir -p "$VULKAN_SDK/include" "$VULKAN_SDK/include/volk"
-          cp -R "$registry_checkout/include/." "$VULKAN_SDK/include/"
+          while IFS= read -r -d '' header; do
+            cmp "$header" "c/vendor/include/${header#"$registry_checkout/include/"}"
+          done < <(find "$registry_checkout/include/vulkan" "$registry_checkout/include/vk_video" -name '*.h' -print0)
           registry_version=$(tr -d '\r\n' < VERSION)
           [[ "$registry_version" =~ ^v[0-9]+\.[0-9]+\.([0-9]+)$ ]] || {
             echo "Invalid Vulkan registry version: $registry_version" >&2
@@ -172,20 +173,22 @@ jobs:
           }
           header_version=${BASH_REMATCH[1]}
           grep -F "#define VK_HEADER_VERSION $header_version" \
-            "$VULKAN_SDK/include/vulkan/vulkan_core.h"
+            "c/vendor/include/vulkan/vulkan_core.h"
 
           volk_commit=$(tr -d '\r\n' < VOLK_COMMIT)
           curl --fail --silent --show-error --location \
             "https://raw.githubusercontent.com/zeux/volk/$volk_commit/volk.h" \
-            --output "$VULKAN_SDK/include/volk/volk.h"
+            --output "$RUNNER_TEMP/pinned-volk.h"
           curl --fail --silent --show-error --location \
             "https://raw.githubusercontent.com/zeux/volk/$volk_commit/volk.c" \
-            --output "$VULKAN_SDK/include/volk/volk.c"
+            --output "$RUNNER_TEMP/pinned-volk.c"
+          cmp "$RUNNER_TEMP/pinned-volk.h" c/vendor/volk/volk.h
+          cmp "$RUNNER_TEMP/pinned-volk.c" c/vendor/volk/volk.c
       - name: Verify the public setup diagnostics
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash
         run: v run setup.vsh --check
-      - name: Reject old headers in setup diagnostics
+      - name: Accept old installed headers with bundled build inputs
         if: runner.os == 'Linux' && matrix.v-channel == 'stable'
         shell: bash
         run: |
@@ -197,13 +200,9 @@ jobs:
           #define VK_HEADER_VERSION 275
           #define VK_HEADER_VERSION_COMPLETE VK_MAKE_API_VERSION(0, 1, 3, VK_HEADER_VERSION)
           EOF
-          if VULKAN_SDK="$old_sdk" v run setup.vsh --check > "$RUNNER_TEMP/old-header-check.log" 2>&1; then
-            cat "$RUNNER_TEMP/old-header-check.log"
-            echo "setup check accepted outdated Vulkan headers" >&2
-            exit 1
-          fi
-          required_version=$(tr -d '\r\n' < VERSION)
-          grep -F "[outdated]  Vulkan headers 1.3.275; bindings use registry ${required_version#v}" \
+          VULKAN_SDK="$old_sdk" v run setup.vsh --check > "$RUNNER_TEMP/old-header-check.log"
+          cat "$RUNNER_TEMP/old-header-check.log"
+          grep -F '[ok]       Bundled Vulkan headers 1.4.363 cover registry 1.4.363' \
             "$RUNNER_TEMP/old-header-check.log"
       - name: Assemble isolated module
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
@@ -214,6 +213,7 @@ jobs:
           mkdir -p "$module_root/c" "$module_root/ergonomic"
           cp vulkan.v vulkan_video.v loader.v v.mod VERSION REGISTRY_COMMIT VOLK_COMMIT "$module_root/"
           cp c/loader_bridge.h c/volk.c.v c/volk_impl.h "$module_root/c/"
+          cp -R c/vendor "$module_root/c/"
           cp ergonomic/ergonomic.v ergonomic/allocator.v ergonomic/discovery.v ergonomic/configuration.v \
             ergonomic/presentation.v ergonomic/resources.v \
             "$module_root/ergonomic/"
@@ -226,14 +226,19 @@ jobs:
           v \
             -new-compiler \
             -check \
-            -cflags "-I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include -I$VULKAN_SDK/include/volk" \
+            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
             generator/test/main.c.v
           v \
             -new-compiler \
             -d vulkan_xlib \
             -check \
-            -cflags "-I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include -I$VULKAN_SDK/include/volk" \
+            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
             generator/test/main.c.v
+          v \
+            -new-compiler \
+            -check \
+            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
+            ci/bundled_header_smoke
       - name: Compile smoke test and ergonomic unit tests
         id: compile
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
@@ -248,7 +253,7 @@ jobs:
             v_flags=(
               -new-compiler
               "${v_flags[@]}"
-              -cflags "-I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include -I$VULKAN_SDK/include/volk"
+              -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include"
             )
           fi
           if [[ "${{ runner.os }}" == macOS ]]; then
@@ -256,6 +261,7 @@ jobs:
           else
             v "${v_flags[@]}" run generator/test
           fi
+          v "${v_flags[@]}" -o "$RUNNER_TEMP/bundled-header-smoke" ci/bundled_header_smoke
           v "${v_flags[@]}" test ergonomic
           if [[ "${{ runner.os }}" == Linux && "${{ matrix.v-channel }}" == stable ]]; then
             v -d vulkan_xlib -cc "${{ matrix.compiler }}" \

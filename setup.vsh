@@ -1,12 +1,12 @@
 #!/usr/bin/env -S v run
 
-// Installs and verifies the native prerequisites used by antono2.vulkan.
+// Installs optional native tooling and verifies the bundled build inputs.
 // Running without arguments performs the installation. Use --check for a
 // read-only diagnostic pass suitable for support requests and CI.
 import os
 
 const usage = 'Usage: v run setup.vsh [--install|--check]\n\n' +
-	'  --install  Install native Vulkan development tools and this V module (default).\n' + '  --check    Only report whether the compiler, SDK/headers, loader, and device work.\n'
+	'  --install  Install native Vulkan tools and this V module (default).\n' + '  --check    Report whether the compiler, bundled headers, loader, and device work.\n'
 
 fn command_exists(name string) bool {
 	os.find_abs_path_of_executable(name) or { return false }
@@ -117,50 +117,11 @@ fn install_native() ! {
 }
 
 fn find_vulkan_header() string {
-	mut roots := []string{}
-	if sdk := os.getenv_opt('VULKAN_SDK') {
-		roots << sdk
-	}
-	$if windows {
-		if program_files := os.getenv_opt('ProgramFiles') {
-			roots << os.join_path(program_files, 'VulkanSDK')
-		}
-	} $else {
-		roots << ['/usr', '/usr/local', '/opt/homebrew']
-	}
-	for root in roots {
-		for relative in ['include/vulkan/vulkan.h', 'Include/vulkan/vulkan.h'] {
-			candidate := os.join_path(root, relative)
-			if os.is_file(candidate) {
-				return candidate
-			}
-		}
-	}
-	return ''
+	return os.join_path(os.dir(@FILE), 'c', 'vendor', 'include', 'vulkan', 'vulkan.h')
 }
 
 fn find_volk_header() string {
-	mut roots := []string{}
-	if sdk := os.getenv_opt('VULKAN_SDK') {
-		roots << sdk
-	}
-	$if windows {
-		if program_files := os.getenv_opt('ProgramFiles') {
-			roots << os.join_path(program_files, 'VulkanSDK')
-		}
-	} $else {
-		roots << ['/usr', '/usr/local', '/opt/homebrew']
-	}
-	for root in roots {
-		for relative in ['include/volk.h', 'include/volk/volk.h', 'Include/volk.h',
-			'Include/volk/volk.h'] {
-			candidate := os.join_path(root, relative)
-			if os.is_file(candidate) {
-				return candidate
-			}
-		}
-	}
-	return ''
+	return os.join_path(os.dir(@FILE), 'c', 'vendor', 'volk', 'volk.h')
 }
 
 struct HeaderVersion {
@@ -244,39 +205,37 @@ fn check() bool {
 		ok = report_command('cc', true) && ok
 	}
 	header := find_vulkan_header()
-	if header == '' {
-		println('[missing] Vulkan headers')
+	if !os.is_file(header) {
+		println('[missing] Bundled Vulkan header: ${header}')
 		ok = false
 	} else {
-		println('[ok]       Vulkan header: ${header}')
+		println('[ok]       Bundled Vulkan header: ${header}')
 		required_text := os.read_file(os.join_path(os.dir(@FILE), 'VERSION')) or { '' }
 		required := parse_registry_version(required_text) or {
 			println('[warning]  Could not read the binding registry version from VERSION')
 			ok = false
 			HeaderVersion{}
 		}
-		installed := installed_header_version(header) or {
-			println('[warning]  Could not determine the installed Vulkan header version')
+		bundled := installed_header_version(header) or {
+			println('[warning]  Could not determine the bundled Vulkan header version')
 			ok = false
 			HeaderVersion{}
 		}
-		if required.major > 0 && installed.major > 0 {
-			if installed.older_than(required) {
-				println('[outdated]  Vulkan headers ${installed}; bindings use registry ${required}')
-				println('            Older APIs may compile, but newer declarations need updated headers.')
-				println('            Install a matching SDK and Volk, then set VULKAN_SDK to its root.')
+		if required.major > 0 && bundled.major > 0 {
+			if bundled.older_than(required) {
+				println('[outdated]  Bundled Vulkan headers ${bundled}; bindings use registry ${required}')
 				ok = false
 			} else {
-				println('[ok]       Vulkan headers ${installed} cover registry ${required}')
+				println('[ok]       Bundled Vulkan headers ${bundled} cover registry ${required}')
 			}
 		}
 	}
 	volk := find_volk_header()
-	if volk == '' {
-		println('[missing] Volk header')
+	if !os.is_file(volk) || !os.is_file(os.join_path(os.dir(volk), 'volk.c')) {
+		println('[missing] Bundled Volk sources: ${os.dir(volk)}')
 		ok = false
 	} else {
-		println('[ok]       Volk header: ${volk}')
+		println('[ok]       Bundled Volk sources: ${os.dir(volk)}')
 	}
 	if command_exists('vulkaninfo') {
 		// Some SDK builds write their update manifest into the process working

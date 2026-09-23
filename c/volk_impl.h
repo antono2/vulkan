@@ -6,7 +6,8 @@
 #ifndef V_VULKAN_VOLK_IMPLEMENTATION
 #define V_VULKAN_VOLK_IMPLEMENTATION
 #define VK_NO_PROTOTYPES
+#include "vendor/include/vulkan/vulkan.h"
 #define VOLK_IMPLEMENTATION
-#include <volk.h>
+#include "vendor/volk/volk.h"
 #undef VOLK_IMPLEMENTATION
 #endif
