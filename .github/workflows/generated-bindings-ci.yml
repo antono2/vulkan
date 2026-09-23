@@ -100,7 +100,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: antono2/v_vulkan_bindings
-          ref: 336e513f7ac4b3c5260f9dabe808b6f54e6a7491
+          ref: acacf0b8043b10364549382d02535bd5d90309a1
           path: generator
       - uses: prantlf/setup-v-action@92f20bea50d2c9931a28c96bb4997a3c7357baf0 # v4
         if: matrix.v-channel == 'stable'
