@@ -30,6 +30,17 @@ module, then verifies the result. For a read-only support check, run:
 v run setup.vsh --check
 ```
 
+`v install antono2.vulkan` downloads the V module without checking local Vulkan
+headers. Older headers can build applications that use declarations they already
+contain, but code using newer generated types or commands needs newer native
+headers and a compatible Volk. `setup.vsh --check` compares the installed
+`vulkan_core.h` version with this release's `VERSION` and reports older headers
+as incomplete for the full binding. A distribution's Vulkan development
+packages may be older than this release; in that case install a recent Vulkan
+SDK or registry-matched headers and Volk, set `VULKAN_SDK` to that SDK, and rerun
+the check. The check finds Volk but does not verify every Volk entry point;
+the CI workflow pins the exact header and Volk sources used to test the release.
+
 The SDK and loader cannot supply a hardware Vulkan implementation. If
 `vulkaninfo` cannot enumerate a device after setup, install or update the GPU
 vendor's driver. CI uses registry-matched headers and the pinned Volk revision

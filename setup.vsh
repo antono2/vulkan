@@ -3,10 +3,10 @@
 // Installs and verifies the native prerequisites used by antono2.vulkan.
 // Running without arguments performs the installation. Use --check for a
 // read-only diagnostic pass suitable for support requests and CI.
-
 import os
 
-const usage = 'Usage: v run setup.vsh [--install|--check]\n\n' + '  --install  Install native Vulkan development tools and this V module (default).\n' + '  --check    Only report whether the compiler, SDK/headers, loader, and device work.\n'
+const usage = 'Usage: v run setup.vsh [--install|--check]\n\n' +
+	'  --install  Install native Vulkan development tools and this V module (default).\n' + '  --check    Only report whether the compiler, SDK/headers, loader, and device work.\n'
 
 fn command_exists(name string) bool {
 	os.find_abs_path_of_executable(name) or { return false }
@@ -55,7 +55,8 @@ fn install_macos() ! {
 	os.mkdir_all(unpacked)!
 	run('curl --fail --location --output ${os.quoted_path(archive)} https://sdk.lunarg.com/sdk/download/latest/mac/vulkan_sdk.zip')!
 	run('ditto -x -k ${os.quoted_path(archive)} ${os.quoted_path(unpacked)}')!
-	found := os.execute('find ${os.quoted_path(unpacked)} -type f -path "*/InstallVulkan*.app/Contents/MacOS/InstallVulkan*" -print -quit')
+	found :=
+		os.execute('find ${os.quoted_path(unpacked)} -type f -path "*/InstallVulkan*.app/Contents/MacOS/InstallVulkan*" -print -quit')
 	installer := found.output.trim_space()
 	if found.exit_code != 0 || installer == '' {
 		return error('the downloaded Vulkan SDK did not contain the expected macOS installer')
@@ -66,7 +67,8 @@ fn install_macos() ! {
 
 fn windows_vulkan_sdk() string {
 	mut candidates := [os.getenv('VULKAN_SDK')]
-	machine_value := os.execute('powershell -NoProfile -Command "[Environment]::GetEnvironmentVariable(\'VULKAN_SDK\', \'Machine\')"')
+	machine_value :=
+		os.execute('powershell -NoProfile -Command "[Environment]::GetEnvironmentVariable(\'VULKAN_SDK\', \'Machine\')"')
 	if machine_value.exit_code == 0 {
 		candidates << machine_value.output.trim_space()
 	}
@@ -161,6 +163,66 @@ fn find_volk_header() string {
 	return ''
 }
 
+struct HeaderVersion {
+mut:
+	major int
+	minor int
+	patch int
+}
+
+fn (version HeaderVersion) str() string {
+	return '${version.major}.${version.minor}.${version.patch}'
+}
+
+fn parse_registry_version(text string) ?HeaderVersion {
+	parts := text.trim_space().trim_string_left('v').split('.')
+	if parts.len != 3 {
+		return none
+	}
+	version := HeaderVersion{
+		major: parts[0].int()
+		minor: parts[1].int()
+		patch: parts[2].int()
+	}
+	if version.major == 0 || version.patch == 0 {
+		return none
+	}
+	return version
+}
+
+fn installed_header_version(header string) ?HeaderVersion {
+	core := os.read_file(os.join_path(os.dir(header), 'vulkan_core.h')) or { return none }
+	mut version := HeaderVersion{
+		minor: -1
+	}
+	for line in core.split_into_lines() {
+		trimmed := line.trim_space()
+		if trimmed.starts_with('#define VK_HEADER_VERSION ') {
+			version.patch = trimmed.all_after('#define VK_HEADER_VERSION ').trim_space().int()
+		} else if trimmed.starts_with('#define VK_HEADER_VERSION_COMPLETE VK_MAKE_API_VERSION(') {
+			parts := trimmed.all_after('VK_MAKE_API_VERSION(').all_before(')').split(',')
+			if parts.len == 4 {
+				version.major = parts[1].trim_space().int()
+				version.minor = parts[2].trim_space().int()
+			}
+		}
+	}
+	if version.major == 0 || version.minor < 0 || version.patch == 0 {
+		return none
+	}
+	return version
+}
+
+fn (version HeaderVersion) older_than(other HeaderVersion) bool {
+	if version.major != other.major {
+		return version.major < other.major
+	}
+	if version.minor != other.minor {
+		return version.minor < other.minor
+	}
+	return version.patch < other.patch
+}
+
 fn report_command(name string, required bool) bool {
 	if path := os.find_abs_path_of_executable(name) {
 		println('[ok]       ${name}: ${path}')
@@ -187,6 +249,27 @@ fn check() bool {
 		ok = false
 	} else {
 		println('[ok]       Vulkan header: ${header}')
+		required_text := os.read_file(os.join_path(os.dir(@FILE), 'VERSION')) or { '' }
+		required := parse_registry_version(required_text) or {
+			println('[warning]  Could not read the binding registry version from VERSION')
+			ok = false
+			HeaderVersion{}
+		}
+		installed := installed_header_version(header) or {
+			println('[warning]  Could not determine the installed Vulkan header version')
+			ok = false
+			HeaderVersion{}
+		}
+		if required.major > 0 && installed.major > 0 {
+			if installed.older_than(required) {
+				println('[outdated]  Vulkan headers ${installed}; bindings use registry ${required}')
+				println('            Older APIs may compile, but newer declarations need updated headers.')
+				println('            Install a matching SDK and Volk, then set VULKAN_SDK to its root.')
+				ok = false
+			} else {
+				println('[ok]       Vulkan headers ${installed} cover registry ${required}')
+			}
+		}
 	}
 	volk := find_volk_header()
 	if volk == '' {
@@ -212,7 +295,8 @@ fn check() bool {
 }
 
 fn main() {
-	if os.args.len > 2 || (os.args.len == 2 && os.args[1] !in ['--install', '--check', '-h', '--help']) {
+	if os.args.len > 2
+		|| (os.args.len == 2 && os.args[1] !in ['--install', '--check', '-h', '--help']) {
 		eprintln(usage)
 		exit(2)
 	}
