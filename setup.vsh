@@ -27,22 +27,22 @@ fn run(command string) ! {
 fn install_linux() ! {
 	if command_exists('apt-get') {
 		run('sudo apt-get update')!
-		run('sudo apt-get install -y build-essential libvulkan-dev libvulkan-volk-dev mesa-vulkan-drivers vulkan-tools')!
+		run('sudo apt-get install -y build-essential libvulkan1 mesa-vulkan-drivers vulkan-tools')!
 		return
 	}
 	if command_exists('dnf') {
-		run('sudo dnf install -y gcc gcc-c++ vulkan-headers vulkan-loader-devel volk-devel vulkan-tools mesa-vulkan-drivers')!
+		run('sudo dnf install -y gcc gcc-c++ vulkan-loader vulkan-tools mesa-vulkan-drivers')!
 		return
 	}
 	if command_exists('pacman') {
-		run('sudo pacman -S --needed --noconfirm base-devel vulkan-headers vulkan-icd-loader vulkan-tools volk')!
+		run('sudo pacman -S --needed --noconfirm base-devel vulkan-icd-loader vulkan-tools')!
 		return
 	}
 	if command_exists('zypper') {
-		run('sudo zypper --non-interactive install -y gcc gcc-c++ vulkan-devel vulkan-tools volk-devel')!
+		run('sudo zypper --non-interactive install -y gcc gcc-c++ vulkan-tools')!
 		return
 	}
-	return error('unsupported Linux package manager; install Vulkan headers, the loader, Volk, vulkaninfo, and a Vulkan ICD, then rerun with --check')
+	return error('unsupported Linux package manager; install a C compiler, the Vulkan loader, vulkaninfo, and a Vulkan ICD, then rerun with --check')
 }
 
 fn install_macos() ! {
@@ -248,7 +248,7 @@ fn check() bool {
 			println('           Install or update the GPU vendor driver; the SDK does not provide a hardware driver.')
 		}
 	} else {
-		println('[warning]  vulkaninfo is unavailable; SDK/loader runtime verification was skipped')
+		println('[warning]  vulkaninfo is unavailable; Vulkan loader/device verification was skipped')
 	}
 	return ok
 }
@@ -280,5 +280,5 @@ fn main() {
 		eprintln('\nSetup is incomplete. Resolve the missing items above and rerun with --check.')
 		exit(1)
 	}
-	println('\nVulkan development prerequisites are ready.')
+	println('\nVulkan module build prerequisites are ready; check runtime warnings above.')
 }
