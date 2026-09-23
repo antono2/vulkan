@@ -97,8 +97,8 @@ v -d vulkan_xlib run your_app.v
 
 For XCB or Wayland, use `vulkan_xcb` or `vulkan_wayland` instead. Other flags
 follow the registry platform names, such as `vulkan_win32`, `vulkan_android`,
-and `vulkan_metal`. Install native window-system headers for the selected
-platform when required (for example Xlib or Wayland headers).
+and `vulkan_metal`. Applications and windowing libraries may need native
+window-system headers for the selected platform (for example Xlib or Wayland).
 Extension name and spec-version constants are available without these flags,
 so applications can still query extension support before selecting a backend.
 

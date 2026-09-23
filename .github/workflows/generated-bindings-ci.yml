@@ -182,8 +182,9 @@ jobs:
           curl --fail --silent --show-error --location \
             "https://raw.githubusercontent.com/zeux/volk/$volk_commit/volk.c" \
             --output "$RUNNER_TEMP/pinned-volk.c"
-          cmp "$RUNNER_TEMP/pinned-volk.h" c/vendor/volk/volk.h
-          cmp "$RUNNER_TEMP/pinned-volk.c" c/vendor/volk/volk.c
+          # Git for Windows can check out tracked text with CRLF line endings.
+          cmp <(sed 's/\r$//' "$RUNNER_TEMP/pinned-volk.h") <(sed 's/\r$//' c/vendor/volk/volk.h)
+          cmp <(sed 's/\r$//' "$RUNNER_TEMP/pinned-volk.c") <(sed 's/\r$//' c/vendor/volk/volk.c)
       - name: Verify the public setup diagnostics
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash
