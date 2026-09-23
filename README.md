@@ -23,7 +23,11 @@ v run ~/.vmodules/antono2/vulkan/setup.vsh
 
 From a source checkout, use `v run setup.vsh`. The script supports Ubuntu and
 Debian, Fedora, Arch, openSUSE, macOS, and Windows with winget.
-It installs native Vulkan tools and the VPM module, then verifies the result.
+On Linux it installs a C compiler, Vulkan runtime tools, and the VPM module;
+the bundled headers and Volk need no distribution development packages. The
+macOS and Windows helpers still use the Vulkan SDK to provide runtime tooling,
+but its headers are not required to compile this module. The script then
+verifies the result.
 For a read-only support check, run:
 
 ```sh
