@@ -11,11 +11,9 @@ fn test_check_preserves_success_and_positive_statuses() ! {
 fn test_check_returns_typed_vulkan_error() {
 	check(.error_device_lost, 'vkQueueSubmit') or {
 		assert err is VulkanError
-		if err is VulkanError {
-			assert err.result == vk.Result.error_device_lost
-			assert err.operation == 'vkQueueSubmit'
-			assert err.msg().contains('-4')
-		}
+		assert err.result == vk.Result.error_device_lost
+		assert err.operation == 'vkQueueSubmit'
+		assert err.msg().contains('-4')
 		return
 	}
 	assert false
@@ -24,9 +22,7 @@ fn test_check_returns_typed_vulkan_error() {
 fn test_require_success_rejects_positive_status() {
 	require_success(.timeout, 'vkWaitForFences') or {
 		assert err is VulkanError
-		if err is VulkanError {
-			assert err.result == vk.Result.timeout
-		}
+		assert err.result == vk.Result.timeout
 		return
 	}
 	assert false

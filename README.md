@@ -11,11 +11,11 @@
 [Vulkan API registry](https://github.com/KhronosGroup/Vulkan-Docs/blob/main/xml/vk.xml).
 The package follows the semantic version in `v.mod`; `VERSION` records the
 Vulkan registry snapshot, while `REGISTRY_COMMIT` and `VOLK_COMMIT` make the
-CI header and loader inputs reproducible.
+bundled header and loader inputs reproducible.
 
 ## One-command setup
 
-Install the native Vulkan development prerequisites and this V module:
+Install native Vulkan tools and this V module:
 
 ```sh
 v run ~/.vmodules/antono2/vulkan/setup.vsh
@@ -23,17 +23,29 @@ v run ~/.vmodules/antono2/vulkan/setup.vsh
 
 From a source checkout, use `v run setup.vsh`. The script supports Ubuntu and
 Debian, Fedora, Arch, openSUSE, macOS, and Windows with winget.
-It installs headers, the Vulkan loader, Volk, diagnostic tools, and the VPM
-module, then verifies the result. For a read-only support check, run:
+On Linux it installs a C compiler, Vulkan runtime tools, and the VPM module;
+the bundled headers and Volk need no distribution development packages. The
+macOS and Windows helpers still use the Vulkan SDK to provide runtime tooling,
+but its headers are not required to compile this module. The script then
+verifies the result.
+For a read-only support check, run:
 
 ```sh
 v run setup.vsh --check
 ```
 
+`v install antono2.vulkan` includes the matching Khronos Vulkan C headers and
+Volk sources. The package compiles against these bundled files, even when the
+system has older Vulkan development headers or none installed. `VULKAN_SDK` is
+not needed to compile the module. `setup.vsh --check` verifies the bundled
+header version against `VERSION` and checks that Volk is present. The native
+Vulkan loader and a driver or software implementation are still needed to run
+Vulkan applications.
+
 The SDK and loader cannot supply a hardware Vulkan implementation. If
 `vulkaninfo` cannot enumerate a device after setup, install or update the GPU
-vendor's driver. CI uses registry-matched headers and the pinned Volk revision
-recorded by this repository rather than this convenience installer.
+vendor's driver. CI verifies the bundled headers and Volk against the pinned
+upstream revisions recorded by this repository.
 
 ## Supported toolchains
 
@@ -89,7 +101,8 @@ v -d vulkan_xlib run your_app.v
 
 For XCB or Wayland, use `vulkan_xcb` or `vulkan_wayland` instead. Other flags
 follow the registry platform names, such as `vulkan_win32`, `vulkan_android`,
-and `vulkan_metal`. Install the native headers for the selected platform.
+and `vulkan_metal`. Applications and windowing libraries may need native
+window-system headers for the selected platform (for example Xlib or Wayland).
 Extension name and spec-version constants are available without these flags,
 so applications can still query extension support before selecting a backend.
 

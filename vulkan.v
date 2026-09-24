@@ -6374,7 +6374,7 @@ pub fn cmd_set_depth_bias(
 fn C.vkCmdSetBlendConstants(
 	commandBuffer CommandBuffer, const_blendConstants [4]f32)
 
-pub type PFN_vkCmdSetBlendConstants = fn (commandBuffer CommandBuffer, const_blendConstants [4]f32)
+pub type PFN_vkCmdSetBlendConstants = fn (commandBuffer CommandBuffer, const_blendConstants &f32)
 
 @[inline]
 pub fn cmd_set_blend_constants(
@@ -14446,10 +14446,6 @@ $if vulkan_win32 ? {
 
 pub const khr_external_memory_fd_spec_version = 1
 pub const khr_external_memory_fd_extension_name = c'VK_KHR_external_memory_fd'
-
-@[typedef]
-pub struct C.int {}
-
 // ImportMemoryFdInfoKHR extends VkMemoryAllocateInfo
 pub type ImportMemoryFdInfoKHR = C.VkImportMemoryFdInfoKHR
 
@@ -14459,7 +14455,7 @@ pub mut:
 	sType      StructureType = StructureType.import_memory_fd_info_khr
 	pNext      voidptr       = unsafe { nil }
 	handleType ExternalMemoryHandleTypeFlagBits
-	fd         int
+	fd         i32
 }
 
 pub type MemoryFdPropertiesKHR = C.VkMemoryFdPropertiesKHR
@@ -14485,29 +14481,29 @@ pub mut:
 
 @[keep_args_alive]
 fn C.vkGetMemoryFdKHR(
-	device Device, const_pGetFdInfo &MemoryGetFdInfoKHR, pFd &int) Result
+	device Device, const_pGetFdInfo &MemoryGetFdInfoKHR, pFd &i32) Result
 
-pub type PFN_vkGetMemoryFdKHR = fn (device Device, const_pGetFdInfo &MemoryGetFdInfoKHR, pFd &int) Result
+pub type PFN_vkGetMemoryFdKHR = fn (device Device, const_pGetFdInfo &MemoryGetFdInfoKHR, pFd &i32) Result
 
 @[inline]
 pub fn get_memory_fd_khr(
 	device Device,
 	const_pGetFdInfo &MemoryGetFdInfoKHR,
-	pFd &int) Result {
+	pFd &i32) Result {
 	return C.vkGetMemoryFdKHR(device, const_pGetFdInfo, pFd)
 }
 
 @[keep_args_alive]
 fn C.vkGetMemoryFdPropertiesKHR(
-	device Device, handleType ExternalMemoryHandleTypeFlagBits, fd int, mut_pMemoryFdProperties &MemoryFdPropertiesKHR) Result
+	device Device, handleType ExternalMemoryHandleTypeFlagBits, fd i32, mut_pMemoryFdProperties &MemoryFdPropertiesKHR) Result
 
-pub type PFN_vkGetMemoryFdPropertiesKHR = fn (device Device, handleType ExternalMemoryHandleTypeFlagBits, fd int, mut_pMemoryFdProperties &MemoryFdPropertiesKHR) Result
+pub type PFN_vkGetMemoryFdPropertiesKHR = fn (device Device, handleType ExternalMemoryHandleTypeFlagBits, fd i32, mut_pMemoryFdProperties &MemoryFdPropertiesKHR) Result
 
 @[inline]
 pub fn get_memory_fd_properties_khr(
 	device Device,
 	handleType ExternalMemoryHandleTypeFlagBits,
-	fd int,
+	fd i32,
 	mut mut_pMemoryFdProperties MemoryFdPropertiesKHR) Result {
 	return C.vkGetMemoryFdPropertiesKHR(device, handleType, fd, mut_pMemoryFdProperties)
 }
@@ -14667,7 +14663,7 @@ pub mut:
 	semaphore  Semaphore
 	flags      SemaphoreImportFlags
 	handleType ExternalSemaphoreHandleTypeFlagBits
-	fd         int
+	fd         i32
 }
 
 pub type SemaphoreGetFdInfoKHR = C.VkSemaphoreGetFdInfoKHR
@@ -14696,15 +14692,15 @@ pub fn import_semaphore_fd_khr(
 
 @[keep_args_alive]
 fn C.vkGetSemaphoreFdKHR(
-	device Device, const_pGetFdInfo &SemaphoreGetFdInfoKHR, pFd &int) Result
+	device Device, const_pGetFdInfo &SemaphoreGetFdInfoKHR, pFd &i32) Result
 
-pub type PFN_vkGetSemaphoreFdKHR = fn (device Device, const_pGetFdInfo &SemaphoreGetFdInfoKHR, pFd &int) Result
+pub type PFN_vkGetSemaphoreFdKHR = fn (device Device, const_pGetFdInfo &SemaphoreGetFdInfoKHR, pFd &i32) Result
 
 @[inline]
 pub fn get_semaphore_fd_khr(
 	device Device,
 	const_pGetFdInfo &SemaphoreGetFdInfoKHR,
-	pFd &int) Result {
+	pFd &i32) Result {
 	return C.vkGetSemaphoreFdKHR(device, const_pGetFdInfo, pFd)
 }
 
@@ -15087,7 +15083,7 @@ pub mut:
 	fence      Fence
 	flags      FenceImportFlags
 	handleType ExternalFenceHandleTypeFlagBits
-	fd         int
+	fd         i32
 }
 
 pub type FenceGetFdInfoKHR = C.VkFenceGetFdInfoKHR
@@ -15116,15 +15112,15 @@ pub fn import_fence_fd_khr(
 
 @[keep_args_alive]
 fn C.vkGetFenceFdKHR(
-	device Device, const_pGetFdInfo &FenceGetFdInfoKHR, pFd &int) Result
+	device Device, const_pGetFdInfo &FenceGetFdInfoKHR, pFd &i32) Result
 
-pub type PFN_vkGetFenceFdKHR = fn (device Device, const_pGetFdInfo &FenceGetFdInfoKHR, pFd &int) Result
+pub type PFN_vkGetFenceFdKHR = fn (device Device, const_pGetFdInfo &FenceGetFdInfoKHR, pFd &i32) Result
 
 @[inline]
 pub fn get_fence_fd_khr(
 	device Device,
 	const_pGetFdInfo &FenceGetFdInfoKHR,
-	pFd &int) Result {
+	pFd &i32) Result {
 	return C.vkGetFenceFdKHR(device, const_pGetFdInfo, pFd)
 }
 
@@ -16181,7 +16177,7 @@ pub fn get_physical_device_fragment_shading_rates_khr(
 fn C.vkCmdSetFragmentShadingRateKHR(
 	commandBuffer CommandBuffer, const_pFragmentSize &Extent2D, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
 
-pub type PFN_vkCmdSetFragmentShadingRateKHR = fn (commandBuffer CommandBuffer, const_pFragmentSize &Extent2D, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
+pub type PFN_vkCmdSetFragmentShadingRateKHR = fn (commandBuffer CommandBuffer, const_pFragmentSize &Extent2D, const_combinerOps &FragmentShadingRateCombinerOpKHR)
 
 @[inline]
 pub fn cmd_set_fragment_shading_rate_khr(
@@ -29265,7 +29261,7 @@ pub mut:
 fn C.vkCmdSetFragmentShadingRateEnumNV(
 	commandBuffer CommandBuffer, shadingRate FragmentShadingRateNV, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
 
-pub type PFN_vkCmdSetFragmentShadingRateEnumNV = fn (commandBuffer CommandBuffer, shadingRate FragmentShadingRateNV, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
+pub type PFN_vkCmdSetFragmentShadingRateEnumNV = fn (commandBuffer CommandBuffer, shadingRate FragmentShadingRateNV, const_combinerOps &FragmentShadingRateCombinerOpKHR)
 
 @[inline]
 pub fn cmd_set_fragment_shading_rate_enum_nv(

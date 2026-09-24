@@ -1,12 +1,12 @@
 #!/usr/bin/env -S v run
 
-// Installs and verifies the native prerequisites used by antono2.vulkan.
+// Installs optional native tooling and verifies the bundled build inputs.
 // Running without arguments performs the installation. Use --check for a
 // read-only diagnostic pass suitable for support requests and CI.
-
 import os
 
-const usage = 'Usage: v run setup.vsh [--install|--check]\n\n' + '  --install  Install native Vulkan development tools and this V module (default).\n' + '  --check    Only report whether the compiler, SDK/headers, loader, and device work.\n'
+const usage = 'Usage: v run setup.vsh [--install|--check]\n\n' +
+	'  --install  Install native Vulkan tools and this V module (default).\n' + '  --check    Report whether the compiler, bundled headers, loader, and device work.\n'
 
 fn command_exists(name string) bool {
 	os.find_abs_path_of_executable(name) or { return false }
@@ -27,22 +27,22 @@ fn run(command string) ! {
 fn install_linux() ! {
 	if command_exists('apt-get') {
 		run('sudo apt-get update')!
-		run('sudo apt-get install -y build-essential libvulkan-dev libvulkan-volk-dev mesa-vulkan-drivers vulkan-tools')!
+		run('sudo apt-get install -y build-essential libvulkan1 mesa-vulkan-drivers vulkan-tools')!
 		return
 	}
 	if command_exists('dnf') {
-		run('sudo dnf install -y gcc gcc-c++ vulkan-headers vulkan-loader-devel volk-devel vulkan-tools mesa-vulkan-drivers')!
+		run('sudo dnf install -y gcc gcc-c++ vulkan-loader vulkan-tools mesa-vulkan-drivers')!
 		return
 	}
 	if command_exists('pacman') {
-		run('sudo pacman -S --needed --noconfirm base-devel vulkan-headers vulkan-icd-loader vulkan-tools volk')!
+		run('sudo pacman -S --needed --noconfirm base-devel vulkan-icd-loader vulkan-tools')!
 		return
 	}
 	if command_exists('zypper') {
-		run('sudo zypper --non-interactive install -y gcc gcc-c++ vulkan-devel vulkan-tools volk-devel')!
+		run('sudo zypper --non-interactive install -y gcc gcc-c++ vulkan-tools')!
 		return
 	}
-	return error('unsupported Linux package manager; install Vulkan headers, the loader, Volk, vulkaninfo, and a Vulkan ICD, then rerun with --check')
+	return error('unsupported Linux package manager; install a C compiler, the Vulkan loader, vulkaninfo, and a Vulkan ICD, then rerun with --check')
 }
 
 fn install_macos() ! {
@@ -55,7 +55,8 @@ fn install_macos() ! {
 	os.mkdir_all(unpacked)!
 	run('curl --fail --location --output ${os.quoted_path(archive)} https://sdk.lunarg.com/sdk/download/latest/mac/vulkan_sdk.zip')!
 	run('ditto -x -k ${os.quoted_path(archive)} ${os.quoted_path(unpacked)}')!
-	found := os.execute('find ${os.quoted_path(unpacked)} -type f -path "*/InstallVulkan*.app/Contents/MacOS/InstallVulkan*" -print -quit')
+	found :=
+		os.execute('find ${os.quoted_path(unpacked)} -type f -path "*/InstallVulkan*.app/Contents/MacOS/InstallVulkan*" -print -quit')
 	installer := found.output.trim_space()
 	if found.exit_code != 0 || installer == '' {
 		return error('the downloaded Vulkan SDK did not contain the expected macOS installer')
@@ -66,7 +67,8 @@ fn install_macos() ! {
 
 fn windows_vulkan_sdk() string {
 	mut candidates := [os.getenv('VULKAN_SDK')]
-	machine_value := os.execute('powershell -NoProfile -Command "[Environment]::GetEnvironmentVariable(\'VULKAN_SDK\', \'Machine\')"')
+	machine_value :=
+		os.execute('powershell -NoProfile -Command "[Environment]::GetEnvironmentVariable(\'VULKAN_SDK\', \'Machine\')"')
 	if machine_value.exit_code == 0 {
 		candidates << machine_value.output.trim_space()
 	}
@@ -115,50 +117,71 @@ fn install_native() ! {
 }
 
 fn find_vulkan_header() string {
-	mut roots := []string{}
-	if sdk := os.getenv_opt('VULKAN_SDK') {
-		roots << sdk
-	}
-	$if windows {
-		if program_files := os.getenv_opt('ProgramFiles') {
-			roots << os.join_path(program_files, 'VulkanSDK')
-		}
-	} $else {
-		roots << ['/usr', '/usr/local', '/opt/homebrew']
-	}
-	for root in roots {
-		for relative in ['include/vulkan/vulkan.h', 'Include/vulkan/vulkan.h'] {
-			candidate := os.join_path(root, relative)
-			if os.is_file(candidate) {
-				return candidate
-			}
-		}
-	}
-	return ''
+	return os.join_path(os.dir(@FILE), 'c', 'vendor', 'include', 'vulkan', 'vulkan.h')
 }
 
 fn find_volk_header() string {
-	mut roots := []string{}
-	if sdk := os.getenv_opt('VULKAN_SDK') {
-		roots << sdk
+	return os.join_path(os.dir(@FILE), 'c', 'vendor', 'volk', 'volk.h')
+}
+
+struct HeaderVersion {
+mut:
+	major int
+	minor int
+	patch int
+}
+
+fn (version HeaderVersion) str() string {
+	return '${version.major}.${version.minor}.${version.patch}'
+}
+
+fn parse_registry_version(text string) ?HeaderVersion {
+	parts := text.trim_space().trim_string_left('v').split('.')
+	if parts.len != 3 {
+		return none
 	}
-	$if windows {
-		if program_files := os.getenv_opt('ProgramFiles') {
-			roots << os.join_path(program_files, 'VulkanSDK')
-		}
-	} $else {
-		roots << ['/usr', '/usr/local', '/opt/homebrew']
+	version := HeaderVersion{
+		major: parts[0].int()
+		minor: parts[1].int()
+		patch: parts[2].int()
 	}
-	for root in roots {
-		for relative in ['include/volk.h', 'include/volk/volk.h', 'Include/volk.h',
-			'Include/volk/volk.h'] {
-			candidate := os.join_path(root, relative)
-			if os.is_file(candidate) {
-				return candidate
+	if version.major == 0 || version.patch == 0 {
+		return none
+	}
+	return version
+}
+
+fn installed_header_version(header string) ?HeaderVersion {
+	core := os.read_file(os.join_path(os.dir(header), 'vulkan_core.h')) or { return none }
+	mut version := HeaderVersion{
+		minor: -1
+	}
+	for line in core.split_into_lines() {
+		trimmed := line.trim_space()
+		if trimmed.starts_with('#define VK_HEADER_VERSION ') {
+			version.patch = trimmed.all_after('#define VK_HEADER_VERSION ').trim_space().int()
+		} else if trimmed.starts_with('#define VK_HEADER_VERSION_COMPLETE VK_MAKE_API_VERSION(') {
+			parts := trimmed.all_after('VK_MAKE_API_VERSION(').all_before(')').split(',')
+			if parts.len == 4 {
+				version.major = parts[1].trim_space().int()
+				version.minor = parts[2].trim_space().int()
 			}
 		}
 	}
-	return ''
+	if version.major == 0 || version.minor < 0 || version.patch == 0 {
+		return none
+	}
+	return version
+}
+
+fn (version HeaderVersion) older_than(other HeaderVersion) bool {
+	if version.major != other.major {
+		return version.major < other.major
+	}
+	if version.minor != other.minor {
+		return version.minor < other.minor
+	}
+	return version.patch < other.patch
 }
 
 fn report_command(name string, required bool) bool {
@@ -182,18 +205,37 @@ fn check() bool {
 		ok = report_command('cc', true) && ok
 	}
 	header := find_vulkan_header()
-	if header == '' {
-		println('[missing] Vulkan headers')
+	if !os.is_file(header) {
+		println('[missing] Bundled Vulkan header: ${header}')
 		ok = false
 	} else {
-		println('[ok]       Vulkan header: ${header}')
+		println('[ok]       Bundled Vulkan header: ${header}')
+		required_text := os.read_file(os.join_path(os.dir(@FILE), 'VERSION')) or { '' }
+		required := parse_registry_version(required_text) or {
+			println('[warning]  Could not read the binding registry version from VERSION')
+			ok = false
+			HeaderVersion{}
+		}
+		bundled := installed_header_version(header) or {
+			println('[warning]  Could not determine the bundled Vulkan header version')
+			ok = false
+			HeaderVersion{}
+		}
+		if required.major > 0 && bundled.major > 0 {
+			if bundled.older_than(required) {
+				println('[outdated]  Bundled Vulkan headers ${bundled}; bindings use registry ${required}')
+				ok = false
+			} else {
+				println('[ok]       Bundled Vulkan headers ${bundled} cover registry ${required}')
+			}
+		}
 	}
 	volk := find_volk_header()
-	if volk == '' {
-		println('[missing] Volk header')
+	if !os.is_file(volk) || !os.is_file(os.join_path(os.dir(volk), 'volk.c')) {
+		println('[missing] Bundled Volk sources: ${os.dir(volk)}')
 		ok = false
 	} else {
-		println('[ok]       Volk header: ${volk}')
+		println('[ok]       Bundled Volk sources: ${os.dir(volk)}')
 	}
 	if command_exists('vulkaninfo') {
 		// Some SDK builds write their update manifest into the process working
@@ -206,13 +248,14 @@ fn check() bool {
 			println('           Install or update the GPU vendor driver; the SDK does not provide a hardware driver.')
 		}
 	} else {
-		println('[warning]  vulkaninfo is unavailable; SDK/loader runtime verification was skipped')
+		println('[warning]  vulkaninfo is unavailable; Vulkan loader/device verification was skipped')
 	}
 	return ok
 }
 
 fn main() {
-	if os.args.len > 2 || (os.args.len == 2 && os.args[1] !in ['--install', '--check', '-h', '--help']) {
+	if os.args.len > 2
+		|| (os.args.len == 2 && os.args[1] !in ['--install', '--check', '-h', '--help']) {
 		eprintln(usage)
 		exit(2)
 	}
@@ -237,5 +280,5 @@ fn main() {
 		eprintln('\nSetup is incomplete. Resolve the missing items above and rerun with --check.')
 		exit(1)
 	}
-	println('\nVulkan development prerequisites are ready.')
+	println('\nVulkan module build prerequisites are ready; check runtime warnings above.')
 }
