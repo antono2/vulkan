@@ -432,7 +432,7 @@ pub fn (mut buffer OwnedBuffer) destroy() {
 }
 
 // OwnedImage owns a two-dimensional VkImage and its bound VkDeviceMemory.
-// The image uses one mip level, one array layer, and one sample.
+// The image uses one array layer and one sample.
 @[nocopy]
 pub struct OwnedImage {
 	device    vk.Device
@@ -443,6 +443,7 @@ pub mut:
 pub:
 	format            vk.Format
 	extent            vk.Extent3D
+	mip_levels        u32 = 1
 	tiling            vk.ImageTiling
 	usage             vk.ImageUsageFlags
 	allocation_size   vk.DeviceSize
@@ -453,8 +454,18 @@ pub:
 // all required properties, allocates it, and binds it at offset zero.
 pub fn (device &OwnedDevice) new_image_2d(width u32, height u32, format vk.Format, tiling vk.ImageTiling,
 	usage vk.ImageUsageFlags, required_memory_properties vk.MemoryPropertyFlags) !&OwnedImage {
+	return device.new_image_2d_mips(width, height, 1, format, tiling, usage, required_memory_properties)
+}
+
+// new_image_2d_mips creates an image with a complete or partial mip chain.
+pub fn (device &OwnedDevice) new_image_2d_mips(width u32, height u32, mip_levels u32,
+	format vk.Format, tiling vk.ImageTiling, usage vk.ImageUsageFlags,
+	required_memory_properties vk.MemoryPropertyFlags) !&OwnedImage {
 	if width == 0 || height == 0 {
 		return error('image width and height must be greater than zero')
+	}
+	if mip_levels == 0 || mip_levels > max_image_mip_levels(width, height) {
+		return error('image mip level count exceeds extent')
 	}
 	if usage == 0 {
 		return error('image usage must not be empty')
@@ -468,7 +479,7 @@ pub fn (device &OwnedDevice) new_image_2d(width u32, height u32, format vk.Forma
 		imageType:     ._2d
 		format:        format
 		extent:        extent
-		mipLevels:     1
+		mipLevels:     mip_levels
 		arrayLayers:   1
 		samples:       ._1
 		tiling:        tiling
@@ -510,11 +521,22 @@ pub fn (device &OwnedDevice) new_image_2d(width u32, height u32, format vk.Forma
 		memory:            memory
 		format:            format
 		extent:            extent
+		mip_levels:        mip_levels
 		tiling:            tiling
 		usage:             usage
 		allocation_size:   requirements.size
 		memory_type_index: memory_type_index
 	}
+}
+
+fn max_image_mip_levels(width u32, height u32) u32 {
+	mut largest := if width > height { width } else { height }
+	mut levels := u32(0)
+	for largest > 0 {
+		levels++
+		largest >>= 1
+	}
+	return levels
 }
 
 // destroy first destroys the image, then frees its bound memory. Repeated
@@ -530,11 +552,11 @@ pub fn (mut image OwnedImage) destroy() {
 	}
 }
 
-fn single_image_subresource_range(aspect_mask vk.ImageAspectFlags) vk.ImageSubresourceRange {
+fn image_subresource_range(aspect_mask vk.ImageAspectFlags, base_mip_level u32, level_count u32) vk.ImageSubresourceRange {
 	return vk.ImageSubresourceRange{
 		aspectMask:     aspect_mask
-		baseMipLevel:   0
-		levelCount:     1
+		baseMipLevel:   base_mip_level
+		levelCount:     level_count
 		baseArrayLayer: 0
 		layerCount:     1
 	}
@@ -560,17 +582,25 @@ pub:
 	subresource_range vk.ImageSubresourceRange
 }
 
-// new_view creates an identity-swizzled 2D view over the image's single mip
-// level and array layer. The aspect mask remains explicit because it depends
-// on how the image format will be used.
+// new_view creates an identity-swizzled 2D view over every mip level.
 pub fn (image &OwnedImage) new_view(aspect_mask vk.ImageAspectFlags) !&OwnedImageView {
+	return image.new_view_mips(aspect_mask, 0, image.mip_levels)
+}
+
+// new_view_mips creates a view over a validated contiguous mip range.
+pub fn (image &OwnedImage) new_view_mips(aspect_mask vk.ImageAspectFlags, base_mip_level u32,
+	level_count u32) !&OwnedImageView {
 	if aspect_mask == 0 {
 		return error('image view aspect mask must not be empty')
+	}
+	if level_count == 0 || base_mip_level >= image.mip_levels
+		|| level_count > image.mip_levels - base_mip_level {
+		return error('image view mip range exceeds image')
 	}
 	if !image_usage_supports_view(image.usage) {
 		return error('image usage does not support image views')
 	}
-	subresource_range := single_image_subresource_range(aspect_mask)
+	subresource_range := image_subresource_range(aspect_mask, base_mip_level, level_count)
 	create_info := vk.ImageViewCreateInfo{
 		image:            image.handle
 		viewType:         ._2d
@@ -620,11 +650,18 @@ pub:
 	dst_access_mask  vk.AccessFlags
 	dependency_flags vk.DependencyFlags
 	aspect_mask      vk.ImageAspectFlags
+	base_mip_level   u32
+	level_count      u32 // zero selects all levels from base_mip_level
 }
 
 // image_memory_barrier builds the raw barrier used by transition_image_layout.
-// It covers the OwnedImage's single mip level and array layer.
+// It covers the selected mip levels and the image's single array layer.
 pub fn (transition ImageLayoutTransition) image_memory_barrier(image &OwnedImage) vk.ImageMemoryBarrier {
+	level_count := if transition.level_count == 0 {
+		image.mip_levels - transition.base_mip_level
+	} else {
+		transition.level_count
+	}
 	return vk.ImageMemoryBarrier{
 		srcAccessMask:       transition.src_access_mask
 		dstAccessMask:       transition.dst_access_mask
@@ -633,7 +670,8 @@ pub fn (transition ImageLayoutTransition) image_memory_barrier(image &OwnedImage
 		srcQueueFamilyIndex: vk.queue_family_ignored
 		dstQueueFamilyIndex: vk.queue_family_ignored
 		image:               image.handle
-		subresourceRange:    single_image_subresource_range(transition.aspect_mask)
+		subresourceRange:    image_subresource_range(transition.aspect_mask, transition.base_mip_level,
+			level_count)
 	}
 }
 
@@ -643,6 +681,10 @@ pub fn (transition ImageLayoutTransition) image_memory_barrier(image &OwnedImage
 pub fn (buffer &PrimaryCommandBuffer) transition_image_layout(image &OwnedImage, transition ImageLayoutTransition) ! {
 	if transition.aspect_mask == 0 {
 		return error('image transition aspect mask must not be empty')
+	}
+	if transition.base_mip_level >= image.mip_levels || (transition.level_count > 0
+		&& transition.level_count > image.mip_levels - transition.base_mip_level) {
+		return error('image transition mip range exceeds image')
 	}
 	barrier := transition.image_memory_barrier(image)
 	vk.cmd_pipeline_barrier(buffer.handle, transition.src_stage_mask, transition.dst_stage_mask,
