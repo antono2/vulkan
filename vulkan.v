@@ -6374,7 +6374,7 @@ pub fn cmd_set_depth_bias(
 fn C.vkCmdSetBlendConstants(
 	commandBuffer CommandBuffer, const_blendConstants [4]f32)
 
-pub type PFN_vkCmdSetBlendConstants = fn (commandBuffer CommandBuffer, const_blendConstants [4]f32)
+pub type PFN_vkCmdSetBlendConstants = fn (commandBuffer CommandBuffer, const_blendConstants &f32)
 
 @[inline]
 pub fn cmd_set_blend_constants(
@@ -14446,7 +14446,6 @@ $if vulkan_win32 ? {
 
 pub const khr_external_memory_fd_spec_version = 1
 pub const khr_external_memory_fd_extension_name = c'VK_KHR_external_memory_fd'
-
 // ImportMemoryFdInfoKHR extends VkMemoryAllocateInfo
 pub type ImportMemoryFdInfoKHR = C.VkImportMemoryFdInfoKHR
 
@@ -16178,7 +16177,7 @@ pub fn get_physical_device_fragment_shading_rates_khr(
 fn C.vkCmdSetFragmentShadingRateKHR(
 	commandBuffer CommandBuffer, const_pFragmentSize &Extent2D, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
 
-pub type PFN_vkCmdSetFragmentShadingRateKHR = fn (commandBuffer CommandBuffer, const_pFragmentSize &Extent2D, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
+pub type PFN_vkCmdSetFragmentShadingRateKHR = fn (commandBuffer CommandBuffer, const_pFragmentSize &Extent2D, const_combinerOps &FragmentShadingRateCombinerOpKHR)
 
 @[inline]
 pub fn cmd_set_fragment_shading_rate_khr(
@@ -29262,7 +29261,7 @@ pub mut:
 fn C.vkCmdSetFragmentShadingRateEnumNV(
 	commandBuffer CommandBuffer, shadingRate FragmentShadingRateNV, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
 
-pub type PFN_vkCmdSetFragmentShadingRateEnumNV = fn (commandBuffer CommandBuffer, shadingRate FragmentShadingRateNV, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
+pub type PFN_vkCmdSetFragmentShadingRateEnumNV = fn (commandBuffer CommandBuffer, shadingRate FragmentShadingRateNV, const_combinerOps &FragmentShadingRateCombinerOpKHR)
 
 @[inline]
 pub fn cmd_set_fragment_shading_rate_enum_nv(
