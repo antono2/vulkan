@@ -16181,7 +16181,7 @@ pub fn get_physical_device_fragment_shading_rates_khr(
 fn C.vkCmdSetFragmentShadingRateKHR(
 	commandBuffer CommandBuffer, const_pFragmentSize &Extent2D, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
 
-pub type PFN_vkCmdSetFragmentShadingRateKHR = fn (commandBuffer CommandBuffer, const_pFragmentSize &Extent2D, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
+pub type PFN_vkCmdSetFragmentShadingRateKHR = fn (commandBuffer CommandBuffer, const_pFragmentSize &Extent2D, const_combinerOps &FragmentShadingRateCombinerOpKHR)
 
 @[inline]
 pub fn cmd_set_fragment_shading_rate_khr(
@@ -29265,7 +29265,7 @@ pub mut:
 fn C.vkCmdSetFragmentShadingRateEnumNV(
 	commandBuffer CommandBuffer, shadingRate FragmentShadingRateNV, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
 
-pub type PFN_vkCmdSetFragmentShadingRateEnumNV = fn (commandBuffer CommandBuffer, shadingRate FragmentShadingRateNV, const_combinerOps [2]FragmentShadingRateCombinerOpKHR)
+pub type PFN_vkCmdSetFragmentShadingRateEnumNV = fn (commandBuffer CommandBuffer, shadingRate FragmentShadingRateNV, const_combinerOps &FragmentShadingRateCombinerOpKHR)
 
 @[inline]
 pub fn cmd_set_fragment_shading_rate_enum_nv(
