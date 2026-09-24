@@ -289,7 +289,7 @@ pub fn (pool &OwnedCommandPool) allocate_primary(count u32) ![]&PrimaryCommandBu
 		commandBufferCount: count
 	}
 	mut handles := unsafe { []vk.CommandBuffer{len: int(count)} }
-	require_success(vk.allocate_command_buffers(pool.device, &allocate_info, handles.data),
+	require_success(vk.allocate_command_buffers(pool.device, &allocate_info, unsafe { &handles[0] }),
 		'vkAllocateCommandBuffers')!
 
 	mut buffers := []&PrimaryCommandBuffer{cap: int(count)}
@@ -825,14 +825,15 @@ pub fn (instance &OwnedInstance) physical_devices() ![]PhysicalDevice {
 		}
 
 		mut handles := unsafe { []vk.PhysicalDevice{len: int(count)} }
-		result := vk.enumerate_physical_devices(instance.handle, &count, handles.data)
+		result := vk.enumerate_physical_devices(instance.handle, &count, unsafe { &handles[0] })
 		if result == .incomplete {
 			continue
 		}
 		require_success(result, 'vkEnumeratePhysicalDevices(values)')!
 
 		mut devices := []PhysicalDevice{cap: int(count)}
-		for handle in handles[..int(count)] {
+		for index in 0 .. int(count) {
+			handle := handles[index]
 			mut properties := vk.PhysicalDeviceProperties{}
 			vk.get_physical_device_properties(handle, mut properties)
 			devices << PhysicalDevice{
