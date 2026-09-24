@@ -354,6 +354,22 @@ fn test_new_image_2d_rejects_empty_usage_before_calling_vulkan() {
 	assert false
 }
 
+fn test_new_image_2d_mips_rejects_invalid_count_before_calling_vulkan() {
+	device := OwnedDevice{
+		handle: vk.Device(unsafe { nil })
+	}
+	usage := u32(vk.ImageUsageFlagBits.sampled)
+	for count in [u32(0), 5] {
+		device.new_image_2d_mips(8, 4, count, .r8g8b8a8_unorm, .optimal, usage,
+			0) or {
+			assert err.msg() == 'image mip level count exceeds extent'
+			continue
+		}
+		assert false
+	}
+	assert max_image_mip_levels(8, 4) == 4
+}
+
 fn test_owned_image_exposes_creation_and_allocation_metadata() {
 	extent := vk.Extent3D{
 		width:  640
@@ -374,6 +390,7 @@ fn test_owned_image_exposes_creation_and_allocation_metadata() {
 	assert image.format == .r8g8b8a8_unorm
 	assert image.extent.width == 640
 	assert image.extent.height == 480
+	assert image.mip_levels == 1
 	assert image.allocation_size == 4096
 	assert image.memory_type_index == 2
 }
@@ -403,6 +420,22 @@ fn test_new_image_view_rejects_transfer_only_usage_before_calling_vulkan() {
 		return
 	}
 	assert false
+}
+
+fn test_new_image_view_rejects_invalid_mip_range_before_calling_vulkan() {
+	image := OwnedImage{
+		device:     vk.Device(unsafe { nil })
+		handle:     vk.Image(unsafe { nil })
+		format:     .r8g8b8a8_unorm
+		mip_levels: 4
+	}
+	for count in [u32(0), 4] {
+		image.new_view_mips(u32(vk.ImageAspectFlagBits.color), 1, count) or {
+			assert err.msg() == 'image view mip range exceeds image'
+			continue
+		}
+		assert false
+	}
 }
 
 fn test_image_view_accepts_every_usage_permitted_by_vuid_04441() {
@@ -440,7 +473,7 @@ fn test_owned_image_view_exposes_parent_and_subresource_metadata() {
 		image:             image_handle
 		format:            .r8g8b8a8_unorm
 		view_type:         ._2d
-		subresource_range: single_image_subresource_range(color)
+		subresource_range: image_subresource_range(color, 0, 1)
 	}
 
 	assert view.handle == view_handle
@@ -482,6 +515,26 @@ fn test_image_layout_transition_builds_explicit_single_subresource_barrier() {
 	assert barrier.subresourceRange.layerCount == 1
 }
 
+fn test_image_layout_transition_selects_mip_range() {
+	image := OwnedImage{
+		handle:     vk.Image(unsafe { nil })
+		mip_levels: 4
+	}
+	transition := ImageLayoutTransition{
+		aspect_mask:    u32(vk.ImageAspectFlagBits.color)
+		base_mip_level: 1
+		level_count:    2
+	}
+	barrier := transition.image_memory_barrier(image)
+	assert barrier.subresourceRange.baseMipLevel == 1
+	assert barrier.subresourceRange.levelCount == 2
+	all_remaining := ImageLayoutTransition{
+		aspect_mask:    u32(vk.ImageAspectFlagBits.color)
+		base_mip_level: 1
+	}
+	assert all_remaining.image_memory_barrier(image).subresourceRange.levelCount == 3
+}
+
 fn test_transition_image_layout_rejects_empty_aspect_before_calling_vulkan() {
 	buffer := PrimaryCommandBuffer{
 		handle: vk.CommandBuffer(unsafe { nil })
@@ -498,4 +551,26 @@ fn test_transition_image_layout_rejects_empty_aspect_before_calling_vulkan() {
 		return
 	}
 	assert false
+}
+
+fn test_transition_image_layout_rejects_invalid_mip_range_before_calling_vulkan() {
+	buffer := PrimaryCommandBuffer{
+		handle: vk.CommandBuffer(unsafe { nil })
+	}
+	image := OwnedImage{
+		handle:     vk.Image(unsafe { nil })
+		mip_levels: 4
+	}
+	for base in [u32(4), 3] {
+		transition := ImageLayoutTransition{
+			aspect_mask:    u32(vk.ImageAspectFlagBits.color)
+			base_mip_level: base
+			level_count:    2
+		}
+		buffer.transition_image_layout(image, transition) or {
+			assert err.msg() == 'image transition mip range exceeds image'
+			continue
+		}
+		assert false
+	}
 }
