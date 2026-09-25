@@ -6,6 +6,21 @@ in `VERSION`.
 
 ## Unreleased
 
+## 3.2.0 - 2026-09-25
+
+### Added
+
+- Support mip ranges in ergonomic image creation and transitions.
+
+### Fixed
+
+- Generate pointer parameters for Vulkan callback array typedefs so current V3
+  can compile the bindings.
+- Pass Vulkan handle array storage to physical-device enumeration and command
+  buffer allocation.
+
+## 3.0.0 - 2026-09-22
+
 ### Fixed
 
 - Spell `LogicOp.or_` with a trailing underscore because `or` is a V3 keyword.
