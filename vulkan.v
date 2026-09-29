@@ -40,7 +40,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 363
+pub const header_version = 364
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -3871,6 +3871,7 @@ pub mut:
 	pSpecializationInfo &SpecializationInfo
 }
 
+// ComputePipelineCreateInfo extends VkPipelineCreateInfoKHR
 pub type ComputePipelineCreateInfo = C.VkComputePipelineCreateInfo
 
 @[typedef]
@@ -4275,6 +4276,7 @@ pub mut:
 	pScissors     &Rect2D
 }
 
+// GraphicsPipelineCreateInfo extends VkPipelineCreateInfoKHR
 pub type GraphicsPipelineCreateInfo = C.VkGraphicsPipelineCreateInfo
 
 @[typedef]
@@ -19857,7 +19859,7 @@ pub type AccessFlagBits3KHR = u64
 
 pub const access_3_none_khr = u64(0)
 
-// MemoryBarrierAccessFlags3KHR extends VkSubpassDependency2,VkBufferMemoryBarrier2,VkImageMemoryBarrier2,VkMemoryRangeBarriersInfoKHR
+// MemoryBarrierAccessFlags3KHR extends VkSubpassDependency2,VkBufferMemoryBarrier2,VkImageMemoryBarrier2,VkMemoryBarrier2,VkMemoryRangeBarrierKHR
 pub type MemoryBarrierAccessFlags3KHR = C.VkMemoryBarrierAccessFlags3KHR
 
 @[typedef]
@@ -23143,6 +23145,7 @@ $if vulkan_provisional ? {
 		sizeGranularity DeviceSize
 	}
 
+	// ExecutionGraphPipelineCreateInfoAMDX extends VkPipelineCreateInfoKHR
 	pub type ExecutionGraphPipelineCreateInfoAMDX = C.VkExecutionGraphPipelineCreateInfoAMDX
 
 	@[typedef]
@@ -38934,6 +38937,7 @@ pub mut:
 	maxPipelineRayHitAttributeSize u32
 }
 
+// RayTracingPipelineCreateInfoKHR extends VkPipelineCreateInfoKHR
 pub type RayTracingPipelineCreateInfoKHR = C.VkRayTracingPipelineCreateInfoKHR
 
 @[typedef]
