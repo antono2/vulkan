@@ -60,7 +60,7 @@ jobs:
           }
           for path in "${changed[@]}"; do
             case "$path" in
-              VERSION|REGISTRY_COMMIT|vulkan.v|vulkan_video.v) ;;
+              VERSION|REGISTRY_COMMIT|vulkan.v|vulkan_video.v|c/vendor/include/vulkan/*.h|c/vendor/include/vk_video/*.h) ;;
               *)
                 echo "Unexpected file in generated update: $path" >&2
                 exit 1
@@ -166,6 +166,9 @@ jobs:
           while IFS= read -r -d '' header; do
             cmp "$header" "c/vendor/include/${header#"$registry_checkout/include/"}"
           done < <(find "$registry_checkout/include/vulkan" "$registry_checkout/include/vk_video" -name '*.h' -print0)
+          while IFS= read -r -d '' header; do
+            test -f "$registry_checkout/include/${header#c/vendor/include/}"
+          done < <(find c/vendor/include/vulkan c/vendor/include/vk_video -name '*.h' -print0)
           registry_version=$(tr -d '\r\n' < VERSION)
           [[ "$registry_version" =~ ^v[0-9]+\.[0-9]+\.([0-9]+)$ ]] || {
             echo "Invalid Vulkan registry version: $registry_version" >&2
@@ -203,7 +206,9 @@ jobs:
           EOF
           VULKAN_SDK="$old_sdk" v run setup.vsh --check > "$RUNNER_TEMP/old-header-check.log"
           cat "$RUNNER_TEMP/old-header-check.log"
-          grep -F '[ok]       Bundled Vulkan headers 1.4.363 cover registry 1.4.363' \
+          registry_version=$(tr -d '\r\n' < VERSION)
+          expected="Bundled Vulkan headers ${registry_version#v} cover registry ${registry_version#v}"
+          grep -F "$expected" \
             "$RUNNER_TEMP/old-header-check.log"
       - name: Assemble isolated module
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
