@@ -83,7 +83,7 @@ jobs:
             v-channel: master
             v-version: master
           - os: ubuntu-24.04
-            compiler: gcc
+            compiler: tcc
             v-channel: v3
             v-version: efae23e85b3772a28e62884d554c1e88f91f52f4
           - os: macos-14
