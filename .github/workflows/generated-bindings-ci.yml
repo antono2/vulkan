@@ -83,9 +83,9 @@ jobs:
             v-channel: master
             v-version: master
           - os: ubuntu-24.04
-            compiler: gcc
+            compiler: tcc
             v-channel: v3
-            v-version: f59b886d2564e37d8626d715236fdfa928e13dda
+            v-version: efae23e85b3772a28e62884d554c1e88f91f52f4
           - os: macos-14
             compiler: clang
             v-channel: stable
@@ -123,7 +123,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: vlang/vc
-          ref: 4598bc7e4894c154b27391e4442005fff2fbbd68
+          ref: 2cbaf6bc2367937cd5f0b4ef923d1ef9aad613b3
           path: .ci-v-source/vc
           fetch-depth: 1
       - name: Check out the matching v3 TinyCC runtime
