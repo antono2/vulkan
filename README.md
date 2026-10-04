@@ -1,6 +1,5 @@
+# Vulkan bindings for [V](https://vlang.io/)
 
-
-# Vulkan Bindings for [V](https://vlang.io/)
 [Project portfolio](https://oreskin.de/projects_en.php)
 
 [![Validate Vulkan bindings](https://github.com/antono2/vulkan/actions/workflows/generated-bindings-ci.yml/badge.svg)](https://github.com/antono2/vulkan/actions/workflows/generated-bindings-ci.yml)
@@ -13,12 +12,25 @@ The package follows the semantic version in `v.mod`; `VERSION` records the
 Vulkan registry snapshot, while `REGISTRY_COMMIT` and `VOLK_COMMIT` make the
 bundled header and loader inputs reproducible.
 
-## One-command setup
+## Install and setup
 
-Install native Vulkan tools and this V module:
+Install the current bindings in your V module directory:
 
 ```sh
-v run ~/.vmodules/antono2/vulkan/setup.vsh
+v install antono2.vulkan
+```
+
+This installs the repository's current default branch. For reproducible builds,
+select a package tag from the [releases](https://github.com/antono2/vulkan/releases)
+and append `@<tag>` to the module name in your install command or `v.mod`.
+Package versions and Khronos registry versions are separate; `v.mod` and
+`VERSION` record them respectively.
+
+Then install or verify native runtime tools using the setup script at the
+default V module location:
+
+```sh
+v run "$HOME/.vmodules/antono2/vulkan/setup.vsh"
 ```
 
 From a source checkout, use `v run setup.vsh`. The script supports Ubuntu and
@@ -47,32 +59,7 @@ The SDK and loader cannot supply a hardware Vulkan implementation. If
 vendor's driver. CI verifies the bundled headers and Volk against the pinned
 upstream revisions recorded by this repository.
 
-## Supported toolchains
-
-| Platform | V compiler | C compiler | Validation level |
-| --- | --- | --- | --- |
-| Ubuntu 24.04 | V 0.5.2 | GCC and TinyCC | Compile, unit tests, and validation-layer lifecycle run |
-| macOS 14 | V 0.5.2 | Clang | Compile and unit tests |
-| Windows Server 2022 | V 0.5.2 | MSVC | Compile and unit tests |
-| Ubuntu 24.04 | Current V master | GCC | Advisory compatibility lane |
-| Ubuntu 24.04 | Pinned strict V3 | GCC | Required frontend; advisory C backend |
-
-V 0.5.2 is the supported baseline. The generated registry snapshot determines
-which declarations are available; the installed Vulkan loader and driver must
-still support every command, extension, and feature an application requests.
-Current V master selects V3 by default and can fall back to its V 0.5.2
-compatibility compiler. CI therefore requires the pinned strict
-`-new-compiler` frontend to parse and type-check the public module. Its full C
-backend remains advisory while compiler compatibility is being verified.
-The unpinned moving-master lane is also advisory
-so an unrelated upstream compiler regression cannot block Vulkan maintenance.
-
-## Install
-Download the latest bindings to your local `.vmodules` directory:
-
-```
-v install antono2.vulkan
-```
+## First use
 
 Applications using the binding directly must initialize Volk before the first
 Vulkan call, then load instance- and device-level commands after creating the
@@ -213,10 +200,41 @@ VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
   v run examples/ergonomic_lifecycle
 ```
 
-## Generate
-The generator is located at [antono2/v_vulkan_bindings](https://github.com/antono2/v_vulkan_bindings)
+## Supported toolchains
 
-# Thanks
+The [validation workflow](.github/workflows/generated-bindings-ci.yml) records
+the exact compiler, runner, registry, and loader pins used for CI.
+
+| Platform | Compiler lane | Validation |
+| --- | --- | --- |
+| Linux | Pinned release V, GCC and TinyCC | Compile, unit tests, and validation-layer lifecycle run |
+| macOS | Pinned release V, Clang | Compile and unit tests |
+| Windows | Pinned release V, MSVC | Compile and unit tests |
+| Linux | Pinned V3, TinyCC | Required strict frontend checks; advisory C backend smoke tests |
+| Linux | Current V master, GCC | Advisory compiler compatibility checks |
+
+Current V master selects V3 by default and can fall back to its compatibility
+compiler. The separate pinned V3 lane requires `-new-compiler` frontend checks
+so that fallback cannot hide type-checking failures. Its C backend and the
+moving-master lane remain advisory while compiler compatibility is verified.
+
+The generated registry snapshot determines which declarations are available.
+The installed Vulkan loader and driver must still support every command,
+extension, and feature an application requests. Successful compilation alone
+does not establish runtime device support.
+
+## Generate and maintain
+
+The generator is maintained in
+[`antono2/v_vulkan_bindings`](https://github.com/antono2/v_vulkan_bindings).
+Its scheduled updater proposes registry and bundled-header changes for review;
+package release tags are prepared separately after CI passes. Keep README
+instructions aligned with these workflows. Link to release metadata and CI
+pins for changing version details, and retain explicit historical versions only
+where they explain compatibility.
+
+## Thanks
+
 - [Delyan Angelov (@spytheman)](https://github.com/spytheman) — for fixing my bugs in the early days.
 - [Jalon Solov (@JalonSolov)](https://github.com/JalonSolov) — for quick and solid answers to obscure questions.
 - [Alexander Medvednikov (@medvednikov)](https://github.com/medvednikov) — for creating V and relentless productivity.
