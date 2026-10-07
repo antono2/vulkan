@@ -40,7 +40,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 364
+pub const header_version = 365
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -1456,6 +1456,7 @@ pub enum StructureType as u32 {
 	physical_device_extended_flags_features_khr                                 = 1000668004
 	image_stencil_usage2_create_info_khr                                        = 1000668005
 	shared_present_surface_capabilities2_khr                                    = 1000668006
+	physical_device_cooperative_matrix_layouts_features_arm                     = 1000670000
 	physical_device_shader_ocp_microscaling_types_features_ext                  = 1000672000
 	physical_device_shader_mixed_float_dot_product_features_valve               = 1000673000
 	physical_device_throttle_hint_features_sec                                  = 1000674000
@@ -38195,6 +38196,19 @@ $if vulkan_ubm ? {
 		return C.vkGetPhysicalDeviceUbmPresentationSupportSEC(physicalDevice, queueFamilyIndex,
 			device)
 	}
+}
+
+pub const arm_cooperative_matrix_layouts_spec_version = 1
+pub const arm_cooperative_matrix_layouts_extension_name = c'VK_ARM_cooperative_matrix_layouts'
+// PhysicalDeviceCooperativeMatrixLayoutsFeaturesARM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceCooperativeMatrixLayoutsFeaturesARM = C.VkPhysicalDeviceCooperativeMatrixLayoutsFeaturesARM
+
+@[typedef]
+pub struct C.VkPhysicalDeviceCooperativeMatrixLayoutsFeaturesARM {
+pub mut:
+	sType                       StructureType = StructureType.physical_device_cooperative_matrix_layouts_features_arm
+	pNext                       voidptr       = unsafe { nil }
+	cooperativeMatrixArmLayouts Bool32
 }
 
 pub const ext_shader_ocp_microscaling_types_spec_version = 1
