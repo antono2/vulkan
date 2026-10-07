@@ -239,3 +239,21 @@ where they explain compatibility.
 - [Jalon Solov (@JalonSolov)](https://github.com/JalonSolov) — for quick and solid answers to obscure questions.
 - [Alexander Medvednikov (@medvednikov)](https://github.com/medvednikov) — for creating V and relentless productivity.
 - The awesome team at [V](https://vlang.io/) — for making this possible.
+
+## Source navigation
+
+`vulkan.v` and `vulkan_video.v` are registry-generated API declarations. Update their
+source in [`v_vulkan_bindings`](https://github.com/antono2/v_vulkan_bindings)
+rather than editing individual declarations. Keep registry versions and
+regeneration changes separate from handwritten convenience-layer edits.
+
+[`loader.v`](loader.v) selects and initializes native dispatch; [`c/`](c/)
+contains the local bridge to Volk. [`ergonomic/`](ergonomic/) contains discovery,
+configuration, allocation and resource-lifetime helpers. Start with
+[`examples/`](examples/) for their initialization and cleanup order, and
+[`ci/`](ci/) for loader and ABI smoke checks. Vendored headers retain their
+upstream license and provenance comments.
+
+The committed generated snapshots retain their existing headers for now; the
+generator owns new purpose and regeneration comments. Refresh them through a
+reviewed registry regeneration, not a manual edit of generated declarations.

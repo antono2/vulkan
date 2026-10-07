@@ -1,3 +1,5 @@
+// Queries surface support and selects presentation settings.
+// Wraps swapchain-related resources while retaining explicit Vulkan lifetime rules.
 module ergonomic
 
 import antono2.vulkan as vk

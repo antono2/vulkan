@@ -1,3 +1,4 @@
+// Checks buffer ranges, coherent writes, shader validation, and cleared-resource cleanup.
 module ergonomic
 
 import antono2.vulkan as vk

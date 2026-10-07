@@ -1,3 +1,5 @@
+// Exercises the opt-in resource lifecycle API on a real Vulkan device.
+// A software Vulkan implementation can be used for headless validation.
 module main
 
 import antono2.vulkan as vk

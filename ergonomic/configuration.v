@@ -1,3 +1,5 @@
+// Builds validated instance and device creation options.
+// Plans queue requests and checks requested extension/layer names before Vulkan calls.
 module ergonomic
 
 import antono2.vulkan as vk

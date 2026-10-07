@@ -1,3 +1,4 @@
+// Checks option validation, extension names, and device queue planning without a GPU.
 module ergonomic
 
 import antono2.vulkan as vk

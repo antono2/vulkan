@@ -1,3 +1,5 @@
+// Initializes Volk and loads instance/device command tables for raw Vulkan calls.
+// Call the appropriate loader step before using commands for each handle level.
 module vulkan
 
 fn C.v_vulkan_initialize_loader() Result

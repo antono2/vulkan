@@ -1,3 +1,4 @@
+// Checks format, presentation-mode, extent, and swapchain option selection.
 module ergonomic
 
 import antono2.vulkan as vk

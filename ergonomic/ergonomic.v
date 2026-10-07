@@ -1,3 +1,5 @@
+// Opt-in owned Vulkan handles, result errors, and lifecycle helpers.
+// Explicit close methods release resources; parent objects must outlive their children.
 module ergonomic
 
 import antono2.vulkan as vk

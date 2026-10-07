@@ -1,3 +1,4 @@
+// Compile probe for Vulkan Xlib extension types enabled by the platform flag.
 module main
 
 import antono2.vulkan as vk

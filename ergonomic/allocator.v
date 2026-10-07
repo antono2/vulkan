@@ -1,3 +1,5 @@
+// Retains optional host allocation callbacks for owned Vulkan resources.
+// Copies the callback structure so cleanup uses the same allocator configuration.
 module ergonomic
 
 import antono2.vulkan as vk

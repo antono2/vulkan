@@ -1,3 +1,5 @@
+// Checks that the module compiles against its bundled Vulkan headers.
+// Exercises representative declarations without requiring device creation.
 module main
 
 import antono2.vulkan as vk
