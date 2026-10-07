@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Prepares Vulkan SDK and software-driver artifacts for CI on supported hosts.
 
 set -euo pipefail
 

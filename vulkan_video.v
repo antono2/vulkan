@@ -22,6 +22,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+// Registry-generated Vulkan declarations; native handles follow Vulkan lifetime rules.
+// Regenerate in antono2/v_vulkan_bindings with scripts/generate.sh (or .ps1).
+// Do not edit declarations here; change src/vgenerator.py and the registry input.
 module vulkan
 
 pub fn make_video_std_version(major u32, minor u32, patch u32) u32 {

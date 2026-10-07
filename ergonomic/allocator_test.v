@@ -1,3 +1,4 @@
+// Checks optional allocation callbacks and copying of their structure.
 module ergonomic
 
 import antono2.vulkan as vk

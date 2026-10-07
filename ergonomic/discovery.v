@@ -1,3 +1,5 @@
+// Enumerates instance/device capabilities into V-owned descriptions.
+// Provides extension, layer, and queue-family selection support.
 module ergonomic
 
 import antono2.vulkan as vk

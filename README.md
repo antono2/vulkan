@@ -239,3 +239,25 @@ where they explain compatibility.
 - [Jalon Solov (@JalonSolov)](https://github.com/JalonSolov) — for quick and solid answers to obscure questions.
 - [Alexander Medvednikov (@medvednikov)](https://github.com/medvednikov) — for creating V and relentless productivity.
 - The awesome team at [V](https://vlang.io/) — for making this possible.
+
+## Source navigation
+
+`vulkan.v` and `vulkan_video.v` are registry-generated API declarations. Update their
+source in [`v_vulkan_bindings`](https://github.com/antono2/v_vulkan_bindings)
+rather than editing individual declarations. Keep registry versions and
+regeneration changes separate from handwritten convenience-layer edits.
+
+[`loader.v`](loader.v) selects and initializes native dispatch; [`c/`](c/)
+contains the local bridge to Volk. [`ergonomic/`](ergonomic/) contains discovery,
+configuration, allocation and resource-lifetime helpers. Start with
+[`examples/`](examples/) for their initialization and cleanup order, and
+[`ci/`](ci/) for loader and ABI smoke checks. Vendored headers retain their
+upstream license and provenance comments.
+
+The generator owns the purpose and regeneration comments in both generated
+files. These introductions were regenerated from Vulkan-Docs tag `v1.4.365`
+(commit `8c9361ba8180c1f4164c0bf79de2f6e817770b0d`), with all declarations
+verified unchanged. Select Vulkan-Docs using this module's `VERSION`; the
+generator repository's historical default snapshot may be older. Despite its
+name, `REGISTRY_COMMIT` pins **Vulkan-Headers**, not Vulkan-Docs. Keep that C-header
+pin and `VOLK_COMMIT` aligned with the inputs described in [the vendor guide](c/vendor/README.md).

@@ -1,3 +1,5 @@
+// Provides checked mapped-buffer access and owned shader/resource helpers.
+// Validates ranges and input data before invoking the Vulkan driver.
 module ergonomic
 
 import antono2.vulkan as vk
