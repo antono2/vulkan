@@ -254,6 +254,10 @@ configuration, allocation and resource-lifetime helpers. Start with
 [`ci/`](ci/) for loader and ABI smoke checks. Vendored headers retain their
 upstream license and provenance comments.
 
-The committed generated snapshots retain their existing headers for now; the
-generator owns new purpose and regeneration comments. Refresh them through a
-reviewed registry regeneration, not a manual edit of generated declarations.
+The generator owns the purpose and regeneration comments in both generated
+files. These introductions were regenerated from Vulkan-Docs tag `v1.4.365`
+(commit `8c9361ba8180c1f4164c0bf79de2f6e817770b0d`), with all declarations
+verified unchanged. Select Vulkan-Docs using this module's `VERSION`; the
+generator repository's historical default snapshot may be older. Despite its
+name, `REGISTRY_COMMIT` pins **Vulkan-Headers**, not Vulkan-Docs. Keep that C-header
+pin and `VOLK_COMMIT` aligned with the inputs described in [the vendor guide](c/vendor/README.md).
