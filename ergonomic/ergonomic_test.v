@@ -1,4 +1,4 @@
-// Checks result handling, queue selection, and lifecycle validation before driver calls.
+// Checks result handling, queue selection and lifecycle validation before driver calls.
 module ergonomic
 
 import antono2.vulkan as vk

@@ -14,7 +14,7 @@ The generated `vulkan.v` and `vulkan_video.v` files remain the complete, low-lev
 
 ## Discovery through resources and queue submission
 
-The first slice covers loader initialization, default-allocator instance creation and destruction, physical-device enumeration, core property snapshots, and owned device-name strings. Later slices add queue-family and logical-device selection, owned memory-backed buffers and images, image views and explicit layout-transition recording, command pools and primary command buffers, fences and binary semaphores, and checked queue submission:
+The first slice covers loader initialization, default-allocator instance creation and destruction, physical-device enumeration, core property snapshots and owned device-name strings. Later slices add queue-family and logical-device selection, owned memory-backed buffers and images, image views and explicit layout-transition recording, command pools and primary command buffers, fences and binary semaphores and checked queue submission:
 
 ```v
 import antono2.vulkan as vk
@@ -105,57 +105,57 @@ For steady-state render loops, prepare raw handle slices once and use
 the slices for the duration of `vkQueueSubmit` and performs no wrapper-side
 allocations. The typed `submit()` call remains the convenient checked default.
 
-`Queue` is borrowed from its parent `OwnedDevice` and becomes invalid when that device is destroyed. `OwnedDevice.queues` contains every requested queue in request and queue-index order, while `OwnedDevice.queue` remains the selected legacy queue or the first multi-queue request for compatibility. Queue requests are grouped by distinct family, and each priority maps to the same zero-based queue index in that family. The convenience API creates ordinary queues with zero `VkDeviceQueueCreateFlags`; protected or otherwise flagged queue configurations remain available through the raw API. `OwnedBuffer` exposes its raw buffer and memory handles, requested size, allocation size, and selected memory-type index. Its `destroy()` method always destroys the buffer before freeing its memory; callers must destroy every buffer before destroying the parent device. `PhysicalDevice.find_memory_type()` applies both the resource's allowed-memory-type bit mask and the complete required property mask.
+`Queue` is borrowed from its parent `OwnedDevice` and becomes invalid when that device is destroyed. `OwnedDevice.queues` contains every requested queue in request and queue-index order, while `OwnedDevice.queue` remains the selected legacy queue or the first multi-queue request for compatibility. Queue requests are grouped by distinct family, and each priority maps to the same zero-based queue index in that family. The convenience API creates ordinary queues with zero `VkDeviceQueueCreateFlags`; protected or otherwise flagged queue configurations remain available through the raw API. `OwnedBuffer` exposes its raw buffer and memory handles, requested size, allocation size and selected memory-type index. Its `destroy()` method always destroys the buffer before freeing its memory; callers must destroy every buffer before destroying the parent device. `PhysicalDevice.find_memory_type()` applies both the resource's allowed-memory-type bit mask and the complete required property mask.
 
-`OwnedCommandPool` belongs to its parent `OwnedDevice` and is fixed to one requested queue-family index. `new_command_pool()` uses `OwnedDevice.queue`; `new_command_pool_for_queue()` accepts any queue borrowed from that device and rejects foreign queues. `PrimaryCommandBuffer` retains the exact device and pool handles needed by `free()`, while its public raw `handle` remains available for recording and submission. `free()` is idempotent and clears that raw handle. Reset, begin, and end failures are returned as typed `VulkanError` values. Destroying a command pool implicitly frees and invalidates all command buffers still allocated from it; callers may either free buffers explicitly before pool destruction or rely on that Vulkan lifetime rule, but must never use or free a buffer after its pool is destroyed. Every command pool must be destroyed before its parent device.
+`OwnedCommandPool` belongs to its parent `OwnedDevice` and is fixed to one requested queue-family index. `new_command_pool()` uses `OwnedDevice.queue`; `new_command_pool_for_queue()` accepts any queue borrowed from that device and rejects foreign queues. `PrimaryCommandBuffer` retains the exact device and pool handles needed by `free()`, while its public raw `handle` remains available for recording and submission. `free()` is idempotent and clears that raw handle. Reset, begin and end failures are returned as typed `VulkanError` values. Destroying a command pool implicitly frees and invalidates all command buffers still allocated from it; callers may either free buffers explicitly before pool destruction or rely on that Vulkan lifetime rule, but must never use or free a buffer after its pool is destroyed. Every command pool must be destroyed before its parent device.
 
-`OwnedFence` exposes status, timeout-aware waiting, and reset while preserving positive Vulkan statuses such as `VK_NOT_READY` and `VK_TIMEOUT`. `OwnedFence` and `OwnedSemaphore` expose their raw handles for submission structures, clear those handles during idempotent destruction, and must be destroyed before their parent device.
+`OwnedFence` exposes status, timeout-aware waiting and reset while preserving positive Vulkan statuses such as `VK_NOT_READY` and `VK_TIMEOUT`. `OwnedFence` and `OwnedSemaphore` expose their raw handles for submission structures, clear those handles during idempotent destruction and must be destroyed before their parent device.
 
-`Queue.submit()` accepts a non-empty primary-command-buffer batch plus raw wait semaphore handles, signal semaphore handles, and an optional raw fence handle in `SubmitOptions`. Every wait semaphore requires a pipeline-stage mask at the same array index; mismatched counts are rejected before Vulkan is called. Owners expose these handles publicly, so the options stay copyable while the owner wrappers remain `@[nocopy]`. The helper keeps the temporary command-handle array alive through `vkQueueSubmit`, returns non-negative Vulkan statuses unchanged, and converts failures to `VulkanError`.
+`Queue.submit()` accepts a non-empty primary-command-buffer batch plus raw wait semaphore handles, signal semaphore handles and an optional raw fence handle in `SubmitOptions`. Every wait semaphore requires a pipeline-stage mask at the same array index; mismatched counts are rejected before Vulkan is called. Owners expose these handles publicly, so the options stay copyable while the owner wrappers remain `@[nocopy]`. The helper keeps the temporary command-handle array alive through `vkQueueSubmit`, returns non-negative Vulkan statuses unchanged and converts failures to `VulkanError`.
 
-`OwnedImage` creates a simple exclusive-sharing 2D image with one mip level, one array layer, and one sample. It exposes the raw image and memory handles plus its format, extent, tiling, usage, allocation size, and selected memory type. Destruction releases the image before its bound allocation, and must happen before destroying the parent device. More specialized image creation remains available through the raw layer.
+`OwnedImage` creates a simple exclusive-sharing 2D image with one mip level, one array layer and one sample. It exposes the raw image and memory handles plus its format, extent, tiling, usage, allocation size and selected memory type. Destruction releases the image before its bound allocation, and must happen before destroying the parent device. More specialized image creation remains available through the raw layer.
 
 The owned buffer and image helpers intentionally make dedicated allocations;
 they optimize for transparent lifetime rules, not allocation density. Use
 [`antono2.vkmemalloc`](https://github.com/antono2/vulkan_memory_allocator) for
-shared memory blocks, allocation policy, mapping, and diagnostics. The
+shared memory blocks, allocation policy, mapping and diagnostics. The
 allocator depends on this package, so importing it back into the ergonomic
 submodule would create a dependency cycle.
 
-`OwnedImageView` creates an identity-swizzled 2D view using the image's format and explicit aspect mask. It exposes the raw view and parent-image handles, view type, format, and complete subresource range. Every view must be destroyed before its image.
+`OwnedImageView` creates an identity-swizzled 2D view using the image's format and explicit aspect mask. It exposes the raw view and parent-image handles, view type, format and complete subresource range. Every view must be destroyed before its image.
 
 `PhysicalDevice.surface_support()` owns the three presentation queries needed
 for swapchain negotiation. The accompanying selection helpers keep policy
 explicit through ordered preference arrays while correctly handling Vulkan's
 undefined-format sentinel, FIFO fallback, fixed versus variable extents,
-bounded image counts, and composite-alpha masks.
+bounded image counts and composite-alpha masks.
 
 `OwnedBuffer.map()` validates the range and host-visible property before
 returning a borrowed `MappedBufferMemory`. Its `write_bytes()` helper is
 restricted to host-coherent memory so a successful return means the bytes are
 visible without a separate flush. Use the public pointer plus raw flush and
 invalidate commands for non-coherent memory. `upload_bytes()` provides the
-common one-shot map, copy, and unmap sequence.
+common one-shot map, copy and unmap sequence.
 
-`OwnedShaderModule` validates SPIR-V size, alignment, and magic before calling
+`OwnedShaderModule` validates SPIR-V size, alignment and magic before calling
 Vulkan. Byte input is copied to aligned words for the duration of creation.
 Shader modules and mappings must be destroyed or unmapped before their parent
 resource or device. Owned-device and queue `wait_idle()` helpers preserve typed
 Vulkan errors.
 
-`ImageLayoutTransition` keeps the synchronization-1 source/destination stage masks, access masks, old/new layouts, dependency flags, and aspect mask explicit. `PrimaryCommandBuffer.transition_image_layout()` records one image-only `vkCmdPipelineBarrier` over the owned image's single mip level and array layer. It does not infer synchronization, track layout state, or perform queue-family ownership transfers; use the raw API for broader ranges, ownership transfers, or synchronization-2 barriers.
+`ImageLayoutTransition` keeps the synchronization-1 source/destination stage masks, access masks, old/new layouts, dependency flags and aspect mask explicit. `PrimaryCommandBuffer.transition_image_layout()` records one image-only `vkCmdPipelineBarrier` over the owned image's single mip level and array layer. It does not infer synchronization, track layout state or perform queue-family ownership transfers; use the raw API for broader ranges, ownership transfers or synchronization-2 barriers.
 
-`InstanceOptions` validates and owns instance layer/extension name pointers through creation. `DeviceOptions` accepts either its compatible single-queue fields or `DeviceQueueRequest` values for multiple queues and families, plus device extensions, core features, and an application-owned feature `pNext` chain. `PhysicalDevice.find_present_queue_family()` layers surface support over the existing queue-flag selection. Optional host allocation callbacks are copied into the instance or device owner and passed through child creation, cleanup, and destruction. The callback functions and `pUserData` state must outlive the affected owners. Concurrent-sharing resources remain in the raw layer.
+`InstanceOptions` validates and owns instance layer/extension name pointers through creation. `DeviceOptions` accepts either its compatible single-queue fields or `DeviceQueueRequest` values for multiple queues and families, plus device extensions, core features and an application-owned feature `pNext` chain. `PhysicalDevice.find_present_queue_family()` layers surface support over the existing queue-flag selection. Optional host allocation callbacks are copied into the instance or device owner and passed through child creation, cleanup and destruction. The callback functions and `pUserData` state must outlive the affected owners. Concurrent-sharing resources remain in the raw layer.
 
 ## Next slices
 
 1. Instance extension and layer enumeration with owned V strings. (Implemented.)
 2. Presentation-support selection layered onto the core queue-flag helper. (Implemented.)
-3. Configurable queue requests, extension validation, and enabled features. (Implemented, including multiple queues and families.)
+3. Configurable queue requests, extension validation and enabled features. (Implemented, including multiple queues and families.)
 4. Owned fences and binary semaphores with explicit parent ownership and destruction ordering. (Implemented.)
 5. Owned 2D images with explicit parent ownership and destruction ordering. (Implemented.)
 6. Checked primary command-buffer queue submission with explicit synchronization. (Implemented.)
 7. Owned 2D image views and focused synchronization-1 layout-transition recording. (Implemented.)
 8. Surface-support snapshots and explicit swapchain-choice helpers. (Implemented.)
-9. Checked host-visible buffer mappings, coherent byte uploads, and owned SPIR-V shader modules. (Implemented.)
+9. Checked host-visible buffer mappings, coherent byte uploads and owned SPIR-V shader modules. (Implemented.)
 10. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.

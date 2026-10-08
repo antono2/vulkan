@@ -1,4 +1,4 @@
-// Opt-in owned Vulkan handles, result errors, and lifecycle helpers.
+// Opt-in owned Vulkan handles, result errors and lifecycle helpers.
 // Explicit close methods release resources; parent objects must outlive their children.
 module ergonomic
 
@@ -366,7 +366,7 @@ pub:
 }
 
 // new_buffer creates an exclusive-sharing buffer, selects a compatible memory
-// type containing every required property, allocates memory, and binds it at
+// type containing every required property, allocates memory and binds it at
 // offset zero.
 pub fn (device &OwnedDevice) new_buffer(size vk.DeviceSize, usage vk.BufferUsageFlags, required_memory_properties vk.MemoryPropertyFlags) !&OwnedBuffer {
 	if size == 0 {
@@ -453,7 +453,7 @@ pub:
 }
 
 // new_image_2d creates an exclusive-sharing 2D image, chooses memory satisfying
-// all required properties, allocates it, and binds it at offset zero.
+// all required properties, allocates it and binds it at offset zero.
 pub fn (device &OwnedDevice) new_image_2d(width u32, height u32, format vk.Format, tiling vk.ImageTiling,
 	usage vk.ImageUsageFlags, required_memory_properties vk.MemoryPropertyFlags) !&OwnedImage {
 	return device.new_image_2d_mips(width, height, 1, format, tiling, usage, required_memory_properties)
@@ -640,7 +640,7 @@ pub fn (mut view OwnedImageView) destroy() {
 }
 
 // ImageLayoutTransition describes one synchronization-1 image barrier. Stage
-// masks, access masks, layouts, dependency flags, and aspects all remain
+// masks, access masks, layouts, dependency flags and aspects all remain
 // explicit. Queue-family ownership transfers are intentionally out of scope.
 pub struct ImageLayoutTransition {
 pub:

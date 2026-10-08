@@ -33,10 +33,10 @@ in `VERSION`.
 ### Changed
 
 - Mark ergonomic Vulkan owners `@[nocopy]`, borrow them by reference in helper
-  and submission APIs, and make mutable destruction consistently idempotent by
+  and submission APIs and make mutable destruction consistently idempotent by
   clearing native handles.
 - Return owned pointers from constructors and use unambiguous `OwnedInstance`,
-  `OwnedDevice`, `OwnedCommandPool`, `OwnedFence`, and `OwnedSemaphore` names so
+  `OwnedDevice`, `OwnedCommandPool`, `OwnedFence` and `OwnedSemaphore` names so
   strict V3 does not confuse wrappers with generated raw Vulkan handle types.
 - Return primary command buffers as references so allocation batches preserve
   unique wrapper ownership without copying.
@@ -70,11 +70,11 @@ in `VERSION`.
 
 ### Added
 
-- Owned SPIR-V shader modules with byte-count, alignment, and magic validation.
-- Checked host-visible buffer mappings, persistent coherent byte writes, and
+- Owned SPIR-V shader modules with byte-count, alignment and magic validation.
+- Checked host-visible buffer mappings, persistent coherent byte writes and
   one-shot map/copy/unmap uploads.
 - Owned surface-support discovery plus reusable format, present-mode, extent,
-  image-count, and composite-alpha selection helpers.
+  image-count and composite-alpha selection helpers.
 - Typed device and queue idle waits.
 - TinyCC loader and lifecycle coverage on Linux.
 
@@ -88,7 +88,7 @@ in `VERSION`.
 ### Added
 
 - Multiple logical-device queue requests across distinct queue families, with
-  per-queue priorities, all borrowed queues exposed through `Device.queues`,
+  per-queue priorities, all borrowed queues exposed through `Device.queues`
   and queue-specific command-pool creation.
 
 ### Fixed
@@ -107,12 +107,12 @@ in `VERSION`.
 
 - A validation-enabled end-to-end lifecycle smoke test covering instance,
   device, buffer, image, image view, command pool, command buffer, fence,
-  semaphore, queue submission, and ordered cleanup.
+  semaphore, queue submission and ordered cleanup.
 - Owned instance layer/extension and physical-device extension discovery.
 - Validated instance options and configurable single-queue device creation with
-  queue index, priority, extensions, core features, and a feature `pNext` chain.
+  queue index, priority, extensions, core features and a feature `pNext` chain.
 - Presentation-support queries and graphics/presentation queue-family selection.
-- Linux, macOS, and Windows CI coverage, with both released and master V tested
+- Linux, macOS and Windows CI coverage, with both released and master V tested
   on Linux.
 - Immutable Vulkan-Headers and Volk source revisions used by CI.
 
@@ -129,21 +129,21 @@ in `VERSION`.
 ### Added
 
 - An opt-in `antono2.vulkan.ergonomic` API with typed `VulkanError` values,
-  loader-aware instance ownership, physical-device discovery, and owned device
+  loader-aware instance ownership, physical-device discovery and owned device
   names while preserving non-negative Vulkan result statuses.
 - Queue-family discovery and complete required-flag selection, single-queue
-  logical-device creation, loaded device commands, explicit device destruction,
+  logical-device creation, loaded device commands, explicit device destruction
   and raw device and queue handles.
 - Memory-type selection and owned memory-backed buffers with explicit,
   correctly ordered destruction.
 - Owned command pools and primary command buffers with allocation, recording,
-  reset, free, and explicit lifetime helpers.
-- Owned fences and binary semaphores, including fence status, wait, and reset
+  reset, free and explicit lifetime helpers.
+- Owned fences and binary semaphores, including fence status, wait and reset
   helpers that preserve `VK_NOT_READY` and `VK_TIMEOUT`.
 - Owned 2D images and image views plus explicit synchronization-1 image-layout
   transition recording.
 - Checked `Queue.submit()` with command-buffer batches, wait and signal
-  semaphores, pipeline-stage masks, and optional fence signaling.
+  semaphores, pipeline-stage masks and optional fence signaling.
 
 The complete generated Vulkan API remains available unchanged through the raw
 `antono2.vulkan` module.
