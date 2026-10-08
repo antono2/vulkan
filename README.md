@@ -34,8 +34,8 @@ v run "$HOME/.vmodules/antono2/vulkan/setup.vsh"
 ```
 
 From a source checkout, use `v run setup.vsh`. The script supports Ubuntu and
-Debian, Fedora, Arch, openSUSE, macOS, and Windows with winget.
-On Linux it installs a C compiler, Vulkan runtime tools, and the VPM module;
+Debian, Fedora, Arch, openSUSE, macOS and Windows with winget.
+On Linux it installs a C compiler, Vulkan runtime tools and the VPM module;
 the bundled headers and Volk need no distribution development packages. The
 macOS and Windows helpers still use the Vulkan SDK to provide runtime tooling,
 but its headers are not required to compile this module. The script then
@@ -87,7 +87,7 @@ v -d vulkan_xlib run your_app.v
 ```
 
 For XCB or Wayland, use `vulkan_xcb` or `vulkan_wayland` instead. Other flags
-follow the registry platform names, such as `vulkan_win32`, `vulkan_android`,
+follow the registry platform names, such as `vulkan_win32`, `vulkan_android`
 and `vulkan_metal`. Applications and windowing libraries may need native
 window-system headers for the selected platform (for example Xlib or Wayland).
 Extension name and spec-version constants are available without these flags,
@@ -131,13 +131,13 @@ The canonical binding-generator tests remain in
 
 The generated module remains the complete low-level binding. The opt-in
 `antono2.vulkan.ergonomic` submodule adds typed errors, instance lifecycle
-helpers, physical-device and queue-family discovery, and validated single- or
+helpers, physical-device and queue-family discovery and validated single- or
 multi-queue logical-device ownership. It also provides explicit memory-type
 selection and owned buffer/device-memory allocation, owned command pools and
 primary command-buffer lifecycle helpers, synchronization objects, checked queue
-submission, owned 2D images and views, and explicit image-layout transition
+submission, owned 2D images and views and explicit image-layout transition
 recording without modifying generated files. Presentation helpers collect and
-select surface formats, present modes, extents, image counts, and composite
+select surface formats, present modes, extents, image counts and composite
 alpha modes. Host-visible buffers support checked persistent mappings and
 coherent uploads, while owned shader modules accept validated SPIR-V words or
 bytes.
@@ -153,9 +153,9 @@ device-memory allocation or the companion memory allocator module.
 
 Owning ergonomic wrappers are `@[nocopy]`, and constructors return owned
 pointers. Store them in `mut` variables so they can be destroyed, pass those
-pointers directly without adding another `&`, and destroy children before
+pointers directly without adding another `&` and destroy children before
 parents. Destruction is explicit and idempotent; borrowed queues, discovery
-snapshots, and raw Vulkan handles remain copyable. See the complete [ownership
+snapshots and raw Vulkan handles remain copyable. See the complete [ownership
 model](OWNERSHIP.md).
 
 `OwnedBuffer` and `OwnedImage` deliberately use one Vulkan memory allocation
@@ -203,11 +203,11 @@ VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
 ## Supported toolchains
 
 The [validation workflow](.github/workflows/generated-bindings-ci.yml) records
-the exact compiler, runner, registry, and loader pins used for CI.
+the exact compiler, runner, registry and loader pins used for CI.
 
 | Platform | Compiler lane | Validation |
 | --- | --- | --- |
-| Linux | Pinned release V, GCC and TinyCC | Compile, unit tests, and validation-layer lifecycle run |
+| Linux | Pinned release V, GCC and TinyCC | Compile, unit tests and validation-layer lifecycle run |
 | macOS | Pinned release V, Clang | Compile and unit tests |
 | Windows | Pinned release V, MSVC | Compile and unit tests |
 | Linux | Pinned V3, TinyCC | Required strict frontend checks; advisory C backend smoke tests |
@@ -220,7 +220,7 @@ moving-master lane remain advisory while compiler compatibility is verified.
 
 The generated registry snapshot determines which declarations are available.
 The installed Vulkan loader and driver must still support every command,
-extension, and feature an application requests. Successful compilation alone
+extension and feature an application requests. Successful compilation alone
 does not establish runtime device support.
 
 ## Generate and maintain

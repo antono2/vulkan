@@ -6,7 +6,7 @@
 import os
 
 const usage = 'Usage: v run setup.vsh [--install|--check]\n\n' +
-	'  --install  Install native Vulkan tools and this V module (default).\n' + '  --check    Report whether the compiler, bundled headers, loader, and device work.\n'
+	'  --install  Install native Vulkan tools and this V module (default).\n' + '  --check    Report whether the compiler, bundled headers, loader and device work.\n'
 
 fn command_exists(name string) bool {
 	os.find_abs_path_of_executable(name) or { return false }
@@ -42,7 +42,7 @@ fn install_linux() ! {
 		run('sudo zypper --non-interactive install -y gcc gcc-c++ vulkan-tools')!
 		return
 	}
-	return error('unsupported Linux package manager; install a C compiler, the Vulkan loader, vulkaninfo, and a Vulkan ICD, then rerun with --check')
+	return error('unsupported Linux package manager; install a C compiler, the Vulkan loader, vulkaninfo and a Vulkan ICD, then rerun with --check')
 }
 
 fn install_macos() ! {

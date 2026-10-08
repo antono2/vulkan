@@ -1,4 +1,4 @@
-// Checks option validation, extension names, and device queue planning without a GPU.
+// Checks option validation, extension names and device queue planning without a GPU.
 module ergonomic
 
 import antono2.vulkan as vk
@@ -231,7 +231,7 @@ fn test_multi_queue_options_reject_legacy_queue_fields() {
 			queue_family: family
 		}]
 	}) or {
-		assert err.msg() == 'queue_requests cannot be combined with queue_family, queue_index, or queue_priority'
+		assert err.msg() == 'queue_requests cannot be combined with queue_family, queue_index or queue_priority'
 		return
 	}
 	assert false

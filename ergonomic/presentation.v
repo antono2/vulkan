@@ -78,7 +78,7 @@ pub fn (device PhysicalDevice) surface_present_modes(surface vk.SurfaceKHR) ![]v
 	return []vk.PresentModeKHR{}
 }
 
-// surface_support obtains the capabilities, formats, and present modes needed
+// surface_support obtains the capabilities, formats and present modes needed
 // to configure or recreate a swapchain.
 pub fn (device PhysicalDevice) surface_support(surface vk.SurfaceKHR) !SurfaceSupport {
 	return SurfaceSupport{

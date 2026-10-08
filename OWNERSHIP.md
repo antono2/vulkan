@@ -6,17 +6,17 @@ in the reverse order of creation.
 
 `OwnedInstance`, `OwnedDevice`, `OwnedCommandPool`, `PrimaryCommandBuffer`,
 `OwnedBuffer`, `OwnedImage`, `OwnedImageView`, `OwnedFence`, `OwnedSemaphore`,
-`MappedBufferMemory`, and `OwnedShaderModule` are marked `@[nocopy]`. Their
+`MappedBufferMemory` and `OwnedShaderModule` are marked `@[nocopy]`. Their
 constructors return owned pointers so resources cross module boundaries without
 copying. Keep the pointers in `mut` variables when they need cleanup and pass
 them directly to helpers; do not add another `&`.
 
-Destruction, command-buffer freeing, and unmapping are explicit, mutable, and
+Destruction, command-buffer freeing and unmapping are explicit, mutable and
 idempotent: they clear the corresponding handle or pointer. This prevents a
 second cleanup through the same value, but does not replace Vulkan's parent /
 child lifetime rules. There are no implicit finalizers.
 
-`PhysicalDevice`, `QueueFamily`, `Queue`, discovery snapshots, and raw Vulkan
+`PhysicalDevice`, `QueueFamily`, `Queue`, discovery snapshots and raw Vulkan
 handles remain copyable borrowed values. A copied `Queue` does not extend its
 parent `OwnedDevice` lifetime.
 
@@ -34,9 +34,9 @@ Follow these rules:
    destroyed.
 
 Pass optional Vulkan host allocation callbacks through `InstanceOptions.allocator`,
-`DeviceOptions.allocator`, or `new_instance_with_allocator()`. Each root owner
+`DeviceOptions.allocator` or `new_instance_with_allocator()`. Each root owner
 copies the callback structure; device child owners inherit that copy and use it
-for creation, failure cleanup, and destruction. Keep the callback functions and
+for creation, failure cleanup and destruction. Keep the callback functions and
 anything referenced by `pUserData` valid until all affected children and their
 parent owner have been destroyed. Instance and device allocators are chosen
 independently. These callbacks control Vulkan host allocations; they do not

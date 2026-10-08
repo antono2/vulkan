@@ -24,7 +24,7 @@ pub:
 }
 
 // new_instance_with_options validates requested layers and extensions, owns
-// their temporary C pointer arrays, and creates a loader-ready instance.
+// their temporary C pointer arrays and creates a loader-ready instance.
 pub fn new_instance_with_options(options InstanceOptions) !&OwnedInstance {
 	available_extensions := extension_names(instance_extensions()!)
 	validate_requested_names('instance extensions', options.extensions, available_extensions)!
@@ -67,13 +67,13 @@ pub:
 }
 
 // DeviceOptions configures logical-device queues together with device
-// extensions, core features, and an optional feature pNext chain.
+// extensions, core features and an optional feature pNext chain.
 //
 // allocator is copied into the device and inherited by its ergonomic child
 // owners. Its callback functions and pUserData must remain valid until all
 // children and the device have been destroyed.
 //
-// queue_family, queue_index, and queue_priority preserve the original
+// queue_family, queue_index and queue_priority preserve the original
 // single-queue API. Set queue_requests to request queues from one or more
 // families; it cannot be combined with those legacy fields. The first queue
 // in queue_requests becomes OwnedDevice.queue.
@@ -143,7 +143,7 @@ fn device_queue_plan(options DeviceOptions) !DeviceQueuePlan {
 
 	if options.queue_family.properties.queueCount != 0 || options.queue_index != 0
 		|| options.queue_priority != 1.0 {
-		return error('queue_requests cannot be combined with queue_family, queue_index, or queue_priority')
+		return error('queue_requests cannot be combined with queue_family, queue_index or queue_priority')
 	}
 
 	mut seen_families := map[u32]bool{}
