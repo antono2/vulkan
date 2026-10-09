@@ -6,6 +6,19 @@ in `VERSION`.
 
 ## Unreleased
 
+## 3.2.2 - 2026-10-09
+
+### Changed
+
+- Update generated bindings and bundled Vulkan headers to registry v1.4.365.
+- Reduce duplicate CI runs after documentation-only merges.
+
+## 3.2.1 - 2026-09-29
+
+### Changed
+
+- Update generated bindings and bundled Vulkan headers to registry v1.4.364.
+
 ## 3.2.0 - 2026-09-25
 
 ### Added
