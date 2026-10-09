@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: [master]
   push:
+    paths-ignore: ['**/*.md']
     branches: [master]
     tags: ['v*']
   workflow_dispatch:
