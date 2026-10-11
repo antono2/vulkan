@@ -17,7 +17,7 @@ def probe(command, timeout=15):
         return False, str(error)
 
 
-def diagnose(root, compiler=None, modules=None, sdk=None, runtime=False):
+def diagnose(root, compiler=None, modules=None, sdk=None, runtime=False, profile='stable'):
     checks = []
     def check(name, passed, detail, action, optional=False):
         checks.append({'name': name, 'status': 'pass' if passed else ('warn' if optional else 'fail'),
@@ -39,8 +39,10 @@ def diagnose(root, compiler=None, modules=None, sdk=None, runtime=False):
     compiler = str(compiler) if compiler else (os.environ.get('VEXE') or shutil.which('v'))
     if compiler:
         passed, detail = probe([compiler, '-version'])
-        expected = pins.get('v', '')[:7] or pins.get('v_release', '')
-        matches = passed and (not expected or expected in detail)
+        selected = pins.get('v_release', '') if profile == 'release' else (
+            pins.get('v3_v', pins.get('v', '')) if profile == 'v3' else pins.get('v', ''))
+        expected = selected[:7] if selected else (pins.get('v_release', '') if profile == 'stable' else '')
+        matches = passed and bool(expected) and expected in detail
         check('V compiler', matches, detail, 'Select the tested V compiler from compatibility.json or rerun the setup helper.')
     else:
         check('V compiler', False, 'No V compiler found', 'Run the project setup helper, or pass --v with the tested compiler path.')
@@ -67,7 +69,7 @@ def diagnose(root, compiler=None, modules=None, sdk=None, runtime=False):
                 executable = str(candidate)
         passed, detail = probe([executable, '--summary'], timeout=30) if executable else (False, 'vulkaninfo is unavailable')
         check('Vulkan devices', passed, detail, 'Install Vulkan runtime tools and a compatible graphics driver; rerun --runtime.', optional=True)
-    return {'project': root.name, 'platform': os.name, 'compatibility': pins, 'checks': checks,
+    return {'project': root.name, 'platform': os.name, 'profile': profile, 'compatibility': pins, 'checks': checks,
             'hardware_note': 'Device enumeration does not validate hardware video decoding or OpenCL interoperability.'}
 
 
@@ -77,9 +79,10 @@ def main():
     parser.add_argument('--modules', type=Path)
     parser.add_argument('--sdk', type=Path)
     parser.add_argument('--runtime', action='store_true', help='Also enumerate Vulkan devices, when tools are available')
+    parser.add_argument('--profile', choices=['stable', 'v3', 'release'], default='stable', help='Compiler profile to diagnose')
     parser.add_argument('--json', action='store_true', help='Emit JSON without modifying the environment or caches')
     args = parser.parse_args()
-    report = diagnose(Path(__file__).resolve().parents[1], args.v, args.modules, args.sdk, args.runtime)
+    report = diagnose(Path(__file__).resolve().parents[1], args.v, args.modules, args.sdk, args.runtime, args.profile)
     if args.json:
         print(json.dumps(report, indent=2))
     else:

@@ -36,6 +36,21 @@ class DoctorChecks(unittest.TestCase):
             self.assertIn('V compiler', failed)
             self.assertIn('Declared dependencies', failed)
 
+    def test_v3_compiler_is_checked_against_its_own_profile(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.fixture(root)
+            pins = json.loads((root / 'compatibility.json').read_text())
+            pins['v3_v'] = 'b' * 40
+            (root / 'compatibility.json').write_text(json.dumps(pins))
+            with patch('doctor.shutil.which', return_value='git'), patch('doctor.probe', return_value=(True, 'V bbbbbbb')):
+                release = diagnose(root, compiler='fixture-v')
+                v3 = diagnose(root, compiler='fixture-v', profile='v3')
+                unsupported = diagnose(root, compiler='fixture-v', profile='release')
+            self.assertEqual(next(item for item in release['checks'] if item['name'] == 'V compiler')['status'], 'fail')
+            self.assertEqual(next(item for item in v3['checks'] if item['name'] == 'V compiler')['status'], 'pass')
+            self.assertEqual(next(item for item in unsupported['checks'] if item['name'] == 'V compiler')['status'], 'fail')
+
 
 if __name__ == '__main__':
     unittest.main()
