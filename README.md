@@ -235,10 +235,10 @@ where they explain compatibility.
 
 ## Thanks
 
-- [Delyan Angelov (@spytheman)](https://github.com/spytheman) — for fixing my bugs in the early days.
-- [Jalon Solov (@JalonSolov)](https://github.com/JalonSolov) — for quick and solid answers to obscure questions.
-- [Alexander Medvednikov (@medvednikov)](https://github.com/medvednikov) — for creating V and relentless productivity.
-- The awesome team at [V](https://vlang.io/) — for making this possible.
+- [Delyan Angelov (@spytheman)](https://github.com/spytheman) â€” for fixing my bugs in the early days.
+- [Jalon Solov (@JalonSolov)](https://github.com/JalonSolov) â€” for quick and solid answers to obscure questions.
+- [Alexander Medvednikov (@medvednikov)](https://github.com/medvednikov) â€” for creating V and relentless productivity.
+- The awesome team at [V](https://vlang.io/) â€” for making this possible.
 
 ## Source navigation
 
@@ -261,3 +261,9 @@ verified unchanged. Select Vulkan-Docs using this module's `VERSION`; the
 generator repository's historical default snapshot may be older. Despite its
 name, `REGISTRY_COMMIT` pins **Vulkan-Headers**, not Vulkan-Docs. Keep that C-header
 pin and `VOLK_COMMIT` aligned with the inputs described in [the vendor guide](c/vendor/README.md).
+
+
+## Compatibility and diagnostics
+
+See [tested profiles and read-only diagnostics](docs/compatibility.md) for
+compiler/dependency versions, setup recovery actions and upgrade checks.
