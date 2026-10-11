@@ -240,7 +240,17 @@ fn check() bool {
 	if command_exists('vulkaninfo') {
 		// Some SDK builds write their update manifest into the process working
 		// directory. Keep diagnostics from leaving residue in the user's repo.
-		result := os.execute('cd ${os.quoted_path(os.temp_dir())} && vulkaninfo --summary')
+		original_directory := os.getwd()
+		os.chdir(os.temp_dir()) or {
+			println('[warning]  Could not enter the temporary directory for Vulkan diagnostics: ${err}')
+			return ok
+		}
+		defer {
+			os.chdir(original_directory) or {}
+		}
+		// V's Windows os.execute rejects shell command chaining. Change the
+		// directory through the OS API so the probe actually runs on Windows.
+		result := os.execute('vulkaninfo --summary')
 		if result.exit_code == 0 {
 			println('[ok]       Vulkan loader enumerated a physical device')
 		} else {
