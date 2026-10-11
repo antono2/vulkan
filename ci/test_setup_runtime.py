@@ -22,6 +22,7 @@ def main():
         probe_source.write_text('''import os
 fn main() {
     assert os.args[1..] == ['--summary']
+    assert os.real_path(os.getwd()) == os.real_path(os.temp_dir())
     os.write_file(os.getenv('PROBE_MARKER'), os.getwd()) or { panic(err) }
     if os.getenv('PROBE_FAIL') == '1' { exit(23) }
     println('GPU0: fixture')
@@ -40,7 +41,6 @@ fn main() {
                                     capture_output=True, text=True, check=True)
             print(result.stdout)
             assert marker.is_file(), 'vulkaninfo never ran'
-            assert Path(marker.read_text()).resolve() == Path(tempfile.gettempdir()).resolve()
             expected = ('[ok]       Vulkan loader enumerated a physical device' if failure == '0'
                         else '[warning]  vulkaninfo is installed, but no usable device was enumerated')
             assert expected in result.stdout, result.stdout + result.stderr
