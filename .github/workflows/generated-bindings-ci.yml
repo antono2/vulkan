@@ -24,6 +24,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+      - name: Validate and resolve tested compatibility
+        id: compat
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          python ./scripts/test_compatibility.py
+          python ./scripts/test_doctor.py
+          python ./scripts/compatibility.py --github-output "$GITHUB_OUTPUT"
       - name: Accept only generated binding files
         env:
           BASE_REF: ${{ github.base_ref }}
@@ -78,35 +86,38 @@ jobs:
           - os: ubuntu-24.04
             compiler: gcc
             v-channel: stable
-            v-version: 0.5.2
           - os: ubuntu-24.04
             compiler: gcc
             v-channel: master
-            v-version: master
           - os: ubuntu-24.04
             compiler: tcc
             v-channel: v3
-            v-version: efae23e85b3772a28e62884d554c1e88f91f52f4
           - os: macos-14
             compiler: clang
             v-channel: stable
-            v-version: 0.5.2
           - os: windows-2022
             compiler: msvc
             v-channel: stable
-            v-version: 0.5.2
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Validate and resolve tested compatibility
+        id: compat
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          python ./scripts/test_compatibility.py
+          python ./scripts/test_doctor.py
+          python ./scripts/compatibility.py --profile '${{ matrix.v-channel }}' --github-output "$GITHUB_OUTPUT"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: antono2/v_vulkan_bindings
-          ref: acacf0b8043b10364549382d02535bd5d90309a1
+          ref: ${{ steps.compat.outputs.generator }}
           path: generator
       - uses: prantlf/setup-v-action@92f20bea50d2c9931a28c96bb4997a3c7357baf0 # v4
         if: matrix.v-channel == 'stable'
         with:
-          version: ${{ matrix.v-version }}
+          version: ${{ steps.compat.outputs.selected_v }}
       # Source-built V revisions include the v1_fallback executable needed by
       # tool commands such as `v test`; setup-v-action@v4 omits it from cache.
       - name: Check out source-built V
@@ -116,7 +127,7 @@ jobs:
         continue-on-error: ${{ matrix.v-channel == 'master' }}
         with:
           repository: vlang/v
-          ref: ${{ matrix.v-version }}
+          ref: ${{ steps.compat.outputs.selected_v }}
           path: .ci-v-source
           fetch-depth: 1
       - name: Check out the matching v3 bootstrap source
@@ -124,7 +135,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: vlang/vc
-          ref: 2cbaf6bc2367937cd5f0b4ef923d1ef9aad613b3
+          ref: ${{ steps.compat.outputs.v3_vc }}
           path: .ci-v-source/vc
           fetch-depth: 1
       - name: Check out the matching v3 TinyCC runtime
@@ -132,7 +143,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: vlang/tccbin
-          ref: d6e7ac1b1bcc98aed734a6ecbfa8509f24606c74
+          ref: ${{ steps.compat.outputs.v3_tcc }}
           path: .ci-v-source/thirdparty/tcc
           fetch-depth: 1
       - name: Build source V compiler
@@ -151,7 +162,7 @@ jobs:
       - name: Install Vulkan SDK and SwiftShader test artifacts
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash
-        run: bash .github/scripts/setup-vulkan-ci.sh 1.4.309.0 v1.2
+        run: bash .github/scripts/setup-vulkan-ci.sh ${{ steps.compat.outputs.ci_sdk }} ${{ steps.compat.outputs.ci_runtime }}
       - name: Verify bundled headers and Volk against pinned upstream sources
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash
@@ -335,6 +346,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+      - name: Validate and resolve tested compatibility
+        id: compat
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          python ./scripts/test_compatibility.py
+          python ./scripts/test_doctor.py
+          python ./scripts/compatibility.py --github-output "$GITHUB_OUTPUT"
       - name: Validate and publish the package release
         env:
           GH_TOKEN: ${{ github.token }}
