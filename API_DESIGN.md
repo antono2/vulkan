@@ -113,7 +113,7 @@ allocations. The typed `submit()` call remains the convenient checked default.
 
 `Queue.submit()` accepts a non-empty primary-command-buffer batch plus raw wait semaphore handles, signal semaphore handles and an optional raw fence handle in `SubmitOptions`. Every wait semaphore requires a pipeline-stage mask at the same array index; mismatched counts are rejected before Vulkan is called. Owners expose these handles publicly, so the options stay copyable while the owner wrappers remain `@[nocopy]`. The helper keeps the temporary command-handle array alive through `vkQueueSubmit`, returns non-negative Vulkan statuses unchanged and converts failures to `VulkanError`.
 
-`OwnedImage` creates a simple exclusive-sharing 2D image with one mip level, one array layer and one sample. It exposes the raw image and memory handles plus its format, extent, tiling, usage, allocation size and selected memory type. Destruction releases the image before its bound allocation, and must happen before destroying the parent device. More specialized image creation remains available through the raw layer.
+`OwnedImage` creates a simple exclusive-sharing 2D image with one array layer and one sample. `new_image_2d_mips` accepts an explicit mip count. It exposes the raw image and memory handles plus its format, extent, tiling, usage, allocation size and selected memory type. Destruction releases the image before its bound allocation, and must happen before destroying the parent device. More specialized image creation remains available through the raw layer.
 
 The owned buffer and image helpers intentionally make dedicated allocations;
 they optimize for transparent lifetime rules, not allocation density. Use
@@ -143,7 +143,7 @@ Shader modules and mappings must be destroyed or unmapped before their parent
 resource or device. Owned-device and queue `wait_idle()` helpers preserve typed
 Vulkan errors.
 
-`ImageLayoutTransition` keeps the synchronization-1 source/destination stage masks, access masks, old/new layouts, dependency flags and aspect mask explicit. `PrimaryCommandBuffer.transition_image_layout()` records one image-only `vkCmdPipelineBarrier` over the owned image's single mip level and array layer. It does not infer synchronization, track layout state or perform queue-family ownership transfers; use the raw API for broader ranges, ownership transfers or synchronization-2 barriers.
+`ImageLayoutTransition` keeps the synchronization-1 source/destination stage masks, access masks, old/new layouts, dependency flags and aspect mask explicit. `PrimaryCommandBuffer.transition_image_layout()` records one image-only `vkCmdPipelineBarrier` over the image subresource range selected by the transition. It does not infer synchronization, track layout state or perform queue-family ownership transfers; use the raw API for broader ranges, ownership transfers or synchronization-2 barriers.
 
 `InstanceOptions` validates and owns instance layer/extension name pointers through creation. `DeviceOptions` accepts either its compatible single-queue fields or `DeviceQueueRequest` values for multiple queues and families, plus device extensions, core features and an application-owned feature `pNext` chain. `PhysicalDevice.find_present_queue_family()` layers surface support over the existing queue-flag selection. Optional host allocation callbacks are copied into the instance or device owner and passed through child creation, cleanup and destruction. The callback functions and `pUserData` state must outlive the affected owners. Concurrent-sharing resources remain in the raw layer.
 
@@ -159,3 +159,5 @@ Vulkan errors.
 8. Surface-support snapshots and explicit swapchain-choice helpers. (Implemented.)
 9. Checked host-visible buffer mappings, coherent byte uploads and owned SPIR-V shader modules. (Implemented.)
 10. Builders only where they eliminate unsafe pointer/count bookkeeping; Vulkan synchronization and memory choices should remain explicit.
+
+See [convenience reference](docs/conveniences.md) for format queries, descriptor owners, swapchain outcomes, and pipeline caches.

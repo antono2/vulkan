@@ -21,3 +21,7 @@ Thumbs.db
 # setup.vsh outputs
 setup
 AvailableVulkanVersions.json
+
+# Python validation scripts
+__pycache__/
+*.pyc
