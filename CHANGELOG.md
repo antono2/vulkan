@@ -6,6 +6,8 @@ in `VERSION`.
 
 ## Unreleased
 
+## 3.3.0 - 2026-10-14
+
 - Add explicit ergonomic owners for descriptor layouts/pools, swapchains and
   image views, pipeline caches, and timestamp queries.
 - Add format selection, debug labels, device UUID and external-resource
