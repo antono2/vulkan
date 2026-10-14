@@ -235,10 +235,10 @@ where they explain compatibility.
 
 ## Thanks
 
-- [Delyan Angelov (@spytheman)](https://github.com/spytheman) â€” for fixing my bugs in the early days.
-- [Jalon Solov (@JalonSolov)](https://github.com/JalonSolov) â€” for quick and solid answers to obscure questions.
-- [Alexander Medvednikov (@medvednikov)](https://github.com/medvednikov) â€” for creating V and relentless productivity.
-- The awesome team at [V](https://vlang.io/) â€” for making this possible.
+- [Delyan Angelov (@spytheman)](https://github.com/spytheman) — for fixing my bugs in the early days.
+- [Jalon Solov (@JalonSolov)](https://github.com/JalonSolov) — for quick and solid answers to obscure questions.
+- [Alexander Medvednikov (@medvednikov)](https://github.com/medvednikov) — for creating V and relentless productivity.
+- The awesome team at [V](https://vlang.io/) — for making this possible.
 
 ## Source navigation
 
