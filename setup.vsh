@@ -5,7 +5,7 @@
 // read-only diagnostic pass suitable for support requests and CI.
 import os
 
-const usage = 'Usage: v run setup.vsh [--install|--check]\n\n' +
+const usage = 'Usage: v run setup.vsh [--install|--check|--probe]\n\n' +
 	'  --install  Install native Vulkan tools and this V module (default).\n' + '  --check    Report whether the compiler, bundled headers, loader and device work.\n'
 
 fn command_exists(name string) bool {
@@ -263,14 +263,34 @@ fn check() bool {
 	return ok
 }
 
+fn probe() ! {
+	root := os.dir(os.real_path(@FILE))
+	mut example := os.join_path(root, 'examples', 'getting_started')
+	if !os.is_dir(example) && os.base(root) == 'packaging' {
+		example = os.join_path(os.dir(root), 'examples', 'getting_started')
+	}
+	if !os.is_dir(example) { return error('first-use example is missing from this installation') }
+	run('v run ${os.quoted_path(example)}')!
+	println('[ok]       Binding runtime probe completed successfully.')
+}
+
 fn main() {
 	if os.args.len > 2
-		|| (os.args.len == 2 && os.args[1] !in ['--install', '--check', '-h', '--help']) {
-		eprintln(usage)
+		|| (os.args.len == 2 && os.args[1] !in ['--install', '--check', '--probe', '-h', '--help']) {
+		eprintln(usage +
+			'\n  --probe    Compile and execute the first-use example; does not install packages.')
 		exit(2)
 	}
 	if os.args.len == 2 && os.args[1] in ['-h', '--help'] {
-		println(usage)
+		println(usage +
+			'\n  --probe    Compile and execute the first-use example; does not install packages.')
+		return
+	}
+	if os.args.len == 2 && os.args[1] == '--probe' {
+		probe() or {
+			eprintln(err)
+			exit(1)
+		}
 		return
 	}
 	install := os.args.len == 1 || os.args[1] == '--install'
@@ -279,7 +299,8 @@ fn main() {
 			eprintln('Setup failed: ${err}')
 			exit(1)
 		}
-		if command_exists('v') {
+		if command_exists('v')
+			&& !os.is_file(os.join_path(os.vmodules_dir(), 'antono2', 'vulkan', 'v.mod')) {
 			run('v install antono2.vulkan') or {
 				eprintln('Could not install the V module: ${err}')
 				exit(1)

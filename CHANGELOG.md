@@ -6,6 +6,13 @@ in `VERSION`.
 
 ## Unreleased
 
+- Add explicit ergonomic owners for descriptor layouts/pools, swapchains and
+  image views, pipeline caches, and timestamp queries.
+- Add format selection, debug labels, device UUID and external-resource
+  capability queries with raw Vulkan escape hatches.
+- Add runnable headless and resize/presentation examples, parameter and lifetime
+  tables, README example checks, and installation that preserves existing pins.
+
 ## 3.2.2 - 2026-10-09
 
 ### Changed

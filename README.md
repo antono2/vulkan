@@ -33,6 +33,11 @@ default V module location:
 v run "$HOME/.vmodules/antono2/vulkan/setup.vsh"
 ```
 
+In PowerShell, use `v run "$HOME\.vmodules\antono2\vulkan\setup.vsh" --check`.
+If `VMODULES` is configured, use its `antono2/vulkan` directory instead.
+Setup preserves existing module installations, including pinned releases.
+Use `--probe` to compile and run the first-use example through these bindings.
+
 From a source checkout, use `v run setup.vsh`. The script supports Ubuntu and
 Debian, Fedora, Arch, openSUSE, macOS and Windows with winget.
 On Linux it installs a C compiler, Vulkan runtime tools and the VPM module;
@@ -61,21 +66,45 @@ upstream revisions recorded by this repository.
 
 ## First use
 
-Applications using the binding directly must initialize Volk before the first
-Vulkan call, then load instance- and device-level commands after creating the
-corresponding handles:
+Save this as `main.v` and run `v run main.v`. It prints the available device
+names and reports an error if none are found. No window or shader tools are needed.
 
+<!-- example: examples/getting_started/main.v -->
 ```v
-import antono2.vulkan as vk
+module main
 
-if vk.initialize_loader() != .success {
-	panic('Vulkan loader initialization failed')
+import antono2.vulkan.ergonomic as vke
+
+fn main() {
+	run() or {
+		eprintln(err)
+		exit(1)
+	}
 }
-// create the Vulkan instance
-vk.load_instance_commands(instance)
-// create the Vulkan device
-vk.load_device_commands(device)
+
+fn run() ! {
+	mut instance := vke.new_instance_with_options(vke.InstanceOptions{
+		application_name: 'Vulkan first use'
+	})!
+	defer { instance.destroy() }
+	devices := instance.physical_devices()!
+	if devices.len == 0 { return error('Vulkan runtime found, but no devices were enumerated') }
+	for device in devices {
+		println(device.name())
+	}
+}
 ```
+
+The ergonomic layer initializes dispatch for you. Applications creating raw
+handles must call `initialize_loader()`, then `load_instance_commands(instance)`
+and `load_device_commands(device)` after their respective creation calls.
+
+| Task | Guide or example |
+| --- | --- |
+| Query formats, manage descriptors or pipeline caches | [Convenience reference](docs/conveniences.md) |
+| Create and recreate a presentation swapchain | [Presentation example](examples/presentation) |
+| Validate headless resource operations | [Convenience smoke test](examples/conveniences) |
+| Manage native resources and synchronization | [Ownership](OWNERSHIP.md) and [API design](API_DESIGN.md) |
 
 ### Platform extensions
 

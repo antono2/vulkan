@@ -51,7 +51,8 @@ pub fn require_success(result vk.Result, operation string) ! {
 // destroy before its storage goes out of scope.
 @[nocopy]
 pub struct OwnedInstance {
-	allocator &HostAllocator = unsafe { nil }
+	api_version u32            = vk.api_version_1_0
+	allocator   &HostAllocator = unsafe { nil }
 pub mut:
 	handle vk.Instance
 }
@@ -67,11 +68,17 @@ pub fn new_instance_with_allocator(create_info &vk.InstanceCreateInfo, allocator
 	require_success(vk.initialize_loader(), 'volkInitialize')!
 	mut handle := vk.Instance(unsafe { nil })
 	host_allocator := new_host_allocator(allocator)
-	require_success(vk.create_instance(create_info, allocator_ptr(host_allocator), &handle), 'vkCreateInstance')!
+	require_success(vk.create_instance(create_info, allocator_ptr(host_allocator), &handle),
+		'vkCreateInstance')!
 	vk.load_instance_commands(handle)
 	return &OwnedInstance{
-		allocator: host_allocator
-		handle:    handle
+		api_version: if isnil(create_info.pApplicationInfo) {
+			vk.api_version_1_0
+		} else {
+			create_info.pApplicationInfo.apiVersion
+		}
+		allocator:   host_allocator
+		handle:      handle
 	}
 }
 
@@ -252,8 +259,8 @@ pub fn (device &OwnedDevice) new_command_pool_for_queue(queue Queue, flags vk.Co
 		queueFamilyIndex: queue.family_index
 	}
 	mut handle := vk.CommandPool(unsafe { nil })
-	require_success(vk.create_command_pool(device.handle, &create_info, allocator_ptr(device.allocator), &handle),
-		'vkCreateCommandPool')!
+	require_success(vk.create_command_pool(device.handle, &create_info,
+		allocator_ptr(device.allocator), &handle), 'vkCreateCommandPool')!
 	return &OwnedCommandPool{
 		device:             device.handle
 		allocator:          device.allocator
@@ -379,8 +386,8 @@ pub fn (device &OwnedDevice) new_buffer(size vk.DeviceSize, usage vk.BufferUsage
 		sharingMode: .exclusive
 	}
 	mut handle := vk.Buffer(unsafe { nil })
-	require_success(vk.create_buffer(device.handle, &create_info, allocator_ptr(device.allocator), &handle),
-		'vkCreateBuffer')!
+	require_success(vk.create_buffer(device.handle, &create_info, allocator_ptr(device.allocator),
+		&handle), 'vkCreateBuffer')!
 
 	mut requirements := vk.MemoryRequirements{}
 	vk.get_buffer_memory_requirements(device.handle, handle, mut requirements)
@@ -396,8 +403,8 @@ pub fn (device &OwnedDevice) new_buffer(size vk.DeviceSize, usage vk.BufferUsage
 		memoryTypeIndex: memory_type_index
 	}
 	mut memory := vk.DeviceMemory(unsafe { nil })
-	require_success(vk.allocate_memory(device.handle, &allocate_info, allocator_ptr(device.allocator), &memory),
-		'vkAllocateMemory') or {
+	require_success(vk.allocate_memory(device.handle, &allocate_info,
+		allocator_ptr(device.allocator), &memory), 'vkAllocateMemory') or {
 		vk.destroy_buffer(device.handle, handle, allocator_ptr(device.allocator))
 		return err
 	}
@@ -456,7 +463,8 @@ pub:
 // all required properties, allocates it and binds it at offset zero.
 pub fn (device &OwnedDevice) new_image_2d(width u32, height u32, format vk.Format, tiling vk.ImageTiling,
 	usage vk.ImageUsageFlags, required_memory_properties vk.MemoryPropertyFlags) !&OwnedImage {
-	return device.new_image_2d_mips(width, height, 1, format, tiling, usage, required_memory_properties)
+	return device.new_image_2d_mips(width, height, 1, format, tiling, usage,
+		required_memory_properties)
 }
 
 // new_image_2d_mips creates an image with a complete or partial mip chain.
@@ -490,8 +498,8 @@ pub fn (device &OwnedDevice) new_image_2d_mips(width u32, height u32, mip_levels
 		initialLayout: .undefined
 	}
 	mut handle := vk.Image(unsafe { nil })
-	require_success(vk.create_image(device.handle, &create_info, allocator_ptr(device.allocator), &handle),
-		'vkCreateImage')!
+	require_success(vk.create_image(device.handle, &create_info, allocator_ptr(device.allocator),
+		&handle), 'vkCreateImage')!
 
 	mut requirements := vk.MemoryRequirements{}
 	vk.get_image_memory_requirements(device.handle, handle, mut requirements)
@@ -505,8 +513,8 @@ pub fn (device &OwnedDevice) new_image_2d_mips(width u32, height u32, mip_levels
 		memoryTypeIndex: memory_type_index
 	}
 	mut memory := vk.DeviceMemory(unsafe { nil })
-	require_success(vk.allocate_memory(device.handle, &allocate_info, allocator_ptr(device.allocator), &memory),
-		'vkAllocateMemory') or {
+	require_success(vk.allocate_memory(device.handle, &allocate_info,
+		allocator_ptr(device.allocator), &memory), 'vkAllocateMemory') or {
 		vk.destroy_image(device.handle, handle, allocator_ptr(device.allocator))
 		return err
 	}
@@ -616,8 +624,8 @@ pub fn (image &OwnedImage) new_view_mips(aspect_mask vk.ImageAspectFlags, base_m
 		subresourceRange: subresource_range
 	}
 	mut handle := vk.ImageView(unsafe { nil })
-	require_success(vk.create_image_view(image.device, &create_info, allocator_ptr(image.allocator), &handle),
-		'vkCreateImageView')!
+	require_success(vk.create_image_view(image.device, &create_info,
+		allocator_ptr(image.allocator), &handle), 'vkCreateImageView')!
 	return &OwnedImageView{
 		device:            image.device
 		allocator:         image.allocator
@@ -672,8 +680,8 @@ pub fn (transition ImageLayoutTransition) image_memory_barrier(image &OwnedImage
 		srcQueueFamilyIndex: vk.queue_family_ignored
 		dstQueueFamilyIndex: vk.queue_family_ignored
 		image:               image.handle
-		subresourceRange:    image_subresource_range(transition.aspect_mask, transition.base_mip_level,
-			level_count)
+		subresourceRange:    image_subresource_range(transition.aspect_mask,
+			transition.base_mip_level, level_count)
 	}
 }
 
@@ -710,8 +718,8 @@ pub fn (device &OwnedDevice) new_fence(signaled bool) !&OwnedFence {
 		flags: flags
 	}
 	mut handle := vk.Fence(unsafe { nil })
-	require_success(vk.create_fence(device.handle, &create_info, allocator_ptr(device.allocator), &handle),
-		'vkCreateFence')!
+	require_success(vk.create_fence(device.handle, &create_info, allocator_ptr(device.allocator),
+		&handle), 'vkCreateFence')!
 	return &OwnedFence{
 		device:    device.handle
 		allocator: device.allocator
@@ -765,8 +773,8 @@ pub mut:
 pub fn (device &OwnedDevice) new_semaphore() !&OwnedSemaphore {
 	create_info := vk.SemaphoreCreateInfo{}
 	mut handle := vk.Semaphore(unsafe { nil })
-	require_success(vk.create_semaphore(device.handle, &create_info, allocator_ptr(device.allocator), &handle),
-		'vkCreateSemaphore')!
+	require_success(vk.create_semaphore(device.handle, &create_info,
+		allocator_ptr(device.allocator), &handle), 'vkCreateSemaphore')!
 	return &OwnedSemaphore{
 		device:    device.handle
 		allocator: device.allocator
