@@ -24,6 +24,7 @@ fn main() {
 	queue_family := physical_device.find_queue_family(required_queue_flags) or {
 		panic('no graphics/compute queue family was found')
 	}
+	// Request queue index 1 when available to exercise nonzero queue selection.
 	if queue_family.properties.queueCount >= 2 {
 		mut legacy_device := physical_device.new_device_with_options(vke.DeviceOptions{
 			queue_family: queue_family
@@ -54,26 +55,30 @@ fn main() {
 
 	memory_properties := u32(vk.MemoryPropertyFlagBits.device_local)
 	buffer_usage := u32(vk.BufferUsageFlagBits.vertex_buffer) | u32(vk.BufferUsageFlagBits.transfer_dst)
-	mut buffer := device.new_buffer(4096, buffer_usage, memory_properties) or { panic(err) }
+	vertex_capacity_bytes := u64(4096) // Small 4 KiB allocation for the lifecycle check.
+	mut buffer := device.new_buffer(vertex_capacity_bytes, buffer_usage, memory_properties) or {
+		panic(err)
+	}
 	defer {
 		buffer.destroy()
 	}
 	host_memory_properties := u32(vk.MemoryPropertyFlagBits.host_visible) | u32(vk.MemoryPropertyFlagBits.host_coherent)
-	mut host_buffer := device.new_buffer(64, u32(vk.BufferUsageFlagBits.transfer_src), host_memory_properties) or {
-		panic(err)
-	}
+	host_capacity_bytes := u64(64) // Enough room for both four-byte writes below.
+	mut host_buffer := device.new_buffer(host_capacity_bytes,
+		u32(vk.BufferUsageFlagBits.transfer_src), host_memory_properties) or { panic(err) }
 	defer {
 		host_buffer.destroy()
 	}
 	host_buffer.upload_bytes(0, [u8(1), 2, 3, 4]) or { panic(err) }
+	// Map four bytes after the first write; flags 0 selects default mapping behavior.
 	mut mapped := host_buffer.map(4, 4, 0) or { panic(err) }
 	mapped.write_bytes(0, [u8(5), 6, 7, 8]) or { panic(err) }
 	mapped.unmap()
 
 	image_usage := u32(vk.ImageUsageFlagBits.sampled) | u32(vk.ImageUsageFlagBits.transfer_dst)
-	mut image := device.new_image_2d(64, 64, .r8g8b8a8_unorm, .optimal, image_usage, memory_properties) or {
-		panic(err)
-	}
+	image_side_pixels := u32(64) // Small square texture used only for a layout transition.
+	mut image := device.new_image_2d(image_side_pixels, image_side_pixels, .r8g8b8a8_unorm,
+		.optimal, image_usage, memory_properties) or { panic(err) }
 	defer {
 		image.destroy()
 	}
@@ -114,7 +119,8 @@ fn main() {
 	work_queue.submit([command_buffer], vke.SubmitOptions{
 		fence: fence.handle
 	}) or { panic(err) }
-	if fence.wait(5_000_000_000) or { panic(err) } != .success {
+	submission_timeout_ns := u64(5_000_000_000) // Five seconds, expressed in nanoseconds.
+	if fence.wait(submission_timeout_ns) or { panic(err) } != .success {
 		panic('queue submission did not complete before the smoke-test timeout')
 	}
 	work_queue.wait_idle() or { panic(err) }
