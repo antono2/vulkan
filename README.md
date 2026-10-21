@@ -71,6 +71,8 @@ names and reports an error if none are found. No window or shader tools are need
 
 <!-- example: examples/getting_started/main.v -->
 ```v
+// Lists Vulkan devices through the ergonomic instance owner with explicit cleanup.
+// Requires a Vulkan loader and device, but no window or shaders.
 module main
 
 import antono2.vulkan.ergonomic as vke

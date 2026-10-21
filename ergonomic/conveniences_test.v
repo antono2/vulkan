@@ -1,3 +1,4 @@
+// Checks format masks, acquire outcomes and invalid descriptor/cache inputs without a driver.
 module ergonomic
 
 import antono2.vulkan as vk
