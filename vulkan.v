@@ -43,7 +43,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 365
+pub const header_version = 366
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -1476,6 +1476,9 @@ pub enum StructureType as u32 {
 	physical_device_buffer_device_address_allocation_alignment_features_valve   = 1000709000
 	physical_device_buffer_device_address_allocation_alignment_properties_valve = 1000709001
 	buffer_device_address_alignment_allocate_info_valve                         = 1000709002
+	physical_device_hdr_smpte_st209450_features_google                          = 1000718000
+	hdr_smpte_st209450_google                                                   = 1000718001
+	surface_capabilities_hdr_smpte_st209450_google                              = 1000718002
 	max_enum                                                                    = max_int
 }
 
@@ -1551,6 +1554,7 @@ pub enum VendorId as u32 {
 	pocl     = u32(0x10006)
 	mobileye = u32(0x10007)
 	ape      = u32(0x10008)
+	apex     = u32(0x10009)
 	max_enum = max_int
 }
 
@@ -8081,6 +8085,9 @@ pub enum DriverId as u32 {
 	mesa_gfxstream                = 29
 	ape_soft                      = 30
 	reserved31                    = 31
+	apex                          = 32
+	nikki                         = 33
+	momoten                       = 34
 	max_enum                      = max_int
 }
 
@@ -38451,6 +38458,49 @@ pub mut:
 	sType     StructureType = StructureType.buffer_device_address_alignment_allocate_info_valve
 	pNext     voidptr       = unsafe { nil }
 	alignment u32
+}
+
+pub const google_hdr_smpte_st_209450_metadata_spec_version = 1
+pub const google_hdr_smpte_st_209450_metadata_extension_name = c'VK_GOOGLE_hdr_smpte_st_209450_metadata'
+
+pub enum HdrSmpteSt209450PowerPreferenceGOOGLE as u32 {
+	color_accuracy  = 0
+	low_power       = 1
+	max_enum_google = max_int
+}
+// PhysicalDeviceHdrSmpteSt209450FeaturesGOOGLE extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceHdrSmpteSt209450FeaturesGOOGLE = C.VkPhysicalDeviceHdrSmpteSt209450FeaturesGOOGLE
+
+@[typedef]
+pub struct C.VkPhysicalDeviceHdrSmpteSt209450FeaturesGOOGLE {
+pub mut:
+	sType            StructureType = StructureType.physical_device_hdr_smpte_st209450_features_google
+	pNext            voidptr       = unsafe { nil }
+	hdrSmpteSt209450 Bool32
+}
+
+// HdrSmpteSt209450GOOGLE extends VkHdrMetadataEXT
+pub type HdrSmpteSt209450GOOGLE = C.VkHdrSmpteSt209450GOOGLE
+
+@[typedef]
+pub struct C.VkHdrSmpteSt209450GOOGLE {
+pub mut:
+	sType           StructureType = StructureType.hdr_smpte_st209450_google
+	pNext           voidptr       = unsafe { nil }
+	metadataSize    usize
+	pMetadata       voidptr
+	powerPreference HdrSmpteSt209450PowerPreferenceGOOGLE
+}
+
+// SurfaceCapabilitiesHdrSmpteSt209450GOOGLE extends VkSurfaceCapabilities2KHR
+pub type SurfaceCapabilitiesHdrSmpteSt209450GOOGLE = C.VkSurfaceCapabilitiesHdrSmpteSt209450GOOGLE
+
+@[typedef]
+pub struct C.VkSurfaceCapabilitiesHdrSmpteSt209450GOOGLE {
+pub mut:
+	sType                     StructureType = StructureType.surface_capabilities_hdr_smpte_st209450_google
+	pNext                     voidptr       = unsafe { nil }
+	hdrSmpteSt209450Supported Bool32
 }
 
 pub const khr_acceleration_structure_spec_version = 13
