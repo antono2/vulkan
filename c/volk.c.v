@@ -6,4 +6,5 @@ module c
 #flag -I@VMODROOT/c/vendor/volk
 #flag linux -Wl,-Bsymbolic
 // Establish the pinned core before GLFW or another consumer includes Vulkan.
-#preinclude "@VMODROOT/c/volk_impl.h"
+#preinclude "@VMODROOT/c/vendor/include/vulkan/vulkan_core.h"
+#include "@VMODROOT/c/volk_impl.h"
