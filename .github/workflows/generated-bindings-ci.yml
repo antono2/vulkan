@@ -92,7 +92,7 @@ jobs:
           - os: ubuntu-24.04
             compiler: tcc
             v-channel: v3
-          - os: macos-14
+          - os: macos-15
             compiler: clang
             v-channel: stable
           - os: windows-2022
