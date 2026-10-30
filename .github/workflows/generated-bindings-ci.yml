@@ -282,6 +282,7 @@ jobs:
             v "${v_flags[@]}" run generator/test
           fi
           v "${v_flags[@]}" -o "$RUNNER_TEMP/bundled-header-smoke" ci/bundled_header_smoke
+          v "${v_flags[@]}" run ci/header_order_smoke
           v "${v_flags[@]}" test ergonomic
           python3 scripts/check_docs.py
           v "${v_flags[@]}" -o "$RUNNER_TEMP/vulkan-first-use" examples/getting_started
@@ -299,6 +300,12 @@ jobs:
           v -cc tcc test ergonomic
           VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
             v -cc tcc run examples/ergonomic_lifecycle
+      - name: Exercise current V3 device discovery and lifecycle
+        if: runner.os == 'Linux' && matrix.v-channel == 'master'
+        shell: bash
+        run: |
+          VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
+            v -new-compiler -cc gcc run examples/ergonomic_lifecycle
       - name: Check out presentation example dependency
         if: runner.os == 'Linux' && matrix.v-channel == 'stable'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7

@@ -24,7 +24,7 @@ fn extension_infos(properties []vk.ExtensionProperties) []ExtensionInfo {
 	mut result := []ExtensionInfo{cap: properties.len}
 	for property in properties {
 		result << ExtensionInfo{
-			name: unsafe { cstring_to_vstring(&property.extensionName[0]) }.clone()
+			name:         unsafe { cstring_to_vstring(&property.extensionName[0]) }.clone()
 			spec_version: property.specVersion
 		}
 	}
@@ -35,9 +35,9 @@ fn layer_infos(properties []vk.LayerProperties) []LayerInfo {
 	mut result := []LayerInfo{cap: properties.len}
 	for property in properties {
 		result << LayerInfo{
-			name: unsafe { cstring_to_vstring(&property.layerName[0]) }.clone()
-			description: unsafe { cstring_to_vstring(&property.description[0]) }.clone()
-			spec_version: property.specVersion
+			name:                   unsafe { cstring_to_vstring(&property.layerName[0]) }.clone()
+			description:            unsafe { cstring_to_vstring(&property.description[0]) }.clone()
+			spec_version:           property.specVersion
 			implementation_version: property.implementationVersion
 		}
 	}
@@ -50,7 +50,7 @@ pub fn instance_extensions() ![]ExtensionInfo {
 	require_success(vk.initialize_loader(), 'volkInitialize')!
 	for {
 		mut count := u32(0)
-		mut no_properties := unsafe { nil }
+		mut no_properties := unsafe { &vk.ExtensionProperties(nil) }
 		require_success(vk.enumerate_instance_extension_properties(unsafe { nil }, &count, mut no_properties), 'vkEnumerateInstanceExtensionProperties(count)')!
 		if count == 0 {
 			return []ExtensionInfo{}
@@ -72,7 +72,7 @@ pub fn instance_layers() ![]LayerInfo {
 	require_success(vk.initialize_loader(), 'volkInitialize')!
 	for {
 		mut count := u32(0)
-		mut no_properties := unsafe { nil }
+		mut no_properties := unsafe { &vk.LayerProperties(nil) }
 		require_success(vk.enumerate_instance_layer_properties(&count, mut no_properties), 'vkEnumerateInstanceLayerProperties(count)')!
 		if count == 0 {
 			return []LayerInfo{}
@@ -92,7 +92,7 @@ pub fn instance_layers() ![]LayerInfo {
 pub fn (device PhysicalDevice) extensions() ![]ExtensionInfo {
 	for {
 		mut count := u32(0)
-		mut no_properties := unsafe { nil }
+		mut no_properties := unsafe { &vk.ExtensionProperties(nil) }
 		require_success(vk.enumerate_device_extension_properties(device.handle, unsafe { nil }, &count, mut no_properties), 'vkEnumerateDeviceExtensionProperties(count)')!
 		if count == 0 {
 			return []ExtensionInfo{}
