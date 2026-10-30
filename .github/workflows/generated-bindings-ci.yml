@@ -234,7 +234,7 @@ jobs:
           module_root="$RUNNER_TEMP/vmodules/antono2/vulkan"
           mkdir -p "$module_root/c" "$module_root/ergonomic"
           cp vulkan.v vulkan_video.v loader.v v.mod VERSION REGISTRY_COMMIT VOLK_COMMIT "$module_root/"
-          cp c/loader_bridge.h c/volk.c.v c/volk_impl.h "$module_root/c/"
+          cp c/loader_bridge.h c/volk.c.v c/volk_impl.h c/vulkan_core_prelude.h "$module_root/c/"
           cp -R c/vendor "$module_root/c/"
           cp ergonomic/*.v "$module_root/ergonomic/"
           echo "VMODULES=$RUNNER_TEMP/vmodules" >> "$GITHUB_ENV"
