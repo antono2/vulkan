@@ -43,7 +43,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 366
+pub const header_version = 367
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -1468,6 +1468,8 @@ pub enum StructureType as u32 {
 	data_graph_pipeline_session_neural_statistics_create_info_arm               = 1000676001
 	physical_device_data_graph_neural_accelerator_statistics_features_arm       = 1000676002
 	physical_device_primitive_restart_index_features_ext                        = 1000678000
+	physical_device_maintenance12_features_khr                                  = 1000680000
+	physical_device_maintenance12_properties_khr                                = 1000680001
 	physical_device_image_tiling_control_features_ext                           = 1000687000
 	image_tiling_control_create_info_ext                                        = 1000687001
 	physical_device_cooperative_matrix_decode_vector_features_nv                = 1000689000
@@ -8088,6 +8090,7 @@ pub enum DriverId as u32 {
 	apex                          = 32
 	nikki                         = 33
 	momoten                       = 34
+	aurora_borealis               = 35
 	max_enum                      = max_int
 }
 
@@ -19835,6 +19838,7 @@ pub mut:
 fn C.vkGetDeviceFaultReportsKHR(
 	device Device, timeout u64, pFaultCounts &u32, mut_pFaultInfo &DeviceFaultInfoKHR) Result
 
+// pFaultCounts Pointer. Required, but 0/NULL allowed
 // mut_pFaultInfo Optional, can be NULL or 0
 pub type PFN_vkGetDeviceFaultReportsKHR = fn (device Device, timeout u64, pFaultCounts &u32, mut_pFaultInfo &DeviceFaultInfoKHR) Result
 
@@ -20465,6 +20469,30 @@ pub mut:
 	sType                            StructureType = StructureType.shared_present_surface_capabilities2_khr
 	pNext                            voidptr       = unsafe { nil }
 	sharedPresentSupportedUsageFlags ImageUsageFlags2KHR
+}
+
+pub const khr_maintenance_12_spec_version = 1
+pub const khr_maintenance_12_extension_name = c'VK_KHR_maintenance12'
+// PhysicalDeviceMaintenance12FeaturesKHR extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceMaintenance12FeaturesKHR = C.VkPhysicalDeviceMaintenance12FeaturesKHR
+
+@[typedef]
+pub struct C.VkPhysicalDeviceMaintenance12FeaturesKHR {
+pub mut:
+	sType         StructureType = StructureType.physical_device_maintenance12_features_khr
+	pNext         voidptr       = unsafe { nil }
+	maintenance12 Bool32
+}
+
+// PhysicalDeviceMaintenance12PropertiesKHR extends VkPhysicalDeviceProperties2
+pub type PhysicalDeviceMaintenance12PropertiesKHR = C.VkPhysicalDeviceMaintenance12PropertiesKHR
+
+@[typedef]
+pub struct C.VkPhysicalDeviceMaintenance12PropertiesKHR {
+pub mut:
+	sType                   StructureType = StructureType.physical_device_maintenance12_properties_khr
+	pNext                   voidptr       = unsafe { nil }
+	maxInputAttachmentIndex u32
 }
 
 // Pointer to VkDebugReportCallbackEXT_T
