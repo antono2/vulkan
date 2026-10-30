@@ -31,7 +31,7 @@ pub fn (device PhysicalDevice) surface_formats(surface vk.SurfaceKHR) ![]vk.Surf
 	}
 	for {
 		mut count := u32(0)
-		mut no_formats := unsafe { nil }
+		mut no_formats := unsafe { &vk.SurfaceFormatKHR(nil) }
 		result := vk.get_physical_device_surface_formats_khr(device.handle, surface, &count, mut no_formats)
 		if result == .incomplete {
 			continue
@@ -82,8 +82,8 @@ pub fn (device PhysicalDevice) surface_present_modes(surface vk.SurfaceKHR) ![]v
 // to configure or recreate a swapchain.
 pub fn (device PhysicalDevice) surface_support(surface vk.SurfaceKHR) !SurfaceSupport {
 	return SurfaceSupport{
-		capabilities: device.surface_capabilities(surface)!
-		formats: device.surface_formats(surface)!
+		capabilities:  device.surface_capabilities(surface)!
+		formats:       device.surface_formats(surface)!
 		present_modes: device.surface_present_modes(surface)!
 	}
 }
@@ -135,7 +135,7 @@ pub fn select_surface_extent(capabilities vk.SurfaceCapabilitiesKHR,
 		return capabilities.currentExtent
 	}
 	return vk.Extent2D{
-		width: clamp_u32(requested.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width)
+		width:  clamp_u32(requested.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width)
 		height: clamp_u32(requested.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height)
 	}
 }

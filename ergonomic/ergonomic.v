@@ -161,7 +161,7 @@ pub fn select_queue_family(families []QueueFamily, required_flags vk.QueueFlags)
 // family properties.
 pub fn (device PhysicalDevice) queue_families() []QueueFamily {
 	mut count := u32(0)
-	mut no_properties := unsafe { nil }
+	mut no_properties := unsafe { &vk.QueueFamilyProperties(nil) }
 	vk.get_physical_device_queue_family_properties(device.handle, &count, mut no_properties)
 	if count == 0 {
 		return []QueueFamily{}

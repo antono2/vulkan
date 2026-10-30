@@ -234,7 +234,7 @@ jobs:
           module_root="$RUNNER_TEMP/vmodules/antono2/vulkan"
           mkdir -p "$module_root/c" "$module_root/ergonomic"
           cp vulkan.v vulkan_video.v loader.v v.mod VERSION REGISTRY_COMMIT VOLK_COMMIT "$module_root/"
-          cp c/loader_bridge.h c/volk.c.v c/volk_impl.h "$module_root/c/"
+          cp c/loader_bridge.h c/volk.c.v c/volk_impl.h c/vulkan_core_prelude.h "$module_root/c/"
           cp -R c/vendor "$module_root/c/"
           cp ergonomic/*.v "$module_root/ergonomic/"
           echo "VMODULES=$RUNNER_TEMP/vmodules" >> "$GITHUB_ENV"
@@ -282,6 +282,7 @@ jobs:
             v "${v_flags[@]}" run generator/test
           fi
           v "${v_flags[@]}" -o "$RUNNER_TEMP/bundled-header-smoke" ci/bundled_header_smoke
+          v "${v_flags[@]}" run ci/header_order_smoke
           v "${v_flags[@]}" test ergonomic
           python3 scripts/check_docs.py
           v "${v_flags[@]}" -o "$RUNNER_TEMP/vulkan-first-use" examples/getting_started
@@ -299,6 +300,12 @@ jobs:
           v -cc tcc test ergonomic
           VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
             v -cc tcc run examples/ergonomic_lifecycle
+      - name: Exercise current V3 device discovery and lifecycle
+        if: runner.os == 'Linux' && matrix.v-channel == 'master'
+        shell: bash
+        run: |
+          VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
+            v -new-compiler -cc gcc run examples/ergonomic_lifecycle
       - name: Check out presentation example dependency
         if: runner.os == 'Linux' && matrix.v-channel == 'stable'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
