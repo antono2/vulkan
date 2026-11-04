@@ -1,3 +1,4 @@
+// Imports a dependent C header to test Vulkan core ordering across V modules.
 module consumer
 
 #include "@VMODROOT/ci/header_order_smoke/consumer.h"
