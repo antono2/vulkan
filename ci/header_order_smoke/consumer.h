@@ -1,3 +1,4 @@
+// Fails compilation if a dependent C header is included before the pinned Vulkan core.
 #ifndef VK_HEADER_VERSION
 #error "Pinned Vulkan headers must precede consumer includes"
 #endif
