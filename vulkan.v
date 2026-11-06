@@ -43,7 +43,7 @@ pub fn make_api_version(variant u32, major u32, minor u32, patch u32) u32 {
 }
 
 pub const api_version = make_api_version(0, 1, 0, 0) // Patch version should always be set to 0
-pub const header_version = 367
+pub const header_version = 368
 pub const header_version_complete = make_api_version(0, 1, 4, header_version)
 
 pub fn make_version(major u32, minor u32, patch u32) u32 {
@@ -1468,6 +1468,7 @@ pub enum StructureType as u32 {
 	data_graph_pipeline_session_neural_statistics_create_info_arm               = 1000676001
 	physical_device_data_graph_neural_accelerator_statistics_features_arm       = 1000676002
 	physical_device_primitive_restart_index_features_ext                        = 1000678000
+	physical_device_vertex_address_binding_unrestricted_features_ext            = 1000679000
 	physical_device_maintenance12_features_khr                                  = 1000680000
 	physical_device_maintenance12_properties_khr                                = 1000680001
 	physical_device_image_tiling_control_features_ext                           = 1000687000
@@ -38236,6 +38237,66 @@ $if vulkan_ubm ? {
 	}
 }
 
+pub type InternalHandleNV = C.VkInternalHandleNV
+
+@[typedef]
+pub struct C.VkInternalHandleNV {}
+
+pub const nv_internal_handle_spec_version = 1
+pub const nv_internal_handle_extension_name = c'VK_NV_internal_handle'
+
+@[keep_args_alive]
+fn C.vkGetPhysicalDeviceInternalHandleNV(
+	physicalDevice PhysicalDevice, mut_pHandle &InternalHandleNV)
+
+pub type PFN_vkGetPhysicalDeviceInternalHandleNV = fn (physicalDevice PhysicalDevice, mut_pHandle &InternalHandleNV)
+
+@[inline]
+pub fn get_physical_device_internal_handle_nv(
+	physicalDevice PhysicalDevice,
+	mut mut_pHandle InternalHandleNV) {
+	C.vkGetPhysicalDeviceInternalHandleNV(physicalDevice, mut_pHandle)
+}
+
+@[keep_args_alive]
+fn C.vkGetDeviceInternalHandleNV(
+	device Device, mut_pHandle &InternalHandleNV)
+
+pub type PFN_vkGetDeviceInternalHandleNV = fn (device Device, mut_pHandle &InternalHandleNV)
+
+@[inline]
+pub fn get_device_internal_handle_nv(
+	device Device,
+	mut mut_pHandle InternalHandleNV) {
+	C.vkGetDeviceInternalHandleNV(device, mut_pHandle)
+}
+
+@[keep_args_alive]
+fn C.vkGetQueueInternalHandleNV(
+	queue Queue, mut_pHandle &InternalHandleNV)
+
+pub type PFN_vkGetQueueInternalHandleNV = fn (queue Queue, mut_pHandle &InternalHandleNV)
+
+@[inline]
+pub fn get_queue_internal_handle_nv(
+	queue Queue,
+	mut mut_pHandle InternalHandleNV) {
+	C.vkGetQueueInternalHandleNV(queue, mut_pHandle)
+}
+
+@[keep_args_alive]
+fn C.vkGetCommandBufferInternalHandleNV(
+	commandBuffer CommandBuffer, mut_pHandle &InternalHandleNV)
+
+pub type PFN_vkGetCommandBufferInternalHandleNV = fn (commandBuffer CommandBuffer, mut_pHandle &InternalHandleNV)
+
+@[inline]
+pub fn get_command_buffer_internal_handle_nv(
+	commandBuffer CommandBuffer,
+	mut mut_pHandle InternalHandleNV) {
+	C.vkGetCommandBufferInternalHandleNV(commandBuffer, mut_pHandle)
+}
+
 pub const arm_cooperative_matrix_layouts_spec_version = 1
 pub const arm_cooperative_matrix_layouts_extension_name = c'VK_ARM_cooperative_matrix_layouts'
 // PhysicalDeviceCooperativeMatrixLayoutsFeaturesARM extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
@@ -38379,6 +38440,19 @@ pub fn cmd_set_primitive_restart_index_ext(
 	commandBuffer CommandBuffer,
 	primitiveRestartIndex u32) {
 	C.vkCmdSetPrimitiveRestartIndexEXT(commandBuffer, primitiveRestartIndex)
+}
+
+pub const ext_vertex_address_binding_unrestricted_spec_version = 1
+pub const ext_vertex_address_binding_unrestricted_extension_name = c'VK_EXT_vertex_address_binding_unrestricted'
+// PhysicalDeviceVertexAddressBindingUnrestrictedFeaturesEXT extends VkPhysicalDeviceFeatures2,VkDeviceCreateInfo
+pub type PhysicalDeviceVertexAddressBindingUnrestrictedFeaturesEXT = C.VkPhysicalDeviceVertexAddressBindingUnrestrictedFeaturesEXT
+
+@[typedef]
+pub struct C.VkPhysicalDeviceVertexAddressBindingUnrestrictedFeaturesEXT {
+pub mut:
+	sType                            StructureType = StructureType.physical_device_vertex_address_binding_unrestricted_features_ext
+	pNext                            voidptr       = unsafe { nil }
+	vertexAddressBindingUnrestricted Bool32
 }
 
 pub const ext_image_tiling_control_spec_version = 1
