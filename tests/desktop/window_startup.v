@@ -137,9 +137,9 @@ fn scenario(binary string, logs string, mode string, args []string) ! {
 	}
 }
 
-fn session(binary string, logs string, args []string) ! {
-	// Keep one client connected between scenarios. Otherwise Xvfb may reset
-	// after the last manager exits, racing the next XOpenDisplay call.
+fn session(binary string, logs string, mode string, args []string) ! {
+	// Keep the display alive during manager handover. Each scenario gets a
+	// fresh server so old manager properties cannot affect the next one.
 	display := C.XOpenDisplay(unsafe { nil })
 	if isnil(display) {
 		return error('Cannot keep the private X11 display open')
@@ -167,10 +167,7 @@ fn session(binary string, logs string, args []string) ! {
 	os.setenv('LP_NUM_THREADS', '1', true)
 	os.setenv('VIMGUI_SMOKE_FRAMES', '3', true)
 	os.setenv('TT_PIPELINE_CACHE_FILE', os.join_path(logs, 'pipelines.cache'), true)
-	for mode in ['normal', 'handover', 'drop-first', 'never-map', 'minimized'] {
-		scenario(binary, logs, mode, args)!
-	}
-	println('PASS: normal mapping, dropped-request recovery, bounded failure and minimized-window handling')
+	scenario(binary, logs, mode, args)!
 }
 
 fn main() {
@@ -181,8 +178,8 @@ fn main() {
 		}
 		return
 	}
-	if os.args.len >= 4 && os.args[1] == '--session' {
-		session(os.args[2], os.args[3], os.args[4..]) or {
+	if os.args.len >= 5 && os.args[1] == '--session' {
+		session(os.args[2], os.args[3], os.args[4], os.args[5..]) or {
 			eprintln(err)
 			exit(1)
 		}
@@ -194,11 +191,15 @@ fn main() {
 	}
 	binary := os.real_path(os.args[1])
 	logs := os.abs_path(os.args[2])
-	mut child := os.new_process('xvfb-run')
-	mut args := ['-a', '-s', '-screen 0 1600x1000x24', os.executable(), '--session', binary, logs]
-	args << os.args[3..]
-	child.set_args(args)
-	child.run()
-	child.wait()
-	exit(child.code)
+	for mode in ['normal', 'handover', 'drop-first', 'never-map', 'minimized'] {
+		mut child := os.new_process('xvfb-run')
+		mut args := ['-a', '-s', '-screen 0 1600x1000x24', os.executable(), '--session', binary,
+			logs, mode]
+		args << os.args[3..]
+		child.set_args(args)
+		child.run()
+		child.wait()
+		if child.code != 0 { exit(child.code) }
+	}
+	println('PASS: normal mapping, dropped-request recovery, bounded failure and minimized-window handling')
 }
