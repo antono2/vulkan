@@ -138,6 +138,13 @@ fn scenario(binary string, logs string, mode string, args []string) ! {
 }
 
 fn session(binary string, logs string, args []string) ! {
+	// Keep one client connected between scenarios. Otherwise Xvfb may reset
+	// after the last manager exits, racing the next XOpenDisplay call.
+	display := C.XOpenDisplay(unsafe { nil })
+	if isnil(display) {
+		return error('Cannot keep the private X11 display open')
+	}
+	defer { C.XCloseDisplay(display) }
 	os.mkdir_all(logs)!
 	if os.getenv('VIMGUI_STARTUP_LOCAL_XLIB') == '1' {
 		// Verify the modern GLFW lane is not masked by accessibility or other
