@@ -16,6 +16,9 @@ concurrency:
   group: validate-vulkan-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  V_C_ERROR_BUG_REPORT_DISABLED: 1
+
 jobs:
   generated-change-scope:
     if: github.event_name == 'pull_request'
@@ -321,10 +324,12 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install -y libglfw3-dev xvfb xauth
+          sudo apt-get install -y libglfw3-dev libx11-dev openbox xvfb xauth mesa-vulkan-drivers vulkan-validationlayers
           mkdir -p "$VMODULES/antono2/glfw"
           cp -R .ci-glfw/. "$VMODULES/antono2/glfw/"
           v -cc gcc -o "$RUNNER_TEMP/presentation" examples/presentation
+          v -cc tcc -o "$RUNNER_TEMP/window-startup-check" tests/desktop/window_startup.v
+          "$RUNNER_TEMP/window-startup-check" "$RUNNER_TEMP/presentation" "$RUNNER_TEMP/window-startup-logs"
           VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation xvfb-run -a "$RUNNER_TEMP/presentation" > "$RUNNER_TEMP/presentation.log" 2>&1
           cat "$RUNNER_TEMP/presentation.log"
           if grep -Eiq 'Validation (Error|Warning)|VUID-' "$RUNNER_TEMP/presentation.log"; then exit 1; fi
