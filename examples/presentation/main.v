@@ -4,6 +4,7 @@ module main
 import antono2.glfw
 import antono2.vulkan as vk
 import antono2.vulkan.ergonomic as vke
+import examples.presentation.windowing
 
 fn C.glfwSetWindowSize(window &glfw.Window, width int, height int)
 fn main() {
@@ -20,9 +21,7 @@ fn run() ! {
 	// A small 16:9 window, enlarged below to exercise swapchain recreation.
 	initial_width := 640
 	initial_height := 360
-	window := glfw.create_window(initial_width, initial_height, 'Vulkan presentation',
-		unsafe { nil }, unsafe { nil })
-	if isnil(window) { return error('window creation failed') }
+	window := windowing.create_windowed(initial_width, initial_height, 'Vulkan presentation')!
 	defer { glfw.destroy_window(window) }
 	mut count := u32(0)
 	names := glfw.get_required_instance_extensions(&count)
