@@ -46,6 +46,9 @@ struct Probes {
 }
 
 fn find_executable(name string) string {
+	if os.is_abs_path(name) && os.is_file(name) && os.is_executable(name) {
+		return name
+	}
 	path := os.find_abs_path_of_executable(name) or { return '' }
 	return if os.is_file(path) && os.is_executable(path) { path } else { '' }
 }
@@ -90,7 +93,7 @@ fn run_probe(executable string, args []string, timeout time.Duration) ProbeResul
 			time.sleep(probe_interval)
 		}
 	}
-	detail := (stdout.str() + stderr.str()).trim_space()
+	detail := (stdout.str() + stderr.str()).replace('\r\n', '\n').trim_space()
 	return ProbeResult{
 		ok:     child.code == 0
 		detail: if detail == '' { child.err } else { detail }
