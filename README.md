@@ -249,6 +249,14 @@ compiler. The separate pinned V3 lane requires `-new-compiler` frontend checks
 so that fallback cannot hide type-checking failures. Its C backend and the
 moving-master lane remain advisory while compiler compatibility is verified.
 
+GitHub Actions consumers can use the [shared Vulkan SDK action](.github/actions/setup-vulkan-ci/action.yml)
+after setting up V. Pass the SDK version and VulkanCI artifact tag from the
+consumer's compatibility manifest. In a checkout, run
+`v run .github/scripts/setup-vulkan-ci.vsh SDK_VERSION ARTIFACT_TAG`.
+For a local run, set `RUNNER_OS`, `RUNNER_TEMP` and `GITHUB_ENV`.
+On Windows, also set `GITHUB_PATH`.
+The shell entry point forwards to the V script in the same checkout.
+
 The generated registry snapshot determines which declarations are available.
 The installed Vulkan loader and driver must still support every command,
 extension and feature an application requests. Successful compilation alone
