@@ -21,3 +21,19 @@ decoding or OpenCL interoperability. Use the tested V compiler from `compatibili
 
 Choose `--profile v3` for the pinned V3 compiler or `--profile release` for
 the released compiler when the project defines multiple profiles.
+
+## Vulkan SDK setup in GitHub Actions
+
+After installing V on the runner, use the SDK setup action with the VulkanCI
+release that matches the native test suite. Pin the action to a commit.
+
+```yaml
+- uses: antono2/vulkan/.github/actions/setup-vulkan-ci@COMMIT_SHA
+  with:
+    sdk-version: '1.4.309.0'
+    artifact-tag: 'v1.2'
+```
+
+The action configures `VULKAN_SDK`, `VULKAN_SDK_VERSION`, `VK_DRIVER_FILES`,
+and the runner paths for the SDK and SwiftShader. Applications can choose
+their bindings revision independently of the SDK setup action.
