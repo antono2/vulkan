@@ -171,7 +171,7 @@ jobs:
       - name: Install Vulkan SDK and SwiftShader test artifacts
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash
-        run: bash .github/scripts/setup-vulkan-ci.sh ${{ steps.compat.outputs.ci_sdk }} ${{ steps.compat.outputs.ci_runtime }}
+        run: v run .github/scripts/setup-vulkan-ci.vsh "${{ steps.compat.outputs.ci_sdk }}" "${{ steps.compat.outputs.ci_runtime }}"
       - name: Verify bundled headers and Volk against pinned upstream sources
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash

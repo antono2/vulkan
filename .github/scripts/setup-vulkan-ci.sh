@@ -3,6 +3,12 @@
 
 set -euo pipefail
 
+# Installed checkouts use V. Some workflows download this entry point on its own.
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+if [[ -f "$script_dir/setup-vulkan-ci.vsh" ]] && command -v v >/dev/null 2>&1; then
+	exec v run "$script_dir/setup-vulkan-ci.vsh" "$@"
+fi
+
 sdk_version="${1:?usage: setup-vulkan-ci.sh SDK_VERSION ARTIFACT_TAG}"
 artifact_tag="${2:?usage: setup-vulkan-ci.sh SDK_VERSION ARTIFACT_TAG}"
 install_root="${RUNNER_TEMP:?}"
