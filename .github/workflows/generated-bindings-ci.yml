@@ -287,7 +287,7 @@ jobs:
           v "${v_flags[@]}" -o "$RUNNER_TEMP/bundled-header-smoke" ci/bundled_header_smoke
           v "${v_flags[@]}" run ci/header_order_smoke
           v "${v_flags[@]}" test ergonomic
-          python3 scripts/check_docs.py
+          v run scripts/check_docs.vsh
           v "${v_flags[@]}" -o "$RUNNER_TEMP/vulkan-first-use" examples/getting_started
           v "${v_flags[@]}" -o "$RUNNER_TEMP/vulkan-conveniences" examples/conveniences
           if [[ "${{ runner.os }}" == Linux && "${{ matrix.v-channel }}" == stable ]]; then
@@ -299,7 +299,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 ci/test_setup_preserves_module.py
+          v run ci/test_setup_preserves_module.vsh
           v -cc tcc test ergonomic
           VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
             v -cc tcc run examples/ergonomic_lifecycle
