@@ -1,0 +1,20 @@
+name: Vulkan SDK and SwiftShader
+description: Install pinned VulkanCI assets with V and configure the runner environment
+inputs:
+  sdk-version:
+    description: Vulkan SDK version used in the VulkanCI asset names
+    required: true
+  artifact-tag:
+    description: VulkanCI release tag that contains the SDK and SwiftShader archives
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Install the SDK and software driver
+      shell: bash
+      env:
+        VULKAN_CI_SDK_VERSION: ${{ inputs.sdk-version }}
+        VULKAN_CI_ARTIFACT_TAG: ${{ inputs.artifact-tag }}
+      run: |
+        v run "$GITHUB_ACTION_PATH/../../scripts/setup-vulkan-ci.vsh" \
+          "$VULKAN_CI_SDK_VERSION" "$VULKAN_CI_ARTIFACT_TAG"
