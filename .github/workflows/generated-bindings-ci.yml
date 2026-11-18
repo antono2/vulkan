@@ -27,14 +27,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+      - uses: prantlf/setup-v-action@92f20bea50d2c9931a28c96bb4997a3c7357baf0 # v4
+        with:
+          version: 0.5.2
       - name: Validate and resolve tested compatibility
         id: compat
         shell: bash
         working-directory: ${{ github.workspace }}
         run: |
-          python ./scripts/test_compatibility.py
+          v run scripts/compatibility.vsh --self-test
           python ./scripts/test_doctor.py
-          python ./scripts/compatibility.py --github-output "$GITHUB_OUTPUT"
+          v run scripts/compatibility.vsh --github-output "$GITHUB_OUTPUT"
       - name: Accept only generated binding files
         env:
           BASE_REF: ${{ github.base_ref }}
@@ -104,21 +107,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: prantlf/setup-v-action@92f20bea50d2c9931a28c96bb4997a3c7357baf0 # v4
+        with:
+          version: 0.5.2
       - name: Validate and resolve tested compatibility
         id: compat
         shell: bash
         working-directory: ${{ github.workspace }}
         run: |
-          python ./scripts/test_compatibility.py
+          v run scripts/compatibility.vsh --self-test
           python ./scripts/test_doctor.py
-          python ./scripts/compatibility.py --profile '${{ matrix.v-channel }}' --github-output "$GITHUB_OUTPUT"
+          v run scripts/compatibility.vsh --profile '${{ matrix.v-channel }}' --github-output "$GITHUB_OUTPUT"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: antono2/v_vulkan_bindings
           ref: ${{ steps.compat.outputs.generator }}
           path: generator
       - uses: prantlf/setup-v-action@92f20bea50d2c9931a28c96bb4997a3c7357baf0 # v4
-        if: matrix.v-channel == 'stable'
+        if: matrix.v-channel == 'stable' && steps.compat.outputs.selected_v != '0.5.2'
         with:
           version: ${{ steps.compat.outputs.selected_v }}
       # Source-built V revisions include the v1_fallback executable needed by
@@ -385,14 +391,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+      - uses: prantlf/setup-v-action@92f20bea50d2c9931a28c96bb4997a3c7357baf0 # v4
+        with:
+          version: 0.5.2
       - name: Validate and resolve tested compatibility
         id: compat
         shell: bash
         working-directory: ${{ github.workspace }}
         run: |
-          python ./scripts/test_compatibility.py
+          v run scripts/compatibility.vsh --self-test
           python ./scripts/test_doctor.py
-          python ./scripts/compatibility.py --github-output "$GITHUB_OUTPUT"
+          v run scripts/compatibility.vsh --github-output "$GITHUB_OUTPUT"
       - name: Validate and publish the package release
         env:
           GH_TOKEN: ${{ github.token }}
