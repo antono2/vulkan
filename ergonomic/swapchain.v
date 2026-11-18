@@ -143,7 +143,8 @@ pub fn (queue Queue) present_image(swapchain vk.SwapchainKHR, index u32, options
 		swapchainCount: 1
 		pFences:        &completion_fence
 	}
-	next := if isnil(completion_fence) { unsafe { nil } } else { voidptr(&fence_info) }
+	mut next := voidptr(unsafe { nil })
+	if !isnil(completion_fence) { next = voidptr(&fence_info) }
 	info := vk.PresentInfoKHR{
 		pNext:              next
 		waitSemaphoreCount: u32(options.waits.len)
