@@ -1,5 +1,9 @@
 # Clear, present, resize
 
+![Vulkan blue clear at 640 × 360 and then 800 × 450](preview.gif)
+
+The preview holds a frame from each swapchain generation so the resize is easy to see. The example itself presents six frames at each size and exits.
+
 Install GLFW's native development files and the dependency in this example's
 `v.mod`. Use the Vulkan checkout containing the new ergonomic helpers as your
 `antono2.vulkan` module. From the Vulkan repository root:
