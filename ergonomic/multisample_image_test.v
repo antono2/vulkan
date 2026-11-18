@@ -1,3 +1,5 @@
+// Checks multisample request validation before native image allocation.
+// Rejects combined sample flags, invalid dimensions/formats and missing device ownership.
 module ergonomic
 
 import antono2.vulkan as vk

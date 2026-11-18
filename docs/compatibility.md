@@ -17,7 +17,7 @@ compiler/tool/dependency diagnostics. Add `--json` for a support report and
 `--runtime` for Vulkan device enumeration when Vulkan tools are available. Missing
 or mismatched prerequisites include a recovery action; diagnostics never repair
 caches or change the environment. Enumeration alone does not prove hardware video
-decoding or OpenCL interoperability. Python 3.9 or newer is required for these tools.
+decoding or OpenCL interoperability. Use the tested V compiler from `compatibility.json` to run these tools.
 
 Choose `--profile v3` for the pinned V3 compiler or `--profile release` for
 the released compiler when the project defines multiple profiles.
