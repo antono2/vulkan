@@ -8,7 +8,7 @@ generated API contents; upstream update workflows deliberately select candidates
 separately from the tested compiler profiles.
 
 Upgrade the manifest and affected VPM declarations together. Run
-`python scripts/test_compatibility.py` and the full project CI. Consumer application
+`v run scripts/compatibility.vsh --self-test` and the full project CI. Consumer application
 compilation/runtime checks are also required before publishing a dependency upgrade.
 The resolver's `--modules PATH` option verifies installed Git tags without fetching.
 
