@@ -84,8 +84,13 @@ fn runner_path(path string) string {
 }
 
 fn setup(args []string) ! {
+	usage := 'Usage: v run .github/scripts/setup-vulkan-ci.vsh SDK_VERSION ARTIFACT_TAG'
+	if args == ['--help'] || args == ['-h'] {
+		println(usage)
+		return
+	}
 	if args.len != 2 || args.any(!valid_asset_component(it)) {
-		return error('Usage: v run .github/scripts/setup-vulkan-ci.vsh SDK_VERSION ARTIFACT_TAG')
+		return error(usage)
 	}
 	sdk_version := args[0]
 	tag := args[1]
