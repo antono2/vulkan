@@ -36,7 +36,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           v run scripts/compatibility.vsh --self-test
-          python ./scripts/test_doctor.py
+          v run ./scripts/doctor.vsh --self-test
           v run scripts/compatibility.vsh --github-output "$GITHUB_OUTPUT"
       - name: Accept only generated binding files
         env:
@@ -116,7 +116,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           v run scripts/compatibility.vsh --self-test
-          python ./scripts/test_doctor.py
+          v run ./scripts/doctor.vsh --self-test
           v run scripts/compatibility.vsh --profile '${{ matrix.v-channel }}' --github-output "$GITHUB_OUTPUT"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -400,7 +400,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           v run scripts/compatibility.vsh --self-test
-          python ./scripts/test_doctor.py
+          v run ./scripts/doctor.vsh --self-test
           v run scripts/compatibility.vsh --github-output "$GITHUB_OUTPUT"
       - name: Validate and publish the package release
         env:
