@@ -17,6 +17,15 @@ A feature-mask match alone does not validate an image's dimensions or sample
 count. Query the exact configuration and check the returned limits as needed.
 Format order is application policy, including depth precision and HDR choices.
 
+`device.physical_device_snapshot()` returns the physical device used to create
+the logical device. Use it for capability queries while both owners remain live.
+`new_multisample_image_2d()` checks the exact format, usage, extent and sample
+count before allocating a one-level, one-layer image. The caller creates views
+and render targets, resolves samples, and waits before destruction.
+
+`loader_api_version()` queries the loader before instance creation. A loader
+without `vkEnumerateInstanceVersion` reports Vulkan 1.0.
+
 ## Descriptors
 
 | Owner or method | Contract |

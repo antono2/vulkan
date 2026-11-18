@@ -115,10 +115,11 @@ pub fn (pool &OwnedDescriptorPool) allocate(layouts []&OwnedDescriptorLayout) ![
 		pSetLayouts:        handles.data
 	}
 	mut sets := []vk.DescriptorSet{len: handles.len, init: vk.DescriptorSet(unsafe { nil })}
-	require_success(vk.allocate_descriptor_sets(pool.device, &info, sets.data),
+	require_success(vk.allocate_descriptor_sets(pool.device, &info, unsafe { &sets[0] }),
 		'vkAllocateDescriptorSets')!
 	mut result := []BorrowedDescriptorSet{cap: sets.len}
-	for i, handle in sets {
+	for i in 0 .. sets.len {
+		handle := sets[i]
 		result << BorrowedDescriptorSet{
 			pool:       pool
 			generation: pool.generation

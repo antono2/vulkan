@@ -12,6 +12,7 @@ fn main() {
 }
 
 fn run() ! {
+	assert vke.loader_api_version()! >= vk.api_version_1_0
 	uniform_binding := u32(0)
 	set_count := u32(2) // Two sets, each with one uniform-buffer descriptor.
 	uniform_bytes := u64(16 * sizeof(f32)) // Space for a 4x4 float matrix.
@@ -40,6 +41,8 @@ fn run() ! {
 	}
 	mut device := physical.new_device(family)!
 	defer { device.destroy() }
+	check_multisample_attachment(device)!
+
 	format := physical.select_format([vk.Format.d32_sfloat, .d24_unorm_s8_uint], .optimal,
 		u32(vk.FormatFeatureFlagBits.depth_stencil_attachment))!
 	assert format != .undefined
@@ -117,4 +120,27 @@ fn run() ! {
 	assert samples.len == 2 && samples[0].available && samples[1].available
 	assert queries.elapsed_ns(samples[0], samples[1])! >= 0
 	println('Vulkan format, descriptor, cache and timestamp checks passed on ${physical.name()}')
+}
+
+// Use a sample count advertised for this exact format and usage.
+fn check_multisample_attachment(device &vke.OwnedDevice) ! {
+	physical := device.physical_device_snapshot()!
+	format := vk.Format.r8g8b8a8_unorm
+	usage := u32(vk.ImageUsageFlagBits.color_attachment)
+	support := physical.image_format_properties(format, ._2d, .optimal, usage, 0)!
+	if !support.supported {
+		return error('RGBA8 color attachments unavailable')
+	}
+	samples := if support.properties.sampleCounts & u32(vk.SampleCountFlagBits._4) != 0 {
+		vk.SampleCountFlagBits._4
+	} else {
+		vk.SampleCountFlagBits._1
+	}
+	attachment_side := u32(16)
+	mut image := device.new_multisample_image_2d(attachment_side, attachment_side, format,
+		samples, usage, u32(vk.MemoryPropertyFlagBits.device_local))!
+	defer { image.destroy() }
+	mut view := image.new_view(u32(vk.ImageAspectFlagBits.color))!
+	defer { view.destroy() }
+	println('Vulkan image allocation and view passed at sample count ${u32(samples)}')
 }
