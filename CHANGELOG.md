@@ -6,6 +6,10 @@ in `VERSION`.
 
 ## Unreleased
 
+- Add loader API version discovery with a Vulkan 1.0 fallback.
+- Add owned 2D image creation with an explicit sample count and a physical
+  device snapshot for capability queries.
+
 ## 3.3.0 - 2026-10-14
 
 - Add explicit ergonomic owners for descriptor layouts/pools, swapchains and

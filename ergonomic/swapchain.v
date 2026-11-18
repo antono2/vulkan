@@ -25,7 +25,7 @@ pub fn swapchain_images(device vk.Device, swapchain vk.SwapchainKHR) ![]vk.Image
 		require_success(status, 'vkGetSwapchainImagesKHR(count)')!
 		if count == 0 { return error('swapchain contains no images') }
 		mut images := []vk.Image{len: int(count), init: vk.Image(unsafe { nil })}
-		filled := vk.get_swapchain_images_khr(device, swapchain, &count, images.data)
+		filled := vk.get_swapchain_images_khr(device, swapchain, &count, unsafe { &images[0] })
 		if filled == .incomplete { continue
 		 }
 		require_success(filled, 'vkGetSwapchainImagesKHR(images)')!
@@ -57,7 +57,8 @@ pub fn (device &OwnedDevice) new_swapchain(info &vk.SwapchainCreateInfoKHR) !&Ow
 		}
 	}
 	images := swapchain_images(device.handle, handle)!
-	for image in images {
+	for index in 0 .. images.len {
+		image := images[index]
 		view_info := vk.ImageViewCreateInfo{
 			image:            image
 			viewType:         ._2d
@@ -119,12 +120,13 @@ pub fn (queue Queue) present(swapchain &OwnedSwapchain, index u32, waits []vk.Se
 		return error('invalid swapchain or image index')
 	}
 	if queue.device != swapchain.device { return error('present queue belongs to another device') }
+	mut image_index := index
 	info := vk.PresentInfoKHR{
 		waitSemaphoreCount: u32(waits.len)
 		pWaitSemaphores:    waits.data
 		swapchainCount:     1
 		pSwapchains:        &swapchain.handle
-		pImageIndices:      &index
+		pImageIndices:      &image_index
 	}
 	status := vk.queue_present_khr(queue.handle, &info)
 	if status in [.success, .suboptimal_khr, .error_out_of_date_khr] { return status }

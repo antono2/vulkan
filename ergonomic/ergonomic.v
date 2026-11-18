@@ -441,7 +441,7 @@ pub fn (mut buffer OwnedBuffer) destroy() {
 }
 
 // OwnedImage owns a two-dimensional VkImage and its bound VkDeviceMemory.
-// The image uses one array layer and one sample.
+// The constructors select the sample count. Images have one array layer.
 @[nocopy]
 pub struct OwnedImage {
 	device    vk.Device
@@ -497,8 +497,13 @@ pub fn (device &OwnedDevice) new_image_2d_mips(width u32, height u32, mip_levels
 		sharingMode:   .exclusive
 		initialLayout: .undefined
 	}
+	return device.new_owned_image(&create_info, required_memory_properties)
+}
+
+fn (device &OwnedDevice) new_owned_image(create_info &vk.ImageCreateInfo,
+	required_memory_properties vk.MemoryPropertyFlags) !&OwnedImage {
 	mut handle := vk.Image(unsafe { nil })
-	require_success(vk.create_image(device.handle, &create_info, allocator_ptr(device.allocator),
+	require_success(vk.create_image(device.handle, create_info, allocator_ptr(device.allocator),
 		&handle), 'vkCreateImage')!
 
 	mut requirements := vk.MemoryRequirements{}
@@ -529,11 +534,11 @@ pub fn (device &OwnedDevice) new_image_2d_mips(width u32, height u32, mip_levels
 		allocator:         device.allocator
 		handle:            handle
 		memory:            memory
-		format:            format
-		extent:            extent
-		mip_levels:        mip_levels
-		tiling:            tiling
-		usage:             usage
+		format:            create_info.format
+		extent:            create_info.extent
+		mip_levels:        create_info.mipLevels
+		tiling:            create_info.tiling
+		usage:             create_info.usage
 		allocation_size:   requirements.size
 		memory_type_index: memory_type_index
 	}
