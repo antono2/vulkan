@@ -1,3 +1,5 @@
+// Checks loader-version validation and the Vulkan 1.0 fallback with fake function pointers.
+// No loader or device is required for these query-path regressions.
 module ergonomic
 
 import antono2.vulkan as vk
