@@ -70,6 +70,12 @@ submission that will signal it. Destroy dependent framebuffers before the
 swapchain. If `oldSwapchain` is provided, Vulkan retirement rules still apply,
 including creation failure. Do not assume the old swapchain remains acquirable.
 
+Use `queue.present_image(handle, index, PresentOptions{...})` with a native
+swapchain when the caller owns acquisition and retirement. It returns
+`VkResult` directly. Set `completion_fence` only with the enabled
+`swapchainMaintenance1` feature and an unsignaled fence. The caller tracks
+which operations queued and waits before reusing or destroying the fence.
+
 ## Diagnostics and caches
 
 | API | Requirements and lifetime |

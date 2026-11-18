@@ -120,17 +120,40 @@ pub fn (queue Queue) present(swapchain &OwnedSwapchain, index u32, waits []vk.Se
 		return error('invalid swapchain or image index')
 	}
 	if queue.device != swapchain.device { return error('present queue belongs to another device') }
-	mut image_index := index
-	info := vk.PresentInfoKHR{
-		waitSemaphoreCount: u32(waits.len)
-		pWaitSemaphores:    waits.data
-		swapchainCount:     1
-		pSwapchains:        &swapchain.handle
-		pImageIndices:      &image_index
-	}
-	status := vk.queue_present_khr(queue.handle, &info)
+	status := queue.present_image(swapchain.handle, index, PresentOptions{ waits: waits })
 	if status in [.success, .suboptimal_khr, .error_out_of_date_khr] { return status }
 	return check(status, 'vkQueuePresentKHR')
+}
+
+pub struct PresentOptions {
+pub:
+	waits []vk.Semaphore
+	// A non-null fence requires the enabled swapchainMaintenance1 feature.
+	completion_fence vk.Fence = unsafe { nil }
+}
+
+// Present one image from a native swapchain. The caller owns the swapchain,
+// supplies a valid image index and keeps wait semaphores and the fence alive.
+// Preserve the native result so callers can track which operations were queued.
+pub fn (queue Queue) present_image(swapchain vk.SwapchainKHR, index u32, options PresentOptions) vk.Result {
+	mut image_index := index
+	mut swapchain_handle := swapchain
+	mut completion_fence := options.completion_fence
+	fence_info := vk.SwapchainPresentFenceInfoKHR{
+		swapchainCount: 1
+		pFences:        &completion_fence
+	}
+	mut next := voidptr(unsafe { nil })
+	if !isnil(completion_fence) { next = voidptr(&fence_info) }
+	info := vk.PresentInfoKHR{
+		pNext:              next
+		waitSemaphoreCount: u32(options.waits.len)
+		pWaitSemaphores:    options.waits.data
+		swapchainCount:     1
+		pSwapchains:        &swapchain_handle
+		pImageIndices:      &image_index
+	}
+	return vk.queue_present_khr(queue.handle, &info)
 }
 
 // Complete GPU/presentation use and destroy framebuffers before destruction.
