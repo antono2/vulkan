@@ -158,6 +158,13 @@ the Vulkan/OpenCL particle renderer in
 The canonical binding-generator tests remain in
 [`antono2/v_vulkan_bindings`](https://github.com/antono2/v_vulkan_bindings/tree/master/test).
 
+The [Vulkan Video player](https://github.com/antono2/v_vulkan_video) uses the
+Vulkan Video bindings for H.264 decode and presentation. The
+[presentation example](examples/presentation) shows the swapchain resize
+sequence in isolation.
+
+![Vulkan clear and present example before and after resizing](examples/presentation/preview.gif)
+
 ## Ergonomic API (opt in)
 
 The generated module remains the complete low-level binding. The opt-in
