@@ -259,7 +259,9 @@ moving-master lane remain advisory while compiler compatibility is verified.
 GitHub Actions consumers can use the [shared Vulkan SDK action](.github/actions/setup-vulkan-ci/action.yml)
 after setting up V. Pass the SDK version and VulkanCI artifact tag from the
 consumer's compatibility manifest. In a checkout, run
-`v run .github/scripts/setup-vulkan-ci.vsh SDK_VERSION ARTIFACT_TAG`.
+`v run .github/scripts/setup-vulkan-ci.vsh SDK_VERSION ARTIFACT_TAG`. Set the
+action's optional `bindings-path` to install headers and Volk pinned by that
+checkout's `REGISTRY_COMMIT` and `VOLK_COMMIT`.
 For a local run, set `RUNNER_OS`, `RUNNER_TEMP` and `GITHUB_ENV`.
 On Windows, also set `GITHUB_PATH`.
 The shell entry point forwards to the V script in the same checkout.

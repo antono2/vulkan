@@ -7,6 +7,10 @@ inputs:
   artifact-tag:
     description: VulkanCI release tag that contains the SDK and SwiftShader archives
     required: true
+  bindings-path:
+    description: Optional Vulkan bindings checkout whose registry and Volk commits select the SDK headers
+    required: false
+    default: ''
 runs:
   using: composite
   steps:
@@ -18,3 +22,9 @@ runs:
       run: |
         v run "$GITHUB_ACTION_PATH/../../scripts/setup-vulkan-ci.vsh" \
           "$VULKAN_CI_SDK_VERSION" "$VULKAN_CI_ARTIFACT_TAG"
+    - name: Install binding-matched headers and Volk
+      if: inputs.bindings-path != ''
+      shell: bash
+      env:
+        VULKAN_CI_BINDINGS_PATH: ${{ inputs.bindings-path }}
+      run: v run "$GITHUB_ACTION_PATH/../../scripts/binding-headers.vsh" install "$VULKAN_CI_BINDINGS_PATH"
