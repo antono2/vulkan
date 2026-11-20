@@ -11,6 +11,10 @@ inputs:
     description: Optional Vulkan bindings checkout whose registry and Volk commits select the SDK headers
     required: false
     default: ''
+  volk-revision:
+    description: Optional separate Volk commit to install in the SDK
+    required: false
+    default: ''
 runs:
   using: composite
   steps:
@@ -27,4 +31,11 @@ runs:
       shell: bash
       env:
         VULKAN_CI_BINDINGS_PATH: ${{ inputs.bindings-path }}
-      run: v run "$GITHUB_ACTION_PATH/../../scripts/binding-headers.vsh" install "$VULKAN_CI_BINDINGS_PATH"
+        VULKAN_CI_VOLK_REVISION: ${{ inputs.volk-revision }}
+      run: v run "$GITHUB_ACTION_PATH/../../scripts/binding-headers.vsh" install "$VULKAN_CI_BINDINGS_PATH" "$VULKAN_CI_VOLK_REVISION"
+    - name: Install a separately pinned Volk revision
+      if: inputs.bindings-path == '' && inputs.volk-revision != ''
+      shell: bash
+      env:
+        VULKAN_CI_VOLK_REVISION: ${{ inputs.volk-revision }}
+      run: v run "$GITHUB_ACTION_PATH/../../scripts/binding-headers.vsh" install-volk "$VULKAN_CI_VOLK_REVISION"

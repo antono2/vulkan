@@ -1,0 +1,14 @@
+name: Stage Vulkan headers
+description: Stage binding-matched headers and Volk with the Linux system Vulkan loader
+inputs:
+  bindings-path:
+    description: Binding checkout containing REGISTRY_COMMIT and VOLK_COMMIT
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Stage binding-matched headers and Volk
+      shell: bash
+      env:
+        VULKAN_CI_BINDINGS_PATH: ${{ inputs.bindings-path }}
+      run: v run "$GITHUB_ACTION_PATH/../../scripts/binding-headers.vsh" stage "$VULKAN_CI_BINDINGS_PATH"

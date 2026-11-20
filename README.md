@@ -261,7 +261,13 @@ after setting up V. Pass the SDK version and VulkanCI artifact tag from the
 consumer's compatibility manifest. In a checkout, run
 `v run .github/scripts/setup-vulkan-ci.vsh SDK_VERSION ARTIFACT_TAG`. Set the
 action's optional `bindings-path` to install headers and Volk pinned by that
-checkout's `REGISTRY_COMMIT` and `VOLK_COMMIT`.
+checkout's `REGISTRY_COMMIT` and `VOLK_COMMIT`. Use `volk-revision` when a
+consumer pins Volk separately.
+
+Jobs that use the Linux system loader can use the
+[header staging action](.github/actions/stage-vulkan-headers/action.yml).
+It reads the same binding pins and exports a temporary `VULKAN_SDK` with a
+writable include directory and links to the installed SDK's library directories.
 For a local run, set `RUNNER_OS`, `RUNNER_TEMP` and `GITHUB_ENV`.
 On Windows, also set `GITHUB_PATH`.
 The shell entry point forwards to the V script in the same checkout.
