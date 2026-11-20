@@ -7,12 +7,15 @@ const volk_repository = 'https://github.com/zeux/volk.git'
 const header_directories = ['vulkan', 'vk_video']
 const volk_files = ['volk.h', 'volk.c']
 
-fn pin(path string) !string {
-	value := os.read_file(path)!.trim_space()
+fn require_pin(value string, label string) !string {
 	if value.len != 40 || !value.bytes().all(it.is_digit() || (it >= `a` && it <= `f`)) {
-		return error('${path} must contain a full Git commit ID.')
+		return error('${label} must contain a full Git commit ID.')
 	}
 	return value
+}
+
+fn pin(path string) !string {
+	return require_pin(os.read_file(path)!.trim_space(), path)
 }
 
 fn command(args []string) !string {
@@ -76,51 +79,107 @@ fn verify(root string, headers string, volk string) ! {
 	println('Bundled Vulkan headers and Volk match their pinned sources.')
 }
 
-fn install(sdk string, headers string, volk string) ! {
-	include := os.join_path(sdk, 'include')
-	destination := os.join_path(include, 'volk')
-	os.cp_all(headers, include, true)!
+fn copy_volk(source string, destination string) ! {
 	os.mkdir_all(destination)!
 	for name in volk_files {
-		os.cp(os.join_path(volk, name), os.join_path(destination, name))!
+		os.cp(os.join_path(source, name), os.join_path(destination, name))!
 	}
+}
+
+fn install(sdk string, headers string, volk string) ! {
+	include := os.join_path(sdk, 'include')
+	os.cp_all(headers, include, true)!
+	copy_volk(volk, os.join_path(include, 'volk'))!
 	println('Installed binding-matched Vulkan headers and Volk in ${include}.')
 }
 
+// Give the job pinned headers without altering the system loader or SDK.
+fn stage_sdk(temp string, source string, headers string, volk string) ! {
+	sdk := os.join_path(temp, 'vulkan-sdk-' + rand.uuid_v4())
+	os.mkdir(sdk)!
+	mut published := false
+	defer {
+		if !published {
+			os.rmdir_all(sdk) or {}
+		}
+	}
+	for directory in ['lib', 'lib64', 'bin'] {
+		system := os.join_path(source, directory)
+		if os.is_dir(system) {
+			os.symlink(system, os.join_path(sdk, directory))!
+		}
+	}
+	install(sdk, headers, volk)!
+	// Linux consumers may resolve <volk.h> directly from the SDK include directory.
+	copy_volk(volk, os.join_path(sdk, 'include'))!
+	line := 'VULKAN_SDK=${sdk}'
+	if path := os.getenv_opt('GITHUB_ENV') {
+		mut environment := os.open_append(path)!
+		defer { environment.close() }
+		environment.writeln(line)!
+	}
+	published = true
+	println(line)
+}
+
 fn run(args []string) ! {
-	usage := 'Usage: v run .github/scripts/binding-headers.vsh verify|install BINDINGS_DIR'
+	usage := 'Usage: v run .github/scripts/binding-headers.vsh verify|stage BINDINGS_DIR\n' +
+		'       v run .github/scripts/binding-headers.vsh install BINDINGS_DIR [VOLK_COMMIT]\n' +
+		'       v run .github/scripts/binding-headers.vsh install-volk VOLK_COMMIT'
 	if args in [['-h'], ['--help']] {
 		println(usage)
 		return
 	}
-	if args.len != 2 || args[0] !in ['verify', 'install'] {
+	if args.len < 2 || args.len > 3
+		|| args[0] !in ['verify', 'install', 'stage', 'install-volk']
+		|| (args.len == 3 && args[0] != 'install') {
 		return error(usage)
 	}
-	root := os.abs_path(args[1])
-	registry := pin(os.join_path(root, 'REGISTRY_COMMIT'))!
-	volk_commit := pin(os.join_path(root, 'VOLK_COMMIT'))!
+	mode := args[0]
 	sdk := os.getenv('VULKAN_SDK')
-	if args[0] == 'install' && (sdk == '' || !os.is_dir(os.join_path(sdk, 'include'))) {
-		return error('Set VULKAN_SDK to the CI SDK before installing binding headers.')
+	if mode != 'verify' && (sdk == '' || !os.is_dir(os.join_path(sdk, 'include'))) {
+		return error('Set VULKAN_SDK to an SDK with installed headers.')
 	}
-	temp := os.getenv('RUNNER_TEMP')
-	work := os.join_path(if temp == '' { os.temp_dir() } else { temp }, 'vulkan-headers-' +
-		rand.uuid_v4())
+	if mode == 'stage' && os.user_os() != 'linux' {
+		return error('Staging the system Vulkan SDK is supported on Linux.')
+	}
+	root := if mode == 'install-volk' { '' } else { os.abs_path(args[1]) }
+	volk_override := args[2] or { '' }
+	volk_commit := if mode == 'install-volk' {
+		require_pin(args[1], 'VOLK_COMMIT')!
+	} else if volk_override != '' {
+		require_pin(volk_override, 'VOLK_COMMIT')!
+	} else {
+		pin(os.join_path(root, 'VOLK_COMMIT'))!
+	}
+	registry := if mode == 'install-volk' { '' } else { pin(os.join_path(root, 'REGISTRY_COMMIT'))! }
+	runner_temp := os.getenv('RUNNER_TEMP')
+	temp := if runner_temp == '' { os.temp_dir() } else { os.abs_path(runner_temp) }
+	if temp.contains_any('\r\n') {
+		return error('The temporary directory must fit on one GitHub Actions environment line.')
+	}
+	work := os.join_path(temp, 'vulkan-headers-' + rand.uuid_v4())
 	os.mkdir(work)!
 	defer { os.rmdir_all(work) or {} }
-	headers := os.join_path(work, 'headers')
 	volk := os.join_path(work, 'volk')
-	fetch(headers, headers_repository, registry)!
 	fetch(volk, volk_repository, volk_commit)!
-	include := os.join_path(headers, 'include')
-	if !os.is_file(os.join_path(include, 'vulkan', 'vulkan_core.h'))
-		|| !volk_files.all(os.is_file(os.join_path(volk, it))) {
-		return error('The pinned checkouts are missing their native sources.')
+	if !volk_files.all(os.is_file(os.join_path(volk, it))) {
+		return error('The pinned Volk checkout is missing its native sources.')
 	}
-	if args[0] == 'verify' {
-		verify(root, include, volk)!
-	} else {
-		install(sdk, include, volk)!
+	if mode == 'install-volk' {
+		copy_volk(volk, os.join_path(sdk, 'include', 'volk'))!
+		return
+	}
+	headers := os.join_path(work, 'headers')
+	fetch(headers, headers_repository, registry)!
+	include := os.join_path(headers, 'include')
+	if !os.is_file(os.join_path(include, 'vulkan', 'vulkan_core.h')) {
+		return error('The pinned Vulkan-Headers checkout is missing its native sources.')
+	}
+	match mode {
+		'verify' { verify(root, include, volk)! }
+		'install' { install(sdk, include, volk)! }
+		else { stage_sdk(temp, os.abs_path(sdk), include, volk)! }
 	}
 }
 
