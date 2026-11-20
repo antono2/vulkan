@@ -179,41 +179,7 @@ jobs:
           artifact-tag: ${{ steps.compat.outputs.ci_runtime }}
       - name: Verify bundled headers and Volk against pinned upstream sources
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
-        shell: bash
-        run: |
-          set -euo pipefail
-          registry_commit=$(tr -d '\r\n' < REGISTRY_COMMIT)
-          registry_checkout="$RUNNER_TEMP/Vulkan-Headers"
-          git init "$registry_checkout"
-          git -C "$registry_checkout" remote add origin https://github.com/KhronosGroup/Vulkan-Headers.git
-          git -C "$registry_checkout" fetch --depth 1 origin "$registry_commit"
-          git -C "$registry_checkout" checkout --detach FETCH_HEAD
-          test "$(git -C "$registry_checkout" rev-parse HEAD)" = "$registry_commit"
-          while IFS= read -r -d '' header; do
-            cmp "$header" "c/vendor/include/${header#"$registry_checkout/include/"}"
-          done < <(find "$registry_checkout/include/vulkan" "$registry_checkout/include/vk_video" -name '*.h' -print0)
-          while IFS= read -r -d '' header; do
-            test -f "$registry_checkout/include/${header#c/vendor/include/}"
-          done < <(find c/vendor/include/vulkan c/vendor/include/vk_video -name '*.h' -print0)
-          registry_version=$(tr -d '\r\n' < VERSION)
-          [[ "$registry_version" =~ ^v[0-9]+\.[0-9]+\.([0-9]+)$ ]] || {
-            echo "Invalid Vulkan registry version: $registry_version" >&2
-            exit 1
-          }
-          header_version=${BASH_REMATCH[1]}
-          grep -F "#define VK_HEADER_VERSION $header_version" \
-            "c/vendor/include/vulkan/vulkan_core.h"
-
-          volk_commit=$(tr -d '\r\n' < VOLK_COMMIT)
-          curl --fail --silent --show-error --location \
-            "https://raw.githubusercontent.com/zeux/volk/$volk_commit/volk.h" \
-            --output "$RUNNER_TEMP/pinned-volk.h"
-          curl --fail --silent --show-error --location \
-            "https://raw.githubusercontent.com/zeux/volk/$volk_commit/volk.c" \
-            --output "$RUNNER_TEMP/pinned-volk.c"
-          # Git for Windows can check out tracked text with CRLF line endings.
-          cmp <(sed 's/\r$//' "$RUNNER_TEMP/pinned-volk.h") <(sed 's/\r$//' c/vendor/volk/volk.h)
-          cmp <(sed 's/\r$//' "$RUNNER_TEMP/pinned-volk.c") <(sed 's/\r$//' c/vendor/volk/volk.c)
+        run: v run .github/scripts/binding-headers.vsh verify .
       - name: Verify the public setup diagnostics
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash
