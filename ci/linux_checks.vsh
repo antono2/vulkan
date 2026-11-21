@@ -1,13 +1,13 @@
 // Run the Linux SDK, lifecycle, and window regressions used by Vulkan CI.
 import os
 
-const usage = 'Usage: v run ci/linux_checks.vsh old-headers SCRATCH | lifecycle SCRATCH CC | presentation SCRATCH GLFW_CHECKOUT'
+const usage = 'Usage: v run ci/linux_checks.vsh old-headers SCRATCH | lifecycle SCRATCH CC | tinycc SCRATCH | master-lifecycle SCRATCH | presentation SCRATCH GLFW_CHECKOUT'
 const usage_status = 2
 const validation_layer = 'VK_LAYER_KHRONOS_validation'
 // Emulate an SDK with Vulkan 1.3.275 headers, older than the bundled registry.
 const obsolete_core_header = '#define VK_HEADER_VERSION 275\n#define VK_HEADER_VERSION_COMPLETE VK_MAKE_API_VERSION(0, 1, 3, VK_HEADER_VERSION)\n'
 
-fn execute(args []string, log string) !string {
+fn run_logged(args []string, log string) !string {
 	result := os.exec(args)
 	if log != '' {
 		os.write_file(log, result.output)!
@@ -20,7 +20,7 @@ fn execute(args []string, log string) !string {
 }
 
 fn validated(args []string, log string) ! {
-	diagnostics := execute(args, log)!.to_lower_ascii()
+	diagnostics := run_logged(args, log)!.to_lower_ascii()
 	if ['validation error', 'validation warning', 'vuid-'].any(diagnostics.contains(it)) {
 		return error('Vulkan validation reported a problem. See ${log}.')
 	}
@@ -35,7 +35,7 @@ fn old_headers(root string, scratch string) ! {
 	os.write_file(os.join_path(include, 'volk', 'volk.h'), '')!
 	os.write_file(os.join_path(include, 'vulkan', 'vulkan_core.h'), obsolete_core_header)!
 	os.setenv('VULKAN_SDK', sdk, true)
-	diagnostics := execute([@VEXE, 'run', os.join_path(root, 'setup.vsh'), '--check'], os.join_path(scratch,
+	diagnostics := run_logged([@VEXE, 'run', os.join_path(root, 'setup.vsh'), '--check'], os.join_path(scratch,
 		'old-header-check.log'))!
 	version := os.read_file(os.join_path(root, 'VERSION'))!.trim_space().trim_string_left('v')
 	if !diagnostics.contains('Bundled Vulkan headers ${version} cover registry ${version}') {
@@ -54,6 +54,23 @@ fn lifecycle(root string, scratch string, compiler string) ! {
 	}
 }
 
+fn tinycc(root string, scratch string) ! {
+	run_logged([@VEXE, 'run', os.join_path(root, 'ci', 'test_setup_preserves_module.vsh')],
+		os.join_path(scratch, 'tinycc-preserved-module.log'))!
+	run_logged([@VEXE, '-cc', 'tcc', 'test', os.join_path(root, 'ergonomic')],
+		os.join_path(scratch, 'tinycc-ergonomic-tests.log'))!
+	os.setenv('VK_INSTANCE_LAYERS', validation_layer, true)
+	run_logged([@VEXE, '-cc', 'tcc', 'run', os.join_path(root, 'examples', 'ergonomic_lifecycle')],
+		os.join_path(scratch, 'tinycc-lifecycle.log'))!
+}
+
+fn master_lifecycle(root string, scratch string) ! {
+	os.setenv('VK_INSTANCE_LAYERS', validation_layer, true)
+	run_logged([@VEXE, '-new-compiler', '-cc', 'gcc', 'run',
+		os.join_path(root, 'examples', 'ergonomic_lifecycle')], os.join_path(scratch,
+		'master-lifecycle.log'))!
+}
+
 fn presentation(root string, scratch string, glfw string) ! {
 	modules := os.getenv('VMODULES')
 	if modules == '' || !os.is_file(os.join_path(glfw, 'v.mod')) {
@@ -68,10 +85,10 @@ fn presentation(root string, scratch string, glfw string) ! {
 	os.cp_all(glfw, destination, false)!
 	binary := os.join_path(scratch, 'presentation')
 	window_check := os.join_path(scratch, 'window-startup-check')
-	execute([@VEXE, '-cc', 'gcc', '-o', binary, os.join_path(root, 'examples', 'presentation')], '')!
-	execute([@VEXE, '-cc', 'tcc', '-o', window_check,
+	run_logged([@VEXE, '-cc', 'gcc', '-o', binary, os.join_path(root, 'examples', 'presentation')], '')!
+	run_logged([@VEXE, '-cc', 'tcc', '-o', window_check,
 		os.join_path(root, 'tests', 'desktop', 'window_startup.v')], '')!
-	execute([window_check, binary, os.join_path(scratch, 'window-startup-logs'), '--startup-only'],
+	run_logged([window_check, binary, os.join_path(scratch, 'window-startup-logs'), '--startup-only'],
 		'')!
 	os.setenv('VK_INSTANCE_LAYERS', validation_layer, true)
 	validated(['xvfb-run', '-a', binary], os.join_path(scratch, 'presentation.log'))!
@@ -94,6 +111,12 @@ fn run(args []string) ! {
 		}
 		args[0] == 'lifecycle' && args.len == 3 {
 			lifecycle(root, scratch, args[2])!
+		}
+		args[0] == 'tinycc' && args.len == 2 {
+			tinycc(root, scratch)!
+		}
+		args[0] == 'master-lifecycle' && args.len == 2 {
+			master_lifecycle(root, scratch)!
 		}
 		args[0] == 'presentation' && args.len == 3 {
 			presentation(root, scratch, os.abs_path(args[2]))!

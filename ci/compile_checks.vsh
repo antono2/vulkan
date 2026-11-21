@@ -2,7 +2,7 @@
 import os
 import rand
 
-const usage = 'Usage: v run ci/compile_checks.vsh stage VMODULES | build-source SOURCE {v3|master} | frontend | smoke SCRATCH CC {stable|v3|master}'
+const usage = 'Usage: v run ci/compile_checks.vsh compatibility {stable|v3|master} | source-warning {v3|master} | stage VMODULES | build-source SOURCE {v3|master} | frontend | smoke SCRATCH CC {stable|v3|master}'
 const usage_status = 2
 const root_files = ['vulkan.v', 'vulkan_video.v', 'loader.v', 'v.mod', 'VERSION', 'REGISTRY_COMMIT',
 	'VOLK_COMMIT']
@@ -30,6 +30,17 @@ fn append_actions_file(variable string, value string) ! {
 		defer { file.close() }
 		file.writeln(value)!
 	}
+}
+
+fn compatibility(root string, profile string) ! {
+	output := os.getenv('GITHUB_OUTPUT')
+	if output == '' {
+		return error('Set GITHUB_OUTPUT to the compatibility output file.')
+	}
+	script := os.join_path(root, 'scripts', 'compatibility.vsh')
+	command(@VEXE, ['run', script, '--self-test'])!
+	command(@VEXE, ['run', os.join_path(root, 'scripts', 'doctor.vsh'), '--self-test'])!
+	command(@VEXE, ['run', script, '--profile', profile, '--github-output', output])!
 }
 
 fn stage(root string, modules string) ! {
@@ -131,6 +142,15 @@ fn run(args []string) ! {
 	}
 	root := os.dir(@DIR)
 	match true {
+		args.len == 2 && args[0] == 'compatibility' && args[1] in ['stable', 'v3', 'master'] {
+			compatibility(root, args[1])!
+		}
+		args == ['source-warning', 'v3'] {
+			println('::warning::The required strict V3 frontend passed, but full V3 C compilation remains advisory.')
+		}
+		args == ['source-warning', 'master'] {
+			println('::warning::The moving V master compatibility lane failed; stable V 0.5.2 remains authoritative.')
+		}
 		args.len == 2 && args[0] == 'stage' && args[1] != '' {
 			stage(root, os.abs_path(args[1]))!
 		}

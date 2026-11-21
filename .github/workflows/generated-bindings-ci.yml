@@ -32,12 +32,7 @@ jobs:
           version: 0.5.2
       - name: Validate and resolve tested compatibility
         id: compat
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        run: |
-          v run scripts/compatibility.vsh --self-test
-          v run ./scripts/doctor.vsh --self-test
-          v run scripts/compatibility.vsh --github-output "$GITHUB_OUTPUT"
+        run: v run ci/compile_checks.vsh compatibility stable
       - name: Test the generated-change policy
         run: v run .github/scripts/generated-change-scope.vsh --self-test
       - name: Test Vulkan package release metadata
@@ -77,12 +72,7 @@ jobs:
           version: 0.5.2
       - name: Validate and resolve tested compatibility
         id: compat
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        run: |
-          v run scripts/compatibility.vsh --self-test
-          v run ./scripts/doctor.vsh --self-test
-          v run scripts/compatibility.vsh --profile '${{ matrix.v-channel }}' --github-output "$GITHUB_OUTPUT"
+        run: v run ci/compile_checks.vsh compatibility "${{ matrix.v-channel }}"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: antono2/v_vulkan_bindings
@@ -167,19 +157,10 @@ jobs:
         run: v run ci/compile_checks.vsh smoke "${{ runner.temp }}" "${{ matrix.compiler }}" "${{ matrix.v-channel }}"
       - name: Validate TinyCC loader and ergonomic API
         if: runner.os == 'Linux' && matrix.v-channel == 'stable'
-        shell: bash
-        run: |
-          set -euo pipefail
-          v run ci/test_setup_preserves_module.vsh
-          v -cc tcc test ergonomic
-          VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
-            v -cc tcc run examples/ergonomic_lifecycle
+        run: v run ci/linux_checks.vsh tinycc "${{ runner.temp }}"
       - name: Exercise current V3 device discovery and lifecycle
         if: runner.os == 'Linux' && matrix.v-channel == 'master'
-        shell: bash
-        run: |
-          VK_INSTANCE_LAYERS=VK_LAYER_KHRONOS_validation \
-            v -new-compiler -cc gcc run examples/ergonomic_lifecycle
+        run: v run ci/linux_checks.vsh master-lifecycle "${{ runner.temp }}"
       - name: Check out presentation example dependency
         if: runner.os == 'Linux' && matrix.v-channel == 'stable'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -199,13 +180,7 @@ jobs:
 
       - name: Report source compiler compatibility warning
         if: always() && matrix.v-channel != 'stable' && (steps.checkout_v_source.outcome == 'failure' || steps.setup_v_source.outcome == 'failure' || steps.compile.outcome == 'failure')
-        shell: bash
-        run: |
-          if [[ "${{ matrix.v-channel }}" == v3 ]]; then
-            echo "::warning::The required strict V3 frontend passed, but full V3 C compilation remains advisory."
-          else
-            echo "::warning::The moving V master compatibility lane failed; stable V 0.5.2 remains authoritative."
-          fi
+        run: v run ci/compile_checks.vsh source-warning "${{ matrix.v-channel }}"
       - name: Run lifecycle under validation
         if: runner.os == 'Linux' && matrix.v-channel == 'stable'
         run: v run ci/linux_checks.vsh lifecycle "${{ runner.temp }}" "${{ matrix.compiler }}"
@@ -236,12 +211,7 @@ jobs:
           version: 0.5.2
       - name: Validate and resolve tested compatibility
         id: compat
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        run: |
-          v run scripts/compatibility.vsh --self-test
-          v run ./scripts/doctor.vsh --self-test
-          v run scripts/compatibility.vsh --github-output "$GITHUB_OUTPUT"
+        run: v run ci/compile_checks.vsh compatibility stable
       - name: Validate and publish the package release
         env:
           GH_TOKEN: ${{ github.token }}
