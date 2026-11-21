@@ -1,0 +1,9 @@
+name: Set up MSVC x64
+description: Discover Visual Studio with V and expose its x64 compiler and SDK to later Windows steps
+runs:
+  using: composite
+  steps:
+    - name: Discover Visual Studio x64 tools
+      shell: pwsh
+      working-directory: ${{ github.action_path }}/../../../ci
+      run: v run setup_msvc.vsh

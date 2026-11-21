@@ -272,6 +272,12 @@ For a local run, set `RUNNER_OS`, `RUNNER_TEMP` and `GITHUB_ENV`.
 On Windows, also set `GITHUB_PATH`.
 The shell entry point forwards to the V script in the same checkout.
 
+Windows jobs can use the [MSVC setup action](.github/actions/setup-msvc/action.yml)
+after installing V. Reference `antono2/vulkan/.github/actions/setup-msvc@<commit>`
+with a pinned commit. The action makes the Visual Studio x64 compiler, headers,
+and libraries available to subsequent steps. The runner needs Visual Studio's
+**Desktop development with C++** workload.
+
 The generated registry snapshot determines which declarations are available.
 The installed Vulkan loader and driver must still support every command,
 extension and feature an application requests. Successful compilation alone
