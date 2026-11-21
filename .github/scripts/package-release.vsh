@@ -2,9 +2,12 @@
 import os
 import v.vmod
 
+const version_component_count = 3 // major, minor, patch
+
 fn release_title(version string, tag string, registry string) !string {
 	parts := version.split('.')
-	if parts.len != 3 || !parts.all(it.len > 0 && it.bytes().all(it.is_digit())) {
+	if parts.len != version_component_count || !parts.all(it.len > 0
+		&& it.bytes().all(it.is_digit())) {
 		return error('Invalid package version: ${version}')
 	}
 	if tag != 'v${version}' {
