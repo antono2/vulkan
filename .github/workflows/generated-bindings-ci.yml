@@ -40,6 +40,8 @@ jobs:
           v run scripts/compatibility.vsh --github-output "$GITHUB_OUTPUT"
       - name: Test the generated-change policy
         run: v run .github/scripts/generated-change-scope.vsh --self-test
+      - name: Test Vulkan package release metadata
+        run: v run .github/scripts/package-release.vsh --self-test
       - name: Verify generated binding change scope
         env:
           BASE_REF: ${{ github.base_ref }}
@@ -344,15 +346,4 @@ jobs:
       - name: Validate and publish the package release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          package_version=$(sed -n "s/^[[:space:]]*version: '\([^']*\)'.*/\1/p" v.mod)
-          [[ "$package_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
-            echo "Invalid package version: $package_version" >&2
-            exit 1
-          }
-          test "$GITHUB_REF_NAME" = "v$package_version"
-          registry_version=$(tr -d '\r\n' < VERSION)
-          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
-            gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes \
-              --title "antono2.vulkan $GITHUB_REF_NAME (registry $registry_version)"
+        run: v run .github/scripts/package-release.vsh
