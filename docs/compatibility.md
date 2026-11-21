@@ -22,6 +22,24 @@ decoding or OpenCL interoperability. Use the tested V compiler from `compatibili
 Choose `--profile v3` for the pinned V3 compiler or `--profile release` for
 the released compiler when the project defines multiple profiles.
 
+## Reproduce the compiler smoke checks
+
+From the Vulkan checkout, put the generator revision pinned in
+`compatibility.json` under `generator/` and install the Vulkan SDK. With the
+tested V release and GCC on `PATH`, run the Linux stable lane in an isolated
+module directory.
+
+```sh
+scratch=$(mktemp -d)
+export VMODULES="$scratch/modules"
+v run ci/compile_checks.vsh stage "$VMODULES"
+v run ci/compile_checks.vsh smoke "$scratch" gcc stable
+```
+
+To run just the strict frontend checks, put the pinned V3 compiler on `PATH`,
+set `VULKAN_SDK`, and run `v run ci/compile_checks.vsh frontend` with the staged
+module directory.
+
 ## Vulkan SDK setup in GitHub Actions
 
 After installing V on the runner, use the SDK setup action with the VulkanCI
