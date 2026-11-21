@@ -2,13 +2,17 @@
 import os
 import rand
 
+// Full Git SHA-1 object IDs have 40 hexadecimal digits.
+const commit_id_hex_digits = 40
+const version_component_count = 3 // major, minor, patch
 const headers_repository = 'https://github.com/KhronosGroup/Vulkan-Headers.git'
 const volk_repository = 'https://github.com/zeux/volk.git'
 const header_directories = ['vulkan', 'vk_video']
 const volk_files = ['volk.h', 'volk.c']
 
 fn require_pin(value string, label string) !string {
-	if value.len != 40 || !value.bytes().all(it.is_digit() || (it >= `a` && it <= `f`)) {
+	if value.len != commit_id_hex_digits || !value.bytes().all(it.is_digit()
+		|| (it >= `a` && it <= `f`)) {
 		return error('${label} must contain a full Git commit ID.')
 	}
 	return value
@@ -64,8 +68,8 @@ fn verify(root string, headers string, volk string) ! {
 	}
 	version := os.read_file(os.join_path(root, 'VERSION'))!.trim_space()
 	parts := version.trim_string_left('v').split('.')
-	if !version.starts_with('v') || parts.len != 3 || !parts.all(it.len > 0
-		&& it.bytes().all(it.is_digit())) {
+	if !version.starts_with('v') || parts.len != version_component_count
+		|| !parts.all(it.len > 0 && it.bytes().all(it.is_digit())) {
 		return error('Invalid Vulkan registry version: ${version}.')
 	}
 	core := os.read_file(os.join_path(bundled, 'vulkan', 'vulkan_core.h'))!
