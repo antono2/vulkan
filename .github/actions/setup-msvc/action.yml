@@ -5,4 +5,5 @@ runs:
   steps:
     - name: Discover Visual Studio x64 tools
       shell: pwsh
-      run: v run "$env:GITHUB_ACTION_PATH/../../../ci/setup_msvc.vsh"
+      working-directory: ${{ github.action_path }}/../../../ci
+      run: v run setup_msvc.vsh
