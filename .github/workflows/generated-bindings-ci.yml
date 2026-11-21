@@ -33,6 +33,8 @@ jobs:
       - name: Validate and resolve tested compatibility
         id: compat
         run: v run ci/compile_checks.vsh compatibility stable
+      - name: Test MSVC environment capture and output
+        run: v test ci/msvcenv
       - name: Test the generated-change policy
         run: v run .github/scripts/generated-change-scope.vsh --self-test
       - name: Test Vulkan package release metadata
@@ -127,6 +129,9 @@ jobs:
       - name: Verify bundled headers and Volk against pinned upstream sources
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         run: v run .github/scripts/binding-headers.vsh verify .
+      - name: Configure MSVC x64 for native tests
+        if: runner.os == 'Windows'
+        uses: ./.github/actions/setup-msvc
       - name: Verify the public setup diagnostics
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         shell: bash
