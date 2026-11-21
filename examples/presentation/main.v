@@ -5,8 +5,11 @@ import antono2.glfw
 import antono2.vulkan as vk
 import antono2.vulkan.ergonomic as vke
 import examples.presentation.windowing
+import os
+import time
 
-fn C.glfwSetWindowSize(window &glfw.Window, width int, height int)
+const resize_timeout = 5 * time.second
+
 fn main() {
 	run() or {
 		eprintln(err)
@@ -47,12 +50,38 @@ fn run() ! {
 	})!
 	defer { device.destroy() }
 	render_generation(physical, device, surface, window)!
+	if '--startup-only' in os.args[1..] {
+		// The startup fixture's minimal manager handles mapping only.
+		return
+	}
 	resized_width := 800
 	resized_height := 450
-	C.glfwSetWindowSize(window, resized_width, resized_height)
-	glfw.poll_events()
+	resize_window(window, resized_width, resized_height)!
 	render_generation(physical, device, surface, window)!
 	println('Presented two swapchain generations, including resize.')
+}
+
+fn resize_window(window &glfw.Window, width int, height int) ! {
+	mut previous_width := i32(0)
+	mut previous_height := i32(0)
+	glfw.get_framebuffer_size(window, &previous_width, &previous_height)
+	glfw.set_window_size(window, width, height)
+	timer := time.new_stopwatch()
+	for {
+		mut current_width := i32(0)
+		mut current_height := i32(0)
+		glfw.get_framebuffer_size(window, &current_width, &current_height)
+		if current_width > 0 && current_height > 0
+			&& (current_width != previous_width || current_height != previous_height) {
+			return
+		}
+		remaining := resize_timeout - timer.elapsed()
+		if remaining <= 0 {
+			return error('Framebuffer did not resize after requesting ${width}x${height}')
+		}
+		// X11 window managers can apply the resize asynchronously.
+		glfw.wait_events_timeout(f64(remaining) / f64(time.second))
+	}
 }
 
 fn render_generation(physical vke.PhysicalDevice, device &vke.OwnedDevice, surface vk.SurfaceKHR, window &glfw.Window) ! {
