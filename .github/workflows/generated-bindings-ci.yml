@@ -124,15 +124,7 @@ jobs:
         if: matrix.v-channel != 'stable' && steps.checkout_v_source.outcome == 'success'
         id: setup_v_source
         continue-on-error: ${{ matrix.v-channel == 'master' }}
-        shell: bash
-        run: |
-          if [[ "${{ matrix.v-channel }}" == v3 ]]; then
-            make -C .ci-v-source local=1
-          else
-            make -C .ci-v-source
-          fi
-          echo "$GITHUB_WORKSPACE/.ci-v-source" >> "$GITHUB_PATH"
-          .ci-v-source/v version
+        run: v run ci/compile_checks.vsh build-source .ci-v-source "${{ matrix.v-channel }}"
       - name: Check the SDK setup entry point
         if: runner.os == 'Linux' && (matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success')
         run: sh .github/scripts/setup-vulkan-ci.sh --help
@@ -164,69 +156,15 @@ jobs:
           bindings-path: .
       - name: Assemble isolated module
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
-        shell: bash
-        run: |
-          set -euo pipefail
-          module_root="$RUNNER_TEMP/vmodules/antono2/vulkan"
-          mkdir -p "$module_root/c" "$module_root/ergonomic"
-          cp vulkan.v vulkan_video.v loader.v v.mod VERSION REGISTRY_COMMIT VOLK_COMMIT "$module_root/"
-          cp c/loader_bridge.h c/volk.c.v c/volk_impl.h c/vulkan_core_prelude.h "$module_root/c/"
-          cp -R c/vendor "$module_root/c/"
-          cp ergonomic/*.v "$module_root/ergonomic/"
-          echo "VMODULES=$RUNNER_TEMP/vmodules" >> "$GITHUB_ENV"
+        run: v run ci/compile_checks.vsh stage "${{ runner.temp }}/vmodules"
       - name: Type-check with the strict V3 frontend
         if: matrix.v-channel == 'v3'
-        shell: bash
-        run: |
-          set -euo pipefail
-          v \
-            -new-compiler \
-            -check \
-            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan/c/vendor/volk -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
-            generator/test/main.c.v
-          v \
-            -new-compiler \
-            -d vulkan_xlib \
-            -check \
-            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan/c/vendor/volk -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
-            generator/test/main.c.v
-          v \
-            -new-compiler \
-            -check \
-            -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan/c/vendor/volk -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include" \
-            ci/bundled_header_smoke
+        run: v run ci/compile_checks.vsh frontend
       - name: Compile smoke test and ergonomic unit tests
         id: compile
         if: matrix.v-channel == 'stable' || steps.setup_v_source.outcome == 'success'
         continue-on-error: ${{ matrix.v-channel != 'stable' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          v_flags=(-cc "${{ matrix.compiler }}")
-          if [[ "${{ matrix.v-channel }}" == v3 ]]; then
-            # Strict V3 does not yet expand module-relative or environment-
-            # derived #flag include paths, so pass the verified paths explicitly.
-            v_flags=(
-              -new-compiler
-              "${v_flags[@]}"
-              -cflags "-I$VMODULES/antono2/vulkan/c/vendor/include -I$VMODULES/antono2/vulkan/c/vendor/volk -I$VMODULES/antono2/vulkan -I$VULKAN_SDK/include"
-            )
-          fi
-          if [[ "${{ runner.os }}" == macOS ]]; then
-            v "${v_flags[@]}" -o "$RUNNER_TEMP/vulkan-smoke" generator/test
-          else
-            v "${v_flags[@]}" run generator/test
-          fi
-          v "${v_flags[@]}" -o "$RUNNER_TEMP/bundled-header-smoke" ci/bundled_header_smoke
-          v "${v_flags[@]}" run ci/header_order_smoke
-          v "${v_flags[@]}" test ergonomic
-          v run scripts/check_docs.vsh
-          v "${v_flags[@]}" -o "$RUNNER_TEMP/vulkan-first-use" examples/getting_started
-          v "${v_flags[@]}" -o "$RUNNER_TEMP/vulkan-conveniences" examples/conveniences
-          if [[ "${{ runner.os }}" == Linux && "${{ matrix.v-channel }}" == stable ]]; then
-            v -d vulkan_xlib -cc "${{ matrix.compiler }}" \
-              -o "$RUNNER_TEMP/vulkan-xlib-smoke" ci/platform_xlib
-          fi
+        run: v run ci/compile_checks.vsh smoke "${{ runner.temp }}" "${{ matrix.compiler }}" "${{ matrix.v-channel }}"
       - name: Validate TinyCC loader and ergonomic API
         if: runner.os == 'Linux' && matrix.v-channel == 'stable'
         shell: bash
