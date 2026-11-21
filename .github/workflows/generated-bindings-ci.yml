@@ -38,50 +38,13 @@ jobs:
           v run scripts/compatibility.vsh --self-test
           v run ./scripts/doctor.vsh --self-test
           v run scripts/compatibility.vsh --github-output "$GITHUB_OUTPUT"
-      - name: Accept only generated binding files
+      - name: Test the generated-change policy
+        run: v run .github/scripts/generated-change-scope.vsh --self-test
+      - name: Verify generated binding change scope
         env:
           BASE_REF: ${{ github.base_ref }}
           HEAD_REF: ${{ github.head_ref }}
-        run: |
-          set -euo pipefail
-          git fetch --no-tags origin "$BASE_REF"
-          mapfile -t changed < <(git diff --name-only "origin/$BASE_REF...HEAD")
-          ((${#changed[@]} > 0)) || {
-            echo "The generated update contains no changed files" >&2
-            exit 1
-          }
-
-          version_changed=false
-          registry_commit_changed=false
-          for path in "${changed[@]}"; do
-            [[ "$path" == VERSION ]] && version_changed=true
-            [[ "$path" == REGISTRY_COMMIT ]] && registry_commit_changed=true
-          done
-
-          if [[ "$version_changed" == true && "$HEAD_REF" != generated/* ]]; then
-            echo "VERSION may only change through a generated/* update branch" >&2
-            exit 1
-          fi
-          if [[ "$HEAD_REF" != generated/* ]]; then
-            exit 0
-          fi
-          [[ "$version_changed" == true ]] || {
-            echo "A generated update must change VERSION" >&2
-            exit 1
-          }
-          [[ "$registry_commit_changed" == true ]] || {
-            echo "A generated update must change REGISTRY_COMMIT" >&2
-            exit 1
-          }
-          for path in "${changed[@]}"; do
-            case "$path" in
-              VERSION|REGISTRY_COMMIT|vulkan.v|vulkan_video.v|c/vendor/include/vulkan/*.h|c/vendor/include/vk_video/*.h) ;;
-              *)
-                echo "Unexpected file in generated update: $path" >&2
-                exit 1
-                ;;
-            esac
-          done
+        run: v run .github/scripts/generated-change-scope.vsh
 
   compile-smoke-matrix:
     name: compile-smoke-test (${{ matrix.os }}, ${{ matrix.compiler }}, ${{ matrix.v-channel }})
