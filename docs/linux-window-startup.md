@@ -15,12 +15,14 @@ The V regression fixture runs in a private Xvfb display. It checks ordinary
 mapping, window-manager handover, a dropped first map request, a manager that
 never maps, and an explicitly minimized window. No input reaches the user's
 desktop. Install `xvfb`, `xauth`, `openbox`, `libx11-dev`, Lavapipe and the Vulkan
-validation layers before running it. Use each repository's supported compiler
-and dependency setup.
+validation layers before running it. Use the supported V release with GCC and
+TinyCC. For the CI entry point, set `VMODULES` to a fresh module directory
+containing this checkout as `antono2/vulkan`, and pass a GLFW v2.0.1 checkout.
 
 ```sh
-export V_C_ERROR_BUG_REPORT_DISABLED=1
-v -cc gcc -o /tmp/startup-probe examples/presentation
-v -cc tcc -o /tmp/startup-check tests/desktop/window_startup.v
-/tmp/startup-check /tmp/startup-probe /tmp/startup-logs
+v run ci/linux_checks.vsh presentation /tmp/vulkan-presentation /path/to/glfw
 ```
+
+The driver checks startup and the first rendered frames with the fixture's
+minimal manager, then runs the complete two-generation presentation check. Both
+sets of logs go in the scratch directory.
