@@ -66,7 +66,9 @@ fn tinycc(root string, scratch string) ! {
 
 fn master_lifecycle(root string, scratch string) ! {
 	os.setenv('VK_INSTANCE_LAYERS', validation_layer, true)
-	run_logged([@VEXE, '-new-compiler', '-cc', 'gcc', 'run',
+	// Current V uses V3 by default and no longer accepts -new-compiler.
+	// The separate pinned V3 checks retain the flag their compiler requires.
+	run_logged([@VEXE, '-cc', 'gcc', 'run',
 		os.join_path(root, 'examples', 'ergonomic_lifecycle')], os.join_path(scratch,
 		'master-lifecycle.log'))!
 }
