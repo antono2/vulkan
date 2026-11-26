@@ -1,0 +1,47 @@
+name: Common V toolchain
+on:
+  pull_request:
+  push:
+    branches: [master]
+    paths: ['toolchain.json', '.github/actions/setup-v/**', '.github/workflows/toolchain.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  V_C_ERROR_BUG_REPORT_DISABLED: '1'
+jobs:
+  bootstrap:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            bootstrap: tcc
+            cc: tcc
+          - os: macos-15
+            bootstrap: tcc
+            cc: clang
+          - os: windows-2022
+            bootstrap: tcc
+            cc: tcc
+          - os: windows-2022
+            bootstrap: msvc
+            cc: msvc
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: ./.github/actions/setup-v
+        with:
+          windows-bootstrap: ${{ matrix.bootstrap }}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: antono2/minimp4
+          path: fixtures/minimp4
+      - uses: ./.github/actions/setup-msvc
+        if: matrix.cc == 'msvc'
+      - name: Test native callbacks with the installed compiler
+        shell: bash
+        env:
+          TEST_CC: ${{ matrix.cc }}
+        run: v -cc "$TEST_CC" -cflags '-DWIN32_LEAN_AND_MEAN' test fixtures/minimp4

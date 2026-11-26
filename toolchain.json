@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "v": "c0bb94990c4c2cd080b27b4e2cbc88a347c6bb4c",
+  "vc": "1bf1afbd0423212c7555801f5c9c0f56cb8558ab",
+  "linux_tcc": "60d606e37e6afe1ac5801fd88c55036a56b7caae",
+  "windows_tcc": "c2f1eaf22973877b336b8064271d725aa15a420a",
+  "macos_x64_tcc": "566b6dfdb843763533e2134423f75139b4285a03",
+  "macos_arm64_tcc": "69ba759bc4ec12bff4098828b5464e99bd29954a"
+}
