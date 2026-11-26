@@ -1,0 +1,67 @@
+name: Set up the tested V toolchain
+description: Build the common current V/VC/TinyCC snapshot without a legacy compiler installation
+inputs:
+  windows-bootstrap:
+    description: Windows bootstrap compiler (tcc or msvc)
+    default: tcc
+outputs:
+  root:
+    description: Absolute compiler checkout path
+    value: ${{ steps.verify.outputs.root }}
+  exe:
+    description: Absolute V executable path
+    value: ${{ steps.verify.outputs.exe }}
+  revision:
+    description: Tested V source revision
+    value: ${{ steps.verify.outputs.revision }}
+runs:
+  using: composite
+  steps:
+    - name: Read the common toolchain manifest
+      id: manifest
+      shell: bash
+      run: printf 'json=%s\n' "$(tr -d '\r\n' < "$GITHUB_ACTION_PATH/../../../toolchain.json")" >> "$GITHUB_OUTPUT"
+    - name: Stage the exact compiler and bootstrap inputs
+      id: checkout
+      shell: bash
+      env:
+        V_REVISION: ${{ fromJSON(steps.manifest.outputs.json).v }}
+        VC_REVISION: ${{ fromJSON(steps.manifest.outputs.json).vc }}
+        TCC_REVISION: ${{ runner.os == 'Windows' && fromJSON(steps.manifest.outputs.json).windows_tcc || runner.os == 'macOS' && (runner.arch == 'ARM64' && fromJSON(steps.manifest.outputs.json).macos_arm64_tcc || fromJSON(steps.manifest.outputs.json).macos_x64_tcc) || fromJSON(steps.manifest.outputs.json).linux_tcc }}
+        WINDOWS_BOOTSTRAP: ${{ inputs.windows-bootstrap }}
+        GIT_TERMINAL_PROMPT: '0'
+      run: |
+        case "$WINDOWS_BOOTSTRAP" in tcc|msvc) ;; *) echo 'Expected tcc or msvc' >&2; exit 2 ;; esac
+        root="$RUNNER_TEMP/antono2-v-$V_REVISION-$WINDOWS_BOOTSTRAP"
+        if [ ! -e "$root" ]; then
+          git init "$root"
+          git -C "$root" remote add origin https://github.com/vlang/v.git
+          git -C "$root" fetch --depth 1 origin "$V_REVISION"
+          git -C "$root" checkout --detach FETCH_HEAD
+          git init "$root/vc"
+          git -C "$root/vc" remote add origin https://github.com/vlang/vc.git
+          git -C "$root/vc" fetch --depth 1 origin "$VC_REVISION"
+          git -C "$root/vc" checkout --detach FETCH_HEAD
+          git init "$root/thirdparty/tcc"
+          git -C "$root/thirdparty/tcc" remote add origin https://github.com/vlang/tccbin.git
+          git -C "$root/thirdparty/tcc" fetch --depth 1 origin "$TCC_REVISION"
+          git -C "$root/thirdparty/tcc" checkout --detach FETCH_HEAD
+        fi
+        printf 'root=%s\n' "$root" >> "$GITHUB_OUTPUT"
+    - name: Bootstrap V on Unix
+      if: runner.os != 'Windows'
+      shell: bash
+      working-directory: ${{ steps.checkout.outputs.root }}
+      run: if [ ! -x ./v ]; then env -u VEXE make local=1; fi
+    - name: Bootstrap V on Windows
+      if: runner.os == 'Windows'
+      shell: cmd
+      working-directory: ${{ steps.checkout.outputs.root }}
+      run: if not exist v.exe (set VEXE=&& call makev.bat -${{ inputs.windows-bootstrap }} --local)
+    - name: Verify the installed toolchain
+      id: verify
+      shell: bash
+      env:
+        TOOLCHAIN_ROOT: ${{ steps.checkout.outputs.root }}
+        V_C_ERROR_BUG_REPORT_DISABLED: '1'
+      run: '"$TOOLCHAIN_ROOT/v" run "$GITHUB_ACTION_PATH/verify.vsh"'
